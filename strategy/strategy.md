@@ -36,7 +36,7 @@ Since this app uses a relatively simple design and is based on a private functio
 
 ## 2. Project Proposal
 
-<!-- Write this last. Introductory paragraph that sums up each of the sections below. -->
+Ist is a task management tool designed to support users with difficulties in task prioritization, initiation, sustained attention, and working memory.
 
 ### 2.1. Problem Statement & Scope
 
@@ -85,29 +85,38 @@ The productivity space is full of strong competitors with larger budgets, establ
 -   **Risk**: Users working with varying cognitive challenges may struggle to navigate and utilize Ist effectively, leading to frustration and disengagement.
     -   **Mitigation**: Conduct user research and testing with individuals representing a diverse range of cognitive abilities, to ensure Ist is intuitive and accessible to all users. Provide clear, simple instructions and support features for users who may require additional assistance.
 
-### 2.4. Requirements
+### 2.4. Functional Requirements
 
-<!-- Specific, measurable goals for delivery. For a new app, a bullet-pointed list of the app's essential functionality (minimum viable product). For an existing app, improvement objectives such as streamlined navigation, visual redesign, and new features. -->
+-   A front page and documentation that clarify features and their uses
+-   Quickly and smoothly log into Todoist and Dynalist, with security assurances
+-   User-friendly onboarding process and set-up guides
+-   Show only the single task that is accessible and most important right now
+-   Satisfying to mark task 'done', quick and easy to defer with precision
+-   Customization options (e.g. urgency vs. importance, order of contexts), organize tasks to suit ever-changing individual workflow
+-   Break down tasks into checklists for better focus
+-   Progress tracking with color-coded bars and potential future features like task streaks, custom daily quests, and weekly stats
+-   Accessibility features and audits to ensure usability
+-   Edit task metadata inline (e.g. priority, context, comments)
 
 ### 2.5. Stakeholders & Communication Plan
 
-<!-- People, teams, and organizations involved in the project, and what level of communication and involvement they expect. How to coordinate between stakeholders, including frequency of meetings, reporting structures, and communication channels. -->
+I am a solo developer and the only stakeholder. I will regularly commit project updates to [the Github repo](https://github.com/realmikkifriend/ist/).
 
 ### 2.6 Technical & Resource Requirements
 
-<!-- A list of required resources, which will start vague and become more detailed over time. Server needs, ideally with scaling. Whether, what type, and how much data storage is needed. Desired qualities in the final technology stack, such as programming languages, frameworks, APIs, etc. Budget and expenses, both for development and ongoing hosting and maintenance. Allocating key roles and responsibilities to team members. -->
+This project should incur almost zero expenses. Only a very simple server setup is required. If Ist's user base ever grows, I can look into scalable cloud hosting. All data is stored by Todoist and Dynalist and accessed via their APIs, except basic user information stored as browser cookies. Because I'm most familiar with JavaScript, the app will be written using a JS front-end framework and NodeJS as a back-end.
 
-### 2.7 Timeframe
-
-<!-- A specific or general timeframe for development, from start to delivery of MVP and beyond. General milestones based on measureable outcomes. -->
+As a solo developer, I will fulfill roles of project management, front- and back-end development, interface design, testing, and deployment.
 
 ### 2.8. Evaluation & Success Measures
 
-<!-- How the project will be monitored and evaluated. Specific and quantifiable success measures corresponding to objectives. -->
+Should user engagement and retention ever become important measures within this project, they will be tracked according to the following metrics:
+
+-   **User Engagement**: Daily active users (DAU) and weekly active users (WAU)
+-   **Task Completion Rate**: Percentage of (anonymized) tasks marked 'done' by users.
+-   **Satisfaction**: Conduct user surveys to evaluate satisfaction.
 
 ## 3. User Research
-
-<!-- An overview of the research conducted and brief summary of the deliverables. -->
 
 ### 3.1. User Personae
 
