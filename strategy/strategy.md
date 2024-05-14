@@ -7,11 +7,8 @@ Developed by Mikki Friend.
 I have always had extra trouble completing the tasks of daily living. I designed Ist over many years and iterations, incorporating the knowledge of occupational therapists (those who study how to help people do things better) to support the following executive functions:
 
 -   **Task prioritization**: I am very good at making a detailed list of everything I need to do. But when I try to do the things on the list, I have trouble figuring out which are most important or need to be done in order.
-
 -   **Task initiation**: If I'm not confident that the next task is the 'right' thing to do next, I procrastinate and lose track of time.
-
 -   **Sustained attention**: I find it hard to stay focused on one thing for a long time. I work best when the task is broken down into smaller steps, presented one at a time. I can multitask within reason, as long as I am reminded to not forget about a task while doing others.
-
 -   **Working memory**: If I can't work on a task right now, I don't want to see it and risk being distracted. I would rather have tasks hidden until I need them.
 
 Ist helps people like me complete tasks with less distraction.
@@ -77,11 +74,16 @@ Broken down by the four phases of user engagement:
 
 #### 2.3.1 Competitive Analysis
 
-<!-- Assess the strengths and weaknesses in existing competitors, and opportunities and threats in the market (SWOT analysis). Highlight feature ideas that are not currently represented in the market or could be vastly improved. Ensure understanding of industry standards. Create a UX value proposition that draws clear comparisons between the current app (or idea), its potential final state, and existing competitors. -->
+The productivity space is full of strong competitors with larger budgets, established brand recognition, and wide ranges of features and customization options. However, no tool offers the focus-promoting interactivity of Ist. As demand grows for task management for neurodivergent users, apps with complex interfaces and overwhelming information will not be prepared. Developing a micro-app with a strong focus on simplicity and effectiveness will differentiate Ist in a crowded market. If neurodivergent users overcome the initial hurdle of switching to a new app, they will find that it fits much better with their cognitive style.
 
 #### 2.3.2 Risk Assessment & Mitigation
 
-<!-- Potential risks and challenges based on user research and competitive analysis findings, as well as potential mitigation. Ensures proactive risk management and minimizes project disruptions. -->
+-   **Risk**: Users, especially those who struggle with executive function, may resist switching task management tools due to familiarity with and investment in their current system.
+    -   **Mitigation**: Highlight the unique ways Ist addresses their specific challenges. Offer a user-friendly onboarding process and easy set-up guides.
+-   **Risk**: Users may initially engage but gradually lose interest or fail to see the long-term value, leading to low retention.
+    -   **Mitigation**: Implement gamification elements such as task streaks, custom daily quests, and weekly stats to encourage sustained engagement. Regularly update and enhance Ist based on user feedback to keep the platform engaging and relevant.
+-   **Risk**: Users working with varying cognitive challenges may struggle to navigate and utilize Ist effectively, leading to frustration and disengagement.
+    -   **Mitigation**: Conduct user research and testing with individuals representing a diverse range of cognitive abilities, to ensure Ist is intuitive and accessible to all users. Provide clear, simple instructions and support features for users who may require additional assistance.
 
 ### 2.4. Requirements
 
