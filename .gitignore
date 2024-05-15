@@ -1,3 +1,4 @@
+*.prettierignore
 *.code-workspace
 *.vscode
 *.well-known
