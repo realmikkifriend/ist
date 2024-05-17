@@ -19,6 +19,7 @@ The following UX deliverables were created during planning:
 
 -   This project proposal
 -   User personae (see below)
+-   [A user story map of basic app functionality](/strategy/usm-mvp.md)
 
 Since this app uses a relatively simple design and is based on a private functioning prototype, I skipped wireframing.
 
@@ -98,9 +99,11 @@ The productivity space is full of strong competitors with larger budgets, establ
 -   Accessibility features and audits to ensure usability
 -   Edit task metadata inline (e.g. priority, context, comments)
 
-### 2.5. Stakeholders & Communication Plan
+### 2.5. Team, Stakeholders, & Communication Plan
 
-I am a solo developer and the only stakeholder. I will regularly commit project updates to [the Github repo](https://github.com/realmikkifriend/ist/).
+I (@realmikkifriend) am the only stakeholder. I will serve as Product Owner and (amateur) specialist roles of Project Manager, UX Researcher, Developer, Tester/Auditor, and Systems Architect.
+
+I will regularly commit project updates to [the Github repo](https://github.com/realmikkifriend/ist/).
 
 ### 2.6 Technical & Resource Requirements
 
