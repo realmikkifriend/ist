@@ -19,7 +19,7 @@ The following UX deliverables were created during planning:
 
 -   This project proposal
 -   User personae (see below)
--   [A user story map of basic app functionality](/strategy/usm-mvp.md)
+-   A [user story map](/strategy/usm-mvp.md) ([screenshot](/strategy/usm-mvp.png)) of basic app functionality
 
 Since this app uses a relatively simple design and is based on a private functioning prototype, I skipped wireframing.
 
