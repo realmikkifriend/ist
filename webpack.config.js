@@ -12,7 +12,7 @@ module.exports = {
         rules: [
             {
                 test: /\.css$/,
-                use: ['style-loader', 'css-loader'],
+                use: ['style-loader', 'css-loader', 'postcss-loader'],
             },
         ],
     },
@@ -23,6 +23,7 @@ module.exports = {
         }),
     ],
     devServer: {
-        static: './dist',
+        hot: false,
+        liveReload: true
     },
 };
