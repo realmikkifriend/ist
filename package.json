@@ -1,0 +1,30 @@
+{
+    "name": "ist-alpine",
+    "version": "1.0.0",
+    "description": "Ist is a micro-app that reads your task list from [Todoist](https://todoist.com/), then displays the most important task that can currently be worked on.",
+    "main": "index.js",
+    "scripts": {
+        "start": "webpack serve --open --mode production",
+        "build": "webpack --mode production"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/realmikkifriend/ist.git"
+    },
+    "author": "realmikkifriend",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/realmikkifriend/ist/issues"
+    },
+    "homepage": "https://github.com/realmikkifriend/ist#readme",
+    "dependencies": {
+        "alpinejs": "^3.13.10"
+    },
+    "devDependencies": {
+        "daisyui": "^4.11.1",
+        "html-webpack-plugin": "^5.6.0",
+        "webpack": "^5.91.0",
+        "webpack-cli": "^5.1.4",
+        "webpack-dev-server": "^5.0.4"
+    }
+}
