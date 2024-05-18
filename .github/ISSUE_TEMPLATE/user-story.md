@@ -1,6 +1,6 @@
 ---
 name: User Story
-about: To add tasks to feature backlog
+about: To add tasks to product backlog
 title: ''
 labels: ''
 assignees: ''
@@ -24,4 +24,6 @@ assignees: ''
 
 # Tasks
 
--   [ ]
+- [estimation matrix](https://github.com/realmikkifriend/ist/issues/3)
+
+- [ ]
