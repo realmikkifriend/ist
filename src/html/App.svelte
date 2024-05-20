@@ -1,19 +1,34 @@
 <script>
-    import { onMount } from 'svelte';
-    import Cookies from 'js-cookie';
-    import '../css/styles.css';
-    import LandingPage from './Landing.svelte';
-    import OAuthCallback from './OAuthCallback.svelte';
+    import { onMount } from "svelte";
+    import Task from "./Task.svelte";
+    import { fetchTodoistData } from "../js/api";
+    export let todoistAccessToken;
 
-    let todoistAccessToken = Cookies.get('todoist_access_token');
+    const resourceTypes = ["items", "projects", "notes"];
+    let resources = {};
+    let error = null;
+
+    onMount(async () => {
+        try {
+            const data = await fetchTodoistData(todoistAccessToken, resourceTypes);
+            resources = data.resources;
+            error = data.error;
+        } catch (err) {
+            error = err.message;
+        }
+    });
 </script>
 
-{#if !todoistAccessToken}
-    {#if window.location.search.slice(0, 5) === '?code'}
-        <OAuthCallback />
+{#if Object.keys(resources).length > 0}
+    {#if resources["dueTasks"]}
+        {#each resources["dueTasks"] as task}
+            <Task {task} />
+        {/each}
     {:else}
-        <LandingPage />
+        <p>No due tasks</p>
     {/if}
+{:else if error}
+    <p>Error: {error}</p>
 {:else}
-    <p>This appears when logged in</p>
+    Loading...
 {/if}

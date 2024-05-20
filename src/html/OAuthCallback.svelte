@@ -2,9 +2,8 @@
     import { onMount } from 'svelte';
     import Cookies from 'js-cookie';
 
-    const todoistClientID = process.env.TODOIST_CLIENT_ID,
-        todoistClientSecret = process.env.TODOIST_CLIENT_SECRET,
-        redirectURI = process.env.TODOIST_REDIRECT_URI;
+    const { TODOIST_CLIENT_ID, TODOIST_CLIENT_SECRET, TODOIST_REDIRECT_URI } =
+        process.env;
 
     async function exchangeCodeForToken(code) {
         const response = await fetch('https://todoist.com/oauth/access_token', {
@@ -13,10 +12,10 @@
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                client_id: todoistClientID,
-                client_secret: todoistClientSecret,
+                client_id: TODOIST_CLIENT_ID,
+                client_secret: TODOIST_CLIENT_SECRET,
                 code,
-                redirect_uri: redirectURI
+                redirect_uri: TODOIST_REDIRECT_URI
             })
         });
 
