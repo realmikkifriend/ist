@@ -1,6 +1,6 @@
 <script>
     import { onMount } from "svelte";
-    import Cookies from "js-cookie";
+    import { todoistAccessToken } from "../js/stores";
 
     const TODOIST_CLIENT_ID = process.env.TODOIST_CLIENT_ID,
         TODOIST_CLIENT_SECRET = process.env.TODOIST_CLIENT_SECRET,
@@ -22,7 +22,7 @@
 
         const data = await response.json();
         if (data.access_token) {
-            Cookies.set("todoist_access_token", data.access_token);
+            todoistAccessToken.set(data.access_token);
             window.location.href = "/";
         } else {
             console.error("Failed to exchange code for token", data);
