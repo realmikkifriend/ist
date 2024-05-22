@@ -1,37 +1,37 @@
 <script>
-    import { onMount } from "svelte";
-    import { todoistAccessToken } from "../js/stores";
+    import { onMount, onDestroy } from "svelte";
+    import { todoistResources, todoistError, refreshData } from "../js/stores";
     import Task from "./Task.svelte";
-    import { fetchTodoistData } from "../js/api";
-    const resourceTypes = ["items", "projects", "notes"];
-    let resources = {};
-    let error = null;
+    let firstDueTask, unsubscribe, intervalId;
 
     onMount(async () => {
-        if ($todoistAccessToken) {
-            try {
-                const data = await fetchTodoistData($todoistAccessToken, resourceTypes);
-                resources = data.resources;
-                error = data.error;
-            } catch (err) {
-                error = err.message;
+        unsubscribe = todoistResources.subscribe(($resources) => {
+            if ($resources.dueTasks && $resources.dueTasks.length > 0) {
+                firstDueTask = $resources.dueTasks[0];
             }
-        } else {
-            error = "No access token found.";
-        }
+        });
+
+        await refreshData();
+
+        intervalId = setInterval(async () => {
+            await refreshData();
+        }, 300000);
+    });
+
+    onDestroy(() => {
+        clearInterval(intervalId);
+        unsubscribe();
     });
 </script>
 
-{#if Object.keys(resources).length > 0}
-    {#if resources["dueTasks"]}
-        {#each resources["dueTasks"] as task}
-            <Task {task} />
-        {/each}
+{#if $todoistResources.items}
+    {#if firstDueTask}
+        <Task task={firstDueTask} />
     {:else}
-        <p>No due tasks</p>
+        <div class="hero">No due tasks</div>
     {/if}
-{:else if error}
-    <p>Error: {error}</p>
+{:else if $todoistError}
+    <div class="hero">Error: {$todoistError}</div>
 {:else}
-    Loading...
+    <div class="hero">Loading...</div>
 {/if}
