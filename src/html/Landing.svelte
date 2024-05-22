@@ -1,6 +1,6 @@
 <script>
-    const todoistClientID = process.env.TODOIST_CLIENT_ID;
-    let todoistAuthURL = `https://todoist.com/oauth/authorize?client_id=${todoistClientID}&scope=data:read_write&state=${crypto.randomUUID()}`;
+    const TODOIST_CLIENT_ID = process.env.TODOIST_CLIENT_ID;
+    let todoistAuthURL = `https://todoist.com/oauth/authorize?client_id=${TODOIST_CLIENT_ID}&scope=data:read_write&state=${crypto.randomUUID()}`;
 </script>
 
 <div class="hero py-24">
