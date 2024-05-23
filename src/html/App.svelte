@@ -2,13 +2,21 @@
     import { onMount, onDestroy } from "svelte";
     import { todoistResources, todoistError, refreshData } from "../js/stores";
     import Task from "./Task.svelte";
-    let firstDueTask, unsubscribe, intervalId;
+    import { checkAndUpdateFirstDueTask } from "../js/first";
+
+    let firstDueTask, previousFirstDueTask, unsubscribe, intervalId;
+
+    const setFirstDueTask = (task) => (firstDueTask = task);
+    const setPreviousFirstDueTask = (task) => (previousFirstDueTask = task);
 
     onMount(async () => {
         unsubscribe = todoistResources.subscribe(($resources) => {
-            if ($resources.dueTasks && $resources.dueTasks.length > 0) {
-                firstDueTask = $resources.dueTasks[0];
-            }
+            checkAndUpdateFirstDueTask(
+                $resources,
+                previousFirstDueTask,
+                setFirstDueTask,
+                setPreviousFirstDueTask,
+            );
         });
 
         await refreshData();
