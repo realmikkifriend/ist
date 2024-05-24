@@ -39,5 +39,7 @@
         --toastContainerRight: 1.5rem;
         --toastContainerBottom: 1rem;
         --toastContainerLeft: auto;
+        --toastBorderRadius: 0.5rem;
+        --toastWidth: 20rem;
     }
 </style>
