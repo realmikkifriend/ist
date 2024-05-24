@@ -1,5 +1,8 @@
 <script>
+    import { createEventDispatcher } from "svelte";
     export let task;
+
+    const dispatch = createEventDispatcher();
 
     const priorityClasses = {
         1: "border-priority-1 text-priority-1",
@@ -11,6 +14,10 @@
     const getPriorityClasses = (priority) => {
         return priorityClasses[priority] || "";
     };
+
+    const handleDone = () => {
+        dispatch("done", { task });
+    };
 </script>
 
 <div class="card mx-auto mt-8 max-w-md bg-primary text-primary-content">
@@ -20,7 +27,7 @@
             <div class={`badge badge-outline self-center ${getPriorityClasses(task.priority)}`}>
                 {task.priority}
             </div>
-            <button class="primary btn">done</button>
+            <button class="primary btn" on:click={handleDone}>done</button>
         </div>
     </div>
 </div>

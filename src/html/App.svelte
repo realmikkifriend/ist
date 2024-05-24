@@ -3,7 +3,7 @@
     import { todoistResources, todoistError, refreshData } from "../js/stores";
     import Task from "./Task.svelte";
     import { checkAndUpdateFirstDueTask } from "../js/first";
-    import { error } from "../js/toasts"; // Import the error toast
+    import { error } from "../js/toasts";
 
     let firstDueTask, previousFirstDueTask, unsubscribe, intervalId;
 
@@ -31,11 +31,24 @@
         clearInterval(intervalId);
         unsubscribe();
     });
+
+    const handleTaskDone = (event) => {
+        todoistResources.update(($resources) => {
+            const index = $resources.dueTasks.findIndex((task) => task.id === event.detail.task.id);
+            if (index !== -1 && index < $resources.dueTasks.length - 1) {
+                setFirstDueTask($resources.dueTasks[index + 1]);
+            } else {
+                setFirstDueTask(null);
+            }
+            return $resources;
+        });
+        refreshData();
+    };
 </script>
 
 {#if $todoistResources.items}
     {#if firstDueTask}
-        <Task task={firstDueTask} />
+        <Task task={firstDueTask} on:done={handleTaskDone} />
     {:else}
         <div class="hero">No due tasks</div>
     {/if}
