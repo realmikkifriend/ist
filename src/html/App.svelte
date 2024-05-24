@@ -3,6 +3,7 @@
     import { todoistResources, todoistError, refreshData } from "../js/stores";
     import Task from "./Task.svelte";
     import { checkAndUpdateFirstDueTask } from "../js/first";
+    import { error } from "../js/toasts"; // Import the error toast
 
     let firstDueTask, previousFirstDueTask, unsubscribe, intervalId;
 
@@ -38,8 +39,10 @@
     {:else}
         <div class="hero">No due tasks</div>
     {/if}
-{:else if $todoistError}
-    <div class="hero">Error loading Todoist data: {$todoistError}</div>
 {:else}
     <div class="hero">Loading...</div>
+{/if}
+
+{#if $todoistError}
+    {@html error(`Error loading Todoist data: ${$todoistError}`) && ""}
 {/if}

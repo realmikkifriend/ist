@@ -1,4 +1,4 @@
-import { toast } from "@zerodevx/svelte-toast";
+import { newFirstTask } from "./toasts";
 import FirstDueTaskToast from "../html/FirstDueTaskToast.svelte";
 
 export const checkAndUpdateFirstDueTask = (
@@ -14,22 +14,10 @@ export const checkAndUpdateFirstDueTask = (
     if (currentFirstDueTask?.id === previousFirstDueTask?.id) return;
 
     if (previousFirstDueTask) {
-        const toastId = toast.push({
-            component: {
-                src: FirstDueTaskToast,
-                props: {
-                    onClick: () => {
-                        setFirstDueTask(currentFirstDueTask);
-                        toast.pop(toastId);
-                    },
-                },
-            },
-            theme: {
-                "--toastColor": "white",
-                "--toastBackground": "orange",
-            },
-            initial: 0,
-        });
+        const onClickHandler = () => {
+            setFirstDueTask(currentFirstDueTask);
+        };
+        newFirstTask(FirstDueTaskToast, onClickHandler);
     } else {
         setFirstDueTask(currentFirstDueTask);
     }
