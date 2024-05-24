@@ -16,6 +16,10 @@
     onDestroy(() => {
         unsubscribe();
     });
+
+    $: if (window.location.search.startsWith("?code") && accessToken) {
+        window.location.href = "/";
+    }
 </script>
 
 <SvelteToast />

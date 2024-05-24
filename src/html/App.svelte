@@ -39,7 +39,7 @@
         <div class="hero">No due tasks</div>
     {/if}
 {:else if $todoistError}
-    <div class="hero">Error: {$todoistError}</div>
+    <div class="hero">Error loading Todoist data: {$todoistError}</div>
 {:else}
     <div class="hero">Loading...</div>
 {/if}
