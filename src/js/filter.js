@@ -1,4 +1,9 @@
-export function filterAndSortDueTasks(tasks) {
+export function filterAndSortDueTasks(tasks, contexts) {
+    const contextLookup = contexts.reduce((acc, context) => {
+        acc[context.id] = context.child_order;
+        return acc;
+    }, {});
+
     let dueTasks = tasks.filter((task) => {
         if (!task.due) {
             return false;
@@ -9,6 +14,19 @@ export function filterAndSortDueTasks(tasks) {
     });
 
     dueTasks.sort((a, b) => {
+        // sort by order of contexts
+        const childOrderA = contextLookup[a.context_id] || 0;
+        const childOrderB = contextLookup[b.context_id] || 0;
+        if (childOrderA !== childOrderB) {
+            return childOrderA - childOrderB;
+        }
+
+        // sort by priority
+        if (b.priority !== a.priority) {
+            return b.priority - a.priority;
+        }
+
+        // sort by due date
         const dateA = new Date(a.due.datetime || a.due.date);
         const dateB = new Date(b.due.datetime || b.due.date);
         return dateA - dateB;

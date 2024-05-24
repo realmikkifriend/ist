@@ -8,7 +8,7 @@ export const todoistAccessToken = persisted("todoist_access_token", "");
 export const todoistResources = persisted("todoist_resources", {});
 export const todoistError = writable(null);
 
-const resourceTypes = ["items", "projects", "notes"];
+const RESOURCE_TYPES = ["items", "projects", "notes"];
 
 export async function refreshData() {
     let resources = {};
@@ -27,12 +27,24 @@ export async function refreshData() {
     }
 
     try {
-        const data = await fetchTodoistData(resourceTypes, syncToken, accessToken);
+        const data = await fetchTodoistData(RESOURCE_TYPES, syncToken, accessToken);
         syncToken = data.sync_token;
 
-        resourceTypes.forEach((type) => {
-            resources[type] = data[type] || [];
+        RESOURCE_TYPES.forEach((type) => {
+            if (type === "projects") {
+                resources.contexts = data[type] || [];
+            } else {
+                resources[type] = data[type] || [];
+            }
         });
+
+        if (resources.items) {
+            resources.items = resources.items.map((item) => ({
+                ...item,
+                context_id: item.project_id,
+                project_id: undefined,
+            }));
+        }
     } catch (err) {
         error = err.message;
     }
@@ -42,7 +54,7 @@ export async function refreshData() {
     } else {
         todoistResources.update(() => ({
             ...resources,
-            dueTasks: filterAndSortDueTasks(resources.items),
+            dueTasks: filterAndSortDueTasks(resources.items, resources.contexts),
         }));
 
         success("Todoist data updated!");
