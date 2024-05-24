@@ -4,6 +4,7 @@
     import Task from "./Task.svelte";
     import { checkAndUpdateFirstDueTask } from "../js/first";
     import { error } from "../js/toasts";
+    import { handleTaskDone } from "../js/taskHandlers";
 
     let firstDueTask, previousFirstDueTask, unsubscribe, intervalId;
 
@@ -32,23 +33,14 @@
         unsubscribe();
     });
 
-    const handleTaskDone = (event) => {
-        todoistResources.update(($resources) => {
-            const index = $resources.dueTasks.findIndex((task) => task.id === event.detail.task.id);
-            if (index !== -1 && index < $resources.dueTasks.length - 1) {
-                setFirstDueTask($resources.dueTasks[index + 1]);
-            } else {
-                setFirstDueTask(null);
-            }
-            return $resources;
-        });
-        refreshData();
+    const handleTaskDoneWrapper = (event) => {
+        handleTaskDone(event, setPreviousFirstDueTask, setFirstDueTask);
     };
 </script>
 
 {#if $todoistResources.items}
     {#if firstDueTask}
-        <Task task={firstDueTask} on:done={handleTaskDone} />
+        <Task task={firstDueTask} on:done={handleTaskDoneWrapper} />
     {:else}
         <div class="hero">No due tasks</div>
     {/if}
