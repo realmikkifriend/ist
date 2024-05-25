@@ -1,4 +1,6 @@
 <script>
+    import Sidebar from "./Sidebar.svelte";
+
     import { onMount, onDestroy } from "svelte";
     import { todoistResources, todoistError, refreshData } from "../js/stores";
     import Task from "./Task.svelte";
@@ -37,6 +39,8 @@
         handleTaskDone(event, setPreviousFirstDueTask, setFirstDueTask);
     };
 </script>
+
+<Sidebar />
 
 {#if $todoistResources.items}
     {#if firstDueTask}
