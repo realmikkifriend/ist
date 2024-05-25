@@ -1,11 +1,15 @@
 <script>
-    import { Bars3Icon } from "@krowten/svelte-heroicons";
-    import { todoistResources } from "../js/stores";
+    import { Bars3Icon, ArrowLeftOnRectangleIcon } from "@krowten/svelte-heroicons";
+    import { todoistResources, todoistAccessToken } from "../js/stores";
     let resources;
 
     todoistResources.subscribe(($resources) => {
         resources = $resources;
     });
+
+    function handleLogout() {
+        todoistAccessToken.set(null);
+    }
 </script>
 
 <div class="drawer">
@@ -18,7 +22,9 @@
     <div class="drawer-side">
         <label for="my-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
         <ul class="menu min-h-full w-80 bg-base-200 p-4 text-base-content">
-            {#if resources}
+            {#if resources.contexts}
+                <h1 class="ml-2 pb-2 text-2xl">Contexts</h1>
+
                 {#each resources.contexts as context}
                     {#if resources.dueTasks.some((task) => task.context_id === context.id)}
                         <div class="card mb-2 border-2">
@@ -29,6 +35,12 @@
                     {/if}
                 {/each}
             {/if}
+
+            <li class="mt-auto">
+                <button class="btn btn-secondary w-full" on:click={handleLogout}
+                    ><ArrowLeftOnRectangleIcon class="h-6 w-6" />Log Out</button
+                >
+            </li>
         </ul>
     </div>
 </div>
