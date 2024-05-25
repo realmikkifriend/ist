@@ -13,15 +13,18 @@ export const handleTaskDone = async (event, setPreviousFirstDueTask, setFirstDue
     }
 
     todoistResources.update(($resources) => {
-        console.log($resources.dueTasks);
         const index = $resources.dueTasks.findIndex((task) => task.id === event.detail.task.id);
-        if (index !== -1 && index < $resources.dueTasks.length - 1) {
-            setPreviousFirstDueTask($resources.dueTasks[index + 1]);
-            setFirstDueTask($resources.dueTasks[index + 1]);
-        } else {
+        if (index !== -1) {
+            $resources.dueTasks.splice(index, 1);
+
+            if ($resources.dueTasks.length > 0) {
+                setFirstDueTask($resources.dueTasks[0]);
+            } else {
+                setFirstDueTask(null);
+            }
             setPreviousFirstDueTask(null);
-            setFirstDueTask(null);
         }
+
         return $resources;
     });
 
