@@ -1,6 +1,7 @@
 <script>
     import { Bars3Icon, ArrowLeftOnRectangleIcon } from "@krowten/svelte-heroicons";
-    import { todoistResources, todoistAccessToken } from "../js/stores";
+    import { todoistAccessToken, todoistResources, todoistError, syncToken } from "../js/stores";
+
     let resources;
 
     todoistResources.subscribe(($resources) => {
@@ -8,7 +9,10 @@
     });
 
     function handleLogout() {
-        todoistAccessToken.set(null);
+        todoistAccessToken.set("");
+        todoistResources.set({});
+        todoistError.set(null);
+        syncToken.set("*");
     }
 </script>
 
