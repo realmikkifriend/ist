@@ -8,7 +8,7 @@ export const todoistAccessToken = persisted("todoist_access_token", "");
 export const todoistResources = persisted("todoist_resources", {});
 export const todoistError = writable(null);
 
-const RESOURCE_TYPES = ["items", "projects", "notes"];
+const RESOURCE_TYPES = ["items", "projects", "notes", "user"];
 
 export async function refreshData() {
     let resources = {};
@@ -52,9 +52,10 @@ export async function refreshData() {
     if (error) {
         todoistError.set(error);
     } else {
+        const timeZone = resources.user?.tz_info?.timezone || "UTC";
         todoistResources.update(() => ({
             ...resources,
-            dueTasks: filterAndSortDueTasks(resources.items, resources.contexts),
+            dueTasks: filterAndSortDueTasks(resources.items, resources.contexts, timeZone),
         }));
 
         success("Todoist data updated!");

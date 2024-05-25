@@ -1,4 +1,5 @@
-export function filterAndSortDueTasks(tasks, contexts) {
+import { DateTime } from "luxon";
+export function filterAndSortDueTasks(tasks, contexts, timeZone) {
     const contextLookup = contexts.reduce((acc, context) => {
         acc[context.id] = context.child_order;
         return acc;
@@ -9,7 +10,9 @@ export function filterAndSortDueTasks(tasks, contexts) {
             return false;
         }
         task.due.all_day = task.due.datetime ? 0 : 1;
-        task.due.date_object = new Date(task.due.datetime || task.due.date);
+        task.due.date_object = DateTime.fromISO(task.due.datetime || task.due.date, {
+            zone: timeZone,
+        }).toJSDate();
         return task.due.date_object < new Date();
     });
 
@@ -27,8 +30,8 @@ export function filterAndSortDueTasks(tasks, contexts) {
         }
 
         // sort by due date
-        const dateA = new Date(a.due.datetime || a.due.date);
-        const dateB = new Date(b.due.datetime || b.due.date);
+        const dateA = DateTime.fromISO(a.due.datetime || a.due.date, { zone: timeZone }).toJSDate();
+        const dateB = DateTime.fromISO(b.due.datetime || b.due.date, { zone: timeZone }).toJSDate();
         return dateA - dateB;
     });
 
