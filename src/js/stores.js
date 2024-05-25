@@ -12,9 +12,9 @@ export const syncToken = persisted("sync_token", "*");
 const RESOURCE_TYPES = ["items", "projects", "notes", "user"];
 
 export async function refreshData() {
-    let resources = {};
     let error = null;
     let accessToken;
+    let currentResources = {};
 
     todoistAccessToken.subscribe(($) => {
         accessToken = $;
@@ -23,7 +23,7 @@ export async function refreshData() {
     if (!accessToken) {
         error = "No access token found.";
         todoistError.set(error);
-        return { resources, error };
+        return { resources: currentResources, error };
     }
 
     let currentSyncToken;
@@ -35,20 +35,54 @@ export async function refreshData() {
         const data = await fetchTodoistData(RESOURCE_TYPES, currentSyncToken, accessToken);
         syncToken.set(data.sync_token);
 
-        RESOURCE_TYPES.forEach((type) => {
-            if (type === "projects") {
-                resources.contexts = data[type] || [];
-            } else {
-                resources[type] = data[type] || [];
-            }
+        todoistResources.subscribe(($) => {
+            currentResources = $ || {};
         });
 
-        if (resources.items) {
-            resources.items = resources.items.map((item) => ({
-                ...item,
-                context_id: item.project_id,
-                project_id: undefined,
-            }));
+        if (data.full_sync) {
+            RESOURCE_TYPES.forEach((type) => {
+                if (type === "projects") {
+                    currentResources.contexts = data[type] || [];
+                } else {
+                    currentResources[type] = data[type] || [];
+                }
+            });
+
+            if (currentResources.items) {
+                currentResources.items = currentResources.items.map((item) => ({
+                    ...item,
+                    context_id: item.project_id,
+                    project_id: undefined,
+                }));
+            }
+        } else {
+            RESOURCE_TYPES.forEach((type) => {
+                if (type === "items" && data[type]) {
+                    const newItemsMap = new Map(data[type].map((item) => [item.id, item]));
+                    currentResources.items = (currentResources.items || []).map((item) => {
+                        if (newItemsMap.has(item.id)) {
+                            const newItem = newItemsMap.get(item.id);
+                            return {
+                                ...newItem,
+                                context_id: newItem.project_id,
+                                project_id: undefined,
+                            };
+                        }
+                        return item;
+                    });
+                    data[type].forEach((item) => {
+                        if (!newItemsMap.has(item.id)) {
+                            currentResources.items.push({
+                                ...item,
+                                context_id: item.project_id,
+                                project_id: undefined,
+                            });
+                        }
+                    });
+                } else if (data[type]) {
+                    currentResources[type] = [...(currentResources[type] || []), ...data[type]];
+                }
+            });
         }
     } catch (err) {
         error = err.message;
@@ -57,14 +91,18 @@ export async function refreshData() {
     if (error) {
         todoistError.set(error);
     } else {
-        const timeZone = resources.user?.tz_info?.timezone || "UTC";
+        const timeZone = currentResources.user?.tz_info?.timezone || "UTC";
         todoistResources.update(() => ({
-            ...resources,
-            dueTasks: filterAndSortDueTasks(resources.items, resources.contexts, timeZone),
+            ...currentResources,
+            dueTasks: filterAndSortDueTasks(
+                currentResources.items,
+                currentResources.contexts,
+                timeZone,
+            ),
         }));
 
         success("Todoist data updated!");
     }
 
-    return { resources, error };
+    return { resources: currentResources, error };
 }
