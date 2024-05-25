@@ -7,12 +7,12 @@ import { success } from "./toasts";
 export const todoistAccessToken = persisted("todoist_access_token", "");
 export const todoistResources = persisted("todoist_resources", {});
 export const todoistError = writable(null);
+export const syncToken = persisted("sync_token", "*");
 
 const RESOURCE_TYPES = ["items", "projects", "notes", "user"];
 
 export async function refreshData() {
     let resources = {};
-    let syncToken = "*";
     let error = null;
     let accessToken;
 
@@ -26,9 +26,14 @@ export async function refreshData() {
         return { resources, error };
     }
 
+    let currentSyncToken;
+    syncToken.subscribe(($) => {
+        currentSyncToken = $;
+    });
+
     try {
-        const data = await fetchTodoistData(RESOURCE_TYPES, syncToken, accessToken);
-        syncToken = data.sync_token;
+        const data = await fetchTodoistData(RESOURCE_TYPES, currentSyncToken, accessToken);
+        syncToken.set(data.sync_token);
 
         RESOURCE_TYPES.forEach((type) => {
             if (type === "projects") {
