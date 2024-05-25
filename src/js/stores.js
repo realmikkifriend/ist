@@ -43,6 +43,8 @@ export async function refreshData() {
             RESOURCE_TYPES.forEach((type) => {
                 if (type === "projects") {
                     currentResources.contexts = data[type] || [];
+                } else if (type === "user") {
+                    currentResources[type] = data[type];
                 } else {
                     currentResources[type] = data[type] || [];
                 }
@@ -79,6 +81,8 @@ export async function refreshData() {
                             });
                         }
                     });
+                } else if (type === "user" && data[type]) {
+                    currentResources[type] = data[type];
                 } else if (data[type]) {
                     currentResources[type] = [...(currentResources[type] || []), ...data[type]];
                 }
