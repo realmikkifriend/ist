@@ -1,6 +1,5 @@
 <script>
     import Sidebar from "./Sidebar.svelte";
-
     import { onMount, onDestroy } from "svelte";
     import { todoistResources, todoistError, refreshData } from "../js/stores";
     import Task from "./Task.svelte";
@@ -8,12 +7,15 @@
     import { error } from "../js/toasts";
     import { handleTaskDone } from "../js/taskHandlers";
 
-    let firstDueTask, previousFirstDueTask, unsubscribe, intervalId;
+    let firstDueTask = null;
+    let previousFirstDueTask, unsubscribe, intervalId;
 
     const setFirstDueTask = (task) => (firstDueTask = task);
     const setPreviousFirstDueTask = (task) => (previousFirstDueTask = task);
 
     onMount(async () => {
+        firstDueTask = null;
+
         unsubscribe = todoistResources.subscribe(($resources) => {
             checkAndUpdateFirstDueTask(
                 $resources,
