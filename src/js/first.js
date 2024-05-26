@@ -8,6 +8,8 @@ export const checkAndUpdateFirstDueTask = (
     setPreviousFirstDueTask,
     selectedContextId = null,
 ) => {
+    if (!$resources || !$resources.dueTasks) return;
+
     let dueTasks = $resources.dueTasks;
 
     if (selectedContextId) {
