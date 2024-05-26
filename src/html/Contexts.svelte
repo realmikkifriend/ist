@@ -1,5 +1,6 @@
 <script>
-    import { todoistResources, userSettings } from "../js/stores";
+    import { todoistResources, userSettings, firstDueTask } from "../js/stores";
+    import { checkAndUpdateFirstDueTask } from "../js/first";
 
     let resources;
 
@@ -12,13 +13,26 @@
         userSettingsValue = $settings;
     });
 
+    let previousFirstDueTask;
+
+    const setPreviousFirstDueTask = (task) => (previousFirstDueTask = task);
     function handleCardClick(contextId) {
+        const newContextId = userSettingsValue.selectedContextId === contextId ? null : contextId;
+
         userSettings.update((settings) => {
             return {
                 ...settings,
-                selectedContextId: settings.selectedContextId === contextId ? null : contextId,
+                selectedContextId: newContextId,
             };
         });
+
+        checkAndUpdateFirstDueTask(
+            resources,
+            null,
+            firstDueTask.set,
+            setPreviousFirstDueTask,
+            newContextId,
+        );
     }
 </script>
 

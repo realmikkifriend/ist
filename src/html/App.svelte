@@ -1,28 +1,36 @@
 <script>
     import Sidebar from "./Sidebar.svelte";
     import { onMount, onDestroy } from "svelte";
-    import { todoistResources, todoistError, refreshData } from "../js/stores";
+    import {
+        todoistResources,
+        todoistError,
+        refreshData,
+        userSettings,
+        firstDueTask,
+    } from "../js/stores";
     import Task from "./Task.svelte";
     import { checkAndUpdateFirstDueTask } from "../js/first";
     import { error } from "../js/toasts";
     import { handleTaskDone } from "../js/taskHandlers";
 
-    let firstDueTask = null;
     let previousFirstDueTask, unsubscribe, intervalId;
+    let selectedContextId;
 
-    const setFirstDueTask = (task) => (firstDueTask = task);
     const setPreviousFirstDueTask = (task) => (previousFirstDueTask = task);
 
     onMount(async () => {
-        firstDueTask = null;
-
         unsubscribe = todoistResources.subscribe(($resources) => {
             checkAndUpdateFirstDueTask(
                 $resources,
                 previousFirstDueTask,
-                setFirstDueTask,
+                firstDueTask.set,
                 setPreviousFirstDueTask,
+                selectedContextId,
             );
+        });
+
+        userSettings.subscribe(($settings) => {
+            selectedContextId = $settings.selectedContextId;
         });
 
         await refreshData();
@@ -38,15 +46,15 @@
     });
 
     const handleTaskDoneWrapper = (event) => {
-        handleTaskDone(event, setPreviousFirstDueTask, setFirstDueTask);
+        handleTaskDone(event, setPreviousFirstDueTask, firstDueTask.set);
     };
 </script>
 
 <Sidebar />
 
 {#if $todoistResources.items}
-    {#if firstDueTask}
-        <Task task={firstDueTask} on:done={handleTaskDoneWrapper} />
+    {#if $firstDueTask}
+        <Task task={$firstDueTask} on:done={handleTaskDoneWrapper} />
     {:else}
         <div class="hero">No due tasks</div>
     {/if}

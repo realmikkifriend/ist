@@ -6,14 +6,24 @@ export const checkAndUpdateFirstDueTask = (
     previousFirstDueTask,
     setFirstDueTask,
     setPreviousFirstDueTask,
+    selectedContextId = null,
 ) => {
-    if (!$resources.dueTasks || $resources.dueTasks.length === 0) return;
+    let dueTasks = $resources.dueTasks;
 
-    const currentFirstDueTask = $resources.dueTasks[0];
+    if (selectedContextId) {
+        dueTasks = dueTasks.filter((task) => task.context_id === selectedContextId);
+    }
+
+    if (!dueTasks || dueTasks.length === 0) return;
+
+    const currentFirstDueTask = dueTasks[0];
 
     if (currentFirstDueTask?.id === previousFirstDueTask?.id) return;
 
-    if (previousFirstDueTask) {
+    if (
+        previousFirstDueTask &&
+        (selectedContextId === null || previousFirstDueTask.context_id === selectedContextId)
+    ) {
         const onClickHandler = () => {
             setFirstDueTask(currentFirstDueTask);
         };

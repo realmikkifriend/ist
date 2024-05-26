@@ -11,6 +11,7 @@ export const syncToken = persisted("sync_token", "*");
 export const userSettings = persisted("user_settings", {
     selectedContextId: null,
 });
+export const firstDueTask = persisted("firstDueTask", null);
 
 const RESOURCE_TYPES = ["items", "projects", "notes", "user"];
 
