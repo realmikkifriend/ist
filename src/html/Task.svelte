@@ -21,7 +21,7 @@
     };
 </script>
 
-<div class="card mx-auto mt-8 max-w-sm bg-neutral text-primary-content">
+<div class="card mx-auto mt-12 max-w-72 bg-neutral text-primary-content sm:mt-8 sm:max-w-sm">
     <div class="card-body">
         <h2 class="card-title text-2xl">{task.content}</h2>
         <div class="card-actions justify-center">

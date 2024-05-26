@@ -2,7 +2,8 @@
     import { onDestroy } from "svelte";
     import { SvelteToast } from "@zerodevx/svelte-toast";
     import { todoistAccessToken } from "../js/stores";
-    import "@fontsource/clear-sans";
+    import "@fontsource/clear-sans/400.css";
+    import "@fontsource/clear-sans/700.css";
     import App from "./App.svelte";
     import LandingPage from "./Landing.svelte";
     import OAuthCallback from "./OAuthCallback.svelte";

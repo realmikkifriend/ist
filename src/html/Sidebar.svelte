@@ -33,7 +33,7 @@
             ><Bars3Icon class="h-8 w-8" /></label
         >
     </div>
-    <div class="drawer-side">
+    <div class="drawer-side z-10">
         <label for="my-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
         <ul class="menu min-h-full w-80 bg-base-100 p-4 text-base-content">
             {#if resources.contexts}
