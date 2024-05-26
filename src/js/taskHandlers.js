@@ -15,6 +15,12 @@ export const handleTaskDone = async (event, setPreviousFirstDueTask, setFirstDue
     todoistResources.update(($resources) => {
         const index = $resources.dueTasks.findIndex((task) => task.id === event.detail.task.id);
         if (index !== -1) {
+            const task = $resources.dueTasks[index];
+
+            const newDueDate = new Date(task.due.date);
+            newDueDate.setMinutes(newDueDate.getMinutes() + 5);
+            task.due.date = newDueDate.toISOString();
+
             $resources.dueTasks.splice(index, 1);
 
             if ($resources.dueTasks.length > 0) {

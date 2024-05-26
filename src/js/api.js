@@ -31,7 +31,7 @@ export async function markTaskDone(taskId, accessToken) {
         body: new URLSearchParams({
             commands: JSON.stringify([
                 {
-                    type: "item_complete",
+                    type: "item_close",
                     uuid: uuidv4(),
                     args: {
                         id: taskId,
