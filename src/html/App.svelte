@@ -1,5 +1,4 @@
 <script>
-    import Sidebar from "./Sidebar.svelte";
     import { onMount, onDestroy } from "svelte";
     import {
         todoistResources,
@@ -8,10 +7,11 @@
         userSettings,
         firstDueTask,
     } from "../js/stores";
-    import Task from "./Task.svelte";
     import { checkAndUpdateFirstDueTask } from "../js/first";
     import { error } from "../js/toasts";
     import { handleTaskDone } from "../js/taskHandlers";
+    import Sidebar from "./Sidebar.svelte";
+    import Task from "./Task.svelte";
 
     let previousFirstDueTask, unsubscribe, intervalId;
     let selectedContextId;

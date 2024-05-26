@@ -1,8 +1,8 @@
 <script>
-    import { onMount, onDestroy } from "svelte";
-    import { get } from "svelte/store";
-    import { todoistAccessToken } from "../js/stores";
+    import { onDestroy } from "svelte";
     import { SvelteToast } from "@zerodevx/svelte-toast";
+    import { todoistAccessToken } from "../js/stores";
+    import "@fontsource/clear-sans";
     import App from "./App.svelte";
     import LandingPage from "./Landing.svelte";
     import OAuthCallback from "./OAuthCallback.svelte";
