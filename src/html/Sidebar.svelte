@@ -1,6 +1,13 @@
 <script>
     import { Bars3Icon, ArrowLeftOnRectangleIcon } from "@krowten/svelte-heroicons";
-    import { todoistAccessToken, todoistResources, todoistError, syncToken } from "../js/stores";
+    import Contexts from "./Contexts.svelte";
+    import {
+        todoistAccessToken,
+        todoistResources,
+        todoistError,
+        syncToken,
+        userSettings,
+    } from "../js/stores";
 
     let resources;
 
@@ -13,6 +20,7 @@
         todoistResources.set({});
         todoistError.set(null);
         syncToken.set("*");
+        userSettings.set({ selectedContextId: null });
     }
 </script>
 
@@ -27,17 +35,7 @@
         <label for="my-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
         <ul class="menu min-h-full w-80 bg-base-200 p-4 text-base-content">
             {#if resources.contexts}
-                <h1 class="ml-2 pb-2 text-2xl">Contexts</h1>
-
-                {#each resources.contexts as context}
-                    {#if resources.dueTasks.some((task) => task.context_id === context.id)}
-                        <div class="card mb-2 border-2">
-                            <div class="card-body p-2 px-3">
-                                <strong class="card-title">{context.name}</strong>
-                            </div>
-                        </div>
-                    {/if}
-                {/each}
+                <Contexts />
             {/if}
 
             <li class="mt-auto">
