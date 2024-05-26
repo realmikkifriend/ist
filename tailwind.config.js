@@ -15,6 +15,20 @@ module.exports = {
     },
     plugins: [require("daisyui")],
     daisyui: {
+        themes: [
+            {
+                dark: {
+                    ...require("daisyui/src/theming/themes")["dark"],
+                    primary: "#C23F31",
+                    secondary: "#737373",
+                    accent: "#C23F31",
+                    neutral: "#2D2D2D",
+                    "base-100": "#1C1C1C",
+                },
+            },
+            "dark",
+            "cupcake",
+        ],
         logs: false,
     },
 };
