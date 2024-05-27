@@ -2,10 +2,6 @@
     import { onMount } from "svelte";
     import { todoistAccessToken } from "../js/stores";
 
-    const TODOIST_CLIENT_ID = process.env.TODOIST_CLIENT_ID,
-        TODOIST_CLIENT_SECRET = process.env.TODOIST_CLIENT_SECRET,
-        TODOIST_REDIRECT_URI = process.env.TODOIST_REDIRECT_URI;
-
     async function exchangeCodeForToken(code) {
         const response = await fetch("https://todoist.com/oauth/access_token", {
             method: "POST",
@@ -13,10 +9,10 @@
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
-                client_id: TODOIST_CLIENT_ID,
-                client_secret: TODOIST_CLIENT_SECRET,
+                client_id: process.env.TODOIST_CLIENT_ID,
+                client_secret: process.env.TODOIST_CLIENT_SECRET,
                 code,
-                redirect_uri: TODOIST_REDIRECT_URI,
+                redirect_uri: process.env.TODOIST_REDIRECT_URI,
             }),
         });
 
