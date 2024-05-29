@@ -34,7 +34,9 @@ module.exports = {
             template: "./src/html/index.html",
             filename: "index.html",
         }),
-        new Dotenv(),
+        new Dotenv({
+            systemvars: true,
+        }),
     ],
     infrastructureLogging: {
         level: "warn",
