@@ -1,7 +1,6 @@
 <script>
     import { XCircleIcon } from "@krowten/svelte-heroicons";
     import { todoistResources, userSettings, firstDueTask } from "../js/stores";
-    import { checkAndUpdateFirstDueTask } from "../js/first";
 
     let resources;
 
@@ -14,9 +13,6 @@
         userSettingsValue = $settings;
     });
 
-    let previousFirstDueTask;
-
-    const setPreviousFirstDueTask = (task) => (previousFirstDueTask = task);
     function handleCardClick(contextId) {
         const newContextId = userSettingsValue.selectedContextId === contextId ? null : contextId;
 
@@ -26,14 +22,6 @@
                 selectedContextId: newContextId,
             };
         });
-
-        checkAndUpdateFirstDueTask(
-            resources,
-            null,
-            firstDueTask.set,
-            setPreviousFirstDueTask,
-            newContextId,
-        );
     }
 </script>
 

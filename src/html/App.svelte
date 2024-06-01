@@ -13,24 +13,31 @@
     import Sidebar from "./Sidebar.svelte";
     import Task from "./Task.svelte";
 
-    let previousFirstDueTask, unsubscribe, intervalId;
+    let previousFirstDueTask, unsubscribeResources, unsubscribeSettings, intervalId;
     let selectedContextId;
+    let resources;
 
     const setPreviousFirstDueTask = (task) => (previousFirstDueTask = task);
 
+    const updateFirstDueTask = ($resources, $settings) => {
+        checkAndUpdateFirstDueTask(
+            $resources,
+            previousFirstDueTask,
+            firstDueTask.set,
+            setPreviousFirstDueTask,
+            $settings.selectedContextId,
+        );
+    };
+
     onMount(async () => {
-        unsubscribe = todoistResources.subscribe(($resources) => {
-            checkAndUpdateFirstDueTask(
-                $resources,
-                previousFirstDueTask,
-                firstDueTask.set,
-                setPreviousFirstDueTask,
-                selectedContextId,
-            );
+        unsubscribeResources = todoistResources.subscribe(($resources) => {
+            resources = $resources;
+            updateFirstDueTask($resources, { selectedContextId });
         });
 
-        userSettings.subscribe(($settings) => {
+        unsubscribeSettings = userSettings.subscribe(($settings) => {
             selectedContextId = $settings.selectedContextId;
+            updateFirstDueTask(resources, $settings);
         });
 
         await refreshData();
@@ -42,7 +49,8 @@
 
     onDestroy(() => {
         clearInterval(intervalId);
-        unsubscribe();
+        unsubscribeResources();
+        unsubscribeSettings();
     });
 
     const handleTaskDoneWrapper = (event) => {
@@ -50,7 +58,7 @@
     };
 </script>
 
-<Sidebar />
+<Sidebar {setPreviousFirstDueTask} />
 
 {#if $todoistResources.items}
     {#if $firstDueTask}

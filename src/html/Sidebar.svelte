@@ -1,5 +1,5 @@
 <script>
-    import { Bars3Icon, ArrowLeftOnRectangleIcon } from "@krowten/svelte-heroicons";
+    import { Bars3Icon, ArrowLeftOnRectangleIcon, XMarkIcon } from "@krowten/svelte-heroicons";
     import Contexts from "./Contexts.svelte";
     import Footer from "./Footer.svelte";
     import {
@@ -10,10 +10,12 @@
         userSettings,
         firstDueTask,
     } from "../js/stores";
+    export let setPreviousFirstDueTask;
 
     let resources;
     let dueTasksInContext = 0;
     let currentContextName = "";
+    let selectedContextId;
 
     todoistResources.subscribe(($resources) => {
         resources = $resources;
@@ -22,6 +24,10 @@
 
     firstDueTask.subscribe(($firstDueTask) => {
         filterDueTasksInContext();
+    });
+
+    userSettings.subscribe(($settings) => {
+        selectedContextId = $settings.selectedContextId;
     });
 
     function filterDueTasksInContext() {
@@ -46,6 +52,17 @@
         syncToken.set("*");
         userSettings.set({ selectedContextId: null });
     }
+
+    function clearSelectedContextId() {
+        setPreviousFirstDueTask(null);
+
+        userSettings.update((settings) => {
+            return {
+                ...settings,
+                selectedContextId: null,
+            };
+        });
+    }
 </script>
 
 <div class="drawer">
@@ -55,9 +72,14 @@
             ><Bars3Icon class="h-8 w-8" />
         </label>
         {#if $firstDueTask}
-            <div class="badge badge-outline whitespace-nowrap opacity-75">
+            <button
+                class="group badge badge-outline cursor-pointer items-center whitespace-nowrap opacity-75"
+                class:text-primary={selectedContextId}
+                on:click={clearSelectedContextId}
+            >
                 {dueTasksInContext} left in {currentContextName}
-            </div>
+                <p class="ml-1 hidden group-hover:block"><XMarkIcon class="h-4 w-4" /></p>
+            </button>
         {/if}
     </div>
     <div class="drawer-side z-10">
