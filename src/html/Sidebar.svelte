@@ -1,6 +1,7 @@
 <script>
     import { Bars3Icon, ArrowLeftOnRectangleIcon } from "@krowten/svelte-heroicons";
     import Contexts from "./Contexts.svelte";
+    import Footer from "./Footer.svelte";
     import {
         todoistAccessToken,
         todoistResources,
@@ -41,6 +42,7 @@
             {/if}
 
             <li class="mt-auto">
+                <Footer />
                 <button class="btn btn-secondary w-full" on:click={handleLogout}
                     ><ArrowLeftOnRectangleIcon class="h-6 w-6" />Log Out</button
                 >
