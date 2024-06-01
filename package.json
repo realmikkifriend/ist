@@ -1,0 +1,53 @@
+{
+    "name": "ist-alpine",
+    "version": "1.0.0",
+    "description": "Ist is a micro-app that reads your task list from [Todoist](https://todoist.com/), then displays the most important task that can currently be worked on.",
+    "scripts": {
+        "start": "dotenv -- webpack serve --open --mode development --no-stats",
+        "build": "webpack --mode production",
+        "test": "vitest run"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/realmikkifriend/ist.git"
+    },
+    "author": "realmikkifriend",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/realmikkifriend/ist/issues"
+    },
+    "homepage": "https://github.com/realmikkifriend/ist#readme",
+    "dependencies": {
+        "@fontsource/clear-sans": "^5.0.11",
+        "@krowten/svelte-heroicons": "^0.1.0",
+        "luxon": "^3.4.4",
+        "svelte": "^4.2.17",
+        "svelte-loader": "^3.2.0",
+        "svelte-persisted-store": "^0.9.4"
+    },
+    "devDependencies": {
+        "@sveltejs/vite-plugin-svelte": "^3.1.0",
+        "@testing-library/jest-dom": "^6.4.5",
+        "@testing-library/svelte": "^5.1.0",
+        "@zerodevx/svelte-toast": "^0.9.5",
+        "autoprefixer": "^10.4.19",
+        "css-loader": "^7.1.1",
+        "daisyui": "^4.11.1",
+        "dotenv": "^16.4.5",
+        "dotenv-cli": "^7.4.2",
+        "dotenv-webpack": "^8.1.0",
+        "html-webpack-plugin": "^5.6.0",
+        "jsdom": "^24.0.0",
+        "postcss": "^8.4.38",
+        "postcss-loader": "^8.1.1",
+        "prettier": "^3.2.5",
+        "prettier-plugin-svelte": "^3.2.3",
+        "prettier-plugin-tailwindcss": "^0.5.14",
+        "style-loader": "^4.0.0",
+        "tailwindcss": "^3.4.3",
+        "vitest": "^1.6.0",
+        "webpack": "^5.91.0",
+        "webpack-cli": "^5.1.4",
+        "webpack-dev-server": "^5.0.4"
+    }
+}
