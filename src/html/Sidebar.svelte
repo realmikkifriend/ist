@@ -73,10 +73,12 @@
         </label>
         {#if $firstDueTask}
             <button
-                class="group badge badge-outline cursor-pointer items-center whitespace-nowrap"
+                class="group badge badge-outline items-center whitespace-nowrap"
                 class:text-primary={selectedContextId}
                 class:opacity-30={!selectedContextId}
                 class:opacity-75={selectedContextId}
+                class:cursor-default={!selectedContextId}
+                class:cursor-pointer={selectedContextId}
                 on:click={clearSelectedContextId}
             >
                 {dueTasksInContext} left in {currentContextName}
@@ -92,7 +94,7 @@
         <label for="my-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
         <ul class="menu min-h-full w-80 bg-base-100 p-4 text-base-content">
             {#if resources.contexts}
-                <Contexts />
+                <Contexts {setPreviousFirstDueTask} />
             {/if}
 
             <li class="mt-auto">
