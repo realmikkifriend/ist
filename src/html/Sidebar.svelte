@@ -73,12 +73,18 @@
         </label>
         {#if $firstDueTask}
             <button
-                class="group badge badge-outline cursor-pointer items-center whitespace-nowrap opacity-75"
+                class="group badge badge-outline cursor-pointer items-center whitespace-nowrap"
                 class:text-primary={selectedContextId}
+                class:opacity-30={!selectedContextId}
+                class:opacity-75={selectedContextId}
                 on:click={clearSelectedContextId}
             >
                 {dueTasksInContext} left in {currentContextName}
-                <p class="ml-1 hidden group-hover:block"><XMarkIcon class="h-4 w-4" /></p>
+                {#if selectedContextId}
+                    <p class="ml-1 hidden group-hover:block">
+                        <XMarkIcon class="h-4 w-4" />
+                    </p>
+                {/if}
             </button>
         {/if}
     </div>
