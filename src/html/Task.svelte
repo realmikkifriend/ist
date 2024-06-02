@@ -1,6 +1,6 @@
 <script>
     import { createEventDispatcher } from "svelte";
-    import { CheckIcon } from "@krowten/svelte-heroicons";
+    import { CheckIcon, CalendarIcon, ClockIcon } from "@krowten/svelte-heroicons";
     export let task;
 
     const dispatch = createEventDispatcher();
@@ -19,6 +19,10 @@
     const handleDone = () => {
         dispatch("done", { task });
     };
+
+    const handleDefer = () => {
+        // dispatch("defer", { task });
+    };
 </script>
 
 <div class="card mx-auto mt-12 max-w-72 bg-neutral text-primary-content sm:mt-8 sm:max-w-sm">
@@ -30,8 +34,18 @@
             </div>
             <button
                 class="text-md btn btn-primary h-8 min-h-8 content-center p-4"
-                on:click={handleDone}><CheckIcon class="h-5 w-5  [&>path]:stroke-[4]" /></button
+                on:click={handleDone}><CheckIcon class="h-5 w-5 [&>path]:stroke-[3]" /></button
             >
+            <button
+                class="text-md btn btn-secondary h-8 min-h-8 content-center p-4"
+                on:click={handleDefer}
+            >
+                {#if task.due.all_day == 1}
+                    <CalendarIcon class="h-5 w-5  [&>path]:stroke-[3]" />
+                {:else}
+                    <ClockIcon class="h-5 w-5  [&>path]:stroke-[3]" />
+                {/if}
+            </button>
         </div>
     </div>
 </div>
