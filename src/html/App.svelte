@@ -9,7 +9,7 @@
     } from "../js/stores";
     import { checkAndUpdateFirstDueTask } from "../js/first";
     import { error } from "../js/toasts";
-    import { handleTaskDone } from "../js/taskHandlers";
+    import { handleTaskDone, handleTaskDefer } from "../js/taskHandlers";
     import Sidebar from "./Sidebar.svelte";
     import Task from "./Task.svelte";
 
@@ -56,13 +56,21 @@
     const handleTaskDoneWrapper = (event) => {
         handleTaskDone(event, setPreviousFirstDueTask, firstDueTask.set);
     };
+
+    const handleTaskDeferWrapper = (event) => {
+        handleTaskDefer(event, setPreviousFirstDueTask, firstDueTask.set);
+    };
 </script>
 
 <Sidebar {setPreviousFirstDueTask} />
 
 {#if $todoistResources.items}
     {#if $firstDueTask}
-        <Task task={$firstDueTask} on:done={handleTaskDoneWrapper} />
+        <Task
+            task={$firstDueTask}
+            on:done={handleTaskDoneWrapper}
+            on:defer={handleTaskDeferWrapper}
+        />
     {:else}
         <div class="hero">No due tasks</div>
     {/if}

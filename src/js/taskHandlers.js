@@ -43,3 +43,7 @@ export const handleTaskDone = async (event, setPreviousFirstDueTask, setFirstDue
 
     refreshData();
 };
+
+export const handleTaskDefer = async (event, setPreviousFirstDueTask, setFirstDueTask) => {
+    // open defer dialog
+};

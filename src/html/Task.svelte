@@ -21,7 +21,7 @@
     };
 
     const handleDefer = () => {
-        // dispatch("defer", { task });
+        dispatch("defer", { task });
     };
 </script>
 
@@ -41,9 +41,9 @@
                 on:click={handleDefer}
             >
                 {#if task.due.all_day == 1}
-                    <CalendarIcon class="h-5 w-5  [&>path]:stroke-[3]" />
+                    <CalendarIcon class="h-5 w-5 [&>path]:stroke-[3]" />
                 {:else}
-                    <ClockIcon class="h-5 w-5  [&>path]:stroke-[3]" />
+                    <ClockIcon class="h-5 w-5 [&>path]:stroke-[3]" />
                 {/if}
             </button>
         </div>
