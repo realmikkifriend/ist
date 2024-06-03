@@ -12,9 +12,8 @@
         isTimeTabActive = tab === "time";
     };
 
-    const handleDefer = (event) => {
-        const { task, ms } = event.detail;
-        dispatch("defer", { task, ms });
+    const handleDefer = ({ detail: { time } }) => {
+        dispatch("defer", { task, time });
     };
 </script>
 

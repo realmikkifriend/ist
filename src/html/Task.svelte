@@ -22,10 +22,9 @@
         dispatch("done", { task });
     };
 
-    const handleDefer = (event) => {
-        const { task, ms } = event.detail;
+    const handleDefer = ({ detail: { task, time } }) => {
         modal.close();
-        dispatch("defer", { task, ms });
+        dispatch("defer", { task, time });
     };
 </script>
 

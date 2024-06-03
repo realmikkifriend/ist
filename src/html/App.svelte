@@ -13,9 +13,12 @@
     import Sidebar from "./Sidebar.svelte";
     import Task from "./Task.svelte";
 
-    let previousFirstDueTask, unsubscribeResources, unsubscribeSettings, intervalId;
-    let selectedContextId;
-    let resources;
+    let resources,
+        previousFirstDueTask,
+        unsubscribeResources,
+        unsubscribeSettings,
+        intervalId,
+        selectedContextId;
 
     const setPreviousFirstDueTask = (task) => (previousFirstDueTask = task);
 
@@ -53,14 +56,16 @@
         unsubscribeSettings();
     });
 
-    const handleTaskDoneWrapper = (event) => {
-        handleTaskDone(event, setPreviousFirstDueTask, firstDueTask.set);
+    const handleDone = ({
+        detail: {
+            task: { id: taskID },
+        },
+    }) => {
+        handleTaskDone(taskID, setPreviousFirstDueTask, firstDueTask.set);
     };
 
-    const handleTaskDeferWrapper = (event) => {
-        const { task, ms } = event.detail;
-
-        handleTaskDefer(task, ms, setPreviousFirstDueTask, firstDueTask.set);
+    const handleDefer = ({ detail: { task, time } }) => {
+        handleTaskDefer(task, time, setPreviousFirstDueTask, firstDueTask.set);
     };
 </script>
 
@@ -68,11 +73,7 @@
 
 {#if $todoistResources.items}
     {#if $firstDueTask}
-        <Task
-            task={$firstDueTask}
-            on:done={handleTaskDoneWrapper}
-            on:defer={handleTaskDeferWrapper}
-        />
+        <Task task={$firstDueTask} on:done={handleDone} on:defer={handleDefer} />
     {:else}
         <div class="hero">No due tasks</div>
     {/if}

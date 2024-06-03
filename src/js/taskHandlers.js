@@ -1,7 +1,7 @@
 import { todoistResources, refreshData, todoistAccessToken, todoistError } from "./stores";
 import { markTaskDone } from "./api";
 
-export const handleTaskDone = async (event, setPreviousFirstDueTask, setFirstDueTask) => {
+export const handleTaskDone = async (taskID, setPreviousFirstDueTask, setFirstDueTask) => {
     let accessToken;
     todoistAccessToken.subscribe(($) => {
         accessToken = $;
@@ -13,7 +13,7 @@ export const handleTaskDone = async (event, setPreviousFirstDueTask, setFirstDue
     }
 
     todoistResources.update(($resources) => {
-        const index = $resources.dueTasks.findIndex((task) => task.id === event.detail.task.id);
+        const index = $resources.dueTasks.findIndex((task) => task.id === taskID);
         if (index !== -1) {
             const task = $resources.dueTasks[index];
 
@@ -35,7 +35,7 @@ export const handleTaskDone = async (event, setPreviousFirstDueTask, setFirstDue
     });
 
     try {
-        await markTaskDone(event.detail.task.id, accessToken);
+        await markTaskDone(taskID, accessToken);
     } catch (error) {
         todoistError.set(`Failed to mark task done: ${error.message}`);
         return;
@@ -44,6 +44,6 @@ export const handleTaskDone = async (event, setPreviousFirstDueTask, setFirstDue
     refreshData();
 };
 
-export const handleTaskDefer = async (task, ms, setPreviousFirstDueTask, setFirstDueTask) => {
+export const handleTaskDefer = async (task, time, setPreviousFirstDueTask, setFirstDueTask) => {
     // back-end task defer logic goes here
 };

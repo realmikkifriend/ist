@@ -1,7 +1,6 @@
 <script>
     import { createEventDispatcher } from "svelte";
     import SveltyPicker from "svelty-picker";
-    export let task;
 
     let valueDefault;
 
@@ -11,9 +10,8 @@
 
     const dispatch = createEventDispatcher();
 
-    const handleDefer = (event) => {
-        const ms = event.detail;
-        dispatch("defer", { task, ms });
+    const handleDefer = ({ detail: time }) => {
+        dispatch("defer", { time });
     };
 </script>
 
