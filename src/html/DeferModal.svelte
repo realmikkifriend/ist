@@ -1,23 +1,26 @@
 <script>
     import { createEventDispatcher } from "svelte";
     import { CalendarIcon, ClockIcon } from "@krowten/svelte-heroicons";
+    import DatePicker from "./DatePicker.svelte";
     export let task;
 
     const dispatch = createEventDispatcher();
-    let isTimeTabActive = true;
 
-    const handleDefer = (ms) => {
-        dispatch("defer", { task, ms });
-    };
+    let isTimeTabActive = true;
 
     const selectTab = (tab) => {
         isTimeTabActive = tab === "time";
     };
+
+    const handleDefer = (event) => {
+        const { task, ms } = event.detail;
+        dispatch("defer", { task, ms });
+    };
 </script>
 
-<div class="modal-box min-h-[75%]">
+<div class="modal-box min-h-[55%] w-fit">
     {#if task.due.all_day == 1}
-        add date picker here
+        <DatePicker on:defer={handleDefer} />
     {:else}
         <div class="flex justify-center">
             <div role="tablist" class="tabs-boxed tabs w-1/2 bg-neutral">
@@ -40,11 +43,11 @@
             </div>
         </div>
         {#if isTimeTabActive}
-            <div class="modal-action">
+            <div class="min-w-72">
                 <button class="btn" on:click={() => handleDefer(24 * 60 * 60 * 1000)}>1 Day</button>
             </div>
         {:else}
-            <div class="modal-action">add calendar defer menu here</div>
+            <DatePicker on:defer={handleDefer} />
         {/if}
     {/if}
 </div>

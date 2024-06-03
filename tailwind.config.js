@@ -21,9 +21,10 @@ module.exports = {
                     ...require("daisyui/src/theming/themes")["dark"],
                     primary: "#C23F31", // highlight best option
                     secondary: "#737373", // other options
-                    accent: "#C23F31", // not used?
+                    // accent: "#C23F31", // not used?
                     neutral: "#2D2D2D", // card background
                     "base-100": "#1C1C1C", // page background
+                    "primary-content": "#e8e8e8", // main text
                 },
             },
             "dark",
