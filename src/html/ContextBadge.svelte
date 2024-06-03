@@ -3,11 +3,10 @@
     import { todoistResources, userSettings, firstDueTask } from "../js/stores";
     export let setPreviousFirstDueTask;
 
-    let resources;
-    let dueTasksInContext = 0;
-    let currentContextName = "";
-    let selectedContextId;
-
+    let resources,
+        dueTasksInContext = 0,
+        currentContextName = "",
+        selectedContextId;
     todoistResources.subscribe(($resources) => {
         resources = $resources;
     });
@@ -21,29 +20,22 @@
     });
 
     function filterDueTasksInContext() {
-        if (resources && resources.dueTasks && firstDueTask) {
+        if (resources?.dueTasks && firstDueTask) {
             let $firstDueTask;
-            firstDueTask.subscribe((value) => {
-                $firstDueTask = value;
-            })();
+            firstDueTask.subscribe((value) => ($firstDueTask = value))();
+
             dueTasksInContext = resources.dueTasks.filter(
                 (task) => task.context_id === $firstDueTask.context_id,
             ).length;
 
-            const context = resources.contexts.find((c) => c.id === $firstDueTask.context_id);
-            currentContextName = context ? context.name : "";
+            currentContextName =
+                resources.contexts.find((c) => c.id === $firstDueTask.context_id)?.name || "";
         }
     }
 
     function clearSelectedContextId() {
         setPreviousFirstDueTask(null);
-
-        userSettings.update((settings) => {
-            return {
-                ...settings,
-                selectedContextId: null,
-            };
-        });
+        userSettings.update((settings) => ({ ...settings, selectedContextId: null }));
     }
 </script>
 
