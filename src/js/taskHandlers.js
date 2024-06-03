@@ -44,6 +44,6 @@ export const handleTaskDone = async (event, setPreviousFirstDueTask, setFirstDue
     refreshData();
 };
 
-export const handleTaskDefer = async (event, setPreviousFirstDueTask, setFirstDueTask) => {
-    // open defer dialog
+export const handleTaskDefer = async (task, ms, setPreviousFirstDueTask, setFirstDueTask) => {
+    // back-end task defer logic goes here
 };

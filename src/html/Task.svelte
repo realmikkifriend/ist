@@ -1,9 +1,11 @@
 <script>
     import { createEventDispatcher } from "svelte";
     import { CheckIcon, CalendarIcon, ClockIcon } from "@krowten/svelte-heroicons";
+    import DeferModal from "./DeferModal.svelte";
     export let task;
 
     const dispatch = createEventDispatcher();
+    let modal;
 
     const priorityClasses = {
         1: "bg-priority-1 text-white",
@@ -20,8 +22,10 @@
         dispatch("done", { task });
     };
 
-    const handleDefer = () => {
-        dispatch("defer", { task });
+    const handleDefer = (event) => {
+        const { task, ms } = event.detail;
+        modal.close();
+        dispatch("defer", { task, ms });
     };
 </script>
 
@@ -38,7 +42,7 @@
             >
             <button
                 class="text-md btn btn-secondary h-8 min-h-8 content-center p-4"
-                on:click={handleDefer}
+                on:click={() => modal.showModal()}
             >
                 {#if task.due.all_day == 1}
                     <CalendarIcon class="h-5 w-5 [&>path]:stroke-[3]" />
@@ -49,3 +53,7 @@
         </div>
     </div>
 </div>
+
+<dialog id="defer_modal" class="modal" bind:this={modal}>
+    <DeferModal {task} on:defer={handleDefer} />
+</dialog>

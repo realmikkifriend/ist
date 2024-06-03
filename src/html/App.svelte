@@ -58,7 +58,9 @@
     };
 
     const handleTaskDeferWrapper = (event) => {
-        handleTaskDefer(event, setPreviousFirstDueTask, firstDueTask.set);
+        const { task, ms } = event.detail;
+
+        handleTaskDefer(task, ms, setPreviousFirstDueTask, firstDueTask.set);
     };
 </script>
 
