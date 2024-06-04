@@ -1,7 +1,7 @@
 <script>
     import { createEventDispatcher } from "svelte";
     import { CheckIcon, CalendarIcon, ClockIcon } from "@krowten/svelte-heroicons";
-    import DeferModal from "./DeferModal.svelte";
+    import DeferModal from "./defer/DeferModal.svelte";
     export let task;
 
     const dispatch = createEventDispatcher();

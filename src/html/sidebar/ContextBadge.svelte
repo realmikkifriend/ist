@@ -1,6 +1,6 @@
 <script>
     import { XMarkIcon } from "@krowten/svelte-heroicons";
-    import { todoistResources, userSettings, firstDueTask } from "../js/stores";
+    import { todoistResources, userSettings, firstDueTask } from "../../js/stores";
     export let setPreviousFirstDueTask;
 
     let resources,

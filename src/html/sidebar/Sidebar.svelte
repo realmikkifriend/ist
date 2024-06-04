@@ -3,7 +3,7 @@
 
     import { Bars3Icon, ArrowLeftOnRectangleIcon } from "@krowten/svelte-heroicons";
     import Contexts from "./Contexts.svelte";
-    import Footer from "./Footer.svelte";
+    import Footer from "../Footer.svelte";
     import {
         todoistAccessToken,
         todoistResources,
@@ -11,7 +11,7 @@
         syncToken,
         userSettings,
         firstDueTask,
-    } from "../js/stores";
+    } from "../../js/stores";
     export let setPreviousFirstDueTask;
 
     let resources;

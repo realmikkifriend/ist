@@ -11,7 +11,7 @@
     import { checkAndUpdateFirstDueTask } from "../js/first";
     import { error } from "../js/toasts";
     import { handleTaskDone, handleTaskDefer } from "../js/taskHandlers";
-    import Sidebar from "./Sidebar.svelte";
+    import Sidebar from "./sidebar/Sidebar.svelte";
     import Task from "./Task.svelte";
 
     let resources,

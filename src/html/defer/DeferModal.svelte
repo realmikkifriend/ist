@@ -3,8 +3,8 @@
     import { get } from "svelte/store";
     import { CalendarIcon, ClockIcon } from "@krowten/svelte-heroicons";
     import { DateTime } from "luxon";
-    import { todoistResources } from "../js/stores";
-    import { createTomorrowDateWithTime } from "../js/time";
+    import { todoistResources } from "../../js/stores";
+    import { createTomorrowDateWithTime } from "../../js/time";
     import DatePicker from "./DatePicker.svelte";
     import TimePicker from "./TimePicker.svelte";
     export let task;

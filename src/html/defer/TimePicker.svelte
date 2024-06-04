@@ -1,7 +1,7 @@
 <script>
     import { createEventDispatcher, onDestroy } from "svelte";
     import { DateTime } from "luxon";
-    import { createTomorrowDateWithTime } from "../js/time";
+    import { createTomorrowDateWithTime } from "../../js/time";
     export let task;
 
     const dispatch = createEventDispatcher();
