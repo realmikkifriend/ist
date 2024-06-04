@@ -1,5 +1,6 @@
 <script>
     import { onMount, onDestroy } from "svelte";
+    import { DateTime } from "luxon";
     import {
         todoistResources,
         todoistError,
@@ -65,7 +66,11 @@
     };
 
     const handleDefer = ({ detail: { task, time } }) => {
-        handleTaskDefer(task, time, setPreviousFirstDueTask, firstDueTask.set);
+        if (DateTime.isDateTime(time)) {
+            handleTaskDefer(task, time, setPreviousFirstDueTask, firstDueTask.set);
+        } else {
+            error("Received unexpected type of date...");
+        }
     };
 </script>
 
