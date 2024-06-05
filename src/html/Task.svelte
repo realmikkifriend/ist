@@ -28,28 +28,35 @@
     };
 </script>
 
-<div class="card mx-auto mt-12 max-w-72 bg-neutral text-primary-content sm:mt-8 sm:max-w-sm">
-    <div class="card-body">
-        <h2 class="card-title text-2xl">{task.content}</h2>
-        <div class="card-actions justify-center">
-            <div class={`badge self-center font-bold ${getPriorityClasses(task.priority)}`}>
-                {task.priority}
+<div class="mx-auto mt-12 max-w-72 sm:mt-8 sm:max-w-sm">
+    <div class="card mt-0 bg-neutral text-primary-content">
+        <div class="card-body">
+            <h2 class="card-title text-2xl">{task.content}</h2>
+            <div class="card-actions justify-center">
+                <div class={`badge self-center font-bold ${getPriorityClasses(task.priority)}`}>
+                    {task.priority}
+                </div>
+                <button
+                    class="text-md btn btn-primary h-8 min-h-8 content-center p-4"
+                    on:click={handleDone}><CheckIcon class="h-5 w-5 [&>path]:stroke-[3]" /></button
+                >
+                <button
+                    class="text-md btn btn-secondary h-8 min-h-8 content-center p-4"
+                    on:click={() => modal.showModal()}
+                >
+                    {#if task.due.all_day == 1}
+                        <CalendarIcon class="h-5 w-5 [&>path]:stroke-[3]" />
+                    {:else}
+                        <ClockIcon class="h-5 w-5 [&>path]:stroke-[3]" />
+                    {/if}
+                </button>
             </div>
-            <button
-                class="text-md btn btn-primary h-8 min-h-8 content-center p-4"
-                on:click={handleDone}><CheckIcon class="h-5 w-5 [&>path]:stroke-[3]" /></button
-            >
-            <button
-                class="text-md btn btn-secondary h-8 min-h-8 content-center p-4"
-                on:click={() => modal.showModal()}
-            >
-                {#if task.due.all_day == 1}
-                    <CalendarIcon class="h-5 w-5 [&>path]:stroke-[3]" />
-                {:else}
-                    <ClockIcon class="h-5 w-5 [&>path]:stroke-[3]" />
-                {/if}
-            </button>
         </div>
+    </div>
+    <div class="mx-auto w-11/12 rounded-b-2xl bg-accent p-4">
+        {#each task.notes as note}
+            <div class="note-content">{note.content}</div>
+        {/each}
     </div>
 </div>
 

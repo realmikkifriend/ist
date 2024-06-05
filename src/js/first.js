@@ -22,6 +22,14 @@ export const checkAndUpdateFirstDueTask = (
 
     if (currentFirstDueTask?.id === previousFirstDueTask?.id) return;
 
+    let firstDueTaskComments = [];
+
+    $: firstDueTaskComments = $resources.notes.filter(
+        (note) => note.item_id === currentFirstDueTask.id,
+    );
+
+    currentFirstDueTask.notes = firstDueTaskComments;
+
     if (
         previousFirstDueTask &&
         (selectedContextId === null || previousFirstDueTask.context_id === selectedContextId)
