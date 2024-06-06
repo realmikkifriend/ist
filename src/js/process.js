@@ -19,26 +19,33 @@ export function processTodoistData(currentResources, data, RESOURCE_TYPES) {
         }
     } else {
         RESOURCE_TYPES.forEach((type) => {
-            if (type === "items" && data[type]) {
-                const newItemsMap = new Map(data[type].map((item) => [item.id, item]));
-                currentResources.items = (currentResources.items || []).map((item) => {
-                    if (newItemsMap.has(item.id)) {
-                        const newItem = newItemsMap.get(item.id);
-                        return {
-                            ...newItem,
-                            context_id: newItem.project_id,
-                            project_id: undefined,
-                        };
+            if ((type === "items" || type === "notes") && data[type]) {
+                const newMap = new Map(data[type].map((entry) => [entry.id, entry]));
+                currentResources[type] = (currentResources[type] || []).map((entry) => {
+                    if (newMap.has(entry.id)) {
+                        const newEntry = newMap.get(entry.id);
+                        if (type === "items") {
+                            return {
+                                ...newEntry,
+                                context_id: newEntry.project_id,
+                                project_id: undefined,
+                            };
+                        }
+                        return newEntry;
                     }
-                    return item;
+                    return entry;
                 });
-                data[type].forEach((item) => {
-                    if (!newItemsMap.has(item.id)) {
-                        currentResources.items.push({
-                            ...item,
-                            context_id: item.project_id,
-                            project_id: undefined,
-                        });
+                data[type].forEach((entry) => {
+                    if (!newMap.has(entry.id)) {
+                        if (type === "items") {
+                            currentResources[type].push({
+                                ...entry,
+                                context_id: entry.project_id,
+                                project_id: undefined,
+                            });
+                        } else {
+                            currentResources[type].push(entry);
+                        }
                     }
                 });
             } else if (type === "user" && data[type]) {
