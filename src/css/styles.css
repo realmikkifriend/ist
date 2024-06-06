@@ -16,7 +16,8 @@ body {
     font-family: "Clear Sans", sans-serif;
 }
 
-/* date picker */
+/* DATE PICKER */
+
 :root {
     --sdt-bg-main: theme("colors.base-100");
     --sdt-shadow-color: transparent;
@@ -29,4 +30,13 @@ body {
 
 .std-calendar-wrap {
     min-width: 18rem;
+}
+
+/* GENERATED ELEMENTS */
+
+.prose ul,
+.prose li,
+.prose p {
+    margin-top: 0;
+    margin-bottom: 0;
 }
