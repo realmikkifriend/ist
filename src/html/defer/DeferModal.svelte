@@ -20,16 +20,20 @@
     const tz = get(todoistResources).user.tz_info.timezone;
 
     const handleDefer = ({ detail: { rawTime } }) => {
-        let time, date;
+        let time;
         if (typeof rawTime === "number") {
             const now = DateTime.now().setZone(tz);
             time = now.plus({ milliseconds: rawTime });
         } else if (typeof rawTime === "string") {
-            date = DateTime.fromISO(rawTime);
+            const date = DateTime.fromISO(rawTime);
 
-            let { hour, minute } = createTomorrowDateWithTime(task.due.string, tz).tomorrow;
-
-            time = date.set({ hour, minute });
+            if (task.due.all_day === 1) {
+                time = date;
+            } else {
+                const extracted = createTomorrowDateWithTime(task.due.string, tz),
+                    { hour, minute } = extracted.tomorrow;
+                time = date.set({ hour, minute });
+            }
         }
 
         dispatch("defer", { task, time });
