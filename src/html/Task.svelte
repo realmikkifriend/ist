@@ -2,6 +2,7 @@
     import { createEventDispatcher } from "svelte";
     import { CheckIcon, CalendarIcon, ClockIcon } from "@krowten/svelte-heroicons";
     import DeferModal from "./defer/DeferModal.svelte";
+    import Comments from "./Comments.svelte";
     export let task;
 
     const dispatch = createEventDispatcher();
@@ -53,11 +54,9 @@
             </div>
         </div>
     </div>
-    <div class="mx-auto w-11/12 rounded-b-2xl bg-accent p-4">
-        {#each task.notes as note}
-            <div class="note-content">{note.content}</div>
-        {/each}
-    </div>
+    {#if task.notes?.length}
+        <Comments comments={task.notes} />
+    {/if}
 </div>
 
 <dialog id="defer_modal" class="modal" bind:this={modal}>
