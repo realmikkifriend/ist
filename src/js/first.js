@@ -20,11 +20,7 @@ export const checkAndUpdateFirstDueTask = (
 
     const currentFirstDueTask = dueTasks[0];
 
-    if (currentFirstDueTask?.id === previousFirstDueTask?.id) return;
-
-    let firstDueTaskComments = [];
-
-    $: firstDueTaskComments = $resources.notes.filter(
+    let firstDueTaskComments = $resources.notes.filter(
         (note) => note.item_id === currentFirstDueTask.id,
     );
 
@@ -32,6 +28,7 @@ export const checkAndUpdateFirstDueTask = (
 
     if (
         previousFirstDueTask &&
+        currentFirstDueTask?.id !== previousFirstDueTask?.id &&
         (selectedContextId === null || previousFirstDueTask.context_id === selectedContextId)
     ) {
         const onClickHandler = () => {
