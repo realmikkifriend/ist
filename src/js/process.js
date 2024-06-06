@@ -19,30 +19,39 @@ export function processTodoistData(currentResources, data, RESOURCE_TYPES) {
         }
     } else {
         RESOURCE_TYPES.forEach((type) => {
-            if (type === "items" && data[type]) {
-                const newItemsMap = new Map(data[type].map((item) => [item.id, item]));
-                currentResources.items = (currentResources.items || []).map((item) => {
-                    if (newItemsMap.has(item.id)) {
-                        const newItem = newItemsMap.get(item.id);
-                        return {
-                            ...newItem,
-                            context_id: newItem.project_id,
+            if ((type === "items" || type === "notes") && data[type]) {
+                let currentMap = new Map(
+                    (currentResources[type] || []).map((entry) => [entry.id, entry]),
+                );
+
+                const activeData = data[type].filter((entry) => !entry.is_deleted);
+
+                activeData.forEach((entry) => {
+                    if (currentMap.has(entry.id)) {
+                        currentMap.set(entry.id, {
+                            ...currentMap.get(entry.id),
+                            ...entry,
+                            context_id:
+                                type === "items"
+                                    ? entry.project_id
+                                    : currentMap.get(entry.id).context_id,
                             project_id: undefined,
-                        };
-                    }
-                    return item;
-                });
-                data[type].forEach((item) => {
-                    if (!newItemsMap.has(item.id)) {
-                        currentResources.items.push({
-                            ...item,
-                            context_id: item.project_id,
+                        });
+                    } else {
+                        currentMap.set(entry.id, {
+                            ...entry,
+                            context_id: type === "items" ? entry.project_id : undefined,
                             project_id: undefined,
                         });
                     }
                 });
+                currentResources[type] = Array.from(currentMap.values());
+
+                currentResources[type] = currentResources[type].filter(
+                    (entry) => !data[type].find((e) => e.id === entry.id && e.is_deleted),
+                );
             } else if (type === "user" && data[type]) {
-                currentResources[type] = data[type];
+                currentResources[type] = { ...currentResources[type], ...data[type] };
             } else if (data[type]) {
                 currentResources[type] = [...(currentResources[type] || []), ...data[type]];
             }

@@ -9,7 +9,7 @@ export function filterAndSortDueTasks(tasks, contexts, timeZone) {
         if (!task.due) {
             return false;
         }
-        task.due.all_day = task.due.datetime ? 0 : 1;
+        task.due.all_day = task.due.date && !task.due.date.includes("T") ? 1 : 0;
         task.due.date_object = DateTime.fromISO(task.due.datetime || task.due.date, {
             zone: timeZone,
         }).toJSDate();

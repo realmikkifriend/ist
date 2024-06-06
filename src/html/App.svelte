@@ -1,5 +1,6 @@
 <script>
     import { onMount, onDestroy } from "svelte";
+    import { DateTime } from "luxon";
     import {
         todoistResources,
         todoistError,
@@ -9,13 +10,16 @@
     } from "../js/stores";
     import { checkAndUpdateFirstDueTask } from "../js/first";
     import { error } from "../js/toasts";
-    import { handleTaskDone } from "../js/taskHandlers";
-    import Sidebar from "./Sidebar.svelte";
+    import { handleTaskDone, handleTaskDefer } from "../js/taskHandlers";
+    import Sidebar from "./sidebar/Sidebar.svelte";
     import Task from "./Task.svelte";
 
-    let previousFirstDueTask, unsubscribeResources, unsubscribeSettings, intervalId;
-    let selectedContextId;
-    let resources;
+    let resources,
+        previousFirstDueTask,
+        unsubscribeResources,
+        unsubscribeSettings,
+        intervalId,
+        selectedContextId;
 
     const setPreviousFirstDueTask = (task) => (previousFirstDueTask = task);
 
@@ -53,8 +57,20 @@
         unsubscribeSettings();
     });
 
-    const handleTaskDoneWrapper = (event) => {
-        handleTaskDone(event, setPreviousFirstDueTask, firstDueTask.set);
+    const handleDone = ({
+        detail: {
+            task: { id: taskID },
+        },
+    }) => {
+        handleTaskDone(taskID, setPreviousFirstDueTask, firstDueTask.set);
+    };
+
+    const handleDefer = ({ detail: { task, time } }) => {
+        if (DateTime.isDateTime(time)) {
+            handleTaskDefer(task, time, setPreviousFirstDueTask, firstDueTask.set);
+        } else {
+            error("Received unexpected type of date...");
+        }
     };
 </script>
 
@@ -62,7 +78,7 @@
 
 {#if $todoistResources.items}
     {#if $firstDueTask}
-        <Task task={$firstDueTask} on:done={handleTaskDoneWrapper} />
+        <Task task={$firstDueTask} on:done={handleDone} on:defer={handleDefer} />
     {:else}
         <div class="hero">No due tasks</div>
     {/if}

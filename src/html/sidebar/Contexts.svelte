@@ -1,6 +1,6 @@
 <script>
     import { XCircleIcon } from "@krowten/svelte-heroicons";
-    import { todoistResources, userSettings } from "../js/stores";
+    import { todoistResources, userSettings } from "../../js/stores";
     export let setPreviousFirstDueTask;
 
     let resources;
