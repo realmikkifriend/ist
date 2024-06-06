@@ -29,6 +29,7 @@
         todoistAccessToken.set("");
         todoistResources.set({});
         todoistError.set(null);
+        firstDueTask.set(null);
         syncToken.set("*");
         userSettings.set({ selectedContextId: null });
     }
