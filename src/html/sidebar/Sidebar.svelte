@@ -1,7 +1,6 @@
 <script>
-    import ContextBadge from "./ContextBadge.svelte";
-
     import { Bars3Icon, ArrowLeftOnRectangleIcon } from "@krowten/svelte-heroicons";
+    import ContextBadge from "./ContextBadge.svelte";
     import Contexts from "./Contexts.svelte";
     import Footer from "../Footer.svelte";
     import {

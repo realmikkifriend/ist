@@ -11,6 +11,7 @@
     import { checkAndUpdateFirstDueTask } from "../js/first";
     import { error } from "../js/toasts";
     import { handleTaskDone, handleTaskDefer } from "../js/taskHandlers";
+    import { ArrowPathIcon } from "@krowten/svelte-heroicons";
     import Sidebar from "./sidebar/Sidebar.svelte";
     import Task from "./Task.svelte";
 
@@ -49,10 +50,10 @@
             updateFirstDueTask(resources, $settings);
         });
 
-        await refreshData();
+        await handleRefresh();
 
         intervalId = setInterval(async () => {
-            await refreshData();
+            await handleRefresh();
         }, 300000);
     });
 
@@ -77,6 +78,16 @@
             error("Received unexpected type of date...");
         }
     };
+
+    let isSpinning = false;
+
+    async function handleRefresh() {
+        isSpinning = true;
+
+        await refreshData();
+
+        isSpinning = false;
+    }
 </script>
 
 <Sidebar {setPreviousFirstDueTask} />
@@ -87,6 +98,10 @@
     {:else}
         <div class="hero">No due tasks</div>
     {/if}
+
+    <button class="fixed bottom-2 right-2 opacity-50" on:click={handleRefresh}>
+        <ArrowPathIcon class="h-6 w-6 {isSpinning ? 'animate-spin' : ''}" />
+    </button>
 {:else}
     <div class="hero">Loading...</div>
 {/if}
