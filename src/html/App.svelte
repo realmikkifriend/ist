@@ -30,6 +30,11 @@
             firstDueTask.set,
             setPreviousFirstDueTask,
             $settings.selectedContextId,
+            (newContextId) => {
+                userSettings.update((settings) => {
+                    return { ...settings, selectedContextId: newContextId };
+                });
+            },
         );
     };
 

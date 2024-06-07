@@ -1,4 +1,4 @@
-import { newFirstTask } from "./toasts";
+import { success, newFirstTask } from "./toasts";
 import FirstDueTaskToast from "../html/FirstDueTaskToast.svelte";
 
 export const checkAndUpdateFirstDueTask = (
@@ -6,17 +6,27 @@ export const checkAndUpdateFirstDueTask = (
     previousFirstDueTask,
     setFirstDueTask,
     setPreviousFirstDueTask,
-    selectedContextId = null,
+    selectedContextId,
+    setSelectedContextId,
 ) => {
     if (!$resources || !$resources.dueTasks) return;
 
     let dueTasks = $resources.dueTasks;
 
     if (selectedContextId) {
-        dueTasks = dueTasks.filter((task) => task.context_id === selectedContextId);
+        const filteredDueTasks = dueTasks.filter((task) => task.context_id === selectedContextId);
+
+        if (!filteredDueTasks || filteredDueTasks.length === 0) {
+            setSelectedContextId(null);
+            success("No more tasks in context! Showing all due tasks...");
+        } else {
+            dueTasks = filteredDueTasks;
+        }
     }
 
-    if (!dueTasks || dueTasks.length === 0) return;
+    if (!dueTasks || dueTasks.length === 0) {
+        return;
+    }
 
     const currentFirstDueTask = dueTasks[0];
 
