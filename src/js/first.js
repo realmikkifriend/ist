@@ -1,3 +1,4 @@
+import { toast } from "@zerodevx/svelte-toast";
 import { success, newFirstTask } from "./toasts";
 import FirstDueTaskToast from "../html/FirstDueTaskToast.svelte";
 
@@ -46,6 +47,7 @@ export const checkAndUpdateFirstDueTask = (
         };
         newFirstTask(FirstDueTaskToast, onClickHandler);
     } else {
+        toast.pop({ target: "wait" });
         setFirstDueTask(currentFirstDueTask);
     }
 
