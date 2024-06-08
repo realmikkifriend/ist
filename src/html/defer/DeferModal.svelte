@@ -21,6 +21,8 @@
 
     const handleDefer = ({ detail: { rawTime } }) => {
         let time;
+        isTimeTabActive = true;
+
         if (typeof rawTime === "number") {
             const now = DateTime.now().setZone(tz);
             time = now.plus({ milliseconds: rawTime });
@@ -40,7 +42,7 @@
     };
 </script>
 
-<div class="modal-box min-h-[55%] w-fit">
+<div class="modal-box min-h-[60%] w-fit">
     {#if task.due.all_day == 1}
         <DatePicker {tz} on:defer={handleDefer} />
     {:else}

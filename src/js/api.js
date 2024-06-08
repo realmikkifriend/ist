@@ -52,7 +52,7 @@ export async function markTaskDone(taskID, accessToken) {
 
 export async function deferTask(task, time, accessToken) {
     const taskNewDate =
-        task.due.is_all_day === 1
+        task.due.all_day === 1
             ? time.toFormat("yyyy-MM-dd")
             : time.toFormat("yyyy-MM-dd'T'HH:mm:ss");
 

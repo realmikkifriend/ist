@@ -43,7 +43,7 @@
 <div class="mt-4 flex w-72 flex-row flex-wrap gap-2">
     {#each buttonConfigs as { text, time, basis, height }}
         <button
-            class="btn mb-2 min-h-4 bg-neutral px-1 hover:bg-secondary {basis} {height}"
+            class="btn mb-2 min-h-4 rounded-md bg-neutral px-1 hover:bg-secondary {basis} {height}"
             on:click={() => handleDefer(time)}
             >{text}
         </button>
