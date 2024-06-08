@@ -39,6 +39,7 @@
                 </div>
                 <button
                     class="text-md btn btn-primary h-8 min-h-8 content-center p-4"
+                    title={task.due.string ? `repeats ${task.due.string}` : "one-time task"}
                     on:click={handleDone}><CheckIcon class="h-5 w-5 [&>path]:stroke-[3]" /></button
                 >
                 <button
