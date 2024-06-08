@@ -13,6 +13,7 @@ export const userSettings = persisted("user_settings", {
     selectedContextId: null,
 });
 export const firstDueTask = persisted("firstDueTask", null);
+export const dynalistAccessToken = persisted("dynalist_access_token", "");
 
 const RESOURCE_TYPES = ["items", "projects", "notes", "user"];
 
