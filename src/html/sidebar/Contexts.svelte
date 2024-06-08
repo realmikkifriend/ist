@@ -1,12 +1,28 @@
 <script>
     import { XCircleIcon } from "@krowten/svelte-heroicons";
     import { todoistResources, userSettings } from "../../js/stores";
+    import { getPriorityClass } from "../../js/priority";
     export let setPreviousFirstDueTask;
 
     let resources;
+    let dueTasksByContext = {};
 
     todoistResources.subscribe(($resources) => {
         resources = $resources;
+
+        dueTasksByContext = $resources.dueTasks.reduce((acc, task) => {
+            if (!acc[task.context_id]) {
+                acc[task.context_id] = { total: 0, priorities: {} };
+            }
+            acc[task.context_id].total += 1;
+
+            if (!acc[task.context_id].priorities[task.priority]) {
+                acc[task.context_id].priorities[task.priority] = 0;
+            }
+            acc[task.context_id].priorities[task.priority] += 1;
+
+            return acc;
+        }, {});
     });
 
     let userSettingsValue;
@@ -38,15 +54,28 @@
 </div>
 
 {#each resources.contexts as context}
-    {#if resources.dueTasks.some((task) => task.context_id === context.id)}
+    {#if dueTasksByContext[context.id] && dueTasksByContext[context.id].total > 0}
         <button
             class:opacity-25={userSettingsValue.selectedContextId &&
                 userSettingsValue.selectedContextId !== context.id}
             class="mb-2 rounded-lg bg-secondary text-base-100"
             on:click={() => handleCardClick(context.id)}
         >
-            <div class="card-body p-2 px-3">
+            <div class="card-body gap-0.5 p-2 px-3">
                 <p class="card-title font-normal">{context.name}</p>
+                <div class="flex flex-row space-x-2">
+                    {#each Object.keys(dueTasksByContext[context.id].priorities).sort((a, b) => b - a) as priority}
+                        <div class="space-x-1">
+                            {#each Array(dueTasksByContext[context.id].priorities[priority]).fill() as _}
+                                <div
+                                    class="badge badge-xs w-3 border-none {getPriorityClass(
+                                        priority,
+                                    )}"
+                                ></div>
+                            {/each}
+                        </div>
+                    {/each}
+                </div>
             </div>
         </button>
     {/if}
