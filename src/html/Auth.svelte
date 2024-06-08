@@ -23,7 +23,8 @@
     }
 </script>
 
-<SvelteToast />
+<SvelteToast target="wait" />
+<SvelteToast target="success" />
 {#if !accessToken}
     {#if window.location.search.startsWith("?code")}
         <OAuthCallback />

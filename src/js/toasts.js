@@ -9,7 +9,8 @@ const createToastConfig = (overrides) => ({
     ...overrides,
 });
 
-export const success = (m) =>
+export const success = (m) => {
+    toast.pop({ target: "success" });
     toast.push(
         m,
         createToastConfig({
@@ -20,10 +21,13 @@ export const success = (m) =>
             },
             duration: 1000,
             dismissable: false,
+            target: "success",
         }),
     );
+};
 
 export const newFirstTask = (component, onClickHandler) => {
+    toast.pop({ target: "wait" });
     const toastInstance = toast.push(
         createToastConfig({
             component: {
@@ -40,6 +44,7 @@ export const newFirstTask = (component, onClickHandler) => {
                 "--toastBackground": "orange",
             },
             initial: 0,
+            target: "wait",
         }),
     );
 };
@@ -55,5 +60,6 @@ export const error = (m) =>
             },
             initial: 0,
             dismissable: true,
+            target: "wait",
         }),
     );
