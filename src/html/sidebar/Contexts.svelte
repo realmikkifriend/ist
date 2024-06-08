@@ -10,19 +10,21 @@
     todoistResources.subscribe(($resources) => {
         resources = $resources;
 
-        dueTasksByContext = $resources.dueTasks.reduce((acc, task) => {
-            if (!acc[task.context_id]) {
-                acc[task.context_id] = { total: 0, priorities: {} };
-            }
-            acc[task.context_id].total += 1;
+        if (resources.dueTasks?.length > 0) {
+            dueTasksByContext = resources.dueTasks.reduce((acc, task) => {
+                if (!acc[task.context_id]) {
+                    acc[task.context_id] = { total: 0, priorities: {} };
+                }
+                acc[task.context_id].total += 1;
 
-            if (!acc[task.context_id].priorities[task.priority]) {
-                acc[task.context_id].priorities[task.priority] = 0;
-            }
-            acc[task.context_id].priorities[task.priority] += 1;
+                if (!acc[task.context_id].priorities[task.priority]) {
+                    acc[task.context_id].priorities[task.priority] = 0;
+                }
+                acc[task.context_id].priorities[task.priority] += 1;
 
-            return acc;
-        }, {});
+                return acc;
+            }, {});
+        }
     });
 
     let userSettingsValue;
