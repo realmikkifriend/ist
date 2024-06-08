@@ -3,21 +3,12 @@
     import { CheckIcon, CalendarIcon, ClockIcon } from "@krowten/svelte-heroicons";
     import DeferModal from "./defer/DeferModal.svelte";
     import Comments from "./Comments.svelte";
+    import { getPriorityClass } from "../js/priority";
+
     export let task;
 
     const dispatch = createEventDispatcher();
     let modal;
-
-    const priorityClasses = {
-        1: "bg-priority-1 text-white",
-        2: "bg-priority-2 text-white",
-        3: "bg-priority-3 text-white",
-        4: "bg-priority-4 text-white",
-    };
-
-    const getPriorityClasses = (priority) => {
-        return priorityClasses[priority] || "";
-    };
 
     const handleDone = () => {
         dispatch("done", { task });
@@ -34,7 +25,7 @@
         <div class="card-body">
             <h2 class="card-title text-2xl">{task.content}</h2>
             <div class="card-actions justify-center">
-                <div class={`badge self-center font-bold ${getPriorityClasses(task.priority)}`}>
+                <div class="badge self-center font-bold {getPriorityClass(task.priority)}">
                     {task.priority}
                 </div>
                 <button
