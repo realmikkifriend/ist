@@ -1,9 +1,9 @@
 <script>
     import { createEventDispatcher } from "svelte";
     import { CheckIcon, CalendarIcon, ClockIcon } from "@krowten/svelte-heroicons";
-    import DeferModal from "./defer/DeferModal.svelte";
+    import DeferModal from "../defer/DeferModal.svelte";
     import Comments from "./Comments.svelte";
-    import { getPriorityClass } from "../js/priority";
+    import { getPriorityClass } from "../../js/priority";
 
     export let task;
 

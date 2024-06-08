@@ -1,5 +1,5 @@
 <script>
-    import { dynalistAccessToken } from "../js/stores";
+    import { dynalistAccessToken } from "../../js/stores";
     export let comment;
 
     let accessToken;
