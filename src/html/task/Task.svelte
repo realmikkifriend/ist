@@ -23,7 +23,7 @@
 <div class="mx-auto mt-12 max-w-72 sm:mt-8 sm:max-w-sm">
     <div class="card mt-0 bg-neutral text-primary-content">
         <div class="card-body">
-            <h2 class="card-title text-2xl">{task.content}</h2>
+            <h2 class="card-title text-3xl">{task.content}</h2>
             <div class="card-actions justify-center">
                 <div class="badge self-center font-bold {getPriorityClass(task.priority)}">
                     {task.priority}
