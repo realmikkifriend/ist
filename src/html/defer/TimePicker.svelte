@@ -26,7 +26,9 @@
 
         for (let i = 1; i < buttons.length; i++) {
             let futureTime = now.plus({ milliseconds: buttons[i].ms });
-            buttons[i].time = futureTime.toFormat("h:mm a");
+            let isTomorrow = now.startOf("day").toMillis() !== futureTime.startOf("day").toMillis();
+            let timeFormat = futureTime.toFormat("h:mm a");
+            buttons[i].time = isTomorrow ? `<i>${timeFormat}</i>` : timeFormat;
         }
     };
 
@@ -54,7 +56,7 @@
                 >{text}
             </button>
             {#if time}
-                <span class="block text-left text-xs opacity-50">{time}</span>
+                <span class="block text-left text-xs opacity-50">{@html time}</span>
             {/if}
         </div>
     {/each}
