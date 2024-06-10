@@ -46,7 +46,8 @@
 
         if (rootNode) {
             dynalistObject = processNode(rootNode, data);
-            dynalistContent = generateDynalistComment(dynalistObject);
+            dynalistContent =
+                generateDynalistComment(dynalistObject) || "Unsupported format, but stay tuned.";
         } else {
             console.error("Specified node not in document.");
         }
