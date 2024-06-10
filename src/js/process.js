@@ -1,4 +1,32 @@
 export function processTodoistData(currentResources, data, RESOURCE_TYPES) {
+    const propsToRemove = [
+        "added_at",
+        "added_by_uid",
+        "assigned_by_uid",
+        "checked",
+        "child_order",
+        "collapsed",
+        "completed_at",
+        "day_order",
+        "description",
+        "labels",
+        "parent_id",
+        "responsible_uid",
+        "section_id",
+        "sync_id",
+        "updated_at",
+        "user_id",
+        "v2_id",
+        "v2_parent_id",
+        "v2_project_id",
+        "v2_section_id",
+    ];
+
+    function removeProps(item, props) {
+        props.forEach((prop) => delete item[prop]);
+        return item;
+    }
+
     if (data.full_sync) {
         RESOURCE_TYPES.forEach((type) => {
             if (type === "projects") {
@@ -12,7 +40,7 @@ export function processTodoistData(currentResources, data, RESOURCE_TYPES) {
 
         if (currentResources.items) {
             currentResources.items = currentResources.items.map((item) => ({
-                ...item,
+                ...removeProps(item, propsToRemove),
                 context_id: item.project_id,
                 project_id: undefined,
             }));
@@ -28,9 +56,15 @@ export function processTodoistData(currentResources, data, RESOURCE_TYPES) {
 
                 activeData.forEach((entry) => {
                     if (currentMap.has(entry.id)) {
+                        const updatedEntry =
+                            type === "items"
+                                ? removeProps(
+                                      { ...currentMap.get(entry.id), ...entry },
+                                      propsToRemove,
+                                  )
+                                : { ...currentMap.get(entry.id), ...entry };
                         currentMap.set(entry.id, {
-                            ...currentMap.get(entry.id),
-                            ...entry,
+                            ...updatedEntry,
                             context_id:
                                 type === "items"
                                     ? entry.project_id
@@ -38,8 +72,12 @@ export function processTodoistData(currentResources, data, RESOURCE_TYPES) {
                             project_id: undefined,
                         });
                     } else {
+                        const newEntry =
+                            type === "items"
+                                ? removeProps({ ...entry }, propsToRemove)
+                                : { ...entry };
                         currentMap.set(entry.id, {
-                            ...entry,
+                            ...newEntry,
                             context_id: type === "items" ? entry.project_id : undefined,
                             project_id: undefined,
                         });
