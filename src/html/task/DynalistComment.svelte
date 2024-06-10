@@ -1,20 +1,9 @@
 <script>
-    import { dynalistAccessToken } from "../../js/stores";
-    export let comment;
+    import { ArrowPathIcon } from "@krowten/svelte-heroicons";
 
-    let accessToken;
-
-    dynalistAccessToken.subscribe(($) => {
-        accessToken = $;
-    });
+    export let url, accessToken;
 </script>
 
-{#if accessToken}
-    <p>access token is set</p>
-    {comment}
-{:else}
-    <p class="dynalistPrompt">
-        Provide <a href="https://dynalist.io/developer" class="href">Dynalist access token</a>...
-        <input type="text" placeholder="" class="input w-full max-w-xs" />
-    </p>
-{/if}
+{url}
+{accessToken}
+<ArrowPathIcon class="h-4 w-4" />

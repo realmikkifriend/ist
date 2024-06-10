@@ -1,13 +1,34 @@
 <script>
     import Markdown from "svelte-exmarkdown";
     import DynalistComment from "./DynalistComment.svelte";
+    import DynalistAuthRequest from "./DynalistAuthRequest.svelte";
+    import { dynalistAccessToken } from "../../js/stores";
     export let comments;
+
+    let accessToken;
+
+    dynalistAccessToken.subscribe(($) => {
+        accessToken = $;
+    });
+
+    const requiresAuthRequest = comments.some((comment) =>
+        comment.content.startsWith("https://dynalist.io/d/"),
+    );
 </script>
 
 <div class="prose mx-auto w-11/12 rounded-b-2xl bg-accent p-4">
+    {#if requiresAuthRequest && !accessToken}
+        <DynalistAuthRequest />
+        <div class="divider my-1" />
+    {/if}
+
     {#each comments as comment, i}
         {#if comment.content.startsWith("https://dynalist.io/d/")}
-            <DynalistComment comment={comment.content} />
+            {#if accessToken}
+                <DynalistComment url={comment.content} {accessToken} />
+            {:else}
+                Dynalist URL detected but no access code stored.
+            {/if}
         {:else}
             <Markdown md={comment.content} />
         {/if}

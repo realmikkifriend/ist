@@ -40,11 +40,3 @@ body {
     margin-top: 0;
     margin-bottom: 0;
 }
-
-/* DYNALIST */
-
-.dynalistPrompt:not(:first-of-type),
-.dynalistPrompt:first-of-type ~ .divider,
-.dynalistPrompt:not(:first-of-type) ~ .divider {
-    display: none;
-}
