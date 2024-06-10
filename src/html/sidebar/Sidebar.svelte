@@ -9,6 +9,7 @@
         todoistError,
         syncToken,
         userSettings,
+        dynalistAccessToken,
         firstDueTask,
     } from "../../js/stores";
     export let setPreviousFirstDueTask;
@@ -31,6 +32,7 @@
         firstDueTask.set(null);
         syncToken.set("*");
         userSettings.set({ selectedContextId: null });
+        dynalistAccessToken.set("");
     }
 </script>
 
