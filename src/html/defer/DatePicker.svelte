@@ -12,6 +12,7 @@
     const dispatch = createEventDispatcher();
 
     const handleDefer = ({ detail: rawTime }) => {
+        valueDefault = undefined;
         dispatch("defer", { rawTime });
     };
 </script>

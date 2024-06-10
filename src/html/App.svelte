@@ -13,7 +13,7 @@
     import { handleTaskDone, handleTaskDefer } from "../js/taskHandlers";
     import { ArrowPathIcon } from "@krowten/svelte-heroicons";
     import Sidebar from "./sidebar/Sidebar.svelte";
-    import Task from "./Task.svelte";
+    import Task from "./task/Task.svelte";
 
     let resources,
         previousFirstDueTask,
