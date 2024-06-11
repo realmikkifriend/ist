@@ -32,18 +32,16 @@ export async function fetchDynalistDocument(url, accessToken) {
 }
 
 export function processNode(node, data) {
-    const { created, modified, collapsed, ...filteredNode } = node;
+    const { created, modified, collapsed, checked, ...filteredNode } = node;
+
+    if (checked) return null;
 
     if (node.children && node.children.length > 0) {
         filteredNode.children = node.children
             .map((childId) => {
                 let child = data.nodes.find((node) => node.id === childId);
 
-                if (child) {
-                    return processNode(child, data);
-                }
-
-                return null;
+                return child ? processNode(child, data) : null;
             })
             .filter((child) => child !== null);
     }
