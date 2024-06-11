@@ -1,5 +1,5 @@
 <script>
-    import { createEventDispatcher } from "svelte";
+    import { createEventDispatcher, onDestroy } from "svelte";
     import { get } from "svelte/store";
     import { CalendarIcon, ClockIcon } from "@krowten/svelte-heroicons";
     import { DateTime } from "luxon";
@@ -18,6 +18,16 @@
     };
 
     const tz = get(todoistResources).user.tz_info.timezone;
+
+    let items = [];
+
+    const unsubscribe = todoistResources.subscribe((value) => {
+        items = value.items;
+    });
+
+    onDestroy(() => {
+        unsubscribe();
+    });
 
     const handleDefer = ({ detail: { rawTime } }) => {
         let time;
@@ -42,37 +52,40 @@
     };
 </script>
 
-<div class="modal-box min-h-[60%] w-fit">
-    {#if task.due.all_day == 1}
-        <DatePicker {tz} on:defer={handleDefer} />
-    {:else}
-        <div class="flex justify-center">
-            <div role="tablist" class="tabs-boxed tabs w-2/3 bg-neutral">
-                {#each ["time", "calendar"] as tab}
-                    <button
-                        role="tab"
-                        tabindex="0"
-                        class={tab === (isTimeTabActive ? "time" : "calendar")
-                            ? "tab tab-active"
-                            : "tab bg-neutral"}
-                        on:click={() => selectTab(tab)}
-                    >
-                        <svelte:component
-                            this={tab === "time" ? ClockIcon : CalendarIcon}
-                            class="h-5 w-5 [&>path]:stroke-[3]"
-                        />
-                    </button>
-                {/each}
-            </div>
-        </div>
-
-        {#if isTimeTabActive}
-            <TimePicker {task} on:defer={handleDefer} />
+{#key items}
+    <div class="modal-box min-h-[60%] w-fit">
+        {#if task.due.all_day == 1}
+            <DatePicker {task} {tz} {items} on:defer={handleDefer} />
         {:else}
-            <DatePicker {tz} on:defer={handleDefer} />
+            <div class="flex justify-center">
+                <div role="tablist" class="tabs-boxed tabs w-2/3 bg-neutral">
+                    {#each ["time", "calendar"] as tab}
+                        <button
+                            role="tab"
+                            tabindex="0"
+                            class={tab === (isTimeTabActive ? "time" : "calendar")
+                                ? "tab tab-active"
+                                : "tab bg-neutral"}
+                            on:click={() => selectTab(tab)}
+                        >
+                            <svelte:component
+                                this={tab === "time" ? ClockIcon : CalendarIcon}
+                                class="h-5 w-5 [&>path]:stroke-[3]"
+                            />
+                        </button>
+                    {/each}
+                </div>
+            </div>
+
+            {#if isTimeTabActive}
+                <TimePicker {task} {items} on:defer={handleDefer} />
+            {:else}
+                <DatePicker {task} {tz} {items} on:defer={handleDefer} />
+            {/if}
         {/if}
-    {/if}
-</div>
+    </div>
+{/key}
+
 <form method="dialog" class="modal-backdrop">
     <button>close</button>
 </form>
