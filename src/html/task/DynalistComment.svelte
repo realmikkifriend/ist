@@ -7,13 +7,13 @@
 
     export let url, accessToken;
 
-    let dynalistContent;
+    let dynalistObject;
     let selectedType = "";
 
     onMount(async () => {
         try {
             const { data, dynalistSubItem } = await fetchDynalistDocument(url, accessToken);
-            let rootNode, dynalistObject;
+            let rootNode;
 
             if (dynalistSubItem) {
                 rootNode = data.nodes.find((node) => node.id === dynalistSubItem);
@@ -23,9 +23,6 @@
 
             if (rootNode) {
                 dynalistObject = processNode(rootNode, data);
-                dynalistContent =
-                    generateDynalistComment(dynalistObject) ||
-                    "Unsupported format, but stay tuned.";
 
                 const validTypes = ["read", "checklist", "count", "rotating", "crossoff"];
                 selectedType = validTypes.includes(dynalistObject.note)
@@ -44,9 +41,26 @@
     }
 </script>
 
-{#if dynalistContent}
+{#if dynalistObject}
     <div class="relative">
-        <Markdown md={dynalistContent} />
+        {#if selectedType === "read"}
+            <Markdown
+                md={generateDynalistComment(dynalistObject) ||
+                    "Unsupported format, but stay tuned."}
+            />
+        {:else if selectedType === "checklist"}
+            <!-- <DynalistChecklist {dynalistObject} /> -->
+            View not supported yet.
+        {:else if selectedType === "count"}
+            <!-- <DynalistCount {dynalistObject} /> -->
+            View not supported yet.
+        {:else if selectedType === "rotating"}
+            <!-- <DynalistRotating {dynalistObject} /> -->
+            View not supported yet.
+        {:else if selectedType === "crossoff"}
+            <!-- <DynalistCrossOff {dynalistObject} /> -->
+            View not supported yet.
+        {/if}
 
         {#key selectedType}
             <DynalistTypeMenu {selectedType} on:selectType={handleTypeSelection} />
