@@ -2,6 +2,7 @@
     import { ArrowPathIcon, KeyIcon } from "@krowten/svelte-heroicons";
     import { dynalistAccessToken } from "../../js/stores";
     import { success } from "../../js/toasts";
+    import { getDynalistLogo } from "../../js/logos";
 
     let tempToken = "";
     let isSubmitting = false;
@@ -38,21 +39,11 @@
             isTokenInvalid = true;
         }
     }
-
-    function getDynalistLogo() {
-        return `
-            <img
-                alt="Dynalist logo"
-                class="max-w-8 my-1 mx-0"
-                src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciICB2aWV3Qm94PSIwIDAgNDggNDgiIHdpZHRoPSI0OHB4IiBoZWlnaHQ9IjQ4cHgiPjxwYXRoIGZpbGw9IiMwMDdjZTYiIGQ9Ik02LDEwYzAtMi4yMDksMS43OTEtNCw0LTRoMjhjMi4yMDksMCw0LDEuNzkxLDQsNHYyOGMwLDIuMjA5LTEuNzkxLDQtNCw0SDEwYy0yLjIwOSwwLTQtMS43OTEtNC00CVYxMHoiLz48cGF0aCBmaWxsPSIjZmZmIiBkPSJNMzEuOTQ5LDE2LjVjLTMuNTc2LDAtNi4yNzUsMi40ODMtNy45NDgsNC42NDNjLTEuNjczLTIuMTU5LTQuMzc0LTQuNjQzLTcuOTQ5LTQuNjQzCUMxMS44ODgsMTYuNSw4LjUsMTkuODY0LDguNSwyNHMzLjM4OCw3LjUsNy41NTEsNy41YzMuNTc2LDAsNi4yNzYtMi40ODMsNy45NDktNC42NDNjMS42NzMsMi4xNiw0LjM3Miw0LjY0Myw3Ljk0OCw0LjY0MwljNC4xNjMsMCw3LjU1MS0zLjM2NCw3LjU1MS03LjVTMzYuMTEyLDE2LjUsMzEuOTQ5LDE2LjV6IE0yMS45OTIsMjQuMjI2Yy0xLjA0OSwxLjUzNy0zLjIxNSw0LjExNi01Ljk0MSw0LjExNgljLTIuNDExLDAtNC4zNzItMS45NDgtNC4zNzItNC4zNDJjMC0yLjM5NCwxLjk2MS00LjM0Miw0LjM3Mi00LjM0MmMyLjcwNCwwLDQuODgzLDIuNTg0LDUuOTQsNC4xMjRsMC4xNTIsMC4yMjJMMjEuOTkyLDI0LjIyNnogTTMxLjk0OSwyOC4zNDJjLTIuNzI2LDAtNC44OTItMi41NzktNS45NDEtNC4xMTZsLTAuMTUyLTAuMjIybDAuMTUyLTAuMjIyYzEuMDU4LTEuNTQsMy4yMzYtNC4xMjQsNS45NDEtNC4xMjQJYzIuNDExLDAsNC4zNzIsMS45NDgsNC4zNzIsNC4zNDJDMzYuMzIxLDI2LjM5NCwzNC4zNTksMjguMzQyLDMxLjk0OSwyOC4zNDJ6Ii8+PC9zdmc+"
-            />
-        `;
-    }
 </script>
 
 <div class="dynalistPrompt">
     <div class="flex h-auto items-center space-x-1">
-        {@html getDynalistLogo()}
+        {@html getDynalistLogo(8)}
         <div>
             Provide <a
                 href="https://dynalist.io/developer"
