@@ -25,10 +25,10 @@
     >
         <ChevronDownIcon class="h-4 w-4" />
     </div>
-    <ul tabindex="-1" class="z-1 menu dropdown-content mr-[-3rem] w-36 bg-neutral p-1">
+    <ul tabindex="-1" class="z-1 menu dropdown-content mr-[-3rem] w-36 rounded-lg bg-neutral p-1">
         {#each iconPairs as { component: IconComponent, label }}
             <span
-                class="m-0 flex w-full cursor-pointer flex-row items-center gap-1 p-1 font-bold hover:bg-accent"
+                class="m-0 flex w-full cursor-pointer flex-row items-center gap-1 rounded p-1 font-bold hover:bg-accent"
             >
                 <IconComponent class="mr-1 h-6 w-6" />
                 {label}
