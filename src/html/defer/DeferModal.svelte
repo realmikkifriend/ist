@@ -55,7 +55,7 @@
 {#key items}
     <div class="modal-box min-h-[60%] w-fit">
         {#if task.due.all_day == 1}
-            <DatePicker {tz} on:defer={handleDefer} />
+            <DatePicker {task} {tz} {items} on:defer={handleDefer} />
         {:else}
             <div class="flex justify-center">
                 <div role="tablist" class="tabs-boxed tabs w-2/3 bg-neutral">
@@ -80,7 +80,7 @@
             {#if isTimeTabActive}
                 <TimePicker {task} {items} on:defer={handleDefer} />
             {:else}
-                <DatePicker {tz} on:defer={handleDefer} />
+                <DatePicker {task} {tz} {items} on:defer={handleDefer} />
             {/if}
         {/if}
     </div>

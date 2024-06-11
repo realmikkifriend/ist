@@ -32,6 +32,11 @@ body {
     min-width: 18rem;
 }
 
+.sdt-cal-td > button {
+    padding-top: 0rem !important;
+    padding-bottom: 0.25rem !important;
+}
+
 /* GENERATED ELEMENTS */
 
 .prose ul,
