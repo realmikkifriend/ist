@@ -2,6 +2,7 @@
     import Markdown from "svelte-exmarkdown";
     import { ArrowPathIcon } from "@krowten/svelte-heroicons";
     import { onMount } from "svelte";
+    import DynalistTypeMenu from "./DynalistTypeMenu.svelte";
     export let url, accessToken;
 
     let dynalistContent;
@@ -91,7 +92,11 @@
 </script>
 
 {#if dynalistContent}
-    <Markdown md={dynalistContent} />
+    <div class="relative">
+        <Markdown md={dynalistContent} />
+
+        <DynalistTypeMenu />
+    </div>
 {:else}
     <span class="flex items-center">
         <ArrowPathIcon class="mr-2 h-4 w-4 animate-spin" /> Retrieving Dynalist document...
