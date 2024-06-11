@@ -39,7 +39,7 @@
     <ul tabindex="-1" class="z-1 menu dropdown-content mr-[-4rem] w-fit rounded-lg bg-neutral p-1">
         {#each iconPairs as { component: IconComponent, label, type }, index}
             {#if index === 3}
-                <span class="text-nowrap text-center text-xs text-primary"
+                <span class="cursor-default text-nowrap text-center text-xs text-primary"
                     >&mdash;modify original document&mdash;</span
                 >
             {/if}
