@@ -8,6 +8,7 @@
     export let url, accessToken;
 
     let dynalistContent;
+    let selectedType = "";
 
     onMount(async () => {
         try {
@@ -25,6 +26,11 @@
                 dynalistContent =
                     generateDynalistComment(dynalistObject) ||
                     "Unsupported format, but stay tuned.";
+
+                const validTypes = ["read", "checklist", "count", "rotating", "crossoff"];
+                selectedType = validTypes.includes(dynalistObject.note)
+                    ? dynalistObject.note
+                    : "read";
             } else {
                 console.error("Specified node not in document.");
             }
@@ -32,13 +38,19 @@
             console.error("Error during Dynalist document retrieval or processing:", error);
         }
     });
+
+    function handleTypeSelection(event) {
+        selectedType = event.detail.type;
+    }
 </script>
 
 {#if dynalistContent}
     <div class="relative">
         <Markdown md={dynalistContent} />
 
-        <DynalistTypeMenu />
+        {#key selectedType}
+            <DynalistTypeMenu {selectedType} on:selectType={handleTypeSelection} />
+        {/key}
     </div>
 {:else}
     <span class="flex items-center">
