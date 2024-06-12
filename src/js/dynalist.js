@@ -19,13 +19,16 @@ export async function fetchDynalistDocument(url, accessToken) {
         });
 
         if (!response.ok) {
-            throw new Error(`Error fetching the document: ${response.statusText}`);
+            throw new Error(`${response.statusText}`);
         }
 
         data = await response.json();
+
+        if (data._code === "NotFound") {
+            throw new Error(data._msg);
+        }
     } catch (error) {
-        console.error("Failed to retrieve the Dynalist document:", error);
-        throw error;
+        throw data._msg;
     }
 
     return { data, dynalistSubItem };

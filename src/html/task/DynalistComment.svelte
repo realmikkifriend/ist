@@ -2,8 +2,10 @@
     import Markdown from "svelte-exmarkdown";
     import { ArrowPathIcon } from "@krowten/svelte-heroicons";
     import { onMount } from "svelte";
+    import DynalistChecklist from "./DynalistChecklist.svelte";
     import DynalistTypeMenu from "./DynalistTypeMenu.svelte";
     import { fetchDynalistDocument, processNode, generateDynalistComment } from "../../js/dynalist";
+    import { error } from "../../js/toasts";
 
     export let url, accessToken;
 
@@ -31,8 +33,9 @@
             } else {
                 console.error("Specified node not in document.");
             }
-        } catch (error) {
-            console.error("Error during Dynalist document retrieval or processing:", error);
+        } catch (e) {
+            error(`Dynalist retrieval/processing error: ${e}`);
+            console.error("Dynalist retrieval/processing error:", e);
         }
     });
 
@@ -49,8 +52,7 @@
                     "Unsupported format, but stay tuned."}
             />
         {:else if selectedType === "checklist"}
-            <!-- <DynalistChecklist {dynalistObject} /> -->
-            View not supported yet.
+            <DynalistChecklist {dynalistObject} />
         {:else if selectedType === "count"}
             <!-- <DynalistCount {dynalistObject} /> -->
             View not supported yet.

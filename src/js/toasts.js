@@ -60,6 +60,6 @@ export const error = (m) =>
             },
             initial: 0,
             dismissable: true,
-            target: "wait",
+            target: "error",
         }),
     );
