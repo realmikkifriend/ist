@@ -26,6 +26,7 @@
 
             if (rootNode) {
                 dynalistObject = processNode(rootNode, data);
+                dynalistObject.file_id = data.file_id;
 
                 const validTypes = ["read", "checklist", "rotating", "crossoff"];
                 const firstWordMatch = dynalistObject.note.match(/^count \d+(\/|$)[\s\S]*$/);
