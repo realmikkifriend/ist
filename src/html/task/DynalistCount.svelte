@@ -10,6 +10,15 @@
         date = todayFormatted;
         current = 0;
     }
+
+    const options = ["+1", "+5", "+10"];
+
+    function handleCount(option) {
+        current = (+current || 0) + +option.slice(1);
+        const newNote = `count ${total}/${current} ${todayFormatted}`;
+
+        console.log(newNote);
+    }
 </script>
 
 <span class="flex w-full justify-between">
@@ -17,9 +26,16 @@
         <span class="text-xl">{content.content}</span>
         <br />
         <span class="text-2xl">{current}</span>
-        <span class="mx-2 text-lg">/{total}</span>
+        <span class="mx-2 text-lg">&#8725;{total}</span>
         <small>{`${Math.round((current / total) * 100)}%`}</small>
     </span>
 
-    <span class="content-end">+1 +5 +10</span>
+    <span class="content-end">
+        {#each options as option}
+            <button
+                class="btn ml-1 h-8 min-h-8 bg-primary px-2 pb-1 pt-0 text-white hover:bg-base-100"
+                on:click={() => handleCount(option)}>{option}</button
+            >
+        {/each}
+    </span>
 </span>
