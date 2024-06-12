@@ -2,18 +2,20 @@
     import Markdown from "svelte-exmarkdown";
     import { ArrowPathIcon } from "@krowten/svelte-heroicons";
     import { onMount } from "svelte";
+    import DynalistChecklist from "./DynalistChecklist.svelte";
     import DynalistTypeMenu from "./DynalistTypeMenu.svelte";
     import { fetchDynalistDocument, processNode, generateDynalistComment } from "../../js/dynalist";
+    import { error } from "../../js/toasts";
 
     export let url, accessToken;
 
-    let dynalistContent;
+    let dynalistObject;
     let selectedType = "";
 
     onMount(async () => {
         try {
             const { data, dynalistSubItem } = await fetchDynalistDocument(url, accessToken);
-            let rootNode, dynalistObject;
+            let rootNode;
 
             if (dynalistSubItem) {
                 rootNode = data.nodes.find((node) => node.id === dynalistSubItem);
@@ -23,9 +25,6 @@
 
             if (rootNode) {
                 dynalistObject = processNode(rootNode, data);
-                dynalistContent =
-                    generateDynalistComment(dynalistObject) ||
-                    "Unsupported format, but stay tuned.";
 
                 const validTypes = ["read", "checklist", "count", "rotating", "crossoff"];
                 selectedType = validTypes.includes(dynalistObject.note)
@@ -34,8 +33,9 @@
             } else {
                 console.error("Specified node not in document.");
             }
-        } catch (error) {
-            console.error("Error during Dynalist document retrieval or processing:", error);
+        } catch (e) {
+            error(`Dynalist retrieval/processing error: ${e}`);
+            console.error("Dynalist retrieval/processing error:", e);
         }
     });
 
@@ -44,9 +44,25 @@
     }
 </script>
 
-{#if dynalistContent}
+{#if dynalistObject}
     <div class="relative">
-        <Markdown md={dynalistContent} />
+        {#if selectedType === "read"}
+            <Markdown
+                md={generateDynalistComment(dynalistObject) ||
+                    "Unsupported format, but stay tuned."}
+            />
+        {:else if selectedType === "checklist"}
+            <DynalistChecklist content={generateDynalistComment(dynalistObject)} />
+        {:else if selectedType === "count"}
+            <!-- <DynalistCount {dynalistObject} /> -->
+            View not supported yet.
+        {:else if selectedType === "rotating"}
+            <!-- <DynalistRotating {dynalistObject} /> -->
+            View not supported yet.
+        {:else if selectedType === "crossoff"}
+            <!-- <DynalistCrossOff {dynalistObject} /> -->
+            View not supported yet.
+        {/if}
 
         {#key selectedType}
             <DynalistTypeMenu {selectedType} on:selectType={handleTypeSelection} />

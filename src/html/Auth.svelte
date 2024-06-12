@@ -24,6 +24,7 @@
 </script>
 
 <SvelteToast target="wait" />
+<SvelteToast target="error" />
 <SvelteToast target="success" />
 {#if !accessToken}
     {#if window.location.search.startsWith("?code")}
