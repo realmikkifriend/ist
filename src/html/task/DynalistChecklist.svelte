@@ -1,5 +1,6 @@
 <script>
     import Markdown from "svelte-exmarkdown";
+    import { BackwardIcon } from "@krowten/svelte-heroicons";
     export let content;
 
     function parseContent(content) {
@@ -44,3 +45,14 @@
     />
     <Markdown md={checklistItems[currentIndex]} />
 </div>
+
+{#if currentIndex > 0}
+    <div class="absolute right-11 top-[-0.5rem]">
+        <button
+            class="btn m-0 h-2 min-h-8 gap-0 border-transparent bg-transparent p-1 pb-2 pt-1.5 hover:bg-primary"
+            on:click={() => (currentIndex = 0)}
+        >
+            <BackwardIcon class="h-5 w-5" />
+        </button>
+    </div>
+{/if}
