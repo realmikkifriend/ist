@@ -1,4 +1,7 @@
 <script>
+    import { get } from "svelte/store";
+    import { dynalistAccessToken } from "../../js/stores";
+    import { success } from "../../js/toasts";
     export let content;
 
     let [_, total, current, date] =
@@ -13,11 +16,42 @@
 
     const options = ["+1", "+5", "+10"];
 
-    function handleCount(option) {
+    async function handleCount(option) {
         current = (+current || 0) + +option.slice(1);
         const newNote = `count ${total}/${current} ${todayFormatted}`;
 
         console.log(newNote);
+
+        const payload = {
+            token: get(dynalistAccessToken),
+            file_id: content.file_id,
+            changes: [
+                {
+                    action: "edit",
+                    node_id: content.id,
+                    note: newNote,
+                },
+            ],
+        };
+
+        try {
+            const response = await fetch("https://dynalist.io/api/v1/doc/edit", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(payload),
+            });
+
+            if (!response.ok) {
+                throw new Error("Network response was not ok");
+            }
+
+            const data = await response.json();
+            success("Updated count!");
+        } catch (error) {
+            console.error("Failed to add note to Dynalist API", error);
+        }
     }
 </script>
 
