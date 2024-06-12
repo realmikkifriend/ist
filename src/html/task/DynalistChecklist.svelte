@@ -37,19 +37,25 @@
     }
 </script>
 
-<div>
-    <button
-        bind:this={buttonElement}
-        class="float-left mr-2 mt-1 inline-block h-5 w-5 cursor-pointer border-2 border-secondary transition-colors"
-        on:click={showNextItem}
-    />
-    <Markdown md={checklistItems[currentIndex]} />
-</div>
+{#if currentIndex < checklistItems.length - 1}
+    <div>
+        <button
+            bind:this={buttonElement}
+            class="float-left mr-2 mt-1 inline-block h-5 w-5 cursor-pointer border-2 border-secondary transition-colors"
+            on:click={showNextItem}
+        />
+        <Markdown md={checklistItems[currentIndex]} />
+    </div>
+{:else}
+    <span class="italic">Reached end of list.</span>
+{/if}
 
 {#if currentIndex > 0}
     <div class="absolute right-11 top-[-0.5rem]">
         <button
-            class="btn m-0 h-2 min-h-8 gap-0 border-transparent bg-transparent p-1 pb-2 pt-1.5 hover:bg-primary"
+            class="btn m-0 h-2 min-h-8 gap-0 border-transparent p-1 pb-2 pt-1.5 hover:bg-primary hover:text-white"
+            class:bg-transparent={currentIndex < checklistItems.length - 1}
+            class:bg-primary={currentIndex === checklistItems.length - 1}
             on:click={() => (currentIndex = 0)}
         >
             <BackwardIcon class="h-5 w-5" />
