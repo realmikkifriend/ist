@@ -26,10 +26,14 @@
             if (rootNode) {
                 dynalistObject = processNode(rootNode, data);
 
-                const validTypes = ["read", "checklist", "count", "rotating", "crossoff"];
-                selectedType = validTypes.includes(dynalistObject.note)
-                    ? dynalistObject.note
-                    : "read";
+                const validTypes = ["read", "checklist", "rotating", "crossoff"];
+                const firstWord = dynalistObject.note.split(" ")[0];
+                selectedType =
+                    validTypes.includes(dynalistObject.note) || firstWord === "count"
+                        ? firstWord === "count"
+                            ? "count"
+                            : dynalistObject.note
+                        : "read";
             } else {
                 console.error("Specified node not in document.");
             }
