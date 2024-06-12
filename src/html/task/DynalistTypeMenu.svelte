@@ -31,7 +31,7 @@
     <div
         tabindex="0"
         role="button"
-        class="btn m-0 h-2 min-h-8 gap-0 border-transparent bg-transparent p-1 pb-2 pt-0 hover:bg-primary"
+        class="btn m-0 h-2 min-h-8 gap-0 border-transparent bg-transparent p-1 pb-3 pt-0 hover:bg-primary"
     >
         {@html getDynalistLogo(6)}
         <ChevronDownIcon class="h-4 w-4" />
