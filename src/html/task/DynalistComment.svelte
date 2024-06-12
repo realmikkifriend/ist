@@ -52,7 +52,7 @@
                     "Unsupported format, but stay tuned."}
             />
         {:else if selectedType === "checklist"}
-            <DynalistChecklist {dynalistObject} />
+            <DynalistChecklist content={generateDynalistComment(dynalistObject)} />
         {:else if selectedType === "count"}
             <!-- <DynalistCount {dynalistObject} /> -->
             View not supported yet.
