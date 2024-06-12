@@ -1,7 +1,7 @@
 export async function fetchDynalistDocument(url, accessToken) {
     const lastIndex = url.lastIndexOf("/"),
         hashIndex = url.indexOf("#z=", lastIndex),
-        dynalistFileID = url.slice(lastIndex + 1, hashIndex),
+        dynalistFileID = url.slice(lastIndex + 1, hashIndex === -1 ? undefined : hashIndex),
         dynalistSubItem = hashIndex === -1 ? undefined : url.slice(hashIndex + 3);
 
     let data;
