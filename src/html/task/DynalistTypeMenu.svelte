@@ -31,12 +31,12 @@
     <div
         tabindex="0"
         role="button"
-        class="btn m-0 h-2 min-h-8 gap-0 border-transparent bg-transparent p-1 pb-2 pt-0 hover:bg-primary"
+        class="btn m-0 h-2 min-h-8 gap-0 border-transparent bg-transparent p-1 pb-3 pt-0 hover:bg-primary"
     >
         {@html getDynalistLogo(6)}
         <ChevronDownIcon class="h-4 w-4" />
     </div>
-    <ul tabindex="-1" class="z-1 menu dropdown-content mr-[-4rem] w-fit rounded-lg bg-neutral p-1">
+    <ul tabindex="-1" class="menu dropdown-content z-10 mr-[-4rem] w-fit rounded-lg bg-neutral p-1">
         {#each iconPairs as { component: IconComponent, label, type }, index}
             {#if index === 3}
                 <span class="cursor-default text-nowrap text-center text-xs text-primary"

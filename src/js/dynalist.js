@@ -1,3 +1,6 @@
+import { get } from "svelte/store";
+import { dynalistAccessToken } from "./stores";
+
 export async function fetchDynalistDocument(url, accessToken) {
     const lastIndex = url.lastIndexOf("/"),
         hashIndex = url.indexOf("#z=", lastIndex),
@@ -66,4 +69,30 @@ export function generateDynalistComment(node, indent = 0) {
     };
 
     return node.children.reduce((acc, child) => acc + processNodeContent(child, indent), "");
+}
+
+export async function updateDynalist(file_id, changes) {
+    const payload = {
+        token: get(dynalistAccessToken),
+        file_id,
+        changes,
+    };
+
+    try {
+        const response = await fetch("https://dynalist.io/api/v1/doc/edit", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(payload),
+        });
+
+        if (!response.ok) {
+            throw new Error("Network response was not ok");
+        }
+
+        await response.json();
+    } catch (error) {
+        console.error("Failed to add note to Dynalist API", error);
+    }
 }

@@ -3,6 +3,7 @@
     import { ArrowPathIcon } from "@krowten/svelte-heroicons";
     import { onMount } from "svelte";
     import DynalistChecklist from "./DynalistChecklist.svelte";
+    import DynalistCount from "./DynalistCount.svelte";
     import DynalistTypeMenu from "./DynalistTypeMenu.svelte";
     import { fetchDynalistDocument, processNode, generateDynalistComment } from "../../js/dynalist";
     import { error } from "../../js/toasts";
@@ -25,11 +26,17 @@
 
             if (rootNode) {
                 dynalistObject = processNode(rootNode, data);
+                dynalistObject.file_id = data.file_id;
 
-                const validTypes = ["read", "checklist", "count", "rotating", "crossoff"];
-                selectedType = validTypes.includes(dynalistObject.note)
-                    ? dynalistObject.note
-                    : "read";
+                const validTypes = ["read", "checklist", "rotating", "crossoff"];
+                const firstWordMatch = dynalistObject.note.match(/^count \d+(\/|$)[\s\S]*$/);
+
+                selectedType =
+                    validTypes.includes(dynalistObject.note) || firstWordMatch
+                        ? firstWordMatch
+                            ? "count"
+                            : dynalistObject.note
+                        : "read";
             } else {
                 console.error("Specified node not in document.");
             }
@@ -54,13 +61,12 @@
         {:else if selectedType === "checklist"}
             <DynalistChecklist content={generateDynalistComment(dynalistObject)} />
         {:else if selectedType === "count"}
-            <!-- <DynalistCount {dynalistObject} /> -->
-            View not supported yet.
+            <DynalistCount content={dynalistObject} />
         {:else if selectedType === "rotating"}
-            <!-- <DynalistRotating {dynalistObject} /> -->
+            <!-- <DynalistRotating content={dynalistObject} /> -->
             View not supported yet.
         {:else if selectedType === "crossoff"}
-            <!-- <DynalistCrossOff {dynalistObject} /> -->
+            <!-- <DynalistCrossOff content={dynalistObject} /> -->
             View not supported yet.
         {/if}
 
