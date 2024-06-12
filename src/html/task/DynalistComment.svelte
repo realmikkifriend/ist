@@ -28,10 +28,11 @@
                 dynalistObject = processNode(rootNode, data);
 
                 const validTypes = ["read", "checklist", "rotating", "crossoff"];
-                const firstWord = dynalistObject.note.split(" ")[0];
+                const firstWordMatch = dynalistObject.note.match(/^count \d+(\/|$)[\s\S]*$/);
+
                 selectedType =
-                    validTypes.includes(dynalistObject.note) || firstWord === "count"
-                        ? firstWord === "count"
+                    validTypes.includes(dynalistObject.note) || firstWordMatch
+                        ? firstWordMatch
                             ? "count"
                             : dynalistObject.note
                         : "read";
