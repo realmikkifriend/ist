@@ -2,18 +2,21 @@
 @tailwind components;
 @tailwind utilities;
 
+body {
+    font-family: "Clear Sans", sans-serif;
+}
+
+/* TOAST NOTIFICATIONS */
+
 :root {
-    /* toast notifications */
-    --toastContainerTop: auto;
-    --toastContainerRight: 1.5rem;
-    --toastContainerBottom: 1rem;
-    --toastContainerLeft: auto;
     --toastBorderRadius: 0.5rem;
     --toastWidth: 20rem;
 }
 
-body {
-    font-family: "Clear Sans", sans-serif;
+._toastContainer {
+    position: relative !important;
+    top: unset !important;
+    right: 0.5rem !important;
 }
 
 /* DATE PICKER */

@@ -23,9 +23,12 @@
     }
 </script>
 
-<SvelteToast target="wait" />
-<SvelteToast target="error" />
-<SvelteToast target="success" />
+<div class="absolute bottom-0 right-0 mb-6 mr-8 flex max-h-fit w-72 flex-col-reverse space-y-1">
+    <SvelteToast target="wait" />
+    <SvelteToast target="error" />
+    <SvelteToast target="success" />
+</div>
+
 {#if !accessToken}
     {#if window.location.search.startsWith("?code")}
         <OAuthCallback />
