@@ -1,4 +1,6 @@
 import { DateTime } from "luxon";
+import { createDateWithTime } from "./time";
+import { handleTaskDefer } from "../js/taskHandlers";
 
 export function processTodoistData(currentResources, data, RESOURCE_TYPES) {
     const propsToRemove = [
@@ -89,17 +91,24 @@ export function processTodoistData(currentResources, data, RESOURCE_TYPES) {
 
     const today = DateTime.now().startOf("day");
     const overdueTasks =
-        currentResources && Array.isArray(currentResources.items)
-            ? currentResources.items.filter((resource) => {
-                  if (resource.due && resource.due.date) {
-                      const dueDate = DateTime.fromISO(resource.due.date).startOf("day");
-                      return dueDate < today;
-                  }
-                  return false;
-              })
-            : [];
+        currentResources?.items?.filter((resource) => {
+            const dueDate =
+                resource.due?.date && DateTime.fromISO(resource.due.date).startOf("day");
+            return dueDate && dueDate < today;
+        }) || [];
 
-    console.log(overdueTasks);
+    if (overdueTasks.length > 0) {
+        const taskUpdates = [];
+
+        overdueTasks.forEach((task) => {
+            const extracted = task.due?.string ? createDateWithTime(task.due.string, today) : null;
+            const time = extracted?.newDate || today;
+
+            taskUpdates.push([task, time]);
+        });
+
+        handleTaskDefer(taskUpdates);
+    }
 
     return currentResources;
 }
