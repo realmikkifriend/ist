@@ -1,11 +1,11 @@
 import { toast } from "@zerodevx/svelte-toast";
 import { success, newFirstTask } from "./toasts";
+import { firstDueTask } from "../js/stores";
 import FirstDueTaskToast from "../html/FirstDueTaskToast.svelte";
 
 export const checkAndUpdateFirstDueTask = (
     $resources,
     previousFirstDueTask,
-    setFirstDueTask,
     setPreviousFirstDueTask,
     selectedContextId,
     setSelectedContextId,
@@ -43,12 +43,12 @@ export const checkAndUpdateFirstDueTask = (
         (selectedContextId === null || previousFirstDueTask.context_id === selectedContextId)
     ) {
         const onClickHandler = () => {
-            setFirstDueTask(currentFirstDueTask);
+            firstDueTask.set(currentFirstDueTask);
         };
         newFirstTask(FirstDueTaskToast, onClickHandler);
     } else {
         toast.pop({ target: "wait" });
-        setFirstDueTask(currentFirstDueTask);
+        firstDueTask.set(currentFirstDueTask);
     }
 
     setPreviousFirstDueTask(currentFirstDueTask);

@@ -28,7 +28,6 @@
         checkAndUpdateFirstDueTask(
             $resources,
             previousFirstDueTask,
-            firstDueTask.set,
             setPreviousFirstDueTask,
             $settings.selectedContextId,
             (newContextId) => {
