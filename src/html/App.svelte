@@ -15,27 +15,14 @@
     import Sidebar from "./sidebar/Sidebar.svelte";
     import Task from "./task/Task.svelte";
 
-    let resources,
-        previousFirstDueTask,
-        unsubscribeResources,
-        unsubscribeSettings,
-        intervalId,
-        selectedContextId;
-
-    const setPreviousFirstDueTask = (task) => (previousFirstDueTask = task);
+    let resources, unsubscribeResources, unsubscribeSettings, intervalId, selectedContextId;
 
     const updateFirstDueTask = ($resources, $settings) => {
-        checkAndUpdateFirstDueTask(
-            $resources,
-            previousFirstDueTask,
-            setPreviousFirstDueTask,
-            $settings.selectedContextId,
-            (newContextId) => {
-                userSettings.update((settings) => {
-                    return { ...settings, selectedContextId: newContextId };
-                });
-            },
-        );
+        checkAndUpdateFirstDueTask($resources, $settings.selectedContextId, (newContextId) => {
+            userSettings.update((settings) => {
+                return { ...settings, selectedContextId: newContextId };
+            });
+        });
     };
 
     onMount(async () => {
@@ -67,12 +54,12 @@
             task: { id: taskID },
         },
     }) => {
-        handleTaskDone(taskID, setPreviousFirstDueTask, firstDueTask.set);
+        handleTaskDone(taskID);
     };
 
     const handleDefer = ({ detail: { task, time } }) => {
         if (DateTime.isDateTime(time)) {
-            handleTaskDefer(task, time, setPreviousFirstDueTask, firstDueTask.set);
+            handleTaskDefer([[task, time]]);
         } else {
             error("Received unexpected type of date...");
         }
@@ -89,7 +76,7 @@
     }
 </script>
 
-<Sidebar {setPreviousFirstDueTask} />
+<Sidebar />
 
 {#if $todoistResources.items}
     {#if $firstDueTask}

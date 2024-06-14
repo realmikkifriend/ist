@@ -1,23 +1,18 @@
+import { get } from "svelte/store";
 import { toast } from "@zerodevx/svelte-toast";
 import { success, newFirstTask } from "./toasts";
-import { firstDueTask } from "../js/stores";
+import { firstDueTask, previousFirstDueTask } from "../js/stores";
 import FirstDueTaskToast from "../html/FirstDueTaskToast.svelte";
 
-export const checkAndUpdateFirstDueTask = (
-    $resources,
-    previousFirstDueTask,
-    setPreviousFirstDueTask,
-    selectedContextId,
-    setSelectedContextId,
-) => {
-    if (!$resources || !$resources.dueTasks) return;
+export const checkAndUpdateFirstDueTask = ($resources, selectedContextId, setSelectedContextId) => {
+    if (!$resources?.dueTasks?.length) return;
 
     let dueTasks = $resources.dueTasks;
+    const oldPreviousFirstDueTask = get(previousFirstDueTask);
 
     if (selectedContextId) {
         const filteredDueTasks = dueTasks.filter((task) => task.context_id === selectedContextId);
-
-        if (!filteredDueTasks || filteredDueTasks.length === 0) {
+        if (!filteredDueTasks.length) {
             setSelectedContextId(null);
             success("No more tasks in context! Showing all due tasks...");
         } else {
@@ -25,31 +20,23 @@ export const checkAndUpdateFirstDueTask = (
         }
     }
 
-    if (!dueTasks || dueTasks.length === 0) {
-        return;
-    }
+    if (!dueTasks.length) return;
 
     const currentFirstDueTask = dueTasks[0];
-
-    let firstDueTaskComments = $resources.notes.filter(
+    currentFirstDueTask.notes = $resources.notes.filter(
         (note) => note.item_id === currentFirstDueTask.id,
     );
 
-    currentFirstDueTask.notes = firstDueTaskComments;
-
     if (
-        previousFirstDueTask &&
-        currentFirstDueTask?.id !== previousFirstDueTask?.id &&
-        (selectedContextId === null || previousFirstDueTask.context_id === selectedContextId)
+        oldPreviousFirstDueTask &&
+        currentFirstDueTask.id !== oldPreviousFirstDueTask.id &&
+        (!selectedContextId || oldPreviousFirstDueTask.context_id === selectedContextId)
     ) {
-        const onClickHandler = () => {
-            firstDueTask.set(currentFirstDueTask);
-        };
-        newFirstTask(FirstDueTaskToast, onClickHandler);
+        newFirstTask(FirstDueTaskToast, () => firstDueTask.set(currentFirstDueTask));
     } else {
         toast.pop({ target: "wait" });
         firstDueTask.set(currentFirstDueTask);
     }
 
-    setPreviousFirstDueTask(currentFirstDueTask);
+    previousFirstDueTask.set(currentFirstDueTask);
 };
