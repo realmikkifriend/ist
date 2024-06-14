@@ -16,7 +16,8 @@
     let extractedTime, tomorrowInMS;
 
     const updateMilliseconds = () => {
-        const result = createDateWithTime(task.due.string),
+        const tomorrowDate = DateTime.now().plus({ days: 1 });
+        const result = createDateWithTime(task.due.string, tomorrowDate),
             tomorrow = result.newDate,
             now = DateTime.now();
         extractedTime = result.extractedTime;
