@@ -1,17 +1,12 @@
 import { parse } from "chrono-node";
 import { DateTime } from "luxon";
 
-export const createTomorrowDateWithTime = (dueString, tz) => {
+export const createDateWithTime = (dueString, dateTimeObj = DateTime.now()) => {
     const dueParsed = parse(dueString)[0];
-    const { hour, minute } = dueParsed?.start.knownValues || {
-        hour: undefined,
-        minute: undefined,
-    };
+    if (!dueParsed?.start.knownValues.hour) return { extractedTime: null, newDate: null };
 
-    if (!hour) return { extractedTime: null, tomorrowInMS: null };
+    const { hour, minute } = dueParsed.start.knownValues;
+    const newDate = dateTimeObj.set({ hour, minute, second: 0, millisecond: 0 });
 
-    const now = DateTime.now().setZone(tz);
-    const tomorrow = now.plus({ days: 1 }).set({ hour, minute, second: 0, millisecond: 0 });
-
-    return { extractedTime: dueParsed.text, tomorrow };
+    return { extractedTime: dueParsed.text, newDate };
 };

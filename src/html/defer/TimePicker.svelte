@@ -1,7 +1,7 @@
 <script>
     import { createEventDispatcher, onDestroy, onMount, afterUpdate } from "svelte";
     import { DateTime } from "luxon";
-    import { createTomorrowDateWithTime } from "../../js/time";
+    import { createDateWithTime } from "../../js/time";
     import { getPriorityClass } from "../../js/priority";
     import buttons from "../../js/deferButtons";
 
@@ -16,8 +16,8 @@
     let extractedTime, tomorrowInMS;
 
     const updateMilliseconds = () => {
-        const result = createTomorrowDateWithTime(task.due.string),
-            tomorrow = result.tomorrow,
+        const result = createDateWithTime(task.due.string),
+            tomorrow = result.newDate,
             now = DateTime.now();
         extractedTime = result.extractedTime;
         tomorrowInMS = tomorrow.diff(now).milliseconds;

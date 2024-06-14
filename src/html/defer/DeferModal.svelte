@@ -4,7 +4,7 @@
     import { CalendarIcon, ClockIcon } from "@krowten/svelte-heroicons";
     import { DateTime } from "luxon";
     import { todoistResources } from "../../js/stores";
-    import { createTomorrowDateWithTime } from "../../js/time";
+    import { createDateWithTime } from "../../js/time";
     import DatePicker from "./DatePicker.svelte";
     import TimePicker from "./TimePicker.svelte";
     export let task;
@@ -38,12 +38,13 @@
             time = now.plus({ milliseconds: rawTime });
         } else if (typeof rawTime === "string") {
             const date = DateTime.fromISO(rawTime);
+            const tomorrow = DateTime.now().plus({ days: 1 }).setZone(tz);
 
             if (task.due.all_day === 1) {
                 time = date;
             } else {
-                const extracted = createTomorrowDateWithTime(task.due.string, tz),
-                    { hour, minute } = extracted.tomorrow;
+                const extracted = createDateWithTime(task.due.string, tomorrow),
+                    { hour, minute } = extracted.newDate;
                 time = date.set({ hour, minute });
             }
         }
