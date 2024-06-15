@@ -14,15 +14,10 @@
     } from "../../js/stores";
 
     let resources;
+    $: resources = $todoistResources;
+
     let selectedContextId;
-
-    todoistResources.subscribe(($resources) => {
-        resources = $resources;
-    });
-
-    userSettings.subscribe(($settings) => {
-        selectedContextId = $settings.selectedContextId;
-    });
+    $: selectedContextId = $userSettings.selectedContextId;
 
     function handleLogout() {
         todoistAccessToken.set("");

@@ -4,36 +4,30 @@
     import { getPriorityClass } from "../../js/priority";
 
     let resources;
+    $: resources = $todoistResources;
+
     let dueTasksByContext = {};
 
-    todoistResources.subscribe(($resources) => {
-        resources = $resources;
+    $: {
+        dueTasksByContext =
+            resources.dueTasks?.length > 0
+                ? resources.dueTasks.reduce((acc, task) => {
+                      const context = acc[task.context_id] || { total: 0, priorities: {} };
+                      context.total += 1;
+                      context.priorities[task.priority] =
+                          (context.priorities[task.priority] || 0) + 1;
+                      acc[task.context_id] = context;
+                      return acc;
+                  }, {})
+                : {};
+    }
 
-        if (resources.dueTasks?.length > 0) {
-            dueTasksByContext = resources.dueTasks.reduce((acc, task) => {
-                if (!acc[task.context_id]) {
-                    acc[task.context_id] = { total: 0, priorities: {} };
-                }
-                acc[task.context_id].total += 1;
-
-                if (!acc[task.context_id].priorities[task.priority]) {
-                    acc[task.context_id].priorities[task.priority] = 0;
-                }
-                acc[task.context_id].priorities[task.priority] += 1;
-
-                return acc;
-            }, {});
-        }
-    });
-
-    let userSettingsValue;
-    userSettings.subscribe(($settings) => {
-        userSettingsValue = $settings;
-    });
+    let settings;
+    $: settings = $userSettings;
 
     function handleCardClick(contextId) {
         previousFirstDueTask.set(null);
-        const newContextId = userSettingsValue.selectedContextId === contextId ? null : contextId;
+        const newContextId = settings.selectedContextId === contextId ? null : contextId;
 
         userSettings.update((settings) => {
             return {
@@ -57,8 +51,8 @@
 {#each resources.contexts as context}
     {#if dueTasksByContext[context.id] && dueTasksByContext[context.id].total > 0}
         <button
-            class:opacity-25={userSettingsValue.selectedContextId &&
-                userSettingsValue.selectedContextId !== context.id}
+            class:opacity-25={settings.selectedContextId &&
+                settings.selectedContextId !== context.id}
             class="mb-2 rounded-lg bg-secondary text-base-100"
             on:click={() => handleCardClick(context.id)}
         >
