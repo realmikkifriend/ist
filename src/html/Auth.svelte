@@ -1,5 +1,4 @@
 <script>
-    import { onDestroy } from "svelte";
     import { SvelteToast } from "@zerodevx/svelte-toast";
     import { todoistAccessToken } from "../js/stores";
     import "@fontsource/clear-sans/400.css";
@@ -10,16 +9,10 @@
     import "../css/styles.css";
 
     let accessToken;
-    const unsubscribe = todoistAccessToken.subscribe((value) => {
-        accessToken = value;
-    });
-
-    onDestroy(() => {
-        unsubscribe();
-    });
+    $: accessToken = $todoistAccessToken;
 
     $: if (window.location.search.startsWith("?code") && accessToken) {
-        window.location.href = "/";
+        window.history.pushState({ path: "/" }, "", "/");
     }
 </script>
 
