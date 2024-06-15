@@ -1,5 +1,56 @@
-import { DateTime } from "luxon";
+import { get } from "svelte/store";
 import { v4 as uuidv4 } from "uuid";
+import { todoistAccessToken, todoistResources, syncToken, todoistError } from "./stores";
+import { filterAndSortDueTasks } from "./filter";
+import { success } from "./toasts";
+import { processTodoistData } from "./process";
+
+export async function refreshData() {
+    const RESOURCE_TYPES = ["items", "projects", "notes", "user"];
+    let error = null,
+        accessToken,
+        currentResources = {},
+        currentSyncToken;
+
+    $: accessToken = get(todoistAccessToken);
+
+    if (!accessToken) {
+        error = "No access token found.";
+        todoistError.set(error);
+        return { resources: currentResources, error };
+    }
+
+    $: currentSyncToken = get(syncToken);
+
+    try {
+        const data = await fetchTodoistData(RESOURCE_TYPES, currentSyncToken, accessToken);
+        syncToken.set(data.sync_token);
+
+        $: currentResources = get(todoistResources) || {};
+
+        currentResources = processTodoistData(currentResources, data, RESOURCE_TYPES);
+    } catch (err) {
+        error = err.message;
+    }
+
+    if (error) {
+        todoistError.set(error);
+    } else {
+        const timeZone = currentResources.user?.tz_info?.timezone || "UTC";
+        todoistResources.set({
+            ...currentResources,
+            dueTasks: filterAndSortDueTasks(
+                currentResources.items,
+                currentResources.contexts,
+                timeZone,
+            ),
+        });
+
+        success("Todoist data updated!");
+    }
+
+    return { resources: currentResources, error };
+}
 
 export async function fetchTodoistData(resourceTypes, syncToken, accessToken) {
     const response = await fetch("https://api.todoist.com/sync/v9/sync", {

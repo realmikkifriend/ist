@@ -2,13 +2,12 @@ import { get } from "svelte/store";
 import { DateTime } from "luxon";
 import {
     todoistResources,
-    refreshData,
     todoistAccessToken,
     todoistError,
     firstDueTask,
     previousFirstDueTask,
 } from "./stores";
-import { markTaskDone, deferTasks } from "./api";
+import { markTaskDone, deferTasks, refreshData } from "./api";
 
 const updateTaskResources = (taskUpdates) => {
     todoistResources.update(($resources) => {
