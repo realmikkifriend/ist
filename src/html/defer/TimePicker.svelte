@@ -1,17 +1,11 @@
 <script>
-    import { createEventDispatcher, onDestroy, onMount, afterUpdate } from "svelte";
+    import { createEventDispatcher, onDestroy, onMount } from "svelte";
     import { DateTime } from "luxon";
     import { createDateWithTime } from "../../js/time";
     import { getPriorityClass } from "../../js/priority";
     import buttons from "../../js/deferButtons";
 
     export let task, items;
-
-    const dispatch = createEventDispatcher();
-
-    const handleDefer = (rawTime) => {
-        dispatch("defer", { rawTime });
-    };
 
     let extractedTime, tomorrowInMS;
 
@@ -27,13 +21,12 @@
         buttons[0].ms = tomorrowInMS;
 
         let soonTasks = items.filter((item) => {
-            if (!item.due.date.includes("T")) {
-                return false;
-            }
-
-            let dueDateTime = DateTime.fromISO(item.due.date),
-                timeDifference = dueDateTime.diffNow("hours").hours;
-            return dueDateTime.isValid && timeDifference > 0 && timeDifference <= 25;
+            let dueDateTime = DateTime.fromISO(item.due.date);
+            return (
+                dueDateTime.isValid &&
+                item.due.date.includes("T") &&
+                dueDateTime.diffNow("hours").hours <= 25
+            );
         });
 
         for (let i = 1; i < buttons.length; i++) {
@@ -79,6 +72,12 @@
     onDestroy(() => {
         clearInterval(interval);
     });
+
+    const dispatch = createEventDispatcher();
+
+    const handleDefer = (rawTime) => {
+        dispatch("defer", { rawTime });
+    };
 </script>
 
 <div class="mt-4 flex w-72 flex-row flex-wrap gap-x-2 gap-y-1">
