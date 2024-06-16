@@ -11,6 +11,8 @@
     let tomorrowStr = tomorrow.toISODate();
 
     function updateCalendarCells() {
+        if (!calendarElement) return;
+
         const cal = calendarElement.querySelector(".std-btn-header.sdt-toggle-btn").innerText;
         const now = DateTime.local().setZone(tz);
         const startOfMonth = DateTime.fromFormat(cal, "MMMM yyyy").startOf("month");
