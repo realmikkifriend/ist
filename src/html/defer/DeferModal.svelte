@@ -1,6 +1,5 @@
 <script>
-    import { createEventDispatcher, onDestroy } from "svelte";
-    import { get } from "svelte/store";
+    import { createEventDispatcher } from "svelte";
     import { CalendarIcon, ClockIcon } from "@krowten/svelte-heroicons";
     import { DateTime } from "luxon";
     import { todoistResources } from "../../js/stores";
@@ -9,25 +8,19 @@
     import TimePicker from "./TimePicker.svelte";
     export let task;
 
-    const dispatch = createEventDispatcher();
-
     let isTimeTabActive = true;
 
     const selectTab = (tab) => {
         isTimeTabActive = tab === "time";
     };
 
-    const tz = get(todoistResources).user.tz_info.timezone;
+    const tz = $todoistResources.user.tz_info.timezone;
 
     let items = [];
 
-    const unsubscribe = todoistResources.subscribe((value) => {
-        items = value.items;
-    });
+    $: items = $todoistResources.items;
 
-    onDestroy(() => {
-        unsubscribe();
-    });
+    const dispatch = createEventDispatcher();
 
     const handleDefer = ({ detail: { rawTime } }) => {
         let time;
