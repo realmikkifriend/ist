@@ -12,18 +12,12 @@
         dynalistAccessToken,
         firstDueTask,
     } from "../../js/stores";
-    export let setPreviousFirstDueTask;
 
     let resources;
+    $: resources = $todoistResources;
+
     let selectedContextId;
-
-    todoistResources.subscribe(($resources) => {
-        resources = $resources;
-    });
-
-    userSettings.subscribe(($settings) => {
-        selectedContextId = $settings.selectedContextId;
-    });
+    $: selectedContextId = $userSettings.selectedContextId;
 
     function handleLogout() {
         todoistAccessToken.set("");
@@ -43,14 +37,14 @@
             ><Bars3Icon class="h-8 w-8" />
         </label>
         {#if $firstDueTask}
-            <ContextBadge {setPreviousFirstDueTask} />
+            <ContextBadge />
         {/if}
     </div>
     <div class="drawer-side z-10">
         <label for="my-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
         <ul class="menu min-h-full w-80 bg-base-100 p-4 text-base-content">
             {#if resources.contexts}
-                <Contexts {setPreviousFirstDueTask} />
+                <Contexts />
             {/if}
 
             <li class="mt-auto">

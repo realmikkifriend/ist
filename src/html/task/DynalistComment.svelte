@@ -18,11 +18,7 @@
             const { data, dynalistSubItem } = await fetchDynalistDocument(url, accessToken);
             let rootNode;
 
-            if (dynalistSubItem) {
-                rootNode = data.nodes.find((node) => node.id === dynalistSubItem);
-            } else {
-                rootNode = data.nodes.find((node) => node.id === "root");
-            }
+            rootNode = data.nodes.find((node) => node.id === (dynalistSubItem || "root"));
 
             if (rootNode) {
                 dynalistObject = processNode(rootNode, data);

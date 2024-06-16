@@ -1,29 +1,27 @@
 <script>
     import { XMarkIcon } from "@krowten/svelte-heroicons";
-    import { todoistResources, userSettings, firstDueTask } from "../../js/stores";
-    export let setPreviousFirstDueTask;
+    import {
+        todoistResources,
+        userSettings,
+        firstDueTask,
+        previousFirstDueTask,
+    } from "../../js/stores";
 
     let resources,
+        selectedContextId,
         dueTasksInContext = 0,
-        currentContextName = "",
-        selectedContextId;
-    todoistResources.subscribe(($resources) => {
-        resources = $resources;
-    });
+        currentContextName = "";
 
-    firstDueTask.subscribe(() => {
-        filterDueTasksInContext();
-    });
+    $: resources = $todoistResources;
 
-    userSettings.subscribe(($settings) => {
-        selectedContextId = $settings.selectedContextId;
-    });
+    $: selectedContextId = $userSettings.selectedContextId;
 
-    function filterDueTasksInContext() {
-        if (resources?.dueTasks && firstDueTask) {
-            let $firstDueTask;
-            firstDueTask.subscribe((value) => ($firstDueTask = value))();
+    $: {
+        filterDueTasksInContext($firstDueTask);
+    }
 
+    function filterDueTasksInContext($firstDueTask) {
+        if (resources?.dueTasks && $firstDueTask) {
             dueTasksInContext = resources.dueTasks.filter(
                 (task) => task.context_id === $firstDueTask.context_id,
             ).length;
@@ -34,7 +32,7 @@
     }
 
     function clearSelectedContextId() {
-        setPreviousFirstDueTask(null);
+        previousFirstDueTask.set(null);
         userSettings.update((settings) => ({ ...settings, selectedContextId: null }));
     }
 </script>
@@ -46,11 +44,11 @@
     class:opacity-75={selectedContextId}
     class:cursor-default={!selectedContextId}
     class:cursor-pointer={selectedContextId}
-    on:click={clearSelectedContextId}
+    on:click={() => selectedContextId && clearSelectedContextId()}
 >
     {dueTasksInContext} left in {currentContextName}
     {#if selectedContextId}
-        <p class="ml-1 hidden group-hover:block">
+        <p class="ml-1 block sm:hidden sm:group-hover:block">
             <XMarkIcon class="h-4 w-4" />
         </p>
     {/if}

@@ -1,55 +1,65 @@
+import { get } from "svelte/store";
 import { DateTime } from "luxon";
-import { todoistResources, refreshData, todoistAccessToken, todoistError } from "./stores";
-import { markTaskDone, deferTask } from "./api";
+import {
+    todoistResources,
+    todoistAccessToken,
+    todoistError,
+    firstDueTask,
+    previousFirstDueTask,
+} from "./stores";
+import { markTaskDone, deferTasks, refreshData } from "./api";
 
-const getAccessToken = async () => {
-    let accessToken;
-    todoistAccessToken.subscribe(($) => {
-        accessToken = $;
-    });
-
-    if (!accessToken) {
-        todoistError.set("No access token found.");
-        throw new Error("No access token found.");
-    }
-
-    return accessToken;
-};
-
-const updateTaskResources = (taskID, time, setPreviousFirstDueTask, setFirstDueTask) => {
+const updateTaskResources = (taskUpdates) => {
     todoistResources.update(($resources) => {
-        const index = $resources.dueTasks.findIndex((task) => task.id === taskID);
-        if (index !== -1) {
-            const task = $resources.dueTasks[index];
+        taskUpdates.sort(([_, timeA], [__, timeB]) => new Date(timeA) - new Date(timeB));
 
-            const newDueDate = new Date(time);
-            task.due.date = newDueDate.toISOString();
+        taskUpdates.forEach(([taskID, time]) => {
+            const index = $resources.dueTasks.findIndex((task) => task.id === taskID);
+            if (index !== -1) {
+                const task = $resources.dueTasks[index];
+                const oldPreviousFirstDueTask = get(previousFirstDueTask);
 
-            $resources.dueTasks.splice(index, 1);
+                const newDueDate = new Date(time);
+                task.due.date = newDueDate.toISOString();
 
-            if ($resources.dueTasks.length > 0) {
-                setFirstDueTask($resources.dueTasks[0]);
-            } else {
-                setFirstDueTask(null);
+                $resources.dueTasks.splice(index, 1);
+
+                if (oldPreviousFirstDueTask && index === 0) {
+                    previousFirstDueTask.set(null);
+                }
+
+                const insertIndex = $resources.dueTasks.findIndex(
+                    (task) => new Date(task.due.date) > newDueDate,
+                );
+                if (insertIndex === -1) {
+                    $resources.dueTasks.push(task);
+                } else {
+                    $resources.dueTasks.splice(insertIndex, 0, task);
+                }
             }
-            setPreviousFirstDueTask(null);
+        });
+
+        if ($resources.dueTasks.length > 0) {
+            firstDueTask.set($resources.dueTasks[0]);
+        } else {
+            firstDueTask.set(null);
         }
 
         return $resources;
     });
 };
 
-export const handleTaskDone = async (taskID, setPreviousFirstDueTask, setFirstDueTask) => {
-    let accessToken;
-    try {
-        accessToken = await getAccessToken();
-    } catch (error) {
-        return;
+export const handleTaskDone = async (taskID) => {
+    let accessToken = get(todoistAccessToken);
+
+    if (!accessToken) {
+        todoistError.set("No access token found.");
+        throw new Error("No access token found.");
     }
 
     const fiveMinutesFromNow = DateTime.now().plus({ minutes: 5 });
 
-    updateTaskResources(taskID, fiveMinutesFromNow, setPreviousFirstDueTask, setFirstDueTask);
+    updateTaskResources([[taskID, fiveMinutesFromNow]]);
 
     try {
         await markTaskDone(taskID, accessToken);
@@ -61,20 +71,17 @@ export const handleTaskDone = async (taskID, setPreviousFirstDueTask, setFirstDu
     refreshData();
 };
 
-export const handleTaskDefer = async (task, time, setPreviousFirstDueTask, setFirstDueTask) => {
-    let accessToken;
-    try {
-        accessToken = await getAccessToken();
-    } catch (error) {
-        return;
-    }
+export const handleTaskDefer = async (taskUpdates) => {
+    let accessToken = get(todoistAccessToken);
+    console.log(taskUpdates);
 
-    updateTaskResources(task.id, time, setPreviousFirstDueTask, setFirstDueTask);
+    const updatedTaskResources = taskUpdates.map(([task, dateTime]) => [task.id, dateTime]);
+    updateTaskResources(updatedTaskResources);
 
     try {
-        await deferTask(task, time, accessToken);
+        await deferTasks(taskUpdates, accessToken);
     } catch (error) {
-        todoistError.set(`Failed to defer task: ${error.message}`);
+        todoistError.set(`Failed to defer tasks: ${error.message}`);
         return;
     }
 

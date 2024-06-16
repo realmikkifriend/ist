@@ -1,55 +1,22 @@
 <script>
     import { onMount, onDestroy } from "svelte";
     import { DateTime } from "luxon";
-    import {
-        todoistResources,
-        todoistError,
-        refreshData,
-        userSettings,
-        firstDueTask,
-    } from "../js/stores";
+    import { todoistResources, todoistError, userSettings, firstDueTask } from "../js/stores";
     import { checkAndUpdateFirstDueTask } from "../js/first";
+    import { refreshData } from "../js/api";
     import { error } from "../js/toasts";
     import { handleTaskDone, handleTaskDefer } from "../js/taskHandlers";
     import { ArrowPathIcon } from "@krowten/svelte-heroicons";
     import Sidebar from "./sidebar/Sidebar.svelte";
     import Task from "./task/Task.svelte";
 
-    let resources,
-        previousFirstDueTask,
-        unsubscribeResources,
-        unsubscribeSettings,
-        intervalId,
-        selectedContextId;
+    let intervalId,
+        isSpinning = false;
 
-    const setPreviousFirstDueTask = (task) => (previousFirstDueTask = task);
-
-    const updateFirstDueTask = ($resources, $settings) => {
-        checkAndUpdateFirstDueTask(
-            $resources,
-            previousFirstDueTask,
-            firstDueTask.set,
-            setPreviousFirstDueTask,
-            $settings.selectedContextId,
-            (newContextId) => {
-                userSettings.update((settings) => {
-                    return { ...settings, selectedContextId: newContextId };
-                });
-            },
-        );
-    };
+    $: selectedContextId = $userSettings.selectedContextId;
+    $: updateFirstDueTask($todoistResources, { selectedContextId });
 
     onMount(async () => {
-        unsubscribeResources = todoistResources.subscribe(($resources) => {
-            resources = $resources;
-            updateFirstDueTask($resources, { selectedContextId });
-        });
-
-        unsubscribeSettings = userSettings.subscribe(($settings) => {
-            selectedContextId = $settings.selectedContextId;
-            updateFirstDueTask(resources, $settings);
-        });
-
         await handleRefresh();
 
         intervalId = setInterval(async () => {
@@ -59,38 +26,44 @@
 
     onDestroy(() => {
         clearInterval(intervalId);
-        unsubscribeResources();
-        unsubscribeSettings();
     });
+
+    const updateFirstDueTask = ($resources, $settings) => {
+        checkAndUpdateFirstDueTask($resources, $settings.selectedContextId, (newContextId) => {
+            userSettings.update((settings) => {
+                return { ...settings, selectedContextId: newContextId };
+            });
+        });
+    };
 
     const handleDone = ({
         detail: {
             task: { id: taskID },
         },
     }) => {
-        handleTaskDone(taskID, setPreviousFirstDueTask, firstDueTask.set);
+        handleTaskDone(taskID);
     };
 
     const handleDefer = ({ detail: { task, time } }) => {
         if (DateTime.isDateTime(time)) {
-            handleTaskDefer(task, time, setPreviousFirstDueTask, firstDueTask.set);
+            handleTaskDefer([[task, time]]);
         } else {
             error("Received unexpected type of date...");
         }
     };
 
-    let isSpinning = false;
-
-    async function handleRefresh() {
+    const handleRefresh = async () => {
         isSpinning = true;
 
-        await refreshData();
-
-        isSpinning = false;
-    }
+        try {
+            await refreshData();
+        } finally {
+            isSpinning = false;
+        }
+    };
 </script>
 
-<Sidebar {setPreviousFirstDueTask} />
+<Sidebar />
 
 {#if $todoistResources.items}
     {#if $firstDueTask}
