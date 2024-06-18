@@ -3,7 +3,7 @@
     import { DateTime } from "luxon";
     import { ArrowPathIcon } from "@krowten/svelte-heroicons";
     import { todoistResources, todoistError, userSettings, firstDueTask } from "../js/stores";
-    import { checkAndUpdateFirstDueTask } from "../js/first";
+    import { updateFirstDueTask } from "../js/first";
     import { refreshData } from "../js/api";
     import { error } from "../js/toasts";
     import { handleTaskDone, handleTaskDefer } from "../js/taskHandlers";
@@ -14,8 +14,7 @@
         isSpinning = false,
         dataPromise;
 
-    $: selectedContextId = $userSettings.selectedContextId;
-    $: updateFirstDueTask($todoistResources, { selectedContextId });
+    $: $userSettings.selectedContextId, updateFirstDueTask();
 
     onMount(() => {
         dataPromise = handleRefresh();
@@ -28,14 +27,6 @@
     onDestroy(() => {
         clearInterval(autoRefresh);
     });
-
-    const updateFirstDueTask = ($resources, $settings) => {
-        checkAndUpdateFirstDueTask($resources, $settings.selectedContextId, (newContextId) => {
-            userSettings.update((settings) => {
-                return { ...settings, selectedContextId: newContextId };
-            });
-        });
-    };
 
     const handleDone = ({
         detail: {
