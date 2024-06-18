@@ -5,7 +5,11 @@ import { firstDueTask, previousFirstDueTask } from "../js/stores";
 import FirstDueTaskToast from "../html/FirstDueTaskToast.svelte";
 
 export const checkAndUpdateFirstDueTask = ($resources, selectedContextId, setSelectedContextId) => {
-    if (!$resources?.dueTasks?.length) return;
+    if (!$resources?.dueTasks?.length) {
+        previousFirstDueTask.set(null);
+        firstDueTask.set(null);
+        return;
+    }
 
     let dueTasks = $resources.dueTasks;
     const oldPreviousFirstDueTask = get(previousFirstDueTask);
@@ -19,8 +23,6 @@ export const checkAndUpdateFirstDueTask = ($resources, selectedContextId, setSel
             dueTasks = filteredDueTasks;
         }
     }
-
-    if (!dueTasks.length) return;
 
     const currentFirstDueTask = dueTasks[0];
     currentFirstDueTask.notes = $resources.notes.filter(
