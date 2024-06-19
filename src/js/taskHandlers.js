@@ -44,6 +44,7 @@ const updateTaskResources = (taskUpdates) => {
 
 export const handleTaskDone = async (taskID) => {
     let accessToken = get(todoistAccessToken);
+    previousFirstDueTask.set(null);
 
     if (!accessToken) {
         todoistError.set("No access token found.");
