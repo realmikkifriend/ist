@@ -14,7 +14,11 @@
         isSpinning = false,
         dataPromise;
 
-    $: $userSettings.selectedContextId, updateFirstDueTask();
+    $: {
+        $userSettings.selectedContextId;
+        $todoistResources.dueTasks;
+        updateFirstDueTask();
+    }
 
     onMount(() => {
         dataPromise = handleRefresh();
@@ -61,7 +65,7 @@
     <div class="hero">Loading...</div>
 {:then}
     {#if $todoistResources.items}
-        {#if $todoistResources.dueTasks}
+        {#if $firstDueTask}
             <Task task={$firstDueTask} on:done={handleDone} on:defer={handleDefer} />
         {:else}
             <div class="hero">No due tasks</div>
