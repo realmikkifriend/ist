@@ -82,5 +82,9 @@
 {/await}
 
 {#if $todoistError}
-    {@html error(`Error loading Todoist data: ${$todoistError}`) && ""}
+    {@html error(
+        $todoistError.includes("NetworkError")
+            ? "Offline..."
+            : `Error loading Todoist data: ${$todoistError}`,
+    ) && ""}
 {/if}
