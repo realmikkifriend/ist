@@ -49,12 +49,12 @@
                 <Contexts />
             {/if}
 
-            <li class="mt-auto">
+            <div class="mt-auto">
                 <Footer />
                 <button class="btn btn-secondary w-full" on:click={handleLogout}
                     ><ArrowLeftOnRectangleIcon class="h-6 w-6" />Log Out</button
                 >
-            </li>
+            </div>
         </ul>
     </div>
 </div>
