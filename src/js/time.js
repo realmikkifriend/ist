@@ -7,6 +7,7 @@ export const createDateWithTime = (dueString, dateTimeObj = DateTime.now()) => {
 
     const { hour, minute } = dueParsed.start.knownValues;
     const newDate = dateTimeObj.set({ hour, minute, second: 0, millisecond: 0 });
+    const formattedTime = newDate.toFormat("h:mm a");
 
-    return { extractedTime: dueParsed.text, newDate };
+    return { extractedTime: formattedTime, newDate };
 };

@@ -5,8 +5,8 @@
     import DynalistChecklist from "./DynalistChecklist.svelte";
     import DynalistCount from "./DynalistCount.svelte";
     import DynalistTypeMenu from "./DynalistTypeMenu.svelte";
-    import { fetchDynalistDocument, processNode, generateDynalistComment } from "../../js/dynalist";
-    import { error } from "../../js/toasts";
+    import { fetchDynalistDocument, processNode, generateDynalistComment } from "./dynalist";
+    import { error } from "../../../js/toasts";
 
     export let url, accessToken;
 

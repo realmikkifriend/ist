@@ -1,19 +1,18 @@
 <script>
-    import { success } from "../../js/toasts";
-    import { updateDynalist } from "../../js/dynalist";
+    import { success } from "../../../js/toasts";
+    import { updateDynalist } from "./dynalist";
     export let content;
 
     let [_, total, current, date] =
         content.note.match(/count (\d+)(?:\/(\d+))?\s*(\d{4}-\d{1,2}-\d{1,2})?/) || [];
 
-    let todayFormatted = new Date().toLocaleDateString("en-CA");
+    const todayFormatted = new Date().toLocaleDateString("en-CA"),
+        options = ["+1", "+5", "+10"];
 
     if (date !== todayFormatted) {
         date = todayFormatted;
         current = 0;
     }
-
-    const options = ["+1", "+5", "+10"];
 
     async function handleCount(option) {
         current = (+current || 0) + +option.slice(1);

@@ -1,29 +1,27 @@
 <script>
+    import { onMount } from "svelte";
     import Markdown from "svelte-exmarkdown";
     import { BackwardIcon } from "@krowten/svelte-heroicons";
     export let content;
 
-    function parseContent(content) {
-        const lines = content.split("\n");
-        const result = [];
+    let checklistItems,
+        buttonElement,
+        currentIndex = 0;
 
-        for (let line of lines) {
-            if (line.startsWith("  - ")) {
-                if (result.length > 0) {
-                    result[result.length - 1] += "\n" + line;
-                }
+    onMount(() => {
+        checklistItems = parseContent(content);
+    });
+
+    function parseContent(content) {
+        return content.split("\n").reduce((result, line) => {
+            if (line.startsWith("  - ") && result.length > 0) {
+                result[result.length - 1] += "\n" + line;
             } else {
                 result.push(line.substring(2).trim());
             }
-        }
-
-        return result;
+            return result;
+        }, []);
     }
-
-    const checklistItems = parseContent(content);
-    let currentIndex = 0;
-
-    let buttonElement;
 
     function showNextItem() {
         buttonElement.classList.add("bg-secondary");

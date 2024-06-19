@@ -1,5 +1,5 @@
 import { get } from "svelte/store";
-import { dynalistAccessToken } from "./stores";
+import { dynalistAccessToken } from "../../../js/stores";
 
 export async function fetchDynalistDocument(url, accessToken) {
     const lastIndex = url.lastIndexOf("/"),

@@ -1,13 +1,8 @@
 import { get } from "svelte/store";
 import { DateTime } from "luxon";
-import {
-    todoistResources,
-    todoistAccessToken,
-    todoistError,
-    firstDueTask,
-    previousFirstDueTask,
-} from "./stores";
+import { todoistResources, todoistAccessToken, todoistError, previousFirstDueTask } from "./stores";
 import { markTaskDone, deferTasks, refreshData } from "./api";
+import { updateFirstDueTask } from "./first";
 
 const updateTaskResources = (taskUpdates) => {
     todoistResources.update(($resources) => {
@@ -17,40 +12,39 @@ const updateTaskResources = (taskUpdates) => {
             const index = $resources.dueTasks.findIndex((task) => task.id === taskID);
             if (index !== -1) {
                 const task = $resources.dueTasks[index];
-                const oldPreviousFirstDueTask = get(previousFirstDueTask);
+                const prevFirstDueTask = get(previousFirstDueTask);
 
                 const newDueDate = new Date(time);
                 task.due.date = newDueDate.toISOString();
 
                 $resources.dueTasks.splice(index, 1);
 
-                if (oldPreviousFirstDueTask && index === 0) {
+                if (prevFirstDueTask && index === 0) {
                     previousFirstDueTask.set(null);
                 }
 
-                const insertIndex = $resources.dueTasks.findIndex(
-                    (task) => new Date(task.due.date) > newDueDate,
-                );
-                if (insertIndex === -1) {
-                    $resources.dueTasks.push(task);
-                } else {
-                    $resources.dueTasks.splice(insertIndex, 0, task);
+                if (newDueDate < new Date()) {
+                    const insertIndex = $resources.dueTasks.findIndex(
+                        (task) => new Date(task.due.date) > newDueDate,
+                    );
+                    if (insertIndex === -1) {
+                        $resources.dueTasks.push(task);
+                    } else {
+                        $resources.dueTasks.splice(insertIndex, 0, task);
+                    }
                 }
             }
         });
 
-        if ($resources.dueTasks.length > 0) {
-            firstDueTask.set($resources.dueTasks[0]);
-        } else {
-            firstDueTask.set(null);
-        }
-
         return $resources;
     });
+
+    updateFirstDueTask();
 };
 
 export const handleTaskDone = async (taskID) => {
     let accessToken = get(todoistAccessToken);
+    previousFirstDueTask.set(null);
 
     if (!accessToken) {
         todoistError.set("No access token found.");
@@ -73,7 +67,7 @@ export const handleTaskDone = async (taskID) => {
 
 export const handleTaskDefer = async (taskUpdates) => {
     let accessToken = get(todoistAccessToken);
-    console.log(taskUpdates);
+    previousFirstDueTask.set(null);
 
     const updatedTaskResources = taskUpdates.map(([task, dateTime]) => [task.id, dateTime]);
     updateTaskResources(updatedTaskResources);
