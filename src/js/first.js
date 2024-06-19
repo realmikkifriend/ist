@@ -4,43 +4,54 @@ import { success, newFirstTask } from "./toasts";
 import { todoistResources, userSettings, firstDueTask, previousFirstDueTask } from "../js/stores";
 import FirstDueTaskToast from "../html/FirstDueTaskToast.svelte";
 
-export const updateFirstDueTask = () => {
-    const $resources = get(todoistResources);
-    if (!$resources?.dueTasks?.length) {
-        previousFirstDueTask.set(null);
-        firstDueTask.set(null);
-        return;
-    }
+const setFirstDueTask = (task) => {
+    firstDueTask.set(task);
+    previousFirstDueTask.set(task);
+};
 
-    const selectedContextId = get(userSettings).selectedContextId;
-    const prevFirstDueTask = get(previousFirstDueTask);
-    let dueTasks = $resources.dueTasks;
+const filterTasksByContext = (tasks, contextId) =>
+    tasks.filter((task) => task.context_id === contextId);
 
-    if (selectedContextId) {
-        const filteredDueTasks = dueTasks.filter((task) => task.context_id === selectedContextId);
+const updateDueTasks = (dueTasks, contextId) => {
+    if (contextId) {
+        const filteredDueTasks = filterTasksByContext(dueTasks, contextId);
         if (!filteredDueTasks.length) {
             userSettings.update((settings) => ({ ...settings, selectedContextId: null }));
             success("No more tasks in context! Showing all due tasks...");
-        } else {
-            dueTasks = filteredDueTasks;
+            return dueTasks;
         }
+        return filteredDueTasks;
+    }
+    return dueTasks;
+};
+
+const updateTaskNotes = (task, notes) => {
+    task.notes = notes.filter((note) => note.item_id === task.id);
+    return task;
+};
+
+export const updateFirstDueTask = () => {
+    const $resources = get(todoistResources);
+    if (!$resources?.dueTasks?.length) {
+        setFirstDueTask(null);
+        return;
     }
 
-    const currentFirstDueTask = dueTasks[0];
-    currentFirstDueTask.notes = $resources.notes.filter(
-        (note) => note.item_id === currentFirstDueTask.id,
-    );
+    const contextId = get(userSettings).selectedContextId;
+    const prevTask = get(previousFirstDueTask);
+
+    let dueTasks = updateDueTasks($resources.dueTasks, contextId);
+
+    const newTask = updateTaskNotes(dueTasks[0], $resources.notes);
 
     if (
-        prevFirstDueTask &&
-        currentFirstDueTask.id !== prevFirstDueTask.id &&
-        (!selectedContextId || prevFirstDueTask.context_id === selectedContextId)
+        prevTask &&
+        newTask.id !== prevTask.id &&
+        (!contextId || prevTask.context_id === contextId)
     ) {
-        newFirstTask(FirstDueTaskToast, () => firstDueTask.set(currentFirstDueTask));
+        newFirstTask(FirstDueTaskToast, () => setFirstDueTask(newTask));
     } else {
         toast.pop({ target: "wait" });
-        firstDueTask.set(currentFirstDueTask);
+        setFirstDueTask(newTask);
     }
-
-    previousFirstDueTask.set(currentFirstDueTask);
 };
