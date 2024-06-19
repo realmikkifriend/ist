@@ -3,7 +3,7 @@
     import { DateTime } from "luxon";
     import { createDateWithTime } from "../../js/time";
     import { getPriorityClass } from "../../js/priority";
-    import buttons from "../../js/deferButtons";
+    import buttons from "./deferButtons";
 
     export let task, items;
 
