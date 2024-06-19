@@ -1,12 +1,6 @@
 import { get } from "svelte/store";
 import { DateTime } from "luxon";
-import {
-    todoistResources,
-    todoistAccessToken,
-    todoistError,
-    firstDueTask,
-    previousFirstDueTask,
-} from "./stores";
+import { todoistResources, todoistAccessToken, todoistError, previousFirstDueTask } from "./stores";
 import { markTaskDone, deferTasks, refreshData } from "./api";
 import { updateFirstDueTask } from "./first";
 
