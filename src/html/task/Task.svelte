@@ -20,7 +20,7 @@
     };
 </script>
 
-<div class="mx-auto mt-12 max-w-72 sm:mt-8 sm:max-w-sm">
+<div class="mx-auto mt-4 max-w-72 sm:mt-2 sm:max-w-sm">
     <div class="card mt-0 bg-neutral text-primary-content">
         <div class="card-body">
             <h2 class="card-title text-3xl">{task.content}</h2>
