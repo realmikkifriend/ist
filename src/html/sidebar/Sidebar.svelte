@@ -1,5 +1,6 @@
 <script>
     import { Bars3Icon, ArrowLeftOnRectangleIcon } from "@krowten/svelte-heroicons";
+    import { toast } from "@zerodevx/svelte-toast";
     import ContextBadge from "./ContextBadge.svelte";
     import Contexts from "./Contexts.svelte";
     import Footer from "../Footer.svelte";
@@ -20,6 +21,7 @@
     $: selectedContextId = $userSettings.selectedContextId;
 
     function handleLogout() {
+        toast.pop(0);
         todoistAccessToken.set("");
         todoistResources.set({});
         todoistError.set(null);
