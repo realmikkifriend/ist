@@ -1,8 +1,8 @@
 <script>
     import { onMount } from "svelte";
     import Markdown from "svelte-exmarkdown";
-    import DynalistComment from "./DynalistComment.svelte";
-    import DynalistAuthRequest from "./DynalistAuthRequest.svelte";
+    import DynalistComment from "./dynalist/DynalistComment.svelte";
+    import DynalistAuthRequest from "./dynalist/DynalistAuthRequest.svelte";
     import { dynalistAccessToken } from "../../js/stores";
     export let comments;
 

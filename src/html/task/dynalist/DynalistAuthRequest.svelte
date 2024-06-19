@@ -1,8 +1,8 @@
 <script>
     import { ArrowPathIcon, KeyIcon } from "@krowten/svelte-heroicons";
-    import { dynalistAccessToken } from "../../js/stores";
-    import { success } from "../../js/toasts";
-    import { getDynalistLogo } from "../../js/logos";
+    import { dynalistAccessToken } from "../../../js/stores";
+    import { success } from "../../../js/toasts";
+    import { getDynalistLogo } from "../../../js/logos";
 
     let tempToken = "";
     let isSubmitting = false;

@@ -8,7 +8,7 @@
         InboxIcon,
     } from "@krowten/svelte-heroicons";
     import { createEventDispatcher } from "svelte";
-    import { getDynalistLogo } from "../../js/logos";
+    import { getDynalistLogo } from "../../../js/logos";
 
     export let selectedType;
 
