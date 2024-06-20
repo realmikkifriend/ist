@@ -10,7 +10,7 @@
     import { createEventDispatcher } from "svelte";
     import { getDynalistLogo } from "../../../js/logos";
 
-    export let selectedType;
+    export let selectedType, url;
 
     const iconPairs = [
         { component: ListBulletIcon, label: "Read", type: "read" },
@@ -36,11 +36,17 @@
         {@html getDynalistLogo(6)}
         <ChevronDownIcon class="h-3 w-3" />
     </div>
-    <ul tabindex="-1" class="menu dropdown-content z-10 mr-[-4rem] w-fit rounded-lg bg-neutral p-1">
+    <ul tabindex="-1" class="menu dropdown-content z-20 mr-[-4rem] w-fit rounded-lg bg-neutral p-1">
         {#each iconPairs as { component: IconComponent, label, type }, index}
+            {#if index === 0}
+                <span class="cursor-default text-nowrap text-center text-xs"
+                    >&mdash;read <a href={url}>original document</a>&mdash;</span
+                >
+            {/if}
             {#if index === 3}
                 <span class="cursor-default text-nowrap text-center text-xs text-primary"
-                    >&mdash;modify original document&mdash;</span
+                    >&mdash;modify <a class="text-primary" href={url}>original document</a
+                    >&mdash;</span
                 >
             {/if}
             <button

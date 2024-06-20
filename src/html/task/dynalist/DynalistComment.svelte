@@ -67,7 +67,7 @@
         {/if}
 
         {#key selectedType}
-            <DynalistTypeMenu {selectedType} on:selectType={handleTypeSelection} />
+            <DynalistTypeMenu {selectedType} {url} on:selectType={handleTypeSelection} />
         {/key}
     </div>
 {:else}
