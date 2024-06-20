@@ -60,7 +60,7 @@
         {:else if selectedType === "count"}
             <DynalistCount content={dynalistObject} />
         {:else if selectedType === "rotating"}
-            <DynalistRotating content={generateDynalistComment(dynalistObject)} />
+            <DynalistRotating content={dynalistObject} />
         {:else if selectedType === "crossoff"}
             <!-- <DynalistCrossOff content={generateDynalistComment(dynalistObject)} /> -->
             View not supported yet.
