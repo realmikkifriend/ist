@@ -51,7 +51,7 @@
 {#if currentIndex > 0}
     <div class="absolute -right-7 top-6">
         <button
-            class="btn m-0 h-2 min-h-8 gap-0 border-transparent p-1 pb-2.5 pt-1 text-primary-content hover:bg-primary hover:text-white"
+            class="btn m-0 h-2 min-h-8 gap-0 border-transparent p-1 pb-2.5 pt-1 text-primary-content shadow-none hover:bg-primary hover:text-white"
             class:bg-accent={currentIndex < checklistItems.length - 1}
             class:bg-primary={currentIndex === checklistItems.length - 1}
             on:click={() => (currentIndex = 0)}
