@@ -44,17 +44,17 @@
     </div>
     <div class="drawer-side z-10">
         <label for="my-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
-        <ul class="menu min-h-full w-80 bg-base-100 p-4 text-base-content">
+        <ul class="menu min-h-full w-80 bg-base-100 px-4 py-2 text-base-content">
             {#if resources.contexts}
                 <Contexts />
             {/if}
 
-            <li class="mt-auto">
+            <div class="mt-auto">
                 <Footer />
                 <button class="btn btn-secondary w-full" on:click={handleLogout}
                     ><ArrowLeftOnRectangleIcon class="h-6 w-6" />Log Out</button
                 >
-            </li>
+            </div>
         </ul>
     </div>
 </div>

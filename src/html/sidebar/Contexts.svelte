@@ -38,7 +38,7 @@
     }
 </script>
 
-<div class="mb-3 ml-2 flex items-center justify-between">
+<div class="mb-2 ml-2 flex items-center justify-between">
     <h1 class="text-2xl font-bold">Contexts</h1>
     <label
         for="my-drawer"
@@ -56,14 +56,14 @@
             class="mb-2 rounded-lg bg-secondary text-base-100"
             on:click={() => handleCardClick(context.id)}
         >
-            <div class="card-body gap-0.5 p-2 px-3">
-                <p class="card-title font-normal">{context.name}</p>
-                <div class="flex flex-row space-x-2">
+            <div class="card-body gap-0 px-2 py-1">
+                <p class="card-title text-lg font-bold">{context.name}</p>
+                <div class="flex flex-row items-start space-x-2">
                     {#each Object.keys(dueTasksByContext[context.id].priorities).sort((a, b) => b - a) as priority}
-                        <div class="space-x-1">
+                        <div class="flex flex-row items-start space-x-1 py-1">
                             {#each Array(dueTasksByContext[context.id].priorities[priority]).fill() as _}
                                 <div
-                                    class="badge badge-xs w-3 border-none {getPriorityClass(
+                                    class="badge badge-xs h-1 w-2 border-none p-1 {getPriorityClass(
                                         priority,
                                     )}"
                                 ></div>

@@ -40,6 +40,27 @@ body {
     padding-bottom: 0.25rem !important;
 }
 
+.sdt-cal-td > button:disabled {
+    pointer-events: none;
+}
+
+.sdt-cal-td {
+    cursor: not-allowed;
+}
+
+.sdt-today {
+    padding-top: 0.1rem !important;
+}
+
+.sdt-today > button {
+    outline: 0.2rem var(--fallback-p, oklch(var(--p) / 1)) solid;
+    outline-offset: -0.1rem;
+}
+
+.sdt-today::before {
+    display: none;
+}
+
 /* GENERATED ELEMENTS */
 
 .prose ul,

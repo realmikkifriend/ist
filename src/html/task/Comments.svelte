@@ -36,7 +36,7 @@
         {/if}
 
         {#if i < comments.length - 1}
-            <div class="divider my-1" />
+            <div class="divider relative z-10 my-1" />
         {/if}
     {/each}
 </div>
