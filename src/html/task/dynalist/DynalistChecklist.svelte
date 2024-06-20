@@ -14,7 +14,7 @@
 
     function parseContent(content) {
         return content.split("\n").reduce((result, line) => {
-            if (line.startsWith("  - ") && result.length > 0) {
+            if (line.startsWith("  ") && result.length > 0) {
                 result[result.length - 1] += "\n" + line;
             } else {
                 result.push(line.substring(2).trim());
