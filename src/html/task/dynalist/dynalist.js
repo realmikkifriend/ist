@@ -96,3 +96,14 @@ export async function updateDynalist(file_id, changes) {
         console.error("Failed to add note to Dynalist API", error);
     }
 }
+
+export function parseList(content) {
+    return content.split("\n").reduce((result, line) => {
+        if (line.startsWith("  ") && result.length > 0) {
+            result[result.length - 1] += "\n" + line;
+        } else {
+            result.push(line.substring(2).trim());
+        }
+        return result;
+    }, []);
+}

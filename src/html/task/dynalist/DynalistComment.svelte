@@ -4,6 +4,7 @@
     import { onMount } from "svelte";
     import DynalistChecklist from "./DynalistChecklist.svelte";
     import DynalistCount from "./DynalistCount.svelte";
+    import DynalistRotating from "./DynalistRotating.svelte";
     import DynalistTypeMenu from "./DynalistTypeMenu.svelte";
     import { fetchDynalistDocument, processNode, generateDynalistComment } from "./dynalist";
     import { error } from "../../../js/toasts";
@@ -59,15 +60,14 @@
         {:else if selectedType === "count"}
             <DynalistCount content={dynalistObject} />
         {:else if selectedType === "rotating"}
-            <!-- <DynalistRotating content={dynalistObject} /> -->
-            View not supported yet.
+            <DynalistRotating content={dynalistObject} />
         {:else if selectedType === "crossoff"}
-            <!-- <DynalistCrossOff content={dynalistObject} /> -->
+            <!-- <DynalistCrossOff content={generateDynalistComment(dynalistObject)} /> -->
             View not supported yet.
         {/if}
 
         {#key selectedType}
-            <DynalistTypeMenu {selectedType} on:selectType={handleTypeSelection} />
+            <DynalistTypeMenu {selectedType} {url} on:selectType={handleTypeSelection} />
         {/key}
     </div>
 {:else}

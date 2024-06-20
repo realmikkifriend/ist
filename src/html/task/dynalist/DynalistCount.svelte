@@ -28,12 +28,10 @@
 
         await updateDynalist(content.file_id, changes);
         success("Updated count!");
-
-        event.target.blur();
     }
 </script>
 
-<span class="flex w-full flex-col justify-between">
+<span class="flex w-full flex-col justify-between text-primary-content">
     <span class="w-full text-xl">{content.content}</span>
     <span class="flex w-full items-end justify-between">
         <span class="flex flex-nowrap items-baseline">
@@ -44,7 +42,7 @@
         <span class="flex flex-nowrap items-end">
             {#each options as option}
                 <button
-                    class="btn ml-1 h-8 min-h-8 bg-primary px-1 pb-1 pt-0 text-white hover:bg-base-100"
+                    class="btn ml-1 h-8 min-h-8 bg-primary px-1 pb-1 pt-0 text-primary-content hover:bg-base-100 active:bg-primary"
                     on:click={(event) => handleCount(option, event)}
                     >{option}
                 </button>

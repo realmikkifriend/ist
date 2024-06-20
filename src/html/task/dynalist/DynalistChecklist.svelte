@@ -2,6 +2,7 @@
     import { onMount } from "svelte";
     import Markdown from "svelte-exmarkdown";
     import { BackwardIcon } from "@krowten/svelte-heroicons";
+    import { parseList } from "./dynalist";
     export let content;
 
     let checklistItems,
@@ -9,19 +10,8 @@
         currentIndex = 0;
 
     onMount(() => {
-        checklistItems = parseContent(content);
+        checklistItems = parseList(content);
     });
-
-    function parseContent(content) {
-        return content.split("\n").reduce((result, line) => {
-            if (line.startsWith("  ") && result.length > 0) {
-                result[result.length - 1] += "\n" + line;
-            } else {
-                result.push(line.substring(2).trim());
-            }
-            return result;
-        }, []);
-    }
 
     function showNextItem() {
         buttonElement.classList.add("bg-secondary");
