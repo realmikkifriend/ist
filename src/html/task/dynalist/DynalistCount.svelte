@@ -14,7 +14,7 @@
         current = 0;
     }
 
-    async function handleCount(option) {
+    async function handleCount(option, event) {
         current = (+current || 0) + +option.slice(1);
         const newNote = `count ${total}/${current} ${todayFormatted}`;
 
@@ -28,6 +28,8 @@
 
         await updateDynalist(content.file_id, changes);
         success("Updated count!");
+
+        event.target.blur();
     }
 </script>
 
@@ -43,7 +45,7 @@
             {#each options as option}
                 <button
                     class="btn ml-1 h-8 min-h-8 bg-primary px-1 pb-1 pt-0 text-white hover:bg-base-100"
-                    on:click={() => handleCount(option)}
+                    on:click={(event) => handleCount(option, event)}
                     >{option}
                 </button>
             {/each}
