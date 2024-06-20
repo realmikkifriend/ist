@@ -1,7 +1,8 @@
 <script>
     import { onMount } from "svelte";
-    import Markdown from "svelte-exmarkdown";
     import { ArrowUturnDownIcon } from "@krowten/svelte-heroicons";
+    import { DateTime } from "luxon";
+    import Markdown from "svelte-exmarkdown";
     import { generateDynalistComment, updateDynalist } from "./dynalist";
     import { success } from "../../../js/toasts";
 
@@ -12,6 +13,14 @@
     onMount(() => {
         checklistItems = content.children;
     });
+
+    function isMonthYearFormat(dateString) {
+        dateString = dateString.trim();
+        const fullMonthFormat = DateTime.fromFormat(dateString, "LLLL yyyy");
+        const shortMonthFormat = DateTime.fromFormat(dateString, "LLL yyyy");
+
+        return fullMonthFormat.isValid || shortMonthFormat.isValid;
+    }
 
     async function showNextItem() {
         buttonElement.classList.add("animate-ping");
@@ -28,6 +37,17 @@
                     index: -1,
                 },
             ];
+
+            if (!itemToMove.note || isMonthYearFormat(itemToMove.note)) {
+                const today = DateTime.now();
+                const newMonthYear = today.toFormat("LLLL yyyy");
+
+                changes.push({
+                    action: "edit",
+                    node_id: itemToMove.id,
+                    note: newMonthYear,
+                });
+            }
 
             await updateDynalist(content.file_id, changes);
 
@@ -47,6 +67,11 @@
             on:click={showNextItem}><ArrowUturnDownIcon class="h-4 w-4" /></button
         >
         {#key checklistItems}
+            {#if checklistItems[0].note && isMonthYearFormat(checklistItems[0].note)}
+                <em class="absolute -top-3.5 left-1/2 -translate-x-1/2 text-xs opacity-25"
+                    >last completed {checklistItems[0].note}</em
+                >
+            {/if}
             <Markdown
                 md={`${checklistItems[0].content}\n${generateDynalistComment(checklistItems[0])}`}
             />
