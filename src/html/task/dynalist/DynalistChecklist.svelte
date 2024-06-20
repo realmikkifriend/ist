@@ -36,10 +36,10 @@
 </script>
 
 {#if checklistItems && currentIndex < checklistItems.length - 1}
-    <div>
+    <div class="text-primary-content">
         <button
             bind:this={buttonElement}
-            class="float-left mr-2 mt-1 inline-block h-5 w-5 cursor-pointer border-2 border-secondary transition-colors"
+            class="float-left mr-2 mt-1 inline-block h-5 w-5 cursor-pointer border-2 border-primary-content transition-colors"
             on:click={showNextItem}
         />
         <Markdown md={checklistItems[currentIndex]} />
@@ -51,7 +51,7 @@
 {#if currentIndex > 0}
     <div class="absolute -right-7 top-6">
         <button
-            class="btn m-0 h-2 min-h-8 gap-0 border-transparent p-1 pb-2.5 pt-1 hover:bg-primary hover:text-white"
+            class="btn m-0 h-2 min-h-8 gap-0 border-transparent p-1 pb-2.5 pt-1 text-primary-content hover:bg-primary hover:text-white"
             class:bg-accent={currentIndex < checklistItems.length - 1}
             class:bg-primary={currentIndex === checklistItems.length - 1}
             on:click={() => (currentIndex = 0)}

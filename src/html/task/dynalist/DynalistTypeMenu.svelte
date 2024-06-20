@@ -27,7 +27,7 @@
     }
 </script>
 
-<div class="dropdown dropdown-left absolute -right-7 -top-3">
+<div class="dropdown dropdown-left absolute -right-7 -top-3 text-primary-content">
     <div
         tabindex="0"
         role="button"
