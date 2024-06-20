@@ -35,7 +35,7 @@
     }
 </script>
 
-{#if currentIndex < checklistItems.length - 1}
+{#if checklistItems && currentIndex < checklistItems.length - 1}
     <div>
         <button
             bind:this={buttonElement}
