@@ -41,12 +41,12 @@
 
             const dotContainer = document.createElement("div");
             dotContainer.className =
-                "dot-container flex justify-center items-center h-1 mt-[-0.5rem]";
+                "dot-container flex space-x-0.5 justify-center items-center h-1 mt-[-0.5rem]";
 
             const elements = tasksForCellDate.slice(0, 4).map((task, index) => {
                 const div = document.createElement("div");
                 if (index < 3) {
-                    div.className = `w-1 h-1 rounded-full mr-0.5 ${getPriorityClass(highestPriority)}`;
+                    div.className = `w-1 h-1 rounded-full ${getPriorityClass(highestPriority)}`;
                 } else {
                     div.textContent = "+";
                     div.className = `text-[0.65rem] text-secondary h-[1.1rem] w-1 ml-0`;
