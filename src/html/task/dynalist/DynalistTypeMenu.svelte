@@ -27,14 +27,14 @@
     }
 </script>
 
-<div class="dropdown dropdown-left absolute right-[-0.5rem] top-[-0.5rem]">
+<div class="dropdown dropdown-left absolute -right-7 -top-3">
     <div
         tabindex="0"
         role="button"
-        class="btn m-0 h-2 min-h-8 gap-0 border-transparent bg-transparent p-1 pb-3 pt-0 hover:bg-primary"
+        class="btn m-0 h-2 min-h-8 gap-0 border-transparent bg-accent p-1 pb-3 pt-0 shadow-none hover:bg-primary"
     >
         {@html getDynalistLogo(6)}
-        <ChevronDownIcon class="h-4 w-4" />
+        <ChevronDownIcon class="h-3 w-3" />
     </div>
     <ul tabindex="-1" class="menu dropdown-content z-10 mr-[-4rem] w-fit rounded-lg bg-neutral p-1">
         {#each iconPairs as { component: IconComponent, label, type }, index}
