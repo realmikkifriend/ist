@@ -41,25 +41,25 @@
     }
 </script>
 
-<div class="dynalistPrompt">
+<div class="dynalistPrompt w-full">
     <div class="flex h-auto items-center space-x-1">
         {@html getDynalistLogo(8)}
-        <div>
+        <div class="overflow-x-hidden text-nowrap">
             Provide <a
                 href="https://dynalist.io/developer"
-                class="href text-blue-500 hover:underline">Dynalist access token</a
-            >...
+                class="href text-blue-500 hover:underline">Dynalist access</a
+            >
             {#if isTokenInvalid}
                 <p class="text-red-500">Invalid token</p>
             {/if}
         </div>
     </div>
     {#if !isSubmitting}
-        <form class="flex w-full gap-2" on:submit={handleToken}>
+        <form class="flex gap-2" on:submit={handleToken}>
             <input
                 type="text"
                 placeholder="Enter your token"
-                class="input flex-grow"
+                class="input min-w-4 flex-grow"
                 bind:value={tempToken}
             />
             <button
