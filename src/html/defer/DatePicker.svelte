@@ -32,9 +32,15 @@
 
             if (cell.querySelector("button[disabled]")) return;
 
-            const cellDate = cell.textContent.trim();
+            const cellDate = parseInt(cell.textContent.trim());
+            const isTomorrow = cellDate === DateTime.now().plus({ days: 1 }).day;
+
+            if (isTomorrow) {
+                cell.classList.add("sdt-tomorrow");
+            }
+
             const tasksForCellDate = soonTasks.filter(
-                (task) => new Date(task.due.date).getDate() == cellDate,
+                ({ due }) => new Date(due.date).getDate() === cellDate,
             );
 
             const highestPriority = Math.max(...tasksForCellDate.map((task) => task.priority));
