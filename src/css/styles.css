@@ -48,13 +48,13 @@ body {
     cursor: not-allowed;
 }
 
-.sdt-today {
+.sdt-tomorrow {
     padding-top: 0.1rem !important;
 }
 
-.sdt-today > button {
-    outline: 0.2rem var(--fallback-p, oklch(var(--p) / 1)) solid;
-    outline-offset: -0.1rem;
+.sdt-tomorrow > button {
+    outline: 0.1rem var(--fallback-p, oklch(var(--p) / 1)) solid;
+    outline-offset: -0.05rem;
 }
 
 .sdt-today::before {
