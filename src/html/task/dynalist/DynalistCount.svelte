@@ -4,7 +4,9 @@
     export let content;
 
     let [_, total, current, date] =
-        content.note.match(/count (\d+)(?:\/(\d+))?\s*(\d{4}-\d{1,2}-\d{1,2})?/) || [];
+        content.note
+            .match(/count (\d+)(?:\/(\d+))?\s*(\d{4}-\d{1,2}-\d{1,2})?/)
+            ?.map((val) => (val && !isNaN(val) ? parseInt(val) : val)) || [];
 
     const todayFormatted = new Date().toLocaleDateString("en-CA"),
         options = ["+1", "+5", "+10"];
