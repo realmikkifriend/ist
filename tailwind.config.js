@@ -28,8 +28,8 @@ module.exports = {
                 },
             },
             "dark",
-            "cupcake",
         ],
+        base: false,
         logs: false,
     },
 };
