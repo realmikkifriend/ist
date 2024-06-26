@@ -42,7 +42,7 @@
             <ContextBadge />
         {/if}
     </div>
-    <div class="drawer-side z-10">
+    <div class="drawer-side z-30">
         <label for="my-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
         <ul class="menu min-h-full w-80 bg-base-100 px-4 py-2 text-base-content">
             {#if resources.contexts}
