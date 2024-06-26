@@ -1,7 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
     content: ["./src/**/*.{html,js,svelte,ts}"],
-    darkMode: "selector",
     theme: {
         extend: {
             colors: {
@@ -30,6 +29,7 @@ module.exports = {
             },
             "dark",
         ],
+        base: false,
         logs: false,
     },
 };
