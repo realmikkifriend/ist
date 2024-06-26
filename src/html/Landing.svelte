@@ -2,8 +2,8 @@
     import { getTodoistLogo } from "../js/logos";
     import Footer from "./Footer.svelte";
 
-    const TODOIST_CLIENT_ID = process.env.TODOIST_CLIENT_ID,
-        todoistAuthURL = `https://todoist.com/oauth/authorize?client_id=${TODOIST_CLIENT_ID}&scope=data:read_write&state=${crypto.randomUUID()}`;
+    const TODOIST_CLIENT_ID = process.env.TODOIST_CLIENT_ID;
+    const todoistAuthURL = `https://todoist.com/oauth/authorize?client_id=${TODOIST_CLIENT_ID}&scope=data:read_write&state=${Array.from({ length: 4 }, () => Math.random().toString(36)[2]).join("")}`;
 </script>
 
 <div class="hero py-6 md:py-20" id="landing">
