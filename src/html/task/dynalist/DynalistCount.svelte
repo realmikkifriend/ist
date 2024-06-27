@@ -38,7 +38,9 @@
     <span class="flex w-full items-end justify-between">
         <span class="flex flex-nowrap items-baseline">
             <span class="text-2xl {current >= total ? 'text-green-500' : ''}">{current}</span>
-            <span class="mx-1 text-lg">&#8725;{total}</span>
+            <span class="ml-2 mr-3 text-base text-secondary"
+                ><span class="text-lg">&#8725;</span>{total}</span
+            >
             <small class={current >= total ? "text-green-500" : ""}
                 >{`${Math.round((current / total) * 100)}%`}</small
             >
