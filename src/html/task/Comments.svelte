@@ -18,7 +18,7 @@
     });
 </script>
 
-<div class="prose mx-auto w-11/12 rounded-b-2xl bg-accent p-4">
+<div class="prose mx-auto w-11/12 rounded-b-2xl bg-accent p-4 text-primary-content">
     {#if requiresAuthRequest && !accessToken}
         <DynalistAuthRequest />
         <div class="divider my-1" />

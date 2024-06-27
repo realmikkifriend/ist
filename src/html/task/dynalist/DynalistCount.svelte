@@ -33,7 +33,7 @@
     }
 </script>
 
-<span class="flex w-full flex-col justify-between text-primary-content">
+<span class="flex w-full flex-col justify-between">
     <span class="w-full text-xl">{content.content}</span>
     <span class="flex w-full items-end justify-between">
         <span class="flex flex-nowrap items-baseline">
