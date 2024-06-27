@@ -14,12 +14,14 @@
     });
 
     function showNextItem() {
-        buttonElement.classList.add("bg-secondary");
+        buttonElement.parentElement.classList.add("line-through", "text-secondary");
+        buttonElement.classList.add("bg-secondary", "border-secondary");
 
         setTimeout(() => {
             if (currentIndex < checklistItems.length - 1) {
                 currentIndex++;
-                buttonElement.classList.remove("bg-secondary");
+                buttonElement.parentElement.classList.remove("line-through", "text-secondary");
+                buttonElement.classList.remove("bg-secondary", "border-secondary");
             }
         }, 200);
     }
