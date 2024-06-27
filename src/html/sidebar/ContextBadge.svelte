@@ -40,7 +40,7 @@
 <button
     class="group badge badge-outline items-center whitespace-nowrap"
     class:text-primary={selectedContextId}
-    class:opacity-30={!selectedContextId}
+    class:opacity-40={!selectedContextId}
     class:opacity-75={selectedContextId}
     class:cursor-default={!selectedContextId}
     class:cursor-pointer={selectedContextId}
