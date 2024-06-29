@@ -63,12 +63,12 @@
     <div>
         <button
             bind:this={buttonElement}
-            class="float-left mr-2 mt-1 inline-block h-5 w-5 cursor-pointer rounded bg-primary p-1 pb-5 pr-5"
+            class="float-left mr-2 mt-0.5 inline-block h-5 w-5 cursor-pointer rounded bg-primary p-1 pb-5 pr-5"
             on:click={showNextItem}><ArrowUturnDownIcon class="h-4 w-4" /></button
         >
         {#key checklistItems}
             {#if checklistItems[0].note && isMonthYearFormat(checklistItems[0].note)}
-                <em class="absolute -top-3.5 left-1/2 -translate-x-1/2 text-xs opacity-25"
+                <em class="absolute -top-2.5 text-nowrap text-xs opacity-25"
                     >last completed {checklistItems[0].note}</em
                 >
             {/if}
