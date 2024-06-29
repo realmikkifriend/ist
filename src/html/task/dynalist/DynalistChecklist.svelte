@@ -28,7 +28,12 @@
 </script>
 
 {#if checklistItems && currentIndex < checklistItems.length - 1}
-    <div>
+    <div class="mt-2">
+        <em class="absolute -left-0.5 -top-3.5 text-nowrap text-xs opacity-25">
+            <span class="mr-0.5 inline-block w-7"
+                >{currentIndex + 1}/{checklistItems.length - 1}</span
+            >
+        </em>
         <button
             bind:this={buttonElement}
             class="float-left mr-2 mt-1 inline-block h-5 w-5 cursor-pointer border-2 border-primary-content transition-colors"
