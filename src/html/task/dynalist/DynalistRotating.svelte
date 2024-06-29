@@ -60,18 +60,20 @@
 </script>
 
 {#if checklistItems?.length > 0}
-    <div>
+    <div class="mt-2">
         <button
             bind:this={buttonElement}
             class="float-left mr-2 mt-0.5 inline-block h-5 w-5 cursor-pointer rounded bg-primary p-1 pb-5 pr-5"
             on:click={showNextItem}><ArrowUturnDownIcon class="h-4 w-4" /></button
         >
+
         {#key checklistItems}
-            {#if checklistItems[0].note && isMonthYearFormat(checklistItems[0].note)}
-                <em class="absolute -top-2.5 text-nowrap text-xs opacity-25"
-                    >last completed {checklistItems[0].note}</em
-                >
-            {/if}
+            <em class="absolute -top-3.5 left-0 text-nowrap text-xs opacity-25">
+                <span class="mr-0.5 inline-block w-7">&infin;{checklistItems.length}</span>
+                {#if checklistItems[0].note && isMonthYearFormat(checklistItems[0].note)}
+                    <span>last completed {checklistItems[0].note}</span>
+                {/if}
+            </em>
             <Markdown
                 md={`${checklistItems[0].content}\n${generateDynalistComment(checklistItems[0])}`}
             />
