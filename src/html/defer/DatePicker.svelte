@@ -50,8 +50,10 @@
                 cell.classList.add("sdt-tomorrow");
             }
 
+            if (grayedOut) return;
+
             const tasksForCellDate = soonTasks.filter(
-                ({ due }) => new Date(due.date).getDate() === cellDate,
+                ({ due }) => DateTime.fromISO(due.date).setZone(tz).day === cellDate,
             );
 
             const highestPriority = Math.max(...tasksForCellDate.map((task) => task.priority));
