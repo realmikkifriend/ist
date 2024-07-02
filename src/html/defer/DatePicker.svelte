@@ -13,11 +13,13 @@
     function updateCalendarCells() {
         if (!calendarElement) return;
 
-        const cal = calendarElement.querySelector(".std-btn-header.sdt-toggle-btn").innerText;
+        const monthYear = calendarElement.querySelector(".std-btn-header.sdt-toggle-btn").innerText;
         const now = DateTime.local().setZone(tz);
-        const startOfMonth = DateTime.fromFormat(cal, "MMMM yyyy").startOf("month");
+        const startOfMonth = DateTime.fromFormat(monthYear, "MMMM yyyy").startOf("month");
         const start =
-            cal === now.toFormat("MMMM yyyy") ? now.plus({ days: 1 }).startOf("day") : startOfMonth;
+            monthYear === now.toFormat("MMMM yyyy")
+                ? now.plus({ days: 1 }).startOf("day")
+                : startOfMonth;
         const end = startOfMonth.endOf("month");
 
         let soonTasks = items.filter((item) => {
@@ -29,13 +31,22 @@
 
         calendarCells.forEach((cell) => {
             cell.querySelector(".dot-container")?.remove();
+            cell.classList.remove("sdt-tomorrow");
 
             if (cell.querySelector("button[disabled]")) return;
 
             const cellDate = parseInt(cell.textContent.trim());
-            const isTomorrow = cellDate === DateTime.now().plus({ days: 1 }).day;
+            const tomorrowDate = DateTime.now().plus({ days: 1 }).day;
+            const isTomorrow = cellDate === tomorrowDate;
+            const grayedOut = cell.querySelector("button.not-current");
+            const currentMonthDisplayed = monthYear === now.toFormat("MMMM yyyy");
+            const nextMonthDisplayed = monthYear === now.plus({ months: 1 }).toFormat("MMMM yyyy");
 
-            if (isTomorrow) {
+            if (
+                isTomorrow &&
+                ((currentMonthDisplayed && !grayedOut) ||
+                    (tomorrowDate === 1 && (grayedOut || nextMonthDisplayed)))
+            ) {
                 cell.classList.add("sdt-tomorrow");
             }
 
