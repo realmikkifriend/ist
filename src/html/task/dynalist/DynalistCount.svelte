@@ -61,13 +61,13 @@
         } else if (percentageComplete === 0) {
             label = "not started";
             classes = "bg-red-500 text-red-100";
-        } else if (current >= goalCount * 1.1) {
+        } else if (current >= goalCount * 1.2) {
             label = "ahead";
             classes = "bg-purple-500 text-purple-100";
         } else if (current <= goalCount * 0.5) {
             label = "way behind";
             classes = "bg-orange-500 text-orange-100";
-        } else if (current <= goalCount * 0.9) {
+        } else if (current <= goalCount * 0.8) {
             label = "behind";
             classes = "bg-yellow-600 text-yellow-100";
         } else {
@@ -82,13 +82,15 @@
 </script>
 
 <span class="flex w-full flex-col justify-between">
-    <span class="w-full text-xl">
+    <span class="flex w-full items-center text-xl">
         {content.content}
         <span
-            class="badge badge-xs w-fit overflow-hidden p-2 font-bold uppercase {labelInfo.classes}"
-            >{labelInfo.label}</span
+            class="badge badge-xs w-fit overflow-hidden p-2 text-[0.6rem] font-bold uppercase {labelInfo.classes} ml-1"
         >
+            {labelInfo.label}
+        </span>
     </span>
+
     <span class="flex w-full items-end justify-between">
         <span class="flex flex-nowrap items-baseline">
             <span class="text-2xl {current >= total ? 'text-blue-500' : ''}">{current}</span>
