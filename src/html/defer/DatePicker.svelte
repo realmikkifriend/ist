@@ -2,7 +2,7 @@
     import { afterUpdate, createEventDispatcher } from "svelte";
     import { DateTime } from "luxon";
     import SveltyPicker from "svelty-picker";
-    import { getPriorityClass } from "../../js/priority";
+    import { getPriorityClasses } from "../../js/priority";
     export let task, tz, items;
 
     let calendarElement, valueDefault;
@@ -65,7 +65,7 @@
             const elements = tasksForCellDate.slice(0, 4).map((task, index) => {
                 const div = document.createElement("div");
                 if (index < 3) {
-                    div.className = `w-1 h-1 rounded-full ${getPriorityClass(highestPriority)}`;
+                    div.className = `w-1 h-1 rounded-full ${getPriorityClasses(highestPriority)}`;
                 } else {
                     div.textContent = "+";
                     div.className = `text-[0.65rem] text-secondary h-[1.1rem] w-1 ml-0`;

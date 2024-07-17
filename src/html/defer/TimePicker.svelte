@@ -2,7 +2,7 @@
     import { createEventDispatcher, onDestroy, onMount } from "svelte";
     import { DateTime } from "luxon";
     import { createDateWithTime } from "../../js/time";
-    import { getPriorityClass } from "../../js/priority";
+    import { getPriorityClasses } from "../../js/priority";
     import buttons from "./deferButtons";
 
     export let task, items;
@@ -92,7 +92,7 @@
                 <div class="flex max-h-4 w-full justify-between overflow-hidden text-xs opacity-65">
                     <span class="w-fit overflow-hidden text-left text-secondary">{@html time}</span>
                     <span
-                        class="badge badge-xs mt-0.5 w-fit overflow-hidden text-right font-bold {getPriorityClass(
+                        class="badge badge-xs mt-0.5 w-fit overflow-hidden text-right font-bold {getPriorityClasses(
                             priority,
                         )}">{count}</span
                     >

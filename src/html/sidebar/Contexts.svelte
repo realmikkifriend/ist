@@ -1,7 +1,7 @@
 <script>
     import { XCircleIcon } from "@krowten/svelte-heroicons";
     import { todoistResources, userSettings, previousFirstDueTask } from "../../js/stores";
-    import { getPriorityClass } from "../../js/priority";
+    import { getPriorityClasses } from "../../js/priority";
 
     let resources;
     $: resources = $todoistResources;
@@ -63,7 +63,7 @@
                         <div class="flex flex-row items-start space-x-1 py-1">
                             {#each Array(dueTasksByContext[context.id].priorities[priority]).fill() as _}
                                 <div
-                                    class="badge badge-xs h-1 w-2 border-none p-1 {getPriorityClass(
+                                    class="badge badge-xs h-1 w-2 border-none p-1 {getPriorityClasses(
                                         priority,
                                     )}"
                                 ></div>
