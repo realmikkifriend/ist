@@ -59,8 +59,8 @@
             label = "incomplete";
             classes = "";
         } else if (percentageComplete === 0) {
-            label = "not started";
-            classes = "bg-red-500 text-red-100";
+            label = "ready";
+            classes = "bg-neutral text-secondary";
         } else if (current >= goalCount * 1.2) {
             label = "ahead";
             classes = "bg-purple-500 text-purple-100";
@@ -85,7 +85,7 @@
     <span class="flex w-full items-center text-xl">
         {content.content}
         <span
-            class="badge badge-xs w-fit overflow-hidden p-2 text-[0.6rem] font-bold uppercase {labelInfo.classes} ml-1"
+            class="badge badge-xs ml-1 w-fit overflow-hidden whitespace-nowrap p-2 px-3 pt-[0.45rem] text-[0.6rem] font-bold uppercase {labelInfo.classes}"
         >
             {labelInfo.label}
         </span>
