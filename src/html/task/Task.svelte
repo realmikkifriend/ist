@@ -22,7 +22,7 @@
 
 <div class="mx-auto mt-4 max-w-72 sm:mt-2 sm:max-w-sm">
     <div
-        class="card mt-0 rounded-xl border-b-[0.75rem] {getPriorityBorder(
+        class="card mt-0 rounded-xl border-b-[0.75rem] border-opacity-50 {getPriorityBorder(
             task.priority,
         )} bg-neutral text-primary-content"
     >
