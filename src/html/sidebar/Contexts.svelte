@@ -25,7 +25,7 @@
     let settings;
     $: settings = $userSettings;
 
-    function handleCardClick(contextId) {
+    function handleContextClick(contextId) {
         previousFirstDueTask.set(null);
         const newContextId = settings.selectedContextId === contextId ? null : contextId;
 
@@ -35,6 +35,13 @@
                 selectedContextId: newContextId,
             };
         });
+
+        if (newContextId !== null) {
+            const drawerCheckbox = document.getElementById("my-drawer");
+            if (drawerCheckbox) {
+                drawerCheckbox.checked = !drawerCheckbox.checked;
+            }
+        }
     }
 </script>
 
@@ -54,7 +61,7 @@
             class:opacity-25={settings.selectedContextId &&
                 settings.selectedContextId !== context.id}
             class="mb-2 rounded-lg bg-secondary text-base-100"
-            on:click={() => handleCardClick(context.id)}
+            on:click={() => handleContextClick(context.id)}
         >
             <div class="card-body gap-0 px-2 py-1">
                 <p class="card-title text-lg font-bold">{context.name}</p>
