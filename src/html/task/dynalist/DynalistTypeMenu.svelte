@@ -27,7 +27,7 @@
     }
 </script>
 
-<div class="dropdown dropdown-left absolute -right-7 -top-3 text-primary-content">
+<div class="dropdown dropdown-left absolute -right-7 -top-3">
     <div
         tabindex="0"
         role="button"
@@ -40,12 +40,13 @@
         {#each iconPairs as { component: IconComponent, label, type }, index}
             {#if index === 0}
                 <span class="cursor-default text-nowrap text-center text-xs"
-                    >&mdash;read <a href={url}>original document</a>&mdash;</span
+                    >&mdash;read <a target="_blank" href={url}>original document</a>&mdash;</span
                 >
             {/if}
             {#if index === 3}
                 <span class="cursor-default text-nowrap text-center text-xs text-primary"
-                    >&mdash;modify <a class="text-primary" href={url}>original document</a
+                    >&mdash;modify <a class="text-primary" target="_blank" href={url}
+                        >original document</a
                     >&mdash;</span
                 >
             {/if}

@@ -39,7 +39,10 @@
 </script>
 
 {#if checklistItems?.length > 0}
-    <div class="text-primary-content">
+    <div class="mt-2">
+        <em class="absolute -top-3.5 left-0 text-nowrap text-xs opacity-25">
+            <span>{checklistItems.length} remaining</span>
+        </em>
         <button
             bind:this={buttonElement}
             class="float-left mr-2 mt-0.5 inline-block h-5 w-5 cursor-pointer rounded bg-primary p-1 pb-5 pr-5"

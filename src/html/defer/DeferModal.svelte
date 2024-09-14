@@ -46,8 +46,8 @@
     };
 </script>
 
-{#key items}
-    <div class="modal-box min-h-[60%] w-fit">
+<div class="modal-box min-h-[60%] w-fit">
+    {#key items}
         {#if task.due.all_day == 1}
             <DatePicker {task} {tz} {items} on:defer={handleDefer} />
         {:else}
@@ -77,8 +77,8 @@
                 <DatePicker {task} {tz} {items} on:defer={handleDefer} />
             {/if}
         {/if}
-    </div>
-{/key}
+    {/key}
+</div>
 
 <form method="dialog" class="modal-backdrop">
     <button>close</button>

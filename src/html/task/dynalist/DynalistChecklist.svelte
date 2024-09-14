@@ -14,19 +14,26 @@
     });
 
     function showNextItem() {
-        buttonElement.classList.add("bg-secondary");
+        buttonElement.parentElement.classList.add("line-through", "text-secondary");
+        buttonElement.classList.add("bg-secondary", "border-secondary");
 
         setTimeout(() => {
             if (currentIndex < checklistItems.length - 1) {
                 currentIndex++;
-                buttonElement.classList.remove("bg-secondary");
+                buttonElement.parentElement.classList.remove("line-through", "text-secondary");
+                buttonElement.classList.remove("bg-secondary", "border-secondary");
             }
         }, 200);
     }
 </script>
 
 {#if checklistItems && currentIndex < checklistItems.length - 1}
-    <div class="text-primary-content">
+    <div class="mt-2">
+        <em class="absolute -left-0.5 -top-3.5 text-nowrap text-xs opacity-25">
+            <span class="mr-0.5 inline-block w-7"
+                >{currentIndex + 1}/{checklistItems.length - 1}</span
+            >
+        </em>
         <button
             bind:this={buttonElement}
             class="float-left mr-2 mt-1 inline-block h-5 w-5 cursor-pointer border-2 border-primary-content transition-colors"
