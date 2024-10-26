@@ -7,7 +7,6 @@ const propsToRemove = [
     "added_by_uid",
     "assigned_by_uid",
     "checked",
-    "child_order",
     "collapsed",
     "completed_at",
     "day_order",
@@ -37,7 +36,17 @@ function processFullSync(currentResources, data, RESOURCE_TYPES) {
         } else if (type === "user") {
             currentResources[type] = data[type];
         } else {
-            currentResources[type] = data[type] || [];
+            const currentMap = new Map(
+                (currentResources[type] || []).map((entry) => [entry.id, entry]),
+            );
+            (data[type] || []).forEach((entry) => {
+                const currentEntry = currentMap.get(entry.id);
+                currentMap.set(
+                    entry.id,
+                    currentEntry ? { ...currentEntry, ...entry } : { ...entry },
+                );
+            });
+            currentResources[type] = Array.from(currentMap.values());
         }
     });
 
@@ -70,20 +79,29 @@ function mergeData(currentResources, data, type) {
         currentResources[type] = Array.from(currentMap.values()).filter(
             (entry) => !data[type].find((e) => e.id === entry.id && e.is_deleted),
         );
+    } else if (type === "projects") {
+        let currentMap = new Map(
+            (currentResources.contexts || []).map((entry) => [entry.id, entry]),
+        );
+        data.projects.forEach((entry) => {
+            const currentEntry = currentMap.get(entry.id);
+            currentMap.set(entry.id, currentEntry ? { ...currentEntry, ...entry } : { ...entry });
+        });
+        currentResources.contexts = Array.from(currentMap.values());
     } else {
-        currentResources[type] =
-            type === "user"
-                ? { ...currentResources[type], ...data[type] }
-                : [...(currentResources[type] || []), ...data[type]];
+        const currentMap = new Map(
+            (currentResources[type] || []).map((entry) => [entry.id, entry]),
+        );
+        (data[type] || []).forEach((entry) => {
+            const currentEntry = currentMap.get(entry.id);
+            currentMap.set(entry.id, currentEntry ? { ...currentEntry, ...entry } : { ...entry });
+        });
+        currentResources[type] = Array.from(currentMap.values());
     }
 }
 
 function processPartialSync(currentResources, data, RESOURCE_TYPES) {
-    RESOURCE_TYPES.forEach((type) => {
-        if (data[type]) {
-            mergeData(currentResources, data, type);
-        }
-    });
+    RESOURCE_TYPES.forEach((type) => data[type] && mergeData(currentResources, data, type));
 }
 
 function handleOverdueTasks(currentResources) {
@@ -112,6 +130,8 @@ export function processTodoistData(currentResources, data, RESOURCE_TYPES) {
     } else {
         processPartialSync(currentResources, data, RESOURCE_TYPES);
     }
+
+    currentResources.contexts.sort((a, b) => a.child_order - b.child_order);
 
     handleOverdueTasks(currentResources);
 
