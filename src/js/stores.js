@@ -4,7 +4,7 @@ import { persisted } from "svelte-persisted-store";
 export const todoistAccessToken = persisted("todoist_access_token", "");
 export const todoistResources = persisted("todoist_resources", {});
 export const todoistError = writable(null);
-export const syncToken = persisted("sync_token", "*");
+export const syncToken = writable(null);
 export const userSettings = persisted("user_settings", {
     selectedContextId: null,
 });
