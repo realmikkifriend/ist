@@ -6,6 +6,7 @@
     import { getPriorityBorder } from "../../js/priority";
 
     export let task;
+    $: console.log(task.due);
 
     const dispatch = createEventDispatcher();
     let modal;
@@ -38,7 +39,7 @@
                     class="text-md btn btn-secondary h-8 min-h-8 content-center p-4"
                     on:click={() => modal.showModal()}
                 >
-                    {#if task.due.all_day == 1}
+                    {#if task.due.all_day === 1}
                         <CalendarIcon class="h-5 w-5 [&>path]:stroke-[3]" />
                     {:else}
                         <ClockIcon class="h-5 w-5 [&>path]:stroke-[3]" />
