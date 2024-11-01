@@ -7,18 +7,22 @@
 
     export let task, items;
 
-    let extractedTime, tomorrowInMS;
-
     const updateMilliseconds = () => {
-        const tomorrowDate = DateTime.now().plus({ days: 1 });
-        const result = createDateWithTime(task.due.string, tomorrowDate),
-            tomorrow = result.newDate,
+        const tomorrowDate = DateTime.now().plus({ days: 1 }),
+            result = createDateWithTime(task.due.string, tomorrowDate),
             now = DateTime.now();
-        extractedTime = result.extractedTime;
-        tomorrowInMS = tomorrow.diff(now).milliseconds;
 
-        buttons[0].text = `tomorrow ${extractedTime}`;
-        buttons[0].ms = tomorrowInMS;
+        if (result.newDate === null) {
+            buttons[0].text = "";
+            buttons[0].ms = 0;
+        } else {
+            const tomorrow = result.newDate,
+                extractedTime = result.extractedTime,
+                tomorrowInMS = tomorrow.diff(now).milliseconds;
+
+            buttons[0].text = `tomorrow ${extractedTime}`;
+            buttons[0].ms = tomorrowInMS;
+        }
 
         let soonTasks = items.filter((item) => {
             let dueDateTime = DateTime.fromISO(item.due.date);

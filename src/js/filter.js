@@ -1,4 +1,5 @@
 import { DateTime } from "luxon";
+import { getTaskTime } from "./time";
 
 function createContextLookup(contexts) {
     return contexts.reduce((acc, context) => {
@@ -11,7 +12,9 @@ function processDueProperties(task, timeZone) {
     if (!task.due) {
         return false;
     }
-    task.due.all_day = task.due.date && !task.due.date.includes("T") ? 1 : 0;
+
+    task.due.extractedTime = getTaskTime(task.due.string);
+    task.due.all_day = task.due.date && !task.due.extractedTime ? 1 : 0;
     task.due.date_object = DateTime.fromISO(task.due.datetime || task.due.date, {
         zone: timeZone,
     }).toJSDate();

@@ -62,18 +62,21 @@ export async function markTaskDone(taskID, accessToken) {
 }
 
 export async function deferTasks(taskTimePairs, accessToken) {
-    const commands = taskTimePairs.map(([task, time]) => ({
-        type: "item_update",
-        uuid: uuidv4(),
-        args: {
-            id: task.id,
-            due: {
-                date: formatTaskDate(task, time),
-                datetime: formatTaskDate(task, time),
-                string: task.due.string,
+    const commands = taskTimePairs.map(([task, time]) => {
+        const formattedDate = formatTaskDate(time);
+        return {
+            type: "item_update",
+            uuid: uuidv4(),
+            args: {
+                id: task.id,
+                due: {
+                    date: formattedDate,
+                    datetime: formattedDate,
+                    string: task.due.string,
+                },
             },
-        },
-    }));
+        };
+    });
 
     return await executeAPICommand({ commands: JSON.stringify(commands) }, accessToken);
 }
@@ -95,8 +98,8 @@ async function executeAPICommand(params, accessToken) {
     return response.json();
 }
 
-function formatTaskDate(task, time) {
-    return task.due.all_day === 1
+function formatTaskDate(time) {
+    return time.hour === 0 && time.minute === 0 && time.second === 0 && time.millisecond === 0
         ? time.toFormat("yyyy-MM-dd")
         : time.toFormat("yyyy-MM-dd'T'HH:mm:ss");
 }

@@ -57,7 +57,8 @@ body {
     outline-offset: -0.05rem;
 }
 
-.sdt-today::before {
+.sdt-today::before,
+.modal-box * .btn:empty {
     display: none;
 }
 

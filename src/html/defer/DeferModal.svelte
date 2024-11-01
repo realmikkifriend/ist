@@ -8,7 +8,8 @@
     import TimePicker from "./TimePicker.svelte";
     export let task;
 
-    let isTimeTabActive = true;
+    let isTimeTabActive;
+    $: isTimeTabActive = task.due.all_day !== 1;
 
     const selectTab = (tab) => {
         isTimeTabActive = tab === "time";
@@ -33,11 +34,11 @@
             const date = DateTime.fromISO(rawTime);
             const tomorrow = DateTime.now().plus({ days: 1 }).setZone(tz);
 
-            if (task.due.all_day === 1) {
+            const extracted = createDateWithTime(task.due.string, tomorrow);
+            if (extracted.newDate === null) {
                 time = date;
             } else {
-                const extracted = createDateWithTime(task.due.string, tomorrow),
-                    { hour, minute } = extracted.newDate;
+                const { hour, minute } = extracted.newDate;
                 time = date.set({ hour, minute });
             }
         }
@@ -47,35 +48,30 @@
 </script>
 
 <div class="modal-box min-h-[60%] w-fit">
-    {#key items}
-        {#if task.due.all_day == 1}
-            <DatePicker {task} {tz} {items} on:defer={handleDefer} />
-        {:else}
-            <div class="flex justify-center">
-                <div role="tablist" class="tabs-boxed tabs w-2/3 bg-neutral">
-                    {#each ["time", "calendar"] as tab}
-                        <button
-                            role="tab"
-                            tabindex="0"
-                            class={tab === (isTimeTabActive ? "time" : "calendar")
-                                ? "tab tab-active"
-                                : "tab bg-neutral"}
-                            on:click={() => selectTab(tab)}
-                        >
-                            <svelte:component
-                                this={tab === "time" ? ClockIcon : CalendarIcon}
-                                class="h-5 w-5 [&>path]:stroke-[3]"
-                            />
-                        </button>
-                    {/each}
-                </div>
+    {#key [items, task]}
+        <div class="flex justify-center">
+            <div role="tablist" class="tabs-boxed tabs w-2/3 bg-neutral">
+                {#each ["time", "calendar"] as tab}
+                    <button
+                        role="tab"
+                        tabindex="0"
+                        class={tab === (isTimeTabActive ? "time" : "calendar")
+                            ? "tab tab-active"
+                            : "tab bg-neutral"}
+                        on:click={() => selectTab(tab)}
+                    >
+                        <svelte:component
+                            this={tab === "time" ? ClockIcon : CalendarIcon}
+                            class="h-5 w-5 [&>path]:stroke-[3]"
+                        />
+                    </button>
+                {/each}
             </div>
-
-            {#if isTimeTabActive}
-                <TimePicker {task} {items} on:defer={handleDefer} />
-            {:else}
-                <DatePicker {task} {tz} {items} on:defer={handleDefer} />
-            {/if}
+        </div>
+        {#if isTimeTabActive}
+            <TimePicker {task} {items} on:defer={handleDefer} />
+        {:else}
+            <DatePicker {task} {tz} {items} on:defer={handleDefer} />
         {/if}
     {/key}
 </div>
