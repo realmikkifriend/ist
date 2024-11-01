@@ -48,7 +48,7 @@
 </script>
 
 <div class="modal-box min-h-[60%] w-fit">
-    {#key [items, task]}
+    {#key task}
         <div class="flex justify-center">
             <div role="tablist" class="tabs-boxed tabs w-2/3 bg-neutral">
                 {#each ["time", "calendar"] as tab}
@@ -68,11 +68,14 @@
                 {/each}
             </div>
         </div>
-        {#if isTimeTabActive}
-            <TimePicker {task} {items} on:defer={handleDefer} />
-        {:else}
-            <DatePicker {task} {tz} {items} on:defer={handleDefer} />
-        {/if}
+
+        {#key items}
+            {#if isTimeTabActive}
+                <TimePicker {task} {items} on:defer={handleDefer} />
+            {:else}
+                <DatePicker {task} {tz} {items} on:defer={handleDefer} />
+            {/if}
+        {/key}
     {/key}
 </div>
 
