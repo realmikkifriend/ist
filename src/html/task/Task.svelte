@@ -6,7 +6,6 @@
     import { getPriorityBorder } from "../../js/priority";
 
     export let task;
-    $: console.log(task.due);
 
     const dispatch = createEventDispatcher();
     let modal;
