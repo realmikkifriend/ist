@@ -14,9 +14,8 @@ body {
 }
 
 ._toastContainer {
-    position: relative !important;
+    @apply relative right-2;
     top: unset !important;
-    right: 0.5rem !important;
 }
 
 /* DATE PICKER */
@@ -32,24 +31,23 @@ body {
 }
 
 .std-calendar-wrap {
-    min-width: 18rem;
+    @apply min-w-72;
 }
 
 .sdt-cal-td > button {
-    padding-top: 0rem !important;
-    padding-bottom: 0.25rem !important;
+    @apply pb-1 pt-0;
 }
 
 .sdt-cal-td > button:disabled {
-    pointer-events: none;
+    @apply pointer-events-none;
 }
 
 .sdt-cal-td {
-    cursor: not-allowed;
+    @apply cursor-not-allowed;
 }
 
 .sdt-tomorrow {
-    padding-top: 0.1rem !important;
+    @apply pt-[0.1rem];
 }
 
 .sdt-tomorrow > button {
@@ -59,7 +57,7 @@ body {
 
 .sdt-today::before,
 .modal-box * .btn:empty {
-    display: none;
+    @apply hidden;
 }
 
 /* GENERATED ELEMENTS */
@@ -67,6 +65,5 @@ body {
 .prose ul,
 .prose li,
 .prose p {
-    margin-top: 0;
-    margin-bottom: 0;
+    @apply mb-0 mt-0;
 }
