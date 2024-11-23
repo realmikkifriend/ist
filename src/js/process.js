@@ -90,12 +90,17 @@ function mergeData(currentResources, data, type) {
         currentResources.contexts = Array.from(currentMap.values());
     } else {
         const currentMap = new Map(
-            (currentResources[type] || []).map((entry) => [entry.id, entry]),
+            Array.isArray(currentResources[type])
+                ? currentResources[type].map((entry) => [entry.id, entry])
+                : [],
         );
-        (data[type] || []).forEach((entry) => {
+
+        const dataEntries = Array.isArray(data[type]) ? data[type] : [];
+        dataEntries.forEach((entry) => {
             const currentEntry = currentMap.get(entry.id);
             currentMap.set(entry.id, currentEntry ? { ...currentEntry, ...entry } : { ...entry });
         });
+
         currentResources[type] = Array.from(currentMap.values());
     }
 }
