@@ -128,7 +128,7 @@
     <div>
         {#each hourSlots as hour}
             {#if displayHours[hour]}
-                <div class="hour group relative flex w-full items-start overflow-hidden">
+                <div class="hour group relative flex w-full items-start overflow-x-hidden">
                     <strong class="mr-2 w-14 text-right text-sm opacity-50">
                         {hour % 12 === 0 ? 12 : hour % 12}
                         {hour < 12 ? "AM" : "PM"}
