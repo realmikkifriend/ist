@@ -128,17 +128,17 @@
     <div>
         {#each hourSlots as hour}
             {#if displayHours[hour]}
-                <div class="hour group relative flex w-full items-start overflow-x-hidden">
+                <div class="hour group relative flex w-full items-start">
                     <strong class="mr-2 w-14 text-right text-sm opacity-50">
                         {hour % 12 === 0 ? 12 : hour % 12}
                         {hour < 12 ? "AM" : "PM"}
                     </strong>
                     <div
-                        class="hour-container h-24 flex-grow border-2 border-b-0 border-gray-700 pb-1 pr-2 group-last:border-b-2"
+                        class="hour-container z-10 h-24 flex-grow border-2 border-t-0 border-gray-700 group-first:border-t-2"
                     >
                         {#if title === "Today" && hour === currentHourSlot}
                             <div
-                                class="absolute left-16 h-0.5 w-[83.5%] rounded-badge bg-red-600"
+                                class="absolute left-16 z-40 h-0.5 w-[83.5%] rounded-badge bg-red-600"
                                 style="top: {(currentMinute / 60) * 100}%;"
                                 id="today-marker"
                             >
@@ -147,37 +147,46 @@
                                 ></div>
                             </div>
                         {/if}
-                        {#each tasks as task, index}
-                            {#if DateTime.fromISO(task.due.date).hour === hour}
-                                <div
-                                    class="task-container absolute z-10 w-[80%]"
-                                    style="
-                                        top: {calculateTaskPosition(task)}%; 
-                                        opacity: {DateTime.fromISO(task.due.date) > DateTime.now()
-                                        ? 0.75
-                                        : 1};
-                                        margin-left: {isTaskIndented(
-                                        task.due.date,
-                                        tasks[index - 1]?.due.date,
-                                        index > 0
-                                            ? isTaskIndented(
-                                                  tasks[index - 1]?.due.date,
-                                                  tasks[index - 2]?.due.date,
-                                                  false,
-                                              )
-                                            : false,
-                                    )
-                                        ? '10rem'
-                                        : '0'};
-                                    "
-                                >
-                                    <AgendaTask {task} />
-                                </div>
-                            {/if}
-                        {/each}
+                        <div class="clipped w-full pb-1 pr-2">
+                            {#each tasks as task, index}
+                                {#if DateTime.fromISO(task.due.date).hour === hour}
+                                    <div
+                                        class="task-container absolute z-20 h-24 w-full"
+                                        style="
+                                            top: {calculateTaskPosition(task)}%;
+                                            opacity: {DateTime.fromISO(task.due.date) >
+                                        DateTime.now()
+                                            ? 0.75
+                                            : 1};
+                                            margin-left: {isTaskIndented(
+                                            task.due.date,
+                                            tasks[index - 1]?.due.date,
+                                            index > 0
+                                                ? isTaskIndented(
+                                                      tasks[index - 1]?.due.date,
+                                                      tasks[index - 2]?.due.date,
+                                                      false,
+                                                  )
+                                                : false,
+                                        )
+                                            ? '10rem'
+                                            : '0'};
+                                        "
+                                    >
+                                        <AgendaTask {task} />
+                                    </div>
+                                {/if}
+                            {/each}
+                        </div>
                     </div>
                 </div>
             {/if}
         {/each}
     </div>
 </div>
+
+<style>
+    .clipped {
+        clip-path: inset(0 0.01rem -15rem 0);
+    }
+</style>
