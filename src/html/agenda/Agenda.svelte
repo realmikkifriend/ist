@@ -71,6 +71,16 @@
         return Math.round((minutes / 60) * 90);
     };
 
+    const isTaskIndented = (currentTaskDue, previousTaskDue, isPreviousIndented) => {
+        if (!previousTaskDue) return false;
+        const timeDifference = DateTime.fromISO(currentTaskDue).diff(
+            DateTime.fromISO(previousTaskDue),
+            "minutes",
+        ).minutes;
+
+        return timeDifference <= 10 && !isPreviousIndented;
+    };
+
     function handleCalendarClick() {
         const currentHash = window.location.hash;
         window.location.hash = currentHash === "#today" ? "#tomorrow" : "#today";
@@ -118,7 +128,7 @@
     <div>
         {#each hourSlots as hour}
             {#if displayHours[hour]}
-                <div class="hour group relative flex w-full items-start">
+                <div class="hour group relative flex w-full items-start overflow-hidden">
                     <strong class="mr-2 w-14 text-right text-sm opacity-50">
                         {hour % 12 === 0 ? 12 : hour % 12}
                         {hour < 12 ? "AM" : "PM"}
@@ -130,21 +140,36 @@
                             <div
                                 class="absolute left-16 h-0.5 w-[83.5%] rounded-badge bg-red-600"
                                 style="top: {(currentMinute / 60) * 100}%;"
+                                id="today-marker"
                             >
                                 <div
                                     class="absolute right-0 h-2 w-2 translate-x-[30%] translate-y-[-40%] rounded-full bg-red-600"
                                 ></div>
                             </div>
                         {/if}
-                        {#each tasks as task}
+                        {#each tasks as task, index}
                             {#if DateTime.fromISO(task.due.date).hour === hour}
                                 <div
-                                    class="absolute z-10 w-[80%]"
+                                    class="task-container absolute z-10 w-[80%]"
                                     style="
-                                top: {calculateTaskPosition(task)}%; 
-                                opacity: {DateTime.fromISO(task.due.date) > DateTime.now()
+                                        top: {calculateTaskPosition(task)}%; 
+                                        opacity: {DateTime.fromISO(task.due.date) > DateTime.now()
                                         ? 0.75
-                                        : 1};"
+                                        : 1};
+                                        margin-left: {isTaskIndented(
+                                        task.due.date,
+                                        tasks[index - 1]?.due.date,
+                                        index > 0
+                                            ? isTaskIndented(
+                                                  tasks[index - 1]?.due.date,
+                                                  tasks[index - 2]?.due.date,
+                                                  false,
+                                              )
+                                            : false,
+                                    )
+                                        ? '10rem'
+                                        : '0'};
+                                    "
                                 >
                                     <AgendaTask {task} />
                                 </div>
