@@ -26,28 +26,29 @@
     let settings;
     $: settings = $userSettings;
 
+    function closeDrawer() {
+        const drawerCheckbox = document.getElementById("my-drawer");
+        if (drawerCheckbox) {
+            drawerCheckbox.checked = false;
+        }
+    }
+
     function handleContextClick(contextId) {
         previousFirstDueTask.set(null);
         const newContextId = settings.selectedContextId === contextId ? null : contextId;
 
-        userSettings.update((settings) => {
-            return {
-                ...settings,
-                selectedContextId: newContextId,
-            };
-        });
+        userSettings.update((settings) => ({
+            ...settings,
+            selectedContextId: newContextId,
+        }));
 
         if (newContextId !== null) {
-            const drawerCheckbox = document.getElementById("my-drawer");
-            if (drawerCheckbox) {
-                drawerCheckbox.checked = !drawerCheckbox.checked;
-            }
+            closeDrawer();
         }
     }
 
     function handleCalendarClick() {
         const currentHash = window.location.hash;
-
         const hashMap = {
             "#today": "#tomorrow",
             "#tomorrow": "",
@@ -56,6 +57,7 @@
 
         toast.pop({ target: "wait" });
         window.location.hash = hashMap[currentHash] || "";
+        closeDrawer();
     }
 </script>
 
