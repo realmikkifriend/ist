@@ -1,5 +1,6 @@
 <script>
     import { XCircleIcon, CalendarIcon } from "@krowten/svelte-heroicons";
+    import { toast } from "@zerodevx/svelte-toast";
     import { todoistResources, userSettings, previousFirstDueTask } from "../../js/stores";
     import { getPriorityClasses } from "../../js/priority";
 
@@ -53,6 +54,7 @@
             "": "#today",
         };
 
+        toast.pop({ target: "wait" });
         window.location.hash = hashMap[currentHash] || "";
     }
 </script>
