@@ -10,7 +10,7 @@
 </script>
 
 <div
-    class="m-1 w-full overflow-hidden whitespace-nowrap rounded-md px-1 text-xs {getPriorityClasses(
+    class="agenda-task m-1 w-full overflow-hidden whitespace-nowrap rounded-md px-1 text-xs {getPriorityClasses(
         task.priority,
     )}"
 >
