@@ -13,6 +13,9 @@
     let displayHours = {};
     const currentHour = DateTime.now().hour;
 
+    let currentHourSlot = currentHour;
+    let currentMinute = DateTime.now().minute;
+
     $: $todoistResources, updatePage();
 
     const setTasks = ({ tasks: newTasks, tasksWithNoTime: newTasksWithNoTime }) => {
@@ -50,6 +53,10 @@
 
         if (targetDate) {
             ({ tasksWithNoTime, tasks } = getTasksForDate(targetDate, $todoistResources));
+            if (title === "Today") {
+                currentHourSlot = currentHour;
+                currentMinute = DateTime.now().minute;
+            }
         } else {
             tasks = [];
             tasksWithNoTime = [];
@@ -119,11 +126,25 @@
                     <div
                         class="hour-container h-24 flex-grow border-2 border-b-0 border-gray-700 pb-1 pr-2 group-last:border-b-2"
                     >
+                        {#if title === "Today" && hour === currentHourSlot}
+                            <div
+                                class="absolute left-16 h-0.5 w-[83.5%] rounded-badge bg-red-600"
+                                style="top: {(currentMinute / 60) * 100}%;"
+                            >
+                                <div
+                                    class="absolute right-0 h-2 w-2 translate-x-[30%] translate-y-[-40%] rounded-full bg-red-600"
+                                ></div>
+                            </div>
+                        {/if}
                         {#each tasks as task}
                             {#if DateTime.fromISO(task.due.date).hour === hour}
                                 <div
                                     class="absolute z-10 w-[80%]"
-                                    style="top: {calculateTaskPosition(task)}%;"
+                                    style="
+                                top: {calculateTaskPosition(task)}%; 
+                                opacity: {DateTime.fromISO(task.due.date) > DateTime.now()
+                                        ? 0.75
+                                        : 1};"
                                 >
                                     <AgendaTask {task} />
                                 </div>
