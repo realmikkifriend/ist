@@ -83,7 +83,7 @@
     });
 </script>
 
-<div class="mx-auto mt-[-2rem] max-w-72 sm:max-w-md" id="agenda">
+<div class="mr-4 mt-[-2rem] max-w-lg sm:mx-auto sm:max-w-96" id="agenda">
     <div class="flex items-center justify-between pb-2 pl-16">
         <button on:click={handleCalendarClick}>
             <CalendarIcon class="h-5 w-6" />
@@ -122,7 +122,7 @@
                         {#each tasks as task}
                             {#if DateTime.fromISO(task.due.date).hour === hour}
                                 <div
-                                    class="absolute z-10 w-1/2"
+                                    class="absolute z-10 w-[80%]"
                                     style="top: {calculateTaskPosition(task)}%;"
                                 >
                                     <AgendaTask {task} />

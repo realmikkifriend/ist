@@ -9,7 +9,11 @@
     }
 </script>
 
-<div class="m-1 w-full rounded-md px-1 text-xs {getPriorityClasses(task.priority)}">
+<div
+    class="m-1 w-full overflow-hidden whitespace-nowrap rounded-md px-1 text-xs {getPriorityClasses(
+        task.priority,
+    )}"
+>
     {#if task.due.date.includes("T")}
         <strong>{formatTime(task.due.date)}</strong> {task.content}
     {:else}
