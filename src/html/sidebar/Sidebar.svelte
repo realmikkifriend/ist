@@ -1,7 +1,6 @@
 <script>
     import { Bars3Icon, ArrowLeftOnRectangleIcon } from "@krowten/svelte-heroicons";
     import { toast } from "@zerodevx/svelte-toast";
-    import ContextBadge from "./ContextBadge.svelte";
     import Contexts from "./Contexts.svelte";
     import Footer from "../Footer.svelte";
     import {
@@ -38,9 +37,6 @@
         <label for="my-drawer" class="btn drawer-button mt-0 bg-transparent hover:bg-primary"
             ><Bars3Icon class="h-8 w-8" />
         </label>
-        {#if $firstDueTask}
-            <ContextBadge />
-        {/if}
     </div>
     <div class="drawer-side z-30">
         <label for="my-drawer" aria-label="close sidebar" class="drawer-overlay"></label>

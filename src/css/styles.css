@@ -67,3 +67,16 @@ body {
 .prose p {
     @apply mb-0 mt-0;
 }
+
+/* AGENDA */
+
+#agenda h1,
+#agenda h2 {
+    @apply text-center font-bold;
+}
+#agenda h1 {
+    @apply text-2xl;
+}
+#agenda h2 {
+    @apply mb-1 text-lg opacity-50;
+}

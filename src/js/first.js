@@ -47,7 +47,9 @@ export const updateFirstDueTask = () => {
     if (
         prevTask &&
         newTask.id !== prevTask.id &&
-        (!contextId || prevTask.context_id === contextId)
+        (!contextId || prevTask.context_id === contextId) &&
+        window.location.hash !== "#today" &&
+        window.location.hash !== "#tomorrow"
     ) {
         newFirstTask(FirstDueTaskToast, () => setFirstDueTask(newTask));
     } else {

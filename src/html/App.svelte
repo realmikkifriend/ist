@@ -8,11 +8,16 @@
     import { error } from "../js/toasts";
     import { handleTaskDone, handleTaskDefer } from "../js/taskHandlers";
     import Sidebar from "./sidebar/Sidebar.svelte";
+    import ContextBadge from "./sidebar/ContextBadge.svelte";
     import Task from "./task/Task.svelte";
+    import Agenda from "./agenda/Agenda.svelte";
+    import { writable } from "svelte/store";
 
     let autoRefresh,
         isSpinning = false,
         dataPromise;
+
+    const hash = writable(window.location.hash);
 
     $: {
         $userSettings.selectedContextId;
@@ -21,6 +26,12 @@
     }
 
     onMount(() => {
+        const updateHash = () => hash.set(window.location.hash);
+
+        window.addEventListener("hashchange", updateHash);
+
+        updateHash();
+
         dataPromise = handleRefresh();
 
         autoRefresh = setInterval(async () => {
@@ -30,6 +41,7 @@
 
     onDestroy(() => {
         clearInterval(autoRefresh);
+        window.removeEventListener("hashchange", updateHash);
     });
 
     const handleDone = ({
@@ -59,32 +71,42 @@
     };
 </script>
 
-<Sidebar />
+<div class="flex w-fit items-center">
+    <Sidebar />
 
-{#await dataPromise}
-    <div class="hero">Loading...</div>
-{:then}
-    {#if $todoistResources.items}
-        {#if $firstDueTask}
-            <Task task={$firstDueTask} on:done={handleDone} on:defer={handleDefer} />
-        {:else}
-            <div class="hero">No due tasks</div>
-        {/if}
-
-        <button class="fixed bottom-2 right-2 opacity-50" on:click={handleRefresh}>
-            <ArrowPathIcon class="h-6 w-6 {isSpinning ? 'animate-spin' : ''}" />
-        </button>
-    {:else}
-        <div class="hero">No tasks, try adding some</div>
+    {#if $firstDueTask && $hash !== "#today" && $hash !== "#tomorrow"}
+        <ContextBadge class="ml-4" />
     {/if}
-{:catch error}
-    <div class="hero">Error loading Todoist data: {error.message}</div>
-{/await}
+</div>
 
-{#if $todoistError}
-    {@html error(
-        $todoistError.includes("NetworkError")
-            ? "Offline..."
-            : `Error loading Todoist data: ${$todoistError}`,
-    ) && ""}
+{#if $hash === "#today" || $hash === "#tomorrow"}
+    <Agenda />
+{:else}
+    {#await dataPromise}
+        <div class="hero">Loading...</div>
+    {:then}
+        {#if $todoistResources.items}
+            {#if $firstDueTask}
+                <Task task={$firstDueTask} on:done={handleDone} on:defer={handleDefer} />
+            {:else}
+                <div class="hero">No due tasks</div>
+            {/if}
+        {:else}
+            <div class="hero">No tasks, try adding some</div>
+        {/if}
+    {:catch error}
+        <div class="hero">Error loading Todoist data: {error.message}</div>
+    {/await}
+
+    {#if $todoistError}
+        {@html error(
+            $todoistError.includes("NetworkError")
+                ? "Offline..."
+                : `Error loading Todoist data: ${$todoistError}`,
+        ) && ""}
+    {/if}
 {/if}
+
+<button class="fixed bottom-2 right-2 opacity-50" on:click={handleRefresh}>
+    <ArrowPathIcon class="h-6 w-6 {isSpinning ? 'animate-spin' : ''}" />
+</button>

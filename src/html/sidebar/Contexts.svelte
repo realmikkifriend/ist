@@ -1,5 +1,5 @@
 <script>
-    import { XCircleIcon } from "@krowten/svelte-heroicons";
+    import { XCircleIcon, CalendarIcon } from "@krowten/svelte-heroicons";
     import { todoistResources, userSettings, previousFirstDueTask } from "../../js/stores";
     import { getPriorityClasses } from "../../js/priority";
 
@@ -43,9 +43,24 @@
             }
         }
     }
+
+    function handleCalendarClick() {
+        const currentHash = window.location.hash;
+
+        const hashMap = {
+            "#today": "#tomorrow",
+            "#tomorrow": "",
+            "": "#today",
+        };
+
+        window.location.hash = hashMap[currentHash] || "";
+    }
 </script>
 
 <div class="mb-2 ml-2 flex items-center justify-between">
+    <button on:click={handleCalendarClick}>
+        <CalendarIcon class="h-7 w-8" />
+    </button>
     <h1 class="text-2xl font-bold">Contexts</h1>
     <label
         for="my-drawer"
