@@ -125,7 +125,7 @@
             {/each}
         </ul>
     {/if}
-    <div>
+    <div class="w-[99%] overflow-hidden">
         {#each hourSlots as hour}
             {#if displayHours[hour]}
                 <div class="hour group relative flex w-full items-start">
