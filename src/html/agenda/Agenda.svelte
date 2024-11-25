@@ -125,7 +125,7 @@
             {/each}
         </ul>
     {/if}
-    <div class="w-[99%] overflow-hidden">
+    <div class="w-[99%] overflow-hidden pr-1">
         {#each hourSlots as hour}
             {#if displayHours[hour]}
                 <div class="hour group relative flex w-full items-start">
@@ -138,12 +138,12 @@
                     >
                         {#if title === "Today" && hour === currentHourSlot}
                             <div
-                                class="absolute left-16 z-40 h-0.5 w-[83.5%] rounded-badge bg-red-600"
+                                class="absolute left-16 z-40 h-0.5 w-[85%] rounded-badge bg-red-600"
                                 style="top: {(currentMinute / 60) * 100}%;"
                                 id="today-marker"
                             >
                                 <div
-                                    class="absolute right-0 h-2 w-2 translate-x-[30%] translate-y-[-40%] rounded-full bg-red-600"
+                                    class="absolute right-0 h-2 w-2 translate-x-[25%] translate-y-[-40%] rounded-full bg-red-600"
                                 ></div>
                             </div>
                         {/if}
