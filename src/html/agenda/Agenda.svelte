@@ -134,16 +134,16 @@
                         {hour < 12 ? "AM" : "PM"}
                     </strong>
                     <div
-                        class="hour-container z-10 h-24 flex-grow border-2 border-t-0 border-gray-700 group-first:border-t-2"
+                        class="hour-container relative z-10 h-24 flex-grow border-2 border-t-0 border-gray-700 group-first:border-t-2"
                     >
                         {#if title === "Today" && hour === currentHourSlot}
                             <div
-                                class="absolute left-16 z-40 h-0.5 w-[85%] rounded-badge bg-red-600"
+                                class="absolute left-0 z-40 h-0.5 w-full rounded-badge bg-red-600"
                                 style="top: {(currentMinute / 60) * 100}%;"
                                 id="today-marker"
                             >
                                 <div
-                                    class="absolute right-0 h-2 w-2 translate-x-[25%] translate-y-[-40%] rounded-full bg-red-600"
+                                    class="absolute -right-[0.3rem] -top-[0.2rem] h-2 w-2 rounded-full bg-red-600"
                                 ></div>
                             </div>
                         {/if}
