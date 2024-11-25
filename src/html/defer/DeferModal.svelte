@@ -15,7 +15,8 @@
         isTimeTabActive = tab === "time";
     };
 
-    const tz = $todoistResources.user.tz_info.timezone;
+    const tz = $todoistResources.user?.tz_info?.timezone;
+    console.log($todoistResources.user);
 
     let items = [];
 
