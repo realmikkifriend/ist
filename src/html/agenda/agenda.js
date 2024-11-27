@@ -33,3 +33,38 @@ export const getTasksForDate = (date, todoistResources) => {
             { tasksWithNoTime: [], tasks: [] },
         );
 };
+
+export const calculateTaskPosition = (task, previousTaskDue) => {
+    const taskDateTime = DateTime.fromISO(task.due.date);
+    let position = Math.round((taskDateTime.minute / 60) * 90);
+    if (previousTaskDue) {
+        const timeDifference = taskDateTime.diff(
+            DateTime.fromISO(previousTaskDue),
+            "minutes",
+        ).minutes;
+        if (timeDifference <= 8) position += 15 - timeDifference;
+    }
+    return position;
+};
+
+const isTaskIndented = (currentTaskDue, previousTaskDue, isPreviousIndented) => {
+    if (!previousTaskDue) return false;
+    return (
+        DateTime.fromISO(currentTaskDue).diff(DateTime.fromISO(previousTaskDue), "minutes")
+            .minutes <= 10 && !isPreviousIndented
+    );
+};
+
+export const calculateTaskStyle = (task, index, tasks) => {
+    const isIndented = isTaskIndented(
+        task.due.date,
+        tasks[index - 1]?.due.date,
+        index > 0
+            ? isTaskIndented(tasks[index - 1]?.due.date, tasks[index - 2]?.due.date, false)
+            : false,
+    );
+    return {
+        marginLeft: isIndented ? "10rem" : "0",
+        zIndex: isIndented ? "30" : "10",
+    };
+};

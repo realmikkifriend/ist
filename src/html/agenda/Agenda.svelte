@@ -3,7 +3,7 @@
     import { DateTime } from "luxon";
     import { XCircleIcon, CalendarIcon } from "@krowten/svelte-heroicons";
     import { todoistResources } from "../../js/stores";
-    import { getTasksForDate } from "./agenda";
+    import { getTasksForDate, calculateTaskPosition, calculateTaskStyle } from "./agenda";
     import AgendaTask from "./AgendaTask.svelte";
 
     let tasks = [];
@@ -21,15 +21,9 @@
     const setTasks = ({ tasks: newTasks, tasksWithNoTime: newTasksWithNoTime }) => {
         tasks = newTasks;
         tasksWithNoTime = newTasksWithNoTime;
-
-        if (title === "Today") {
-            updateDisplayHours();
-        } else {
-            displayHours = {};
-            hourSlots.forEach((hour) => {
-                displayHours[hour] = true;
-            });
-        }
+        title === "Today"
+            ? updateDisplayHours()
+            : hourSlots.forEach((hour) => (displayHours[hour] = true));
     };
 
     const updateDisplayHours = () => {
@@ -43,47 +37,25 @@
     const updatePage = () => {
         title = window.location.hash.replace("#", "").replace(/^./, (c) => c.toUpperCase());
         const today = DateTime.now();
-        const tomorrow = today.plus({ days: 1 });
         const targetDate =
             window.location.hash === "#today"
                 ? today
                 : window.location.hash === "#tomorrow"
-                  ? tomorrow
+                  ? today.plus({ days: 1 })
                   : null;
 
-        if (targetDate) {
-            ({ tasksWithNoTime, tasks } = getTasksForDate(targetDate, $todoistResources));
-            if (title === "Today") {
-                currentHourSlot = currentHour;
-                currentMinute = DateTime.now().minute;
-            }
-        } else {
-            tasks = [];
-            tasksWithNoTime = [];
+        ({ tasksWithNoTime, tasks } = targetDate
+            ? getTasksForDate(targetDate, $todoistResources)
+            : { tasks: [], tasksWithNoTime: [] });
+        if (title === "Today") {
+            currentHourSlot = currentHour;
+            currentMinute = DateTime.now().minute;
         }
-
         setTasks({ tasks, tasksWithNoTime });
     };
 
-    const calculateTaskPosition = (task) => {
-        const taskDateTime = DateTime.fromISO(task.due.date);
-        const minutes = taskDateTime.minute;
-        return Math.round((minutes / 60) * 90);
-    };
-
-    const isTaskIndented = (currentTaskDue, previousTaskDue, isPreviousIndented) => {
-        if (!previousTaskDue) return false;
-        const timeDifference = DateTime.fromISO(currentTaskDue).diff(
-            DateTime.fromISO(previousTaskDue),
-            "minutes",
-        ).minutes;
-
-        return timeDifference <= 10 && !isPreviousIndented;
-    };
-
     function handleCalendarClick() {
-        const currentHash = window.location.hash;
-        window.location.hash = currentHash === "#today" ? "#tomorrow" : "#today";
+        window.location.hash = window.location.hash === "#today" ? "#tomorrow" : "#today";
     }
 
     function handleAgendaClose() {
@@ -106,12 +78,8 @@
             <CalendarIcon class="h-5 w-6" />
         </button>
         <div class="flex flex-col items-center">
-            <h1 class="flex-1 text-center">
-                {title}
-            </h1>
-            <h2 class="text-center">
-                {tasks.length} tasks
-            </h2>
+            <h1 class="flex-1 text-center">{title}</h1>
+            <h2 class="text-center">{tasks.length} tasks</h2>
         </div>
         <button on:click={handleAgendaClose}>
             <XCircleIcon class="h-5 w-6" />
@@ -125,6 +93,7 @@
             {/each}
         </ul>
     {/if}
+
     <div class="w-[99%] overflow-hidden pr-1">
         {#each hourSlots as hour}
             {#if displayHours[hour]}
@@ -151,27 +120,13 @@
                             {#each tasks as task, index}
                                 {#if DateTime.fromISO(task.due.date).hour === hour}
                                     <div
-                                        class="task-container absolute z-20 h-24 w-full"
+                                        class="task-container absolute"
                                         style="
-                                            top: {calculateTaskPosition(task)}%;
-                                            opacity: {DateTime.fromISO(task.due.date) >
-                                        DateTime.now()
-                                            ? 0.75
-                                            : 1};
-                                            margin-left: {isTaskIndented(
-                                            task.due.date,
-                                            tasks[index - 1]?.due.date,
-                                            index > 0
-                                                ? isTaskIndented(
-                                                      tasks[index - 1]?.due.date,
-                                                      tasks[index - 2]?.due.date,
-                                                      false,
-                                                  )
-                                                : false,
-                                        )
-                                            ? '10rem'
-                                            : '0'};
-                                        "
+                    top: {calculateTaskPosition(task, tasks[index - 1]?.due.date)}%;
+                    opacity: {DateTime.fromISO(task.due.date) > DateTime.now() ? 0.75 : 1};
+                    margin-left: {calculateTaskStyle(task, index, tasks).marginLeft};
+                    z-index: {calculateTaskStyle(task, index, tasks).zIndex};
+                                    "
                                     >
                                         <AgendaTask {task} />
                                     </div>
