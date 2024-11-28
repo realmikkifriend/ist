@@ -112,7 +112,7 @@
                                 {#each tasks as task, index}
                                     {#if DateTime.fromISO(task.due.date).hour === hour}
                                         <div
-                                            class="task-container absolute"
+                                            class="task-container absolute w-[98%]"
                                             style="
                     top: {calculateTaskPosition(task, tasks[index - 1]?.due.date)}%;
                     opacity: {DateTime.fromISO(task.due.date) > DateTime.now() ? 0.75 : 1};
