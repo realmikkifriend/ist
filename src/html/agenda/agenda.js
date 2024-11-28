@@ -64,7 +64,7 @@ export const calculateTaskStyle = (task, index, tasks) => {
             : false,
     );
     return {
-        marginLeft: isIndented ? "10rem" : "0",
+        marginLeft: isIndented ? "50%" : "0",
         zIndex: isIndented ? "30" : "10",
     };
 };
