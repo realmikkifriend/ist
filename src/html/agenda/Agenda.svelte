@@ -11,10 +11,7 @@
     let hourSlots = Array.from({ length: 18 }, (_, i) => i + 6);
     let title = "";
     let displayHours = {};
-    const currentHour = DateTime.now().hour;
-
-    let currentHourSlot = currentHour;
-    let currentMinute = DateTime.now().minute;
+    let currentHour, currentMinute;
 
     $: $todoistResources, updatePage();
 
@@ -35,23 +32,25 @@
     };
 
     const updatePage = () => {
+        const now = DateTime.now();
+        currentHour = now.hour;
+        currentMinute = now.minute;
+
         title = window.location.hash.replace("#", "").replace(/^./, (c) => c.toUpperCase());
-        const today = DateTime.now();
         const targetDate =
             window.location.hash === "#today"
-                ? today
+                ? now
                 : window.location.hash === "#tomorrow"
-                  ? today.plus({ days: 1 })
+                  ? now.plus({ days: 1 })
                   : null;
 
         ({ tasksWithNoTime, tasks } = targetDate
             ? getTasksForDate(targetDate, $todoistResources)
             : { tasks: [], tasksWithNoTime: [] });
+
         if (title === "Today") {
-            currentHourSlot = currentHour;
-            currentMinute = DateTime.now().minute;
+            setTasks({ tasks, tasksWithNoTime });
         }
-        setTasks({ tasks, tasksWithNoTime });
     };
 
     function handleCalendarClick() {
@@ -95,7 +94,7 @@
     {/if}
 
     <div class="w-[99%] overflow-hidden pr-1">
-        {#key currentHourSlot}
+        {#key currentHour}
             {#each hourSlots as hour}
                 {#if displayHours[hour]}
                     <div class="hour group relative flex w-full items-start">
@@ -106,7 +105,7 @@
                         <div
                             class="hour-container relative z-10 h-24 flex-grow border-2 border-t-0 border-gray-700 group-first:border-t-2"
                         >
-                            {#if title === "Today" && hour === currentHourSlot}
+                            {#if title === "Today" && hour === currentHour}
                                 <div
                                     class="absolute left-0 z-40 h-0.5 w-full rounded-badge bg-red-600"
                                     style="top: {(currentMinute / 60) * 100}%;"
