@@ -15,22 +15,6 @@
 
     $: $todoistResources, updatePage();
 
-    const setTasks = ({ tasks: newTasks, tasksWithNoTime: newTasksWithNoTime }) => {
-        tasks = newTasks;
-        tasksWithNoTime = newTasksWithNoTime;
-        title === "Today"
-            ? updateDisplayHours()
-            : hourSlots.forEach((hour) => (displayHours[hour] = true));
-    };
-
-    const updateDisplayHours = () => {
-        displayHours = {};
-        hourSlots.forEach((hour) => {
-            const hourTasks = tasks.filter((task) => DateTime.fromISO(task.due.date).hour === hour);
-            displayHours[hour] = hour >= currentHour || hourTasks.length > 0;
-        });
-    };
-
     const updatePage = () => {
         const now = DateTime.now();
         currentHour = now.hour;
@@ -48,7 +32,17 @@
             ? getTasksForDate(targetDate, $todoistResources)
             : { tasks: [], tasksWithNoTime: [] });
 
-        setTasks({ tasks, tasksWithNoTime });
+        if (title === "Today") {
+            displayHours = {};
+            hourSlots.forEach((hour) => {
+                const hourTasks = tasks.filter(
+                    (task) => DateTime.fromISO(task.due.date).hour === hour,
+                );
+                displayHours[hour] = hour >= currentHour || hourTasks.length > 0;
+            });
+        } else {
+            hourSlots.forEach((hour) => (displayHours[hour] = true));
+        }
     };
 
     function handleCalendarClick() {
