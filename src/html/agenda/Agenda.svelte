@@ -48,9 +48,7 @@
             ? getTasksForDate(targetDate, $todoistResources)
             : { tasks: [], tasksWithNoTime: [] });
 
-        if (title === "Today") {
-            setTasks({ tasks, tasksWithNoTime });
-        }
+        setTasks({ tasks, tasksWithNoTime });
     };
 
     function handleCalendarClick() {
