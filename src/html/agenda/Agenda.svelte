@@ -95,48 +95,50 @@
     {/if}
 
     <div class="w-[99%] overflow-hidden pr-1">
-        {#each hourSlots as hour}
-            {#if displayHours[hour]}
-                <div class="hour group relative flex w-full items-start">
-                    <strong class="mr-2 w-14 text-right text-sm opacity-50">
-                        {hour % 12 === 0 ? 12 : hour % 12}
-                        {hour < 12 ? "AM" : "PM"}
-                    </strong>
-                    <div
-                        class="hour-container relative z-10 h-24 flex-grow border-2 border-t-0 border-gray-700 group-first:border-t-2"
-                    >
-                        {#if title === "Today" && hour === currentHourSlot}
-                            <div
-                                class="absolute left-0 z-40 h-0.5 w-full rounded-badge bg-red-600"
-                                style="top: {(currentMinute / 60) * 100}%;"
-                                id="today-marker"
-                            >
+        {#key currentHourSlot}
+            {#each hourSlots as hour}
+                {#if displayHours[hour]}
+                    <div class="hour group relative flex w-full items-start">
+                        <strong class="mr-2 w-14 text-right text-sm opacity-50">
+                            {hour % 12 === 0 ? 12 : hour % 12}
+                            {hour < 12 ? "AM" : "PM"}
+                        </strong>
+                        <div
+                            class="hour-container relative z-10 h-24 flex-grow border-2 border-t-0 border-gray-700 group-first:border-t-2"
+                        >
+                            {#if title === "Today" && hour === currentHourSlot}
                                 <div
-                                    class="absolute -right-[0.3rem] -top-[0.2rem] h-2 w-2 rounded-full bg-red-600"
-                                ></div>
-                            </div>
-                        {/if}
-                        <div class="clipped w-full pb-1 pr-2">
-                            {#each tasks as task, index}
-                                {#if DateTime.fromISO(task.due.date).hour === hour}
+                                    class="absolute left-0 z-40 h-0.5 w-full rounded-badge bg-red-600"
+                                    style="top: {(currentMinute / 60) * 100}%;"
+                                    id="today-marker"
+                                >
                                     <div
-                                        class="task-container absolute"
-                                        style="
+                                        class="absolute -right-[0.3rem] -top-[0.2rem] h-2 w-2 rounded-full bg-red-600"
+                                    ></div>
+                                </div>
+                            {/if}
+                            <div class="clipped w-full pb-1 pr-2">
+                                {#each tasks as task, index}
+                                    {#if DateTime.fromISO(task.due.date).hour === hour}
+                                        <div
+                                            class="task-container absolute"
+                                            style="
                     top: {calculateTaskPosition(task, tasks[index - 1]?.due.date)}%;
                     opacity: {DateTime.fromISO(task.due.date) > DateTime.now() ? 0.75 : 1};
                     margin-left: {calculateTaskStyle(task, index, tasks).marginLeft};
                     z-index: {calculateTaskStyle(task, index, tasks).zIndex};
                                     "
-                                    >
-                                        <AgendaTask {task} />
-                                    </div>
-                                {/if}
-                            {/each}
+                                        >
+                                            <AgendaTask {task} />
+                                        </div>
+                                    {/if}
+                                {/each}
+                            </div>
                         </div>
                     </div>
-                </div>
-            {/if}
-        {/each}
+                {/if}
+            {/each}
+        {/key}
     </div>
 </div>
 
