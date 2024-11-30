@@ -90,10 +90,19 @@
             {#each hourSlots as hour}
                 {#if displayHours[hour]}
                     <div class="hour group relative flex w-full items-start">
-                        <strong class="mr-2 w-14 text-right text-sm opacity-50">
-                            {hour % 12 === 0 ? 12 : hour % 12}
-                            {hour < 12 ? "AM" : "PM"}
-                        </strong>
+                        <div
+                            class="mr-1 flex w-16 flex-row items-center justify-end font-extrabold"
+                        >
+                            {#if tasks.filter((task) => DateTime.fromISO(task.due.date).hour === hour).length >= 4}
+                                <span class="mr-1 mt-[.1rem] text-xs text-red-500">4+</span>
+                            {/if}
+
+                            <span class="mr-1 text-sm opacity-50">
+                                {hour % 12 === 0 ? 12 : hour % 12}
+                                {hour < 12 ? "AM" : "PM"}
+                            </span>
+                        </div>
+
                         <div
                             class="hour-container relative z-10 h-24 flex-grow border-2 border-t-0 border-gray-700 group-first:border-t-2"
                         >
