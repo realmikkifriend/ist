@@ -2,21 +2,42 @@
     import { DateTime } from "luxon";
     import { getPriorityClasses } from "../../js/priority"; // Import the function
 
-    export let task;
+    export let task, color;
 
-    function formatTime(dateString) {
-        return DateTime.fromISO(dateString).toFormat("h:mm a");
-    }
+    const colorClasses = {
+        berry_red: "bg-pink-300",
+        red: "bg-red-400",
+        orange: "bg-orange-500",
+        yellow: "bg-yellow-400",
+        blue: "bg-blue-400",
+        green: "bg-green-400",
+        olive_green: "bg-olive-600",
+        lime_green: "bg-lime-600",
+        mint_green: "bg-mint-600",
+        teal: "bg-teal-600",
+        sky_blue: "bg-sky-blue-600",
+        light_blue: "bg-light-blue-600",
+        grape: "bg-grape-600",
+        violet: "bg-violet-600",
+        lavender: "bg-lavender-600",
+        magenta: "bg-pink-500",
+        salmon: "bg-salmon-600",
+        charcoal: "bg-charcoal-600",
+        grey: "bg-grey-600",
+        taupe: "bg-taupe-600",
+    };
 </script>
 
 <div
-    class="agenda-task m-1 w-full overflow-hidden whitespace-nowrap rounded-md px-1 text-xs {getPriorityClasses(
-        task.priority,
-    )}"
+    class={`agenda-task m-1 w-full items-center overflow-hidden whitespace-nowrap rounded-md px-1 text-xs brightness-90 ${colorClasses[color] || "bg-gray-600"}`}
 >
-    {#if task.due.date.includes("T")}
-        <strong>{formatTime(task.due.date)}</strong> {task.content}
-    {:else}
-        {task.content}
-    {/if}
+    <span
+        class="priority-element relative -left-1.5 mt-0 inline-block h-fit min-h-2.5 min-w-4 rounded-md px-1.5 text-xs font-bold {getPriorityClasses(
+            task.priority,
+        )}"
+    >
+        {#if task.due.date.includes("T")}
+            {DateTime.fromISO(task.due.date).toFormat("h:mm")}
+        {/if}
+    </span>{task.content}
 </div>

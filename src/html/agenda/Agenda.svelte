@@ -53,6 +53,11 @@
         window.location.hash = "";
     }
 
+    function getTaskColor(id) {
+        const context = $todoistResources.contexts.find((context) => context.id === id);
+        return context?.color || null;
+    }
+
     onMount(() => {
         updatePage();
         window.addEventListener("hashchange", updatePage);
@@ -78,11 +83,11 @@
     </div>
 
     {#if tasksWithNoTime.length > 0}
-        <ul class="mb-4 flex w-full flex-col items-center pl-[4.5rem] pr-1.5">
+        <div class="mb-4 flex w-full flex-col items-center pl-[4.5rem] pr-2">
             {#each tasksWithNoTime as task}
-                <AgendaTask {task} />
+                <AgendaTask {task} color={getTaskColor(task.context_id)} />
             {/each}
-        </ul>
+        </div>
     {/if}
 
     <div class="w-[99%] overflow-hidden pr-1">
@@ -137,12 +142,17 @@
                                             class="task-container absolute w-[98%]"
                                             style="
                     top: {calculateTaskPosition(task, tasks[index - 1]?.due.date)}%;
-                    opacity: {DateTime.fromISO(task.due.date) > DateTime.now() ? 0.75 : 1};
+                    filter: {DateTime.fromISO(task.due.date) > DateTime.now()
+                                                ? 'brightness(0.75)'
+                                                : 'brightness(1)'};
                     margin-left: {calculateTaskStyle(task, index, tasks).marginLeft};
                     z-index: {calculateTaskStyle(task, index, tasks).zIndex};
                                     "
                                         >
-                                            <AgendaTask {task} />
+                                            <AgendaTask
+                                                {task}
+                                                color={getTaskColor(task.context_id)}
+                                            />
                                         </div>
                                     {/if}
                                 {/each}
