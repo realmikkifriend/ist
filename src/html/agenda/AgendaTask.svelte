@@ -5,7 +5,7 @@
     export let task;
 
     function formatTime(dateString) {
-        return DateTime.fromISO(dateString).toFormat("hh:mm a");
+        return DateTime.fromISO(dateString).toFormat("h:mm a");
     }
 </script>
 
