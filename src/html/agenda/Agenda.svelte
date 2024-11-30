@@ -96,13 +96,13 @@
                 {#if displayHours[hour]}
                     <div class="hour group relative flex w-full items-start">
                         <div
-                            class="mr-1 flex w-16 flex-row items-center justify-end font-extrabold"
+                            class="mr-1 flex w-16 flex-row items-center justify-end text-right font-extrabold"
                         >
                             {#if tasks.filter((task) => DateTime.fromISO(task.due.date).hour === hour).length >= 4}
-                                <span class="mr-1 mt-[.1rem] text-xs text-red-500">4+</span>
+                                <span class="mr-0.5 text-xs text-red-500">4+</span>
                             {/if}
 
-                            <span class="mr-1 text-sm opacity-50">
+                            <span class="mr-0.5 text-xs brightness-50">
                                 {hour % 12 === 0 ? 12 : hour % 12}
                                 {hour < 12 ? "AM" : "PM"}
                             </span>
