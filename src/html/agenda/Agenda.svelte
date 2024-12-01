@@ -1,25 +1,23 @@
 <script>
+    import AgendaHour from "./AgendaHour.svelte";
     import { onMount, onDestroy } from "svelte";
     import { DateTime } from "luxon";
     import { XCircleIcon, CalendarIcon } from "@krowten/svelte-heroicons";
     import { todoistResources } from "../../js/stores";
-    import { getQuarterHourPosition } from "../../js/classes";
-    import { getTasksForDate, calculateTaskPosition, calculateTaskStyle } from "./agenda";
+    import { getTasksForDate } from "./agenda";
     import AgendaTask from "./AgendaTask.svelte";
 
+    let title = "";
     let tasks = [];
     let tasksWithNoTime = [];
     let hourSlots = Array.from({ length: 18 }, (_, i) => i + 6);
-    let title = "";
     let displayHours = {};
-    let currentHour, currentMinute;
+    let now;
 
     $: $todoistResources, updatePage();
 
     const updatePage = () => {
-        const now = DateTime.now();
-        currentHour = now.hour;
-        currentMinute = now.minute;
+        now = DateTime.now();
 
         title = window.location.hash.replace("#", "").replace(/^./, (c) => c.toUpperCase());
         const targetDate =
@@ -39,18 +37,18 @@
                 const hourTasks = tasks.filter(
                     (task) => DateTime.fromISO(task.due.date).hour === hour,
                 );
-                displayHours[hour] = hour >= currentHour || hourTasks.length > 0;
+                displayHours[hour] = hour >= now.hour || hourTasks.length > 0;
             });
         } else {
             hourSlots.forEach((hour) => (displayHours[hour] = true));
         }
     };
 
-    function handleCalendarClick() {
+    function switchView() {
         window.location.hash = window.location.hash === "#today" ? "#tomorrow" : "#today";
     }
 
-    function handleAgendaClose() {
+    function closeAgenda() {
         window.location.hash = "";
     }
 
@@ -71,14 +69,14 @@
 
 <div class="mr-4 mt-[-2rem] max-w-lg sm:mx-auto sm:max-w-96" id="agenda">
     <div class="flex items-center justify-between pb-2 pl-16">
-        <button on:click={handleCalendarClick}>
+        <button on:click={switchView}>
             <CalendarIcon class="h-5 w-6" />
         </button>
         <div class="flex flex-col items-center">
             <h1 class="flex-1 text-center">{title}</h1>
             <h2 class="text-center">{tasks.length + tasksWithNoTime.length} tasks</h2>
         </div>
-        <button on:click={handleAgendaClose}>
+        <button on:click={closeAgenda}>
             <XCircleIcon class="h-5 w-6" />
         </button>
     </div>
@@ -92,74 +90,19 @@
     {/if}
 
     <div class="w-[99%] overflow-hidden pr-1">
-        {#key currentHour}
+        {#key now.hour}
             {#each hourSlots as hour}
                 {#if displayHours[hour]}
-                    <div class="hour group relative flex w-full items-start">
-                        <div
-                            class="mr-1 flex w-16 flex-row items-center justify-end text-right font-extrabold"
-                        >
-                            {#if tasks.filter((task) => DateTime.fromISO(task.due.date).hour === hour).length >= 4}
-                                <span class="mr-0.5 text-xs text-red-500">4+</span>
-                            {/if}
-
-                            <span class="mr-0.5 text-xs brightness-50">
-                                {hour % 12 === 0 ? 12 : hour % 12}
-                                {hour < 12 ? "AM" : "PM"}
-                            </span>
-                        </div>
-
-                        <div
-                            class="hour-container relative z-10 h-24 flex-grow border-2 border-t-0 border-gray-700 group-first:border-t-2"
-                        >
-                            {#each [0.25, 0.5, 0.75] as position}
-                                <div
-                                    class={`absolute left-0 w-full border-t border-gray-800 ${getQuarterHourPosition(position)}`}
-                                ></div>
-                            {/each}
-                            {#if title === "Today" && hour === currentHour}
-                                <div
-                                    class="absolute left-0 z-40 h-0.5 w-full rounded-badge bg-red-600"
-                                    style="top: {(currentMinute / 60) * 100}%;"
-                                    id="today-marker"
-                                >
-                                    <div
-                                        class="absolute -right-[0.3rem] -top-[0.2rem] h-2 w-2 rounded-full bg-red-600"
-                                    ></div>
-                                </div>
-                            {/if}
-                            <div class="clipped w-full pb-1 pr-2">
-                                {#each tasks as task, index}
-                                    {#if DateTime.fromISO(task.due.date).hour === hour}
-                                        <div
-                                            class="task-container absolute w-[98%]"
-                                            style="
-                    top: {calculateTaskPosition(task, tasks[index - 1]?.due.date)}%;
-                    filter: {DateTime.fromISO(task.due.date) > DateTime.now()
-                                                ? 'brightness(0.75)'
-                                                : 'brightness(1)'};
-                    margin-left: {calculateTaskStyle(task, index, tasks).marginLeft};
-                    z-index: {calculateTaskStyle(task, index, tasks).zIndex};
-                                    "
-                                        >
-                                            <AgendaTask
-                                                {task}
-                                                color={getTaskColor(task.context_id)}
-                                            />
-                                        </div>
-                                    {/if}
-                                {/each}
-                            </div>
-                        </div>
-                    </div>
+                    <AgendaHour
+                        {title}
+                        {hour}
+                        {now}
+                        tasks={tasks.filter(
+                            (task) => DateTime.fromISO(task.due.date).hour === hour,
+                        )}
+                    />
                 {/if}
             {/each}
         {/key}
     </div>
 </div>
-
-<style>
-    .clipped {
-        clip-path: inset(0 0.01rem -15rem 0);
-    }
-</style>
