@@ -44,3 +44,13 @@ export const colorClasses = {
     grey: "bg-gray-400",
     taupe: "bg-red-100",
 };
+
+const positionClasses = {
+    0.25: "top-[25%]",
+    0.5: "top-[50%]",
+    0.75: "top-[75%]",
+};
+
+export function getQuarterHourPosition(position) {
+    return positionClasses[position] || "";
+}

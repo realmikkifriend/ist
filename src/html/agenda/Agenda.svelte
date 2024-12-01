@@ -3,6 +3,7 @@
     import { DateTime } from "luxon";
     import { XCircleIcon, CalendarIcon } from "@krowten/svelte-heroicons";
     import { todoistResources } from "../../js/stores";
+    import { getQuarterHourPosition } from "../../js/classes";
     import { getTasksForDate, calculateTaskPosition, calculateTaskStyle } from "./agenda";
     import AgendaTask from "./AgendaTask.svelte";
 
@@ -113,15 +114,7 @@
                         >
                             {#each [0.25, 0.5, 0.75] as position}
                                 <div
-                                    class={`absolute left-0 w-full border-t border-gray-800 ${
-                                        position === 0.25
-                                            ? "top-[25%]"
-                                            : position === 0.5
-                                              ? "top-[50%]"
-                                              : position === 0.75
-                                                ? "top-[75%]"
-                                                : ""
-                                    }`}
+                                    class={`absolute left-0 w-full border-t border-gray-800 ${getQuarterHourPosition(position)}`}
                                 ></div>
                             {/each}
                             {#if title === "Today" && hour === currentHour}
