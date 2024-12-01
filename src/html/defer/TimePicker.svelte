@@ -2,7 +2,7 @@
     import { createEventDispatcher, onDestroy, onMount } from "svelte";
     import { DateTime } from "luxon";
     import { createDateWithTime } from "../../js/time";
-    import { getPriorityClasses } from "../../js/priority";
+    import { getPriorityClasses } from "../../js/classes";
     import buttons from "./deferButtons";
 
     export let task, items;

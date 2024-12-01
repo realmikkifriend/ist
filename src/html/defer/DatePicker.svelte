@@ -2,7 +2,7 @@
     import { afterUpdate, createEventDispatcher } from "svelte";
     import { DateTime } from "luxon";
     import SveltyPicker from "svelty-picker";
-    import { getPriorityClasses } from "../../js/priority";
+    import { getPriorityClasses } from "../../js/classes";
     export let task, tz, items;
 
     let calendarElement, valueDefault;

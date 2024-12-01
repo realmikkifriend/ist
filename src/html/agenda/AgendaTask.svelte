@@ -1,31 +1,8 @@
 <script>
     import { DateTime } from "luxon";
-    import { getPriorityClasses } from "../../js/priority"; // Import the function
+    import { getPriorityClasses, colorClasses } from "../../js/classes";
 
     export let task, color;
-
-    const colorClasses = {
-        berry_red: "bg-pink-300",
-        red: "bg-red-400",
-        orange: "bg-orange-500",
-        yellow: "bg-yellow-500",
-        blue: "bg-blue-500",
-        green: "bg-green-500",
-        olive_green: "bg-olive-600",
-        lime_green: "bg-lime-600",
-        mint_green: "bg-green-200",
-        teal: "bg-teal-600",
-        sky_blue: "bg-sky-blue-600",
-        light_blue: "bg-light-blue-600",
-        grape: "bg-purple-400",
-        violet: "bg-violet-500",
-        lavender: "bg-lavender-600",
-        magenta: "bg-pink-500",
-        salmon: "bg-salmon-600",
-        charcoal: "bg-charcoal-600",
-        grey: "bg-grey-600",
-        taupe: "bg-taupe-600",
-    };
 </script>
 
 <div

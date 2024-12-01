@@ -2,7 +2,7 @@
     import { XCircleIcon, CalendarIcon } from "@krowten/svelte-heroicons";
     import { toast } from "@zerodevx/svelte-toast";
     import { todoistResources, userSettings, previousFirstDueTask } from "../../js/stores";
-    import { getPriorityClasses } from "../../js/priority";
+    import { getPriorityClasses } from "../../js/classes";
 
     let resources;
     $: resources = $todoistResources;

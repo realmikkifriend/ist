@@ -3,7 +3,7 @@
     import { CheckIcon, CalendarIcon, ClockIcon } from "@krowten/svelte-heroicons";
     import DeferModal from "../defer/DeferModal.svelte";
     import Comments from "./Comments.svelte";
-    import { getPriorityBorder } from "../../js/priority";
+    import { getPriorityBorder } from "../../js/classes";
 
     export let task;
 
