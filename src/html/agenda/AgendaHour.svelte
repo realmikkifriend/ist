@@ -54,7 +54,7 @@
                         processedTasks,
                     )}"
                     style="
-        top: {calculateTaskPosition(task, processedTasks[index - 1]?.due.date)}%;
+        top: {calculateTaskPosition(task, processedTasks[index - 1])}%;
         filter: {DateTime.fromISO(task.due.date) > now && title === 'Today'
                         ? 'brightness(0.75)'
                         : 'brightness(1)'};
