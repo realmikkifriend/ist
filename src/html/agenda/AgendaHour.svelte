@@ -2,7 +2,7 @@
     import { DateTime } from "luxon";
     import { todoistResources } from "../../js/stores";
     import { getQuarterHourPosition } from "../../js/classes";
-    import { calculateTaskPosition, calculateTaskStyle } from "./agenda";
+    import { markCloseTasks, calculateTaskPosition, calculateTaskStyle } from "./agenda";
     import AgendaTask from "./AgendaTask.svelte";
 
     export let tasks, hour, title, now;
@@ -11,6 +11,8 @@
         const context = $todoistResources.contexts.find((context) => context.id === id);
         return context?.color || null;
     }
+
+    const processedTasks = markCloseTasks(tasks);
 </script>
 
 <div class="hour group relative flex w-full items-start">
@@ -45,17 +47,18 @@
             </div>
         {/if}
         <div class="clipped w-full pb-1 pr-2">
-            {#each tasks as task, index}
+            {#each processedTasks as task, index}
                 <div
-                    class="task-container absolute w-[98%]"
+                    class="task-container absolute w-[98%] {calculateTaskStyle(
+                        index,
+                        processedTasks,
+                    )}"
                     style="
-                    top: {calculateTaskPosition(task, tasks[index - 1]?.due.date)}%;
-                    filter: {DateTime.fromISO(task.due.date) > now && title === 'Today'
+        top: {calculateTaskPosition(task, processedTasks[index - 1]?.due.date)}%;
+        filter: {DateTime.fromISO(task.due.date) > now && title === 'Today'
                         ? 'brightness(0.75)'
                         : 'brightness(1)'};
-                    margin-left: {calculateTaskStyle(task, index, tasks).marginLeft};
-                    z-index: {calculateTaskStyle(task, index, tasks).zIndex};
-                                    "
+    "
                 >
                     <AgendaTask {task} color={getTaskColor(task.context_id)} />
                 </div>

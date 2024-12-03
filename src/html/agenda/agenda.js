@@ -34,6 +34,25 @@ export const getTasksForDate = (date, todoistResources) => {
         );
 };
 
+export function markCloseTasks(tasks) {
+    return tasks.map((currentTask, index) => {
+        if (index > 0) {
+            const previousTaskDue = tasks[index - 1].due.date;
+            const currentTaskDue = currentTask.due.date;
+
+            const differenceInMinutes = DateTime.fromISO(currentTaskDue).diff(
+                DateTime.fromISO(previousTaskDue),
+                "minutes",
+            ).minutes;
+
+            if (differenceInMinutes <= 10) {
+                return { ...currentTask, closeTiming: true };
+            }
+        }
+        return { ...currentTask, closeTiming: false };
+    });
+}
+
 export const calculateTaskPosition = (task, previousTaskDue) => {
     const taskDateTime = DateTime.fromISO(task.due.date);
     let position = Math.round((taskDateTime.minute / 60) * 90);
@@ -47,24 +66,19 @@ export const calculateTaskPosition = (task, previousTaskDue) => {
     return position;
 };
 
-const isTaskIndented = (currentTaskDue, previousTaskDue, isPreviousIndented) => {
-    if (!previousTaskDue) return false;
-    return (
-        DateTime.fromISO(currentTaskDue).diff(DateTime.fromISO(previousTaskDue), "minutes")
-            .minutes <= 10 && !isPreviousIndented
-    );
-};
+export const calculateTaskStyle = (index, tasks) => {
+    let count = 0;
+    let currentIndex = index;
 
-export const calculateTaskStyle = (task, index, tasks) => {
-    const isIndented = isTaskIndented(
-        task.due.date,
-        tasks[index - 1]?.due.date,
-        index > 0
-            ? isTaskIndented(tasks[index - 1]?.due.date, tasks[index - 2]?.due.date, false)
-            : false,
-    );
-    return {
-        marginLeft: isIndented ? "50%" : "0",
-        zIndex: isIndented ? "30" : "10",
-    };
+    while (currentIndex >= 0 && tasks[currentIndex].closeTiming) {
+        count++;
+        currentIndex--;
+    }
+
+    const isIndented = count % 2 !== 0;
+
+    const marginClass = isIndented ? "ml-[40%]" : "ml-0";
+    const zIndexClass = isIndented ? "z-30" : "z-10";
+
+    return `${marginClass} ${zIndexClass}`;
 };
