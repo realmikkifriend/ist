@@ -46,15 +46,12 @@
                 ></div>
             </div>
         {/if}
-        <div class="clipped w-full pb-1 pr-2">
+        <div class="clipped flex w-full max-w-[19rem] flex-col pb-1 pr-2">
             {#each processedTasks as task, index}
                 <div
-                    class="task-container absolute w-[98%] {calculateTaskStyle(
-                        index,
-                        processedTasks,
-                    )}"
+                    class="task-container w-[98%] {calculateTaskStyle(index, processedTasks)}"
                     style="
-        top: {calculateTaskPosition(task, processedTasks[index - 1])}%;
+        margin-top: {calculateTaskPosition(task, processedTasks[index - 1])}rem;
         filter: {DateTime.fromISO(task.due.date) > now && title === 'Today'
                         ? 'brightness(0.75)'
                         : 'brightness(1)'};

@@ -55,21 +55,12 @@ export function markCloseTasks(tasks) {
 
 export const calculateTaskPosition = (task, previousTaskDue) => {
     const taskDateTime = DateTime.fromISO(task.due.date);
-    let position = Math.round((taskDateTime.minute / 60) * 90);
-    if (task.closeTiming) {
-        if (previousTaskDue.closeTiming) {
-            position += 20;
-        }
 
-        const timeDifference = taskDateTime.diff(
-            DateTime.fromISO(previousTaskDue?.due.date),
-            "minutes",
-        ).minutes;
-        if (timeDifference <= 8) {
-            position += 15;
-        }
-    }
-    return position;
+    const timeDifference = previousTaskDue
+        ? taskDateTime.diff(DateTime.fromISO(previousTaskDue.due.date), "minutes").minutes
+        : taskDateTime.diff(taskDateTime.startOf("hour"), "minutes").minutes;
+
+    return 1 * (timeDifference * 0.05);
 };
 
 export const calculateTaskStyle = (index, tasks) => {
