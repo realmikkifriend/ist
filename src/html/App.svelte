@@ -107,6 +107,6 @@
     {/if}
 {/if}
 
-<button class="fixed bottom-2 right-2 z-20 bg-base-100 p-1" on:click={handleRefresh}>
+<button class="fixed bottom-2 right-2 z-20 rounded-md bg-base-100 p-1" on:click={handleRefresh}>
     <ArrowPathIcon class="h-6 w-6 {isSpinning ? 'animate-spin' : ''}" />
 </button>
