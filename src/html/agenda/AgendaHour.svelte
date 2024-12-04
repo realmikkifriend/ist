@@ -16,7 +16,9 @@
 </script>
 
 <div class="hour group relative flex w-full items-start">
-    <div class="mr-1 flex w-16 flex-row items-center justify-end text-right font-extrabold">
+    <div
+        class="mr-1 flex w-16 min-w-16 flex-row items-center justify-end text-right font-extrabold"
+    >
         {#if tasks.length >= 4}
             <span class="mr-0.5 text-xs text-red-500">4+</span>
         {/if}
@@ -28,7 +30,7 @@
     </div>
 
     <div
-        class="hour-container relative z-10 h-24 flex-grow border-2 border-t-0 border-gray-700 group-first:border-t-2"
+        class="hour-container relative z-10 h-24 w-[70%] flex-grow border-2 border-t-0 border-gray-700 group-first:border-t-2"
     >
         {#each [0.25, 0.5, 0.75] as position}
             <div
@@ -46,7 +48,7 @@
                 ></div>
             </div>
         {/if}
-        <div class="clipped flex w-full max-w-[19rem] flex-col pb-1 pr-2">
+        <div class="clipped flex w-full flex-col pb-1 pr-2">
             {#each processedTasks as task, index}
                 <div
                     class="task-container w-[98%] {calculateTaskStyle(index, processedTasks)}"
