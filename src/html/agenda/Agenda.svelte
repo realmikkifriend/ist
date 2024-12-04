@@ -90,7 +90,7 @@
     {/if}
 
     <div class="w-[99%] overflow-hidden pr-1">
-        {#key now.hour}
+        {#key (now.hour, tasks)}
             {#each hourSlots as hour}
                 {#if displayHours[hour]}
                     <AgendaHour
