@@ -7,6 +7,8 @@
 
     export let tasks, hour, title, now;
 
+    const currentHour = title === "Today" && hour === now.hour;
+
     function getTaskColor(id) {
         const context = $todoistResources.contexts.find((context) => context.id === id);
         return context?.color || null;
@@ -30,14 +32,16 @@
     </div>
 
     <div
-        class="hour-container relative z-10 h-24 w-[70%] flex-grow border-2 border-t-0 border-gray-700 group-first:border-t-2"
+        class="hour-container relative {currentHour
+            ? 'z-20'
+            : 'z-10'} h-24 w-[70%] flex-grow border-2 border-t-0 border-gray-700 group-first:border-t-2"
     >
         {#each [0.25, 0.5, 0.75] as position}
             <div
                 class={`absolute left-0 w-full border-t border-gray-800 ${getQuarterHourPosition(position)}`}
             ></div>
         {/each}
-        {#if title === "Today" && hour === now.hour}
+        {#if currentHour}
             <div
                 class="absolute left-0 z-40 h-0.5 w-full rounded-badge bg-red-600"
                 style="top: {(now.minute / 60) * 100}%;"
@@ -48,7 +52,7 @@
                 ></div>
             </div>
         {/if}
-        <div class="clipped flex w-full flex-col pb-1 pr-2">
+        <div class="clipped flex w-full flex-col py-0.5 pr-1">
             {#each processedTasks as task, index}
                 <div
                     class="task-container w-[98%] {calculateTaskStyle(index, processedTasks)}"
