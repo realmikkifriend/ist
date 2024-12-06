@@ -50,7 +50,7 @@
         "svelty-picker": "^5.2.9",
         "tailwindcss": "^3.4.14",
         "vitest": "^1.6.0",
-        "webpack": "^5.94.0",
+        "webpack": "5.93.0",
         "webpack-cli": "^5.1.4",
         "webpack-dev-server": "^5.1.0"
     }
