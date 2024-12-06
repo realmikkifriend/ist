@@ -1,11 +1,19 @@
 <script>
     import { DateTime } from "luxon";
     import { InboxArrowDownIcon } from "@krowten/svelte-heroicons";
+    import { get } from "svelte/store";
     import { getPriorityClasses, colorClasses } from "../../js/classes";
+    import { firstDueTask, previousFirstDueTask } from "../../js/stores";
+    import { setFirstDueTask } from "../../js/first";
 
     export let task, color;
 
-    function closeAgenda() {
+    function summonTask() {
+        const currentFirstDueTask = get(firstDueTask);
+
+        setFirstDueTask(task);
+        previousFirstDueTask.set(currentFirstDueTask);
+
         window.location.hash = "";
     }
 </script>
@@ -14,7 +22,7 @@
     class={`agenda-task mx-1 flex w-full flex-row items-center overflow-hidden whitespace-nowrap rounded-md px-1 text-xs brightness-90 ${colorClasses[color] || "bg-gray-600"}`}
 >
     <button
-        on:click={closeAgenda}
+        on:click={summonTask}
         class="priority-element relative -left-1.5 mt-0 flex h-fit min-h-2.5 min-w-10 flex-shrink-0 flex-row items-center justify-center rounded-md pl-2 pr-1 text-xs font-bold {getPriorityClasses(
             task.priority,
         )}"
