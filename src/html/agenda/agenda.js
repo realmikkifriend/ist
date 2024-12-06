@@ -1,5 +1,6 @@
 import { DateTime } from "luxon";
 import { get } from "svelte/store";
+import { toast } from "@zerodevx/svelte-toast";
 import { firstDueTask, previousFirstDueTask } from "../../js/stores";
 import { setFirstDueTask } from "../../js/first";
 
@@ -100,4 +101,14 @@ export function summonTask(task) {
     }
 
     window.location.hash = "";
+}
+
+export function openAgenda(agendaType = "today") {
+    toast.pop({ target: "wait" });
+    window.location.hash = agendaType;
+
+    const drawerCheckbox = document.getElementById("my-drawer");
+    if (drawerCheckbox) {
+        drawerCheckbox.checked = false;
+    }
 }

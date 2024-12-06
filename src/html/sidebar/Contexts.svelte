@@ -1,8 +1,8 @@
 <script>
     import { XCircleIcon, CalendarIcon } from "@krowten/svelte-heroicons";
-    import { toast } from "@zerodevx/svelte-toast";
     import { todoistResources, userSettings, previousFirstDueTask } from "../../js/stores";
     import { getPriorityClasses } from "../../js/classes";
+    import { openAgenda } from "../agenda/agenda";
 
     let resources;
     $: resources = $todoistResources;
@@ -46,23 +46,10 @@
             closeDrawer();
         }
     }
-
-    function handleCalendarClick() {
-        const currentHash = window.location.hash;
-        const hashMap = {
-            "#today": "#tomorrow",
-            "#tomorrow": "",
-            "": "#today",
-        };
-
-        toast.pop({ target: "wait" });
-        window.location.hash = hashMap[currentHash] || "";
-        closeDrawer();
-    }
 </script>
 
 <div class="mb-2 ml-2 flex items-center justify-between">
-    <button on:click={handleCalendarClick}>
+    <button on:click={() => openAgenda("today")}>
         <CalendarIcon class="h-7 w-8" />
     </button>
     <h1 class="text-2xl font-bold">Contexts</h1>

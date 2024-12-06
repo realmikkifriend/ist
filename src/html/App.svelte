@@ -9,6 +9,7 @@
     import { handleTaskDone, handleTaskDefer } from "../js/taskHandlers";
     import Sidebar from "./sidebar/Sidebar.svelte";
     import ContextBadge from "./sidebar/ContextBadge.svelte";
+    import NoTasks from "./NoTasks.svelte";
     import Task from "./task/Task.svelte";
     import Agenda from "./agenda/Agenda.svelte";
     import { writable } from "svelte/store";
@@ -89,7 +90,7 @@
             {#if $firstDueTask}
                 <Task task={$firstDueTask} on:done={handleDone} on:defer={handleDefer} />
             {:else}
-                <div class="hero">No due tasks</div>
+                <NoTasks />
             {/if}
         {:else}
             <div class="hero">No tasks, try adding some</div>
