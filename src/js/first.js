@@ -4,7 +4,7 @@ import { success, newFirstTask } from "./toasts";
 import { todoistResources, userSettings, firstDueTask, previousFirstDueTask } from "../js/stores";
 import FirstDueTaskToast from "../html/FirstDueTaskToast.svelte";
 
-const setFirstDueTask = (task) => {
+export const setFirstDueTask = (task) => {
     firstDueTask.set(task);
     previousFirstDueTask.set(task);
 };
