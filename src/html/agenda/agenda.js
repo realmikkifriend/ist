@@ -1,4 +1,7 @@
 import { DateTime } from "luxon";
+import { get } from "svelte/store";
+import { firstDueTask, previousFirstDueTask } from "../../js/stores";
+import { setFirstDueTask } from "../../js/first";
 
 export const getTasksForDate = (date, todoistResources) => {
     const startOfDay = date.startOf("day");
@@ -87,3 +90,12 @@ export const calculateTaskStyle = (index, tasks) => {
 
     return `${marginClass} ${zIndexClass}`;
 };
+
+export function summonTask(task) {
+    const currentFirstDueTask = get(firstDueTask);
+
+    setFirstDueTask(task);
+    previousFirstDueTask.set(currentFirstDueTask);
+
+    window.location.hash = "";
+}
