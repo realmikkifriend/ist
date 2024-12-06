@@ -1,5 +1,6 @@
 <script>
     import { XMarkIcon } from "@krowten/svelte-heroicons";
+    import { updateFirstDueTask } from "../../js/first";
     import {
         todoistResources,
         userSettings,
@@ -35,18 +36,33 @@
         previousFirstDueTask.set(null);
         userSettings.update((settings) => ({ ...settings, selectedContextId: null }));
     }
+
+    function handleClick() {
+        if ($firstDueTask?.summoned) {
+            updateFirstDueTask();
+        } else if (selectedContextId) {
+            clearSelectedContextId();
+        }
+    }
 </script>
 
 <button
-    class="group badge badge-outline items-center whitespace-nowrap"
-    class:text-primary={selectedContextId}
-    class:opacity-40={!selectedContextId}
-    class:opacity-75={selectedContextId}
-    class:cursor-default={!selectedContextId}
-    class:cursor-pointer={selectedContextId}
-    on:click={() => selectedContextId && clearSelectedContextId()}
+    class="group badge badge-outline items-center whitespace-nowrap
+           {selectedContextId
+        ? 'cursor-pointer'
+        : !$firstDueTask?.summoned
+          ? 'cursor-default'
+          : ''} 
+           {selectedContextId ? 'opacity-75' : 'opacity-40'}
+           {selectedContextId ? 'text-primary' : ''} 
+           {$firstDueTask?.summoned ? 'border-purple-400 text-purple-400' : ''}"
+    on:click={handleClick}
 >
-    {dueTasksInContext} left in {currentContextName}
+    {#if $firstDueTask?.summoned}
+        summoned task
+    {:else}
+        {dueTasksInContext} left in {currentContextName}
+    {/if}
     {#if selectedContextId}
         <p class="ml-1 block sm:hidden sm:group-hover:block">
             <XMarkIcon class="h-4 w-4" />
