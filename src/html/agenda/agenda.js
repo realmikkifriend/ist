@@ -72,9 +72,11 @@ export const calculateTaskPosition = (task, previousTaskDue) => {
             : taskDateTime.diff(taskDateTime.startOf("hour"), "minutes").minutes;
 
         if (!previousTaskDue) {
-            return timeDifference * 0.1;
+            return (taskDateTime.minute > 45 ? 46 : timeDifference) * 0.1;
+        } else if (taskDateTime.minute > 45 && timeDifference < 20) {
+            return 0;
         } else {
-            return Math.pow(timeDifference + 1, 2) * 0.0019;
+            return Math.pow(timeDifference + 1, 2) * 0.0009;
         }
     }
 };
