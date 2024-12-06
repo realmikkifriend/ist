@@ -21,10 +21,13 @@
         {#if task.due.date.includes("T")}
             {DateTime.fromISO(task.due.date).toFormat("h:mm")}
         {/if}
+
         {#if task.firstDue}
             <InboxIcon class="h-3 min-h-3 w-4 min-w-4" />
         {:else}
             <InboxArrowDownIcon class="h-3 min-h-3 w-4 min-w-4" />
         {/if}
-    </button>{task.content}
+    </button>
+
+    {task.content}
 </div>
