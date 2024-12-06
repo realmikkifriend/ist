@@ -38,8 +38,12 @@ export const getTasksForDate = (date, todoistResources) => {
         );
 };
 
-export function markCloseTasks(tasks) {
+export function markTasks(tasks) {
     return tasks.map((currentTask, index) => {
+        if (get(firstDueTask) === currentTask) {
+            currentTask.firstDue = true;
+        }
+
         if (index > 0) {
             const previousTaskDue = tasks[index - 1].due.date;
             const currentTaskDue = currentTask.due.date;
@@ -95,7 +99,7 @@ export const calculateTaskStyle = (index, tasks) => {
 export function summonTask(task) {
     const currentFirstDueTask = get(firstDueTask);
 
-    if (currentFirstDueTask !== task) {
+    if (currentFirstDueTask.id !== task.id) {
         setFirstDueTask(task);
         previousFirstDueTask.set(currentFirstDueTask);
     }

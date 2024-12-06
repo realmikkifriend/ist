@@ -2,7 +2,7 @@
     import { DateTime } from "luxon";
     import { todoistResources } from "../../js/stores";
     import { getQuarterHourPosition } from "../../js/classes";
-    import { markCloseTasks, calculateTaskPosition, calculateTaskStyle } from "./agenda";
+    import { markTasks, calculateTaskPosition, calculateTaskStyle } from "./agenda";
     import AgendaTask from "./AgendaTask.svelte";
 
     export let tasks, hour, title, now;
@@ -14,7 +14,7 @@
         return context?.color || null;
     }
 
-    const processedTasks = markCloseTasks(tasks);
+    const processedTasks = markTasks(tasks);
 </script>
 
 <div class="hour group relative flex w-full items-start">
