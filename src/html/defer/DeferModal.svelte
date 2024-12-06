@@ -16,7 +16,6 @@
     };
 
     const tz = $todoistResources.user?.tz_info?.timezone;
-    console.log($todoistResources.user);
 
     let items = [];
 
