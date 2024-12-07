@@ -39,10 +39,10 @@ export const getTasksForDate = (date, todoistResources) => {
 };
 
 export function markTasks(tasks) {
+    const firstDueTaskID = get(firstDueTask)?.id || null;
+
     return tasks.map((currentTask, index) => {
-        if (get(firstDueTask) === currentTask) {
-            currentTask.firstDue = true;
-        }
+        currentTask.firstDue = firstDueTaskID === currentTask.id;
 
         if (index > 0) {
             const previousTaskDue = tasks[index - 1].due.date;
@@ -99,9 +99,7 @@ export const calculateTaskStyle = (index, tasks) => {
 };
 
 export function summonTask(task) {
-    const currentFirstDueTask = get(firstDueTask);
-
-    if (currentFirstDueTask?.id !== task.id) {
+    if (!task.firstDue) {
         task.summoned = window.location.hash;
         setFirstDueTask(task);
         previousFirstDueTask.set(currentFirstDueTask || null);
