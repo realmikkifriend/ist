@@ -102,7 +102,7 @@ export function summonTask(task) {
     if (!task.firstDue) {
         task.summoned = window.location.hash;
         setFirstDueTask(task);
-        previousFirstDueTask.set(currentFirstDueTask || null);
+        previousFirstDueTask.set(get(firstDueTask) || null);
     }
 
     window.location.hash = "";
