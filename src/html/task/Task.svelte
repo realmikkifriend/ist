@@ -11,11 +11,13 @@
     let modal;
 
     const handleDone = () => {
+        if (task.summoned) window.location.hash = task.summoned;
         dispatch("done", { task });
     };
 
     const handleDefer = ({ detail: { task, time } }) => {
         modal.close();
+        if (task.summoned) window.location.hash = task.summoned;
         dispatch("defer", { task, time });
     };
 </script>

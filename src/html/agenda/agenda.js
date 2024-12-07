@@ -102,7 +102,7 @@ export function summonTask(task) {
     const currentFirstDueTask = get(firstDueTask);
 
     if (currentFirstDueTask?.id !== task.id) {
-        task.summoned = true;
+        task.summoned = window.location.hash;
         setFirstDueTask(task);
         previousFirstDueTask.set(currentFirstDueTask || null);
     }
