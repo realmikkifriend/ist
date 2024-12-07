@@ -63,7 +63,7 @@
     {:else}
         {dueTasksInContext} left in {currentContextName}
     {/if}
-    {#if selectedContextId}
+    {#if selectedContextId || $firstDueTask?.summoned}
         <p class="ml-1 block sm:hidden sm:group-hover:block">
             <XMarkIcon class="h-4 w-4" />
         </p>
