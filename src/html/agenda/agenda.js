@@ -101,10 +101,10 @@ export const calculateTaskStyle = (index, tasks) => {
 export function summonTask(task) {
     const currentFirstDueTask = get(firstDueTask);
 
-    if (currentFirstDueTask.id !== task.id) {
+    if (currentFirstDueTask?.id !== task.id) {
         task.summoned = true;
         setFirstDueTask(task);
-        previousFirstDueTask.set(currentFirstDueTask);
+        previousFirstDueTask.set(currentFirstDueTask || null);
     }
 
     window.location.hash = "";
