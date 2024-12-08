@@ -13,6 +13,8 @@
         firstDueTask,
     } from "../../js/stores";
 
+    export let hash;
+
     let resources;
     $: resources = $todoistResources;
 
@@ -34,8 +36,10 @@
 <div class="drawer">
     <input id="my-drawer" type="checkbox" class="drawer-toggle" />
     <div class="drawer-content flex flex-row items-center">
-        <label for="my-drawer" class="btn drawer-button mt-0 bg-transparent hover:bg-primary"
-            ><Bars3Icon class="h-8 w-8" />
+        <label for="my-drawer" class="btn drawer-button mt-0 bg-transparent hover:bg-primary">
+            {#if hash !== "#today" && hash !== "#tomorrow"}
+                <Bars3Icon class="h-8 w-8" />
+            {/if}
         </label>
     </div>
     <div class="drawer-side z-30">

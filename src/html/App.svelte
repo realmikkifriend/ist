@@ -73,7 +73,7 @@
 </script>
 
 <div class="flex w-fit items-center">
-    <Sidebar />
+    <Sidebar hash={$hash} />
 
     {#if $firstDueTask && $hash !== "#today" && $hash !== "#tomorrow"}
         <ContextBadge class="ml-4" />
