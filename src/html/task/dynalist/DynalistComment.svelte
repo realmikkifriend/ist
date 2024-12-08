@@ -20,6 +20,11 @@
             const { data, dynalistSubItem } = await fetchDynalistDocument(url, accessToken);
             let rootNode;
 
+            data.nodes.forEach((node) => {
+                // correct Dynalist-flavored Markdown
+                if (node.content) node.content = node.content.replace(/__(.*?)__/g, "_$1_");
+            });
+
             rootNode = data.nodes.find((node) => node.id === (dynalistSubItem || "root"));
 
             if (rootNode) {
