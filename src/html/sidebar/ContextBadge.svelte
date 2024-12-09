@@ -39,6 +39,7 @@
 
     function handleClick() {
         if ($firstDueTask?.summoned) {
+            $firstDueTask.summoned = false;
             updateFirstDueTask();
         } else if (selectedContextId) {
             clearSelectedContextId();
