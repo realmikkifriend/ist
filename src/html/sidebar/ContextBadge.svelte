@@ -39,6 +39,8 @@
 
     function handleClick() {
         if ($firstDueTask?.summoned) {
+            window.location.hash = $firstDueTask.summoned;
+
             $firstDueTask.summoned = false;
             updateFirstDueTask();
         } else if (selectedContextId) {
