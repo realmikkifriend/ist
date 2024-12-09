@@ -32,7 +32,9 @@
     </div>
 
     <div
-        class="hour-container relative {currentHour
+        class="hour-container relative {tasks.length >= 4
+            ? 'bg-gradient-to-b from-transparent via-red-950'
+            : ''} {currentHour
             ? 'z-20'
             : 'z-10'} h-24 w-[70%] flex-grow border-2 border-t-0 border-gray-700 group-first:border-t-2"
     >
