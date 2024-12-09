@@ -74,7 +74,13 @@
         </button>
         <div class="flex flex-col items-center">
             <h1 class="flex-1 text-center">{title}</h1>
-            <h2 class="text-center">{tasks.length + tasksWithNoTime.length} tasks</h2>
+            <h2
+                class="rounded-badge px-3 text-center {tasks.length + tasksWithNoTime.length > 25
+                    ? 'bg-red-800'
+                    : ''}"
+            >
+                {tasks.length + tasksWithNoTime.length} tasks
+            </h2>
         </div>
         <button on:click={closeAgenda}>
             <XCircleIcon class="h-5 w-6" />
