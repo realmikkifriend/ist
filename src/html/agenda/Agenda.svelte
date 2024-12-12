@@ -4,6 +4,7 @@
     import { DateTime } from "luxon";
     import { XCircleIcon, CalendarIcon } from "@krowten/svelte-heroicons";
     import { todoistResources } from "../../js/stores";
+    import { filterAndSortDueTasks } from "../../js/filter";
     import { getTasksForDate } from "./agenda";
     import AgendaTask from "./AgendaTask.svelte";
 
@@ -30,6 +31,14 @@
         ({ tasksWithNoTime, tasks } = targetDate
             ? getTasksForDate(targetDate, $todoistResources)
             : { tasks: [], tasksWithNoTime: [] });
+
+        if (tasksWithNoTime.length > 2) {
+            tasksWithNoTime = filterAndSortDueTasks(
+                tasksWithNoTime,
+                $todoistResources.contexts,
+                false,
+            );
+        }
 
         if (title === "Today") {
             displayHours = {};

@@ -43,8 +43,11 @@ function compareTasks(a, b, contextLookup, timeZone) {
 
 export function filterAndSortDueTasks(tasks, contexts, timeZone) {
     const contextLookup = createContextLookup(contexts);
-    const dueTasks = filterDueTasks(tasks, timeZone);
 
-    dueTasks.sort((a, b) => compareTasks(a, b, contextLookup, timeZone));
-    return dueTasks;
+    if (timeZone) {
+        tasks = filterDueTasks(tasks, timeZone);
+    }
+
+    tasks.sort((a, b) => compareTasks(a, b, contextLookup, timeZone));
+    return tasks;
 }
