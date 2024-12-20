@@ -67,6 +67,12 @@
     }
 
     onMount(() => {
+        if ($todoistResources.items) {
+            $todoistResources.items.forEach((item) => {
+                if (item.summoned) delete item.summoned;
+            });
+        }
+
         updatePage();
         window.addEventListener("hashchange", updatePage);
     });
