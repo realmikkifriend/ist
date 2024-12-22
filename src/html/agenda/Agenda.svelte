@@ -9,8 +9,9 @@
     import AgendaTask from "./AgendaTask.svelte";
 
     let title = "";
-    let tasks = [];
-    let tasksWithNoTime = [];
+    let tasks,
+        tasksWithNoTime,
+        todayTasks = [];
     let hourSlots = Array.from({ length: 18 }, (_, i) => i + 6);
     let displayHours = {};
     let now;
@@ -21,12 +22,19 @@
         now = DateTime.now();
 
         title = window.location.hash.replace("#", "").replace(/^./, (c) => c.toUpperCase());
+
         const targetDate =
             window.location.hash === "#today"
                 ? now
                 : window.location.hash === "#tomorrow"
                   ? now.plus({ days: 1 })
                   : null;
+
+        if (window.location.hash === "#tomorrow") {
+            const tasksForTomorrow = getTasksForDate(now, $todoistResources);
+
+            todayTasks = [...tasksForTomorrow.tasksWithNoTime, ...tasksForTomorrow.tasks];
+        }
 
         ({ tasksWithNoTime, tasks } = targetDate
             ? getTasksForDate(targetDate, $todoistResources)
@@ -91,11 +99,23 @@
         <div class="flex flex-col items-center">
             <h1 class="flex-1 text-center">{title}</h1>
             <h2
-                class="rounded-badge px-3 text-center {tasks.length + tasksWithNoTime.length > 18
+                class="rounded-badge px-3 text-center
+                {tasks?.length +
+                    tasksWithNoTime?.length +
+                    (window.location.hash === '#tomorrow' ? todayTasks?.length : 0) >
+                18
                     ? 'bg-red-800'
                     : ''}"
             >
-                {tasks.length + tasksWithNoTime.length} tasks
+                {#if todayTasks && window.location.hash === "#tomorrow"}
+                    <div class="mt-2 text-xs/[.1rem]">
+                        {tasks.length + tasksWithNoTime.length}+{todayTasks.length}=
+                    </div>
+                    {tasks.length + tasksWithNoTime.length + todayTasks.length}
+                {:else}
+                    {tasks.length + tasksWithNoTime.length}
+                {/if}
+                tasks
             </h2>
         </div>
         <button on:click={closeAgenda}>

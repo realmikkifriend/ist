@@ -78,5 +78,5 @@ body {
     @apply text-2xl;
 }
 #agenda h2 {
-    @apply mb-1 text-lg opacity-50;
+    @apply mb-1 text-lg;
 }
