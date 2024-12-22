@@ -91,7 +91,7 @@
         <div class="flex flex-col items-center">
             <h1 class="flex-1 text-center">{title}</h1>
             <h2
-                class="rounded-badge px-3 text-center {tasks.length + tasksWithNoTime.length > 25
+                class="rounded-badge px-3 text-center {tasks.length + tasksWithNoTime.length > 18
                     ? 'bg-red-800'
                     : ''}"
             >
