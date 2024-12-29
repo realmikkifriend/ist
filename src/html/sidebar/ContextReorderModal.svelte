@@ -45,16 +45,24 @@
             selectedOrder.push(filteredContexts[indexB]);
         } else {
             if (selectedOrder.length > 0) {
+                [filteredContexts[indexB], filteredContexts[indexB - 1]] = [
+                    filteredContexts[indexB - 1],
+                    filteredContexts[indexB],
+                ];
+
                 selectedOrder.pop();
-                indexA++;
-                indexB++;
+                indexA += 2;
+                indexB += 2;
             } else {
                 selectedOrder.push(filteredContexts[indexA]);
-            }
 
-            const temp = filteredContexts[indexB];
-            filteredContexts[indexB] = filteredContexts[indexB - 1];
-            filteredContexts[indexB - 1] = temp;
+                if (indexB > 0) {
+                    [filteredContexts[indexB], filteredContexts[indexB - 1]] = [
+                        filteredContexts[indexB - 1],
+                        filteredContexts[indexB],
+                    ];
+                }
+            }
         }
 
         if (indexA > 0) {
@@ -74,7 +82,7 @@
             });
 
             if (differences.length > 0) {
-                // sendReorderedContextsToApi(); ////////////////////////////////
+                sendReorderedContextsToApi();
             }
         }
     }
