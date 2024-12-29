@@ -1,8 +1,9 @@
 <script>
-    import { XCircleIcon, CalendarIcon } from "@krowten/svelte-heroicons";
+    import { XCircleIcon, CalendarIcon, ArrowsUpDownIcon } from "@krowten/svelte-heroicons";
     import { todoistResources, userSettings, previousFirstDueTask } from "../../js/stores";
     import { getPriorityClasses } from "../../js/classes";
     import { openAgenda } from "../agenda/agenda";
+    import ContextReorderModal from "./ContextReorderModal.svelte";
 
     let resources;
     $: resources = $todoistResources;
@@ -25,6 +26,8 @@
 
     let settings;
     $: settings = $userSettings;
+
+    let modal;
 
     function closeDrawer() {
         const drawerCheckbox = document.getElementById("my-drawer");
@@ -49,9 +52,14 @@
 </script>
 
 <div class="mb-2 ml-2 flex items-center justify-between">
-    <button on:click={() => openAgenda("today")}>
-        <CalendarIcon class="h-7 w-8" />
-    </button>
+    <div class="buttons">
+        <button on:click={() => openAgenda("today")}>
+            <CalendarIcon class="h-7 w-8" />
+        </button>
+        <button on:click={() => modal.showModal()}>
+            <ArrowsUpDownIcon class="h-7 w-8" />
+        </button>
+    </div>
     <h1 class="text-2xl font-bold">Contexts</h1>
     <label
         for="my-drawer"
@@ -88,3 +96,7 @@
         </button>
     {/if}
 {/each}
+
+<dialog id="reorder_modal" class="modal" bind:this={modal}>
+    <ContextReorderModal />
+</dialog>
