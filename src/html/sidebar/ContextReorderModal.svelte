@@ -5,13 +5,23 @@
     import { sendReorderedContexts, refreshData } from "../../js/api";
 
     let filteredContexts = [],
+        originalContexts = [],
         selectedOrder = [],
         differences = [];
     let indexA, indexB;
     let isComparing = true;
 
     function resetAll() {
-        filteredContexts = $todoistResources.contexts.filter((context) => !context.inbox_project);
+        filteredContexts = $todoistResources.contexts
+            .filter((context) => !context.inbox_project)
+            .map((context, index) => {
+                return {
+                    ...context,
+                    child_order: index,
+                };
+            });
+        originalContexts = [...filteredContexts];
+
         indexB = filteredContexts.length - 1;
         indexA = filteredContexts.length - 2;
 
@@ -33,13 +43,23 @@
     function selectHigher(selectedIndex) {
         if (selectedIndex === indexA) {
             selectedOrder.push(filteredContexts[indexB]);
-            indexB = indexA;
         } else {
-            selectedOrder.push(filteredContexts[indexA]);
+            if (selectedOrder.length > 0) {
+                selectedOrder.pop();
+                indexA++;
+                indexB++;
+            } else {
+                selectedOrder.push(filteredContexts[indexA]);
+            }
+
+            const temp = filteredContexts[indexB];
+            filteredContexts[indexB] = filteredContexts[indexB - 1];
+            filteredContexts[indexB - 1] = temp;
         }
 
         if (indexA > 0) {
             indexA--;
+            indexB--;
         } else {
             selectedOrder.push(filteredContexts[selectedIndex]);
 
@@ -47,14 +67,14 @@
             selectedOrder.reverse();
 
             selectedOrder.forEach((context, newIndex) => {
-                const originalIndex = filteredContexts.findIndex((c) => c.id === context.id);
+                const originalIndex = originalContexts.findIndex((c) => c.id === context.id);
                 if (originalIndex !== newIndex) {
                     differences.push({ id: context.id, child_order: newIndex });
                 }
             });
 
             if (differences.length > 0) {
-                sendReorderedContextsToApi();
+                // sendReorderedContextsToApi(); ////////////////////////////////
             }
         }
     }
