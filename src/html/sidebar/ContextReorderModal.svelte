@@ -7,6 +7,7 @@
     let indexB;
     let selectedOrder = [];
     let isComparing = true;
+    let differences = [];
 
     $: filteredContexts = $todoistResources.contexts.filter((context) => !context.inbox_project);
 
@@ -30,6 +31,13 @@
 
             isComparing = false;
             selectedOrder.reverse();
+
+            selectedOrder.forEach((context, newIndex) => {
+                const originalIndex = filteredContexts.findIndex((c) => c.id === context.id);
+                if (originalIndex !== newIndex) {
+                    differences.push({ id: context.id, child_order: newIndex });
+                }
+            });
         }
     }
 </script>
@@ -51,7 +59,19 @@
         <h2 class="mb-4">Your re-ranked contexts:</h2>
         <ul class="flex flex-col items-center space-y-2">
             {#each selectedOrder as context}
-                <li>{context.name}</li>
+                <li class="flex flex-row items-baseline">
+                    {context.name}
+                    {#if differences.find((difference) => difference.id === context.id)}
+                        {@const childOrderDifference =
+                            context.child_order -
+                            differences.find((difference) => difference.id === context.id)
+                                .child_order}
+
+                        <span class="badge badge-xs ml-1 h-fit bg-neutral px-1 py-0.5">
+                            {childOrderDifference > 0 ? "+" : "-"}{Math.abs(childOrderDifference)}
+                        </span>
+                    {/if}
+                </li>
             {/each}
         </ul>
     {/if}
