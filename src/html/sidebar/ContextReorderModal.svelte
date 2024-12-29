@@ -4,18 +4,30 @@
     import { todoistResources, todoistAccessToken, todoistError } from "../../js/stores";
     import { sendReorderedContexts, refreshData } from "../../js/api";
 
-    let filteredContexts = [];
-    let indexA;
-    let indexB;
-    let selectedOrder = [];
+    let filteredContexts = [],
+        selectedOrder = [],
+        differences = [];
+    let indexA, indexB;
     let isComparing = true;
-    let differences = [];
 
-    $: filteredContexts = $todoistResources.contexts.filter((context) => !context.inbox_project);
-
-    onMount(() => {
+    function resetAll() {
+        filteredContexts = $todoistResources.contexts.filter((context) => !context.inbox_project);
         indexB = filteredContexts.length - 1;
         indexA = filteredContexts.length - 2;
+
+        selectedOrder = [];
+        differences = [];
+        isComparing = true;
+    }
+
+    export let modalOpen;
+
+    $: if (!modalOpen || ($todoistResources.contexts && isComparing)) {
+        resetAll();
+    }
+
+    onMount(() => {
+        resetAll();
     });
 
     function selectHigher(selectedIndex) {

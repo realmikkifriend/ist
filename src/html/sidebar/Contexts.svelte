@@ -28,6 +28,7 @@
     $: settings = $userSettings;
 
     let modal;
+    let modalOpen = false;
 
     function closeDrawer() {
         const drawerCheckbox = document.getElementById("my-drawer");
@@ -49,6 +50,16 @@
             closeDrawer();
         }
     }
+
+    function openModal() {
+        modal.showModal();
+        modalOpen = true;
+    }
+
+    function closeModal() {
+        modal.close();
+        modalOpen = false;
+    }
 </script>
 
 <div class="mb-2 ml-2 flex items-center justify-between">
@@ -56,7 +67,7 @@
         <button on:click={() => openAgenda("today")}>
             <CalendarIcon class="h-7 w-8" />
         </button>
-        <button on:click={() => modal.showModal()}>
+        <button on:click={openModal}>
             <ArrowsUpDownIcon class="h-7 w-8" />
         </button>
     </div>
@@ -97,6 +108,6 @@
     {/if}
 {/each}
 
-<dialog id="reorder_modal" class="modal" bind:this={modal}>
-    <ContextReorderModal />
+<dialog id="reorder_modal" class="modal" bind:this={modal} on:close={closeModal}>
+    <ContextReorderModal {modalOpen} />
 </dialog>
