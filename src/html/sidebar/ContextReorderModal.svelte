@@ -1,6 +1,8 @@
 <script>
     import { onMount } from "svelte";
-    import { todoistResources } from "../../js/stores";
+    import { get } from "svelte/store";
+    import { todoistResources, todoistAccessToken, todoistError } from "../../js/stores";
+    import { sendReorderedContexts, refreshData } from "../../js/api";
 
     let filteredContexts = [];
     let indexA;
@@ -38,13 +40,33 @@
                     differences.push({ id: context.id, child_order: newIndex });
                 }
             });
+
+            if (differences.length > 0) {
+                sendReorderedContextsToApi();
+            }
         }
+    }
+
+    async function sendReorderedContextsToApi() {
+        let accessToken = get(todoistAccessToken);
+        if (!accessToken) {
+            todoistError.set("No access token found.");
+            throw new Error("No access token found.");
+        }
+        try {
+            await sendReorderedContexts(differences, accessToken);
+        } catch (error) {
+            todoistError.set(`Failed to send reordered contexts: ${error.message}`);
+            return;
+        }
+
+        refreshData();
     }
 </script>
 
-<div class="modal-box flex w-fit min-w-[40%] flex-col items-center bg-base-100">
+<div class="modal-box flex w-fit min-w-[30%] flex-col items-center bg-base-100">
     {#if isComparing}
-        <h2 class="mb-4">Rank Contexts</h2>
+        <h2 class="mb-4 font-bold">Rank Contexts</h2>
         <div class="flex space-x-4">
             {#if indexA >= 0}
                 <button class="btn bg-neutral" on:click={() => selectHigher(indexA)}>
@@ -56,7 +78,7 @@
             {/if}
         </div>
     {:else}
-        <h2 class="mb-4">Your re-ranked contexts:</h2>
+        <h2 class="mb-4 font-bold">Your re-ranked contexts:</h2>
         <ul class="flex flex-col items-center space-y-2">
             {#each selectedOrder as context}
                 <li class="flex flex-row items-baseline">

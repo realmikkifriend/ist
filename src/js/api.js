@@ -81,6 +81,20 @@ export async function deferTasks(taskTimePairs, accessToken) {
     return await executeAPICommand({ commands: JSON.stringify(commands) }, accessToken);
 }
 
+export async function sendReorderedContexts(differences, accessToken) {
+    const commands = [
+        {
+            type: "project_reorder",
+            uuid: uuidv4(),
+            args: {
+                projects: differences,
+            },
+        },
+    ];
+
+    return await executeAPICommand({ commands: JSON.stringify(commands) }, accessToken);
+}
+
 async function executeAPICommand(params, accessToken) {
     const response = await fetch(API_URL, {
         method: "POST",
