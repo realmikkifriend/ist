@@ -42,7 +42,6 @@
 
     onDestroy(() => {
         clearInterval(autoRefresh);
-        window.removeEventListener("hashchange", updateHash);
     });
 
     const handleDone = ({
