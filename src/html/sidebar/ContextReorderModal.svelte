@@ -65,10 +65,7 @@
             }
         }
 
-        if (indexA > 0) {
-            indexA--;
-            indexB--;
-        } else {
+        if (indexA === 0) {
             selectedOrder.push(filteredContexts[selectedIndex]);
 
             isComparing = false;
@@ -83,6 +80,18 @@
 
             if (differences.length > 0) {
                 sendReorderedContextsToApi();
+            }
+        } else {
+            indexA--;
+            indexB--;
+
+            while (
+                indexA > 0 &&
+                filteredContexts[indexB].child_order < filteredContexts[indexA].child_order
+            ) {
+                selectedOrder.push(filteredContexts[indexB]);
+                indexA--;
+                indexB--;
             }
         }
     }
