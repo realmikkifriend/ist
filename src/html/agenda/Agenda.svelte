@@ -107,7 +107,7 @@
                     ? 'bg-red-800'
                     : ''}"
             >
-                {#if todayTasks && window.location.hash === "#tomorrow"}
+                {#if todayTasks.length > 0 && window.location.hash === "#tomorrow"}
                     <div class="mt-2 text-xs/[.1rem]">
                         {tasks.length + tasksWithNoTime.length}+{todayTasks.length}=
                     </div>
