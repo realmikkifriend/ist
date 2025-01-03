@@ -15,7 +15,7 @@
         isTimeTabActive = tab === "time";
     };
 
-    const tz = $todoistResources.user?.tz_info?.timezone;
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "America/Chicago";
 
     let items = [];
 

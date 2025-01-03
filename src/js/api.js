@@ -29,7 +29,7 @@ export async function refreshData() {
 
         let currentResources = get(todoistResources) || {};
         currentResources = processTodoistData(currentResources, data, RESOURCE_TYPES);
-        const timeZone = currentResources.user?.tz_info?.timezone || "UTC";
+        const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone || "America/Chicago";
         todoistResources.set({
             ...currentResources,
             dueTasks: filterAndSortDueTasks(
