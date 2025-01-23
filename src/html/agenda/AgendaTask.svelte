@@ -1,7 +1,7 @@
 <script>
     import { DateTime } from "luxon";
     import { InboxArrowDownIcon, InboxIcon } from "@krowten/svelte-heroicons";
-    import { getPriorityClasses, colorClasses } from "../../js/classes";
+    import { getPriorityClasses, colorClasses, borderClasses } from "../../js/classes";
     import { summonTask } from "./agenda";
 
     export let task, color;
@@ -10,7 +10,10 @@
 </script>
 
 <div
-    class={`agenda-task mx-1 flex w-full flex-row items-center overflow-hidden whitespace-nowrap rounded-md px-1 text-xs brightness-90 ${colorClasses[color] || "bg-gray-600"} ${task.firstDue ? firstDueClasses : ""}`}
+    class={`agenda-task mx-1 flex w-full flex-row items-center overflow-hidden whitespace-nowrap rounded-md px-1 text-xs brightness-90 
+        ${colorClasses[color] || "bg-gray-600"} 
+        ${task.priority < 3 ? `border bg-opacity-50 ${borderClasses[color] || "border-gray-600"}` : ""} 
+        ${task.firstDue ? firstDueClasses : ""}`}
 >
     <button
         on:click={summonTask(task)}
