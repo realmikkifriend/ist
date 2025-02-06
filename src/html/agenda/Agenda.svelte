@@ -93,18 +93,21 @@
 
 <div class="mr-4 mt-[-2rem] max-w-lg sm:mx-auto sm:max-w-96" id="agenda">
     <div class="flex items-center justify-between pb-2 pl-16">
-        <button on:click={switchView}>
+        <button
+            on:click={switchView}
+            class="rounded-full p-2 transition-colors duration-200 hover:bg-blue-800"
+        >
             <CalendarIcon class="h-5 w-6" />
         </button>
         <div class="flex flex-col items-center">
             <h1 class="flex-1 text-center">{title}</h1>
             <h2
-                class="rounded-badge px-3 text-center
+                class="rounded-badge px-3 py-0.5 text-center
                 {tasks?.length +
                     tasksWithNoTime?.length +
                     (window.location.hash === '#tomorrow' ? todayTasks?.length : 0) >
                 18
-                    ? 'bg-red-800'
+                    ? 'bg-gradient-to-r from-red-900 to-red-700'
                     : ''}"
             >
                 {#if todayTasks.length > 0 && window.location.hash === "#tomorrow"}
@@ -118,7 +121,10 @@
                 tasks
             </h2>
         </div>
-        <button on:click={closeAgenda}>
+        <button
+            on:click={closeAgenda}
+            class="rounded-full p-2 transition-colors duration-200 hover:bg-red-700"
+        >
             <XCircleIcon class="h-5 w-6" />
         </button>
     </div>
