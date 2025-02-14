@@ -85,10 +85,10 @@
 </script>
 
 <div class="mt-4 flex w-72 flex-row flex-wrap gap-x-2 gap-y-1">
-    {#each buttons as { text, ms, basis, height, time, count, priority }}
-        <div class={basis}>
+    {#each buttons as { text, ms, styling, stylingButton, time, count, priority }}
+        <div class={styling}>
             <button
-                class="btn min-h-4 w-full rounded-md bg-neutral px-1 hover:bg-secondary {height}"
+                class="btn min-h-4 w-full rounded-md bg-neutral px-1 hover:bg-secondary {stylingButton}"
                 on:click={() => handleDefer(ms)}
                 >{text}
             </button>
