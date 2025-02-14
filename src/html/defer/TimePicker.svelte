@@ -84,7 +84,7 @@
     };
 </script>
 
-<div class="mt-4 flex w-72 flex-row flex-wrap gap-x-2 gap-y-1">
+<div class="mt-2 flex w-72 flex-row flex-wrap gap-x-2 gap-y-1">
     {#each buttons as { text, ms, styling, stylingButton, time, count, priority }}
         <div class={styling}>
             <button
