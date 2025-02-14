@@ -30,8 +30,9 @@ const buttons = [
 
 const now = new Date();
 let hours = 0;
+let previousFutureTime;
 
-buttons.forEach((button) => {
+buttons.forEach((button, index) => {
     const futureTime = new Date(now.getTime() + button.ms);
 
     const nextMorning = new Date(now);
@@ -39,18 +40,22 @@ buttons.forEach((button) => {
     nextMorning.setHours(6, 0, 0, 0);
 
     if (futureTime.getDate() !== now.getDate()) {
+        if (index > 0 && previousFutureTime) {
+            futureTime.setTime(previousFutureTime.getTime() + hours * 60 * 60 * 1000);
+            hours++;
+        }
         if (futureTime < nextMorning) {
             if (hours === 0) {
                 hours = Math.ceil((nextMorning - futureTime) / (1000 * 60 * 60));
+                futureTime.setHours(futureTime.getHours() + hours);
+                previousFutureTime = futureTime;
+                hours = 1;
             }
         }
-        futureTime.setHours(futureTime.getHours() + hours);
 
         const hoursInFuture = Math.floor((futureTime - now) / (1000 * 60 * 60));
 
-        hours--;
         button.stylingButton += " bg-blue-900";
-
         button.ms = futureTime.getTime() - now.getTime();
         button.text = `${hoursInFuture} hrs`;
     }
