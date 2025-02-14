@@ -3,11 +3,15 @@
     import { DateTime } from "luxon";
     import { createDateWithTime } from "../../js/time";
     import { getPriorityClasses } from "../../js/classes";
-    import buttons from "./deferButtons";
+    import createButtons from "./deferButtons"; // Import the function
 
     export let task, items;
 
+    let buttons = createButtons();
+
     const updateMilliseconds = () => {
+        buttons = createButtons();
+
         const tomorrowDate = DateTime.now().plus({ days: 1 }),
             result = createDateWithTime(task.due.string, tomorrowDate),
             now = DateTime.now();
