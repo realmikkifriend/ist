@@ -58,6 +58,8 @@ buttons.forEach((button, index) => {
         button.stylingButton += " bg-blue-900";
         button.ms = futureTime.getTime() - now.getTime();
         button.text = `${hoursInFuture} hrs`;
+    } else if (button.text !== "tomorrow") {
+        button.stylingButton += " bg-neutral";
     }
 });
 

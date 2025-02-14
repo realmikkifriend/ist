@@ -88,7 +88,7 @@
     {#each buttons as { text, ms, styling, stylingButton, time, count, priority }}
         <div class={styling}>
             <button
-                class="btn min-h-4 w-full rounded-md bg-neutral px-1 hover:bg-secondary {stylingButton}"
+                class="btn min-h-4 w-full rounded-md px-1 hover:bg-secondary {stylingButton}"
                 on:click={() => handleDefer(ms)}
                 >{text}
             </button>
