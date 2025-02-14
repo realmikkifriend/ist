@@ -28,4 +28,32 @@ const buttons = [
     { text: "24 hrs", ms: 24 * 60 * 60 * 1000, styling: "basis-[22.75%]", stylingButton: "h-8" },
 ];
 
+const now = new Date();
+let hours = 0;
+
+buttons.forEach((button) => {
+    const futureTime = new Date(now.getTime() + button.ms);
+
+    const nextMorning = new Date(now);
+    nextMorning.setDate(now.getDate() + 1);
+    nextMorning.setHours(6, 0, 0, 0);
+
+    if (futureTime.getDate() !== now.getDate()) {
+        if (futureTime < nextMorning) {
+            if (hours === 0) {
+                hours = Math.ceil((nextMorning - futureTime) / (1000 * 60 * 60));
+            }
+        }
+        futureTime.setHours(futureTime.getHours() + hours);
+
+        const hoursInFuture = Math.floor((futureTime - now) / (1000 * 60 * 60));
+
+        hours--;
+        button.stylingButton += " bg-blue-900";
+
+        button.ms = futureTime.getTime() - now.getTime();
+        button.text = `${hoursInFuture} hrs`;
+    }
+});
+
 export default buttons;
