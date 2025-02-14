@@ -47,7 +47,7 @@
     };
 </script>
 
-<div class="modal-box min-h-[60%] w-fit">
+<div class="modal-box flex min-h-[65%] w-fit flex-col justify-center">
     {#key task}
         <div class="flex justify-center">
             <div role="tablist" class="tabs-boxed tabs w-2/3 bg-neutral">
