@@ -46,6 +46,14 @@ const createButtons = () => {
     buttons.forEach((button, index) => {
         const futureTime = new Date(now.getTime() + button.ms);
 
+        if (index > 2) {
+            const roundingFactor = index >= 3 && index <= 7 ? 5 : 15;
+            const roundedMinutes =
+                Math.round(futureTime.getMinutes() / roundingFactor) * roundingFactor;
+            futureTime.setMinutes(roundedMinutes);
+            button.ms = futureTime.getTime() - now.getTime();
+        }
+
         const nextMorning = new Date(now);
         nextMorning.setDate(now.getDate() + 1);
         nextMorning.setHours(6, 0, 0, 0);
