@@ -103,15 +103,20 @@
             <h1 class="flex-1 text-center">{title}</h1>
             <h2
                 class="rounded-badge px-3 py-0.5 text-center
-                {tasks?.length +
-                    tasksWithNoTime?.length +
-                    (window.location.hash === '#tomorrow' ? todayTasks?.length : 0) >
-                18
-                    ? 'bg-gradient-to-r from-red-900 to-red-700'
-                    : ''}"
+                {(() => {
+                    const totalTasks =
+                        (tasks?.length || 0) +
+                        (tasksWithNoTime?.length || 0) +
+                        (window.location.hash === '#tomorrow' ? todayTasks?.length || 0 : 0);
+                    return totalTasks > 18
+                        ? 'bg-gradient-to-r from-red-900 to-red-700'
+                        : totalTasks < 15
+                          ? 'bg-gradient-to-r from-green-900 to-green-700'
+                          : '';
+                })()}"
             >
                 {#if todayTasks.length > 0 && window.location.hash === "#tomorrow"}
-                    <div class="mt-2 text-xs/[.1rem]">
+                    <div class="mt-2 text-xs/[.5rem]">
                         {tasks.length + tasksWithNoTime.length}+{todayTasks.length}=
                     </div>
                     {tasks.length + tasksWithNoTime.length + todayTasks.length}
