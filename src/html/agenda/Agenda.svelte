@@ -107,16 +107,28 @@
                     const totalTasks =
                         (tasks?.length || 0) +
                         (tasksWithNoTime?.length || 0) +
-                        (window.location.hash === '#tomorrow' ? todayTasks?.length || 0 : 0);
-                    return totalTasks > 18
-                        ? 'bg-gradient-to-r from-red-900 to-red-700'
-                        : totalTasks < 15
-                          ? 'bg-gradient-to-r from-green-900 to-green-700'
-                          : '';
+                        (todayTasks?.length || 0);
+                    const gradientGreen = 'bg-gradient-to-r from-green-900 to-green-700',
+                        gradientRed = 'bg-gradient-to-r from-red-900 to-red-700';
+
+                    if (window.location.hash === '#tomorrow') {
+                        return totalTasks > 18 ? gradientRed : totalTasks < 15 ? gradientGreen : '';
+                    } else if (window.location.hash === '#today') {
+                        const currentHour = new Date().getHours(),
+                            hourAdjustment = currentHour > 8 ? currentHour - 8 : 0,
+                            todayThreshold = 14 - hourAdjustment;
+
+                        if (totalTasks <= todayThreshold - 2) {
+                            return gradientGreen;
+                        } else if (totalTasks > todayThreshold) {
+                            return gradientRed;
+                        }
+                    }
+                    return '';
                 })()}"
             >
                 {#if todayTasks.length > 0 && window.location.hash === "#tomorrow"}
-                    <div class="mt-2 text-xs/[.5rem]">
+                    <div class="my-0.5 text-xs/[.5rem]">
                         {tasks.length + tasksWithNoTime.length}+{todayTasks.length}=
                     </div>
                     {tasks.length + tasksWithNoTime.length + todayTasks.length}
