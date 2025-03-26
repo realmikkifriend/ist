@@ -1,8 +1,9 @@
 <script>
+    import AgendaHeader from "./AgendaHeader.svelte";
+
     import AgendaHour from "./AgendaHour.svelte";
     import { onMount, onDestroy } from "svelte";
     import { DateTime } from "luxon";
-    import { XCircleIcon, CalendarIcon } from "@krowten/svelte-heroicons";
     import { todoistResources } from "../../js/stores";
     import { filterAndSortDueTasks } from "../../js/filter";
     import { getTasksForDate } from "./agenda";
@@ -14,6 +15,7 @@
         todayTasks = [];
     let hourSlots = Array.from({ length: 18 }, (_, i) => i + 6);
     let displayHours = {};
+    let headerGradientColor;
     let now;
 
     $: $todoistResources, updatePage();
@@ -59,19 +61,40 @@
         } else {
             hourSlots.forEach((hour) => (displayHours[hour] = true));
         }
+
+        headerGradientColor = getGradientColor();
     };
-
-    function switchView() {
-        window.location.hash = window.location.hash === "#today" ? "#tomorrow" : "#today";
-    }
-
-    function closeAgenda() {
-        window.location.hash = "";
-    }
 
     function getTaskColor(id) {
         const context = $todoistResources.contexts.find((context) => context.id === id);
         return context?.color || null;
+    }
+
+    function getGradientColor() {
+        const gradientGreen = "bg-gradient-to-r from-green-900 to-green-700";
+        const gradientRed = "bg-gradient-to-r from-red-900 to-red-700";
+
+        if (window.location.hash === "#tomorrow") {
+            const totalTasks =
+                (tasks?.length || 0) + (tasksWithNoTime?.length || 0) + (todayTasks?.length || 0);
+
+            return totalTasks > 18 ? gradientRed : totalTasks < 15 ? gradientGreen : "";
+        } else if (window.location.hash === "#today") {
+            const totalTasks = (tasks?.length || 0) + (tasksWithNoTime?.length || 0);
+            const currentHour = new Date().getHours();
+            const hourAdjustment = currentHour > 8 ? currentHour - 8 : 0;
+            const todayThreshold = 14 - hourAdjustment;
+
+            if (totalTasks <= todayThreshold - 2) {
+                return gradientGreen;
+            } else if (totalTasks > todayThreshold) {
+                return gradientRed;
+            } else {
+                return "";
+            }
+        } else {
+            return "";
+        }
     }
 
     onMount(() => {
@@ -92,59 +115,7 @@
 </script>
 
 <div class="mr-4 mt-[-2rem] max-w-lg sm:mx-auto sm:max-w-96" id="agenda">
-    <div class="flex items-center justify-between pb-2 pl-16">
-        <button
-            on:click={switchView}
-            class="rounded-full p-2 transition-colors duration-200 hover:bg-blue-800"
-        >
-            <CalendarIcon class="h-5 w-6" />
-        </button>
-        <div class="flex flex-col items-center">
-            <h1 class="flex-1 text-center">{title}</h1>
-            <h2
-                class="rounded-badge px-3 py-0.5 text-center
-                {(() => {
-                    const totalTasks =
-                        (tasks?.length || 0) +
-                        (tasksWithNoTime?.length || 0) +
-                        (todayTasks?.length || 0);
-                    const gradientGreen = 'bg-gradient-to-r from-green-900 to-green-700',
-                        gradientRed = 'bg-gradient-to-r from-red-900 to-red-700';
-
-                    if (window.location.hash === '#tomorrow') {
-                        return totalTasks > 18 ? gradientRed : totalTasks < 15 ? gradientGreen : '';
-                    } else if (window.location.hash === '#today') {
-                        const currentHour = new Date().getHours(),
-                            hourAdjustment = currentHour > 8 ? currentHour - 8 : 0,
-                            todayThreshold = 14 - hourAdjustment;
-
-                        if (totalTasks <= todayThreshold - 2) {
-                            return gradientGreen;
-                        } else if (totalTasks > todayThreshold) {
-                            return gradientRed;
-                        }
-                    }
-                    return '';
-                })()}"
-            >
-                {#if todayTasks.length > 0 && window.location.hash === "#tomorrow"}
-                    <div class="my-0.5 text-xs/[.5rem]">
-                        {tasks.length + tasksWithNoTime.length}+{todayTasks.length}=
-                    </div>
-                    {tasks.length + tasksWithNoTime.length + todayTasks.length}
-                {:else}
-                    {tasks.length + tasksWithNoTime.length}
-                {/if}
-                tasks
-            </h2>
-        </div>
-        <button
-            on:click={closeAgenda}
-            class="rounded-full p-2 transition-colors duration-200 hover:bg-red-700"
-        >
-            <XCircleIcon class="h-5 w-6" />
-        </button>
-    </div>
+    <AgendaHeader {title} {tasks} {tasksWithNoTime} {todayTasks} {headerGradientColor} />
 
     {#if tasksWithNoTime.length > 0}
         <div class="mb-4 flex w-full flex-col items-center pl-[4.5rem] pr-2">
