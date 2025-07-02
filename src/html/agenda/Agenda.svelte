@@ -81,7 +81,22 @@
             const totalTasks =
                 (tasks?.length || 0) + (tasksWithNoTime?.length || 0) + (todayTasks?.length || 0);
 
-            return totalTasks > 18 ? gradientRed : totalTasks < 15 ? gradientGreen : "";
+            switch (true) {
+                case totalTasks > 20:
+                    return gradientRed;
+                case totalTasks >= 19:
+                    return gradientOrange;
+                case totalTasks >= 17:
+                    return null;
+                case totalTasks >= 15:
+                    return gradientDarkGreen;
+                case totalTasks >= 12:
+                    return gradientGreen;
+                case totalTasks < 12:
+                    return gradientBlue;
+                default:
+                    return null;
+            }
         } else if (window.location.hash === "#today") {
             const totalTasks = (tasks?.length || 0) + (tasksWithNoTime?.length || 0);
             const currentHour = new Date().getHours();
