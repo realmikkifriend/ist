@@ -71,7 +71,10 @@
     }
 
     function getGradientColor() {
+        const gradientBlue = "bg-gradient-to-r from-blue-900 to-blue-700";
         const gradientGreen = "bg-gradient-to-r from-green-900 to-green-700";
+        const gradientDarkGreen = "bg-gradient-to-r from-emerald-900 to-emerald-700";
+        const gradientOrange = "bg-gradient-to-r from-orange-800 to-orange-600";
         const gradientRed = "bg-gradient-to-r from-red-900 to-red-700";
 
         if (window.location.hash === "#tomorrow") {
@@ -85,9 +88,17 @@
             const hourAdjustment = currentHour > 8 ? currentHour - 8 : 0;
             const todayThreshold = 14 - hourAdjustment;
 
-            if (totalTasks <= todayThreshold - 2) {
+            if (totalTasks < todayThreshold - 2) {
+                return gradientBlue;
+            } else if (totalTasks === todayThreshold - 2) {
                 return gradientGreen;
-            } else if (totalTasks > todayThreshold) {
+            } else if (totalTasks === todayThreshold - 1) {
+                return gradientDarkGreen;
+            } else if (totalTasks === todayThreshold) {
+                return null;
+            } else if (totalTasks === todayThreshold + 1) {
+                return gradientOrange;
+            } else if (totalTasks > todayThreshold + 1) {
                 return gradientRed;
             } else {
                 return "";
