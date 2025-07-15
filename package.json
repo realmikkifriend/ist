@@ -17,6 +17,9 @@
         "url": "https://github.com/realmikkifriend/ist/issues"
     },
     "homepage": "https://github.com/realmikkifriend/ist#readme",
+    "engines": {
+        "node": "22.x"
+    },
     "dependencies": {
         "@fontsource/clear-sans": "^5.0.11",
         "@krowten/svelte-heroicons": "^0.1.0",
