@@ -1,5 +1,6 @@
 import { get } from "svelte/store";
 import { v4 as uuidv4 } from "uuid";
+import { TodoistApi } from "@doist/todoist-api-typescript";
 import { todoistAccessToken, todoistResources, syncToken, todoistError } from "./stores";
 import { filterAndSortDueTasks } from "./filter";
 import { success } from "./toasts";
@@ -7,11 +8,13 @@ import { processTodoistData } from "./process";
 
 const API_URL = "https://api.todoist.com/sync/v9/sync";
 const CONTENT_TYPE = "application/x-www-form-urlencoded";
+const accessToken = get(todoistAccessToken);
+
+const api = new TodoistApi(accessToken);
 
 export async function refreshData() {
     const RESOURCE_TYPES = ["items", "projects", "notes", "user"];
     let error = null;
-    const accessToken = get(todoistAccessToken);
     if (!accessToken) {
         return setErrorState("No access token found.", {});
     }
