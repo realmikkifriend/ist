@@ -73,7 +73,7 @@
             {#if isTimeTabActive}
                 <TimePicker {task} {tasks} on:defer={handleDefer} />
             {:else}
-                <DatePicker {task} {tz} {tasks} on:defer={handleDefer} />
+                <DatePicker taskToDefer={task} {tz} {tasks} on:defer={handleDefer} />
             {/if}
         {/key}
     {/key}
