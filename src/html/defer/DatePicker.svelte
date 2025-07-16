@@ -3,7 +3,7 @@
     import { DateTime } from "luxon";
     import SveltyPicker from "svelty-picker";
     import { getPriorityClasses } from "../../js/classes";
-    export let task, tz, items;
+    export let taskToDefer, tz, tasks;
 
     let calendarElement, valueDefault;
 
@@ -22,9 +22,9 @@
                 : startOfMonth;
         const end = startOfMonth.endOf("month");
 
-        let soonTasks = items.filter((item) => {
-            const dueDate = DateTime.fromISO(item.due.date).setZone(tz);
-            return dueDate >= start && dueDate <= end && item.context_id === task.context_id;
+        let soonTasks = tasks.filter((task) => {
+            const dueDate = DateTime.fromISO(task.due.date).setZone(tz);
+            return dueDate >= start && dueDate <= end && task.context_id === taskToDefer.context_id;
         });
 
         const calendarCells = calendarElement.querySelectorAll("td.sdt-cal-td.svelte-hexbpx");
@@ -61,9 +61,9 @@
             dotContainer.className =
                 "dot-container flex space-x-0.5 justify-center items-center h-1 mt-[-0.5rem]";
 
-            const elements = tasksForCellDate.slice(0, 3).map((task) => {
+            const elements = tasksForCellDate.slice(0, 3).map((taskToDefer) => {
                 const div = document.createElement("div");
-                div.className = `w-1 h-1 rounded-full ${getPriorityClasses(task.priority)}`;
+                div.className = `w-1 h-1 rounded-full ${getPriorityClasses(taskToDefer.priority)}`;
                 return div;
             });
 

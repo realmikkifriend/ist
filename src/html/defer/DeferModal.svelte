@@ -17,9 +17,9 @@
 
     const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "America/Chicago";
 
-    let items = [];
+    let tasks = [];
 
-    $: items = $todoistResources.items;
+    $: tasks = $todoistResources.items;
 
     const dispatch = createEventDispatcher();
 
@@ -69,11 +69,11 @@
             </div>
         </div>
 
-        {#key items}
+        {#key tasks}
             {#if isTimeTabActive}
-                <TimePicker {task} {items} on:defer={handleDefer} />
+                <TimePicker {task} {tasks} on:defer={handleDefer} />
             {:else}
-                <DatePicker {task} {tz} {items} on:defer={handleDefer} />
+                <DatePicker {task} {tz} {tasks} on:defer={handleDefer} />
             {/if}
         {/key}
     {/key}

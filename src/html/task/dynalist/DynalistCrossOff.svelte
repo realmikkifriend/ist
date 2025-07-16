@@ -55,5 +55,5 @@
         {/key}
     </div>
 {:else}
-    <span class="italic">No items in list!</span>
+    <span class="italic">No tasks in list!</span>
 {/if}

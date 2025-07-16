@@ -24,9 +24,9 @@ const propsToRemove = [
     "v2_section_id",
 ];
 
-function removeProps(item, props) {
-    props.forEach((prop) => delete item[prop]);
-    return item;
+function removeProps(task, props) {
+    props.forEach((prop) => delete task[prop]);
+    return task;
 }
 
 function processFullSync(currentResources, data, RESOURCE_TYPES) {
@@ -51,9 +51,9 @@ function processFullSync(currentResources, data, RESOURCE_TYPES) {
     });
 
     if (currentResources.items) {
-        currentResources.items = currentResources.items.map((item) => ({
-            ...removeProps(item, propsToRemove),
-            context_id: item.project_id,
+        currentResources.items = currentResources.items.map((task) => ({
+            ...removeProps(task, propsToRemove),
+            context_id: task.project_id,
             project_id: undefined,
         }));
     }

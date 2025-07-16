@@ -5,7 +5,7 @@
     import { getPriorityClasses } from "../../js/classes";
     import createButtons from "./deferButtons"; // Import the function
 
-    export let task, items;
+    export let task, tasks;
 
     let buttons = createButtons();
 
@@ -28,11 +28,11 @@
             buttons[0].ms = tomorrowInMS;
         }
 
-        let soonTasks = items.filter((item) => {
-            let dueDateTime = DateTime.fromISO(item.due.date);
+        let soonTasks = tasks.filter((task) => {
+            let dueDateTime = DateTime.fromISO(task.due.date);
             return (
                 dueDateTime.isValid &&
-                item.due.date.includes("T") &&
+                task.due.date.includes("T") &&
                 dueDateTime.diffNow("hours").hours <= 25
             );
         });

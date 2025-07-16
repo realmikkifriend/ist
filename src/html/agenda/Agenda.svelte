@@ -125,9 +125,9 @@
 
     onMount(() => {
         if ($todoistResources.items) {
-            $todoistResources.items.forEach((item) => {
-                delete item.summoned;
-                delete item.firstDue;
+            $todoistResources.items.forEach((task) => {
+                delete task.summoned;
+                delete task.firstDue;
             });
         }
 
