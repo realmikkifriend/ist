@@ -57,24 +57,17 @@ export async function markTaskDone(taskID) {
     return await api.closeTask(taskID);
 }
 
-export async function deferTasks(taskTimePairs, accessToken) {
-    const commands = taskTimePairs.map(([task, time]) => {
+export async function deferTasks(taskTimePairs) {
+    const updatePromises = taskTimePairs.map(([task, time]) => {
         const formattedDate = formatTaskDate(time);
-        return {
-            type: "item_update",
-            uuid: uuidv4(),
-            args: {
-                id: task.id,
-                due: {
-                    date: formattedDate,
-                    datetime: formattedDate,
-                    string: task.due.string,
-                },
-            },
-        };
+        return api.updateTask(task.id, {
+            due_date: formattedDate,
+            due_datetime: formattedDate,
+            due_string: task.due.string,
+        });
     });
 
-    return await executeAPICommand({ commands: JSON.stringify(commands) }, accessToken);
+    return Promise.all(updatePromises);
 }
 
 // export async function sendReorderedContexts(differences, accessToken) {
