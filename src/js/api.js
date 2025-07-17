@@ -63,7 +63,7 @@ export async function refreshData() {
             });
 
             const dueTasks = getDueTasks(cleanedData);
-            console.log(dueTasks);
+
             todoistData.set({ ...cleanedData, dueTasks });
         } catch (apiTsError) {
             console.error("Error fetching data with TodoistApi:", apiTsError);
@@ -81,14 +81,7 @@ export function setErrorState(error, currentResources) {
 }
 
 export async function markTaskDone(taskID, accessToken) {
-    return await executeAPICommand(
-        {
-            commands: JSON.stringify([
-                { type: "item_close", uuid: uuidv4(), args: { id: taskID } },
-            ]),
-        },
-        accessToken,
-    );
+    return await api.closeTask(taskID);
 }
 
 export async function deferTasks(taskTimePairs, accessToken) {
