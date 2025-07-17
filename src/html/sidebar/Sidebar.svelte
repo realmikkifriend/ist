@@ -7,7 +7,6 @@
         todoistAccessToken,
         todoistData,
         todoistError,
-        syncToken,
         userSettings,
         dynalistAccessToken,
         firstDueTask,
@@ -24,7 +23,6 @@
         todoistData.set({});
         todoistError.set(null);
         firstDueTask.set(null);
-        syncToken.set("*");
         userSettings.set({ selectedContextId: null });
         dynalistAccessToken.set("");
     }
