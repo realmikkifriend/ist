@@ -8,7 +8,7 @@ import {
     syncToken,
     todoistError,
 } from "./stores";
-import { filterAndSortDueTasks } from "./filter";
+import { filterAndSortDueTasks, getDueTasks } from "./filter";
 import { success } from "./toasts";
 import { processTodoistData, cleanTodoistData } from "./process";
 
@@ -56,13 +56,15 @@ export async function refreshData() {
                 getEndpoint("user", accessToken),
             ]);
 
-            todoistData.set(
-                cleanTodoistData({
-                    tasks: tasksResponse.results,
-                    contexts: projectsResponse.results,
-                    user: userResponse,
-                }),
-            );
+            const cleanedData = cleanTodoistData({
+                tasks: tasksResponse.results,
+                contexts: projectsResponse.results,
+                user: userResponse,
+            });
+
+            const dueTasks = getDueTasks(cleanedData);
+            console.log(dueTasks);
+            todoistData.set({ ...cleanedData, dueTasks });
         } catch (apiTsError) {
             console.error("Error fetching data with TodoistApi:", apiTsError);
         }

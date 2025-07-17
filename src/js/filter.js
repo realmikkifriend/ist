@@ -51,3 +51,10 @@ export function filterAndSortDueTasks(tasks, contexts, timeZone) {
     tasks.sort((a, b) => compareTasks(a, b, contextLookup, timeZone));
     return tasks;
 }
+
+export function getDueTasks(data) {
+    const { tasks, contexts, user } = data;
+    const timeZone = user?.tz_info?.name || "local";
+    const filteredTasks = filterAndSortDueTasks(tasks, contexts, timeZone);
+    return filteredTasks;
+}
