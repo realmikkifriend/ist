@@ -1,12 +1,10 @@
 import { get } from "svelte/store";
-import { v4 as uuidv4 } from "uuid";
 import { TodoistApi } from "@doist/todoist-api-typescript";
 import { todoistAccessToken, todoistData, todoistError } from "./stores";
 import { getDueTasks } from "./filter";
 import { success } from "./toasts";
 import { cleanTodoistData } from "./process";
 
-const API_URL = "https://api.todoist.com/sync/v9/sync";
 const CONTENT_TYPE = "application/x-www-form-urlencoded";
 const accessToken = get(todoistAccessToken);
 
@@ -83,23 +81,6 @@ export async function deferTasks(taskTimePairs) {
 
 //     return await executeAPICommand({ commands: JSON.stringify(commands) }, accessToken);
 // }
-
-async function executeAPICommand(params, accessToken) {
-    const response = await fetch(API_URL, {
-        method: "POST",
-        headers: {
-            Authorization: `Bearer ${accessToken}`,
-            "Content-Type": CONTENT_TYPE,
-        },
-        body: new URLSearchParams(params),
-    });
-
-    if (!response.ok) {
-        throw new Error(`Error: ${response.status}`);
-    }
-
-    return response.json();
-}
 
 async function getEndpoint(endpoint, accessToken, params = {}) {
     const response = await fetch(`https://api.todoist.com/api/v1/${endpoint}`, {
