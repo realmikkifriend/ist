@@ -48,6 +48,20 @@ export async function refreshData() {
             ),
         });
         success("Todoist data updated!");
+
+        try {
+            const tasksResponse = await api.getTasks({ limit: 200 });
+            const projectsResponse = await api.getProjects();
+
+            todoistData.set({
+                tasks: tasksResponse.results,
+                contexts: projectsResponse.results,
+                // user:
+            });
+        } catch (apiTsError) {
+            console.error("Error fetching data with TodoistApi:", apiTsError);
+        }
+
         return { resources: currentResources, error };
     } catch (err) {
         return setErrorState(err.message, {});
