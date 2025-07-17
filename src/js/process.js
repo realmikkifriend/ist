@@ -24,9 +24,9 @@ const propsToRemove = [
     "v2_section_id",
 ];
 
-function removeProps(task, props) {
-    props.forEach((prop) => delete task[prop]);
-    return task;
+function removeProps(data, props) {
+    props.forEach((prop) => delete data[prop]);
+    return data;
 }
 
 function processFullSync(currentResources, data, RESOURCE_TYPES) {
@@ -144,5 +144,102 @@ export function processTodoistData(currentResources, data, RESOURCE_TYPES) {
 }
 
 export function cleanTodoistData(data) {
+    if (data.tasks) {
+        data.tasks = data.tasks.map((task) => {
+            const {
+                userId,
+                sectionId,
+                parentId,
+                addedByUid,
+                assignedByUid,
+                responsibleUid,
+                deadline,
+                checked,
+                description,
+                isDeleted,
+                addedAt,
+                completedAt,
+                updatedAt,
+                noteCount,
+                isCollapsed,
+                dayOrder,
+                ...rest
+            } = task;
+            return rest;
+        });
+    }
+    if (data.contexts) {
+        data.contexts = data.contexts.map((context) => {
+            const {
+                canAssignTasks,
+                createdAt,
+                isArchived,
+                isDeleted,
+                isFavorite,
+                isFrozen,
+                updatedAt,
+                viewStyle,
+                defaultOrder,
+                description,
+                isCollapsed,
+                isShared,
+                parentId,
+                ...rest
+            } = context;
+            return rest;
+        });
+    }
+    if (data.user) {
+        const {
+            activated_user,
+            auto_reminder,
+            avatar_big,
+            avatar_medium,
+            avatar_s640,
+            avatar_small,
+            business_account_id,
+            completed_count,
+            date_format,
+            deleted_at,
+            feature_identifier,
+            features,
+            has_magic_number,
+            has_password,
+            has_started_a_trial,
+            image_id,
+            id,
+            inbox_project_id,
+            is_celebrations_enabled,
+            is_deleted,
+            is_premium,
+            joinable_workspace,
+            joined_at,
+            karma,
+            karma_trend,
+            lang,
+            mfa_enabled,
+            onboarding_level,
+            onboarding_persona,
+            onboarding_role,
+            onboarding_started,
+            onboarding_team_mode,
+            onboarding_use_cases,
+            premium_status,
+            premium_until,
+            shard_id,
+            share_limit,
+            sort_order,
+            start_day,
+            start_page,
+            theme_id,
+            time_format,
+            unique_prefix,
+            verification_status,
+            websocket_url,
+            weekend_start_day,
+            ...rest
+        } = data.user;
+        data.user = rest;
+    }
     return data;
 }
