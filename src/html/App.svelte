@@ -2,7 +2,13 @@
     import { onMount, onDestroy } from "svelte";
     import { DateTime } from "luxon";
     import { ArrowPathIcon } from "@krowten/svelte-heroicons";
-    import { todoistResources, todoistError, userSettings, firstDueTask } from "../js/stores";
+    import {
+        todoistResources,
+        todoistData,
+        todoistError,
+        userSettings,
+        firstDueTask,
+    } from "../js/stores";
     import { updateFirstDueTask } from "../js/first";
     import { refreshData } from "../js/api";
     import { error } from "../js/toasts";
@@ -22,6 +28,7 @@
 
     $: {
         $userSettings.selectedContextId;
+        $todoistData.dueTasks;
         $todoistResources.dueTasks;
         updateFirstDueTask();
     }

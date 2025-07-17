@@ -1,7 +1,13 @@
 import { get } from "svelte/store";
 import { toast } from "@zerodevx/svelte-toast";
 import { success, newFirstTask } from "./toasts";
-import { todoistResources, userSettings, firstDueTask, previousFirstDueTask } from "../js/stores";
+import {
+    todoistResources,
+    todoistData,
+    userSettings,
+    firstDueTask,
+    previousFirstDueTask,
+} from "../js/stores";
 import FirstDueTaskToast from "../html/FirstDueTaskToast.svelte";
 
 export const setFirstDueTask = (task) => {
@@ -31,8 +37,8 @@ const updateTaskNotes = (task, notes) => {
 };
 
 export const updateFirstDueTask = () => {
-    const $resources = get(todoistResources);
-    if (!$resources?.dueTasks?.length) {
+    const $todoistData = get(todoistData);
+    if (!$todoistData?.dueTasks?.length) {
         setFirstDueTask(null);
         return;
     }
@@ -40,9 +46,9 @@ export const updateFirstDueTask = () => {
     const contextId = get(userSettings).selectedContextId;
     const prevTask = get(previousFirstDueTask);
 
-    let dueTasks = updateDueTasks($resources.dueTasks, contextId);
+    let dueTasks = updateDueTasks($todoistData.dueTasks, contextId);
 
-    const newTask = updateTaskNotes(dueTasks[0], $resources.notes);
+    const newTask = dueTasks[0];
 
     if (
         prevTask &&
