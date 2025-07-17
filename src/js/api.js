@@ -50,9 +50,11 @@ export async function refreshData() {
         success("Todoist data updated!");
 
         try {
-            const tasksResponse = await api.getTasks({ limit: 200 });
-            const projectsResponse = await api.getProjects();
-            const userResponse = await getEndpoint("user", accessToken);
+            const [tasksResponse, projectsResponse, userResponse] = await Promise.all([
+                api.getTasks({ limit: 200 }),
+                api.getProjects(),
+                getEndpoint("user", accessToken),
+            ]);
 
             todoistData.set({
                 tasks: tasksResponse.results,
