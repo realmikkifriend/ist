@@ -52,11 +52,12 @@ export async function refreshData() {
         try {
             const tasksResponse = await api.getTasks({ limit: 200 });
             const projectsResponse = await api.getProjects();
+            const userResponse = await getEndpoint("user", accessToken);
 
             todoistData.set({
                 tasks: tasksResponse.results,
                 contexts: projectsResponse.results,
-                // user:
+                user: userResponse,
             });
         } catch (apiTsError) {
             console.error("Error fetching data with TodoistApi:", apiTsError);
@@ -120,6 +121,23 @@ export async function deferTasks(taskTimePairs, accessToken) {
 
 async function executeAPICommand(params, accessToken) {
     const response = await fetch(API_URL, {
+        method: "POST",
+        headers: {
+            Authorization: `Bearer ${accessToken}`,
+            "Content-Type": CONTENT_TYPE,
+        },
+        body: new URLSearchParams(params),
+    });
+
+    if (!response.ok) {
+        throw new Error(`Error: ${response.status}`);
+    }
+
+    return response.json();
+}
+
+async function getEndpoint(endpoint, accessToken, params = {}) {
+    const response = await fetch(`https://api.todoist.com/api/v1/${endpoint}`, {
         method: "POST",
         headers: {
             Authorization: `Bearer ${accessToken}`,
