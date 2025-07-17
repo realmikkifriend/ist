@@ -1,7 +1,7 @@
 <script>
     import { onMount } from "svelte";
     import { get } from "svelte/store";
-    import { todoistResources, todoistAccessToken, todoistError } from "../../js/stores";
+    import { todoistData, todoistAccessToken, todoistError } from "../../js/stores";
     import { sendReorderedContexts, refreshData } from "../../js/api";
 
     let filteredContexts = [],
@@ -12,12 +12,12 @@
     let isComparing = true;
 
     function resetAll() {
-        filteredContexts = $todoistResources.contexts
-            .filter((context) => !context.inbox_project)
+        filteredContexts = $todoistData.contexts
+            .filter((context) => !context.inboxProject)
             .map((context, index) => {
                 return {
                     ...context,
-                    child_order: index,
+                    childOrder: index,
                 };
             });
         originalContexts = [...filteredContexts];
@@ -32,7 +32,7 @@
 
     export let modalOpen;
 
-    $: if (!modalOpen || ($todoistResources.contexts && isComparing)) {
+    $: if (!modalOpen || ($todoistData.contexts && isComparing)) {
         resetAll();
     }
 
@@ -74,7 +74,7 @@
             selectedOrder.forEach((context, newIndex) => {
                 const originalIndex = originalContexts.findIndex((c) => c.id === context.id);
                 if (originalIndex !== newIndex) {
-                    differences.push({ id: context.id, child_order: newIndex });
+                    differences.push({ id: context.id, childOrder: newIndex });
                 }
             });
 
@@ -87,7 +87,7 @@
 
             while (
                 indexA > 0 &&
-                filteredContexts[indexB].child_order < filteredContexts[indexA].child_order
+                filteredContexts[indexB].childOrder < filteredContexts[indexA].childOrder
             ) {
                 selectedOrder.push(filteredContexts[indexB]);
                 indexA--;
@@ -134,9 +134,9 @@
                     {context.name}
                     {#if differences.find((difference) => difference.id === context.id)}
                         {@const childOrderDifference =
-                            context.child_order -
+                            context.childOrder -
                             differences.find((difference) => difference.id === context.id)
-                                .child_order}
+                                .childOrder}
 
                         <span class="badge badge-xs ml-1 h-fit bg-neutral px-1 py-0.5">
                             {childOrderDifference > 0 ? "+" : "-"}{Math.abs(childOrderDifference)}

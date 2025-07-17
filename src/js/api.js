@@ -1,16 +1,10 @@
 import { get } from "svelte/store";
 import { v4 as uuidv4 } from "uuid";
 import { TodoistApi } from "@doist/todoist-api-typescript";
-import {
-    todoistAccessToken,
-    todoistResources,
-    todoistData,
-    syncToken,
-    todoistError,
-} from "./stores";
-import { filterAndSortDueTasks, getDueTasks } from "./filter";
+import { todoistAccessToken, todoistData, todoistError } from "./stores";
+import { getDueTasks } from "./filter";
 import { success } from "./toasts";
-import { processTodoistData, cleanTodoistData } from "./process";
+import { cleanTodoistData } from "./process";
 
 const API_URL = "https://api.todoist.com/sync/v9/sync";
 const CONTENT_TYPE = "application/x-www-form-urlencoded";
@@ -19,36 +13,13 @@ const accessToken = get(todoistAccessToken);
 const api = new TodoistApi(accessToken);
 
 export async function refreshData() {
-    const RESOURCE_TYPES = ["items", "projects", "notes", "user"];
     let error = null;
+
     if (!accessToken) {
         return setErrorState("No access token found.", {});
     }
 
-    const currentSyncToken = get(syncToken);
     try {
-        const data = await executeAPICommand(
-            {
-                sync_token: currentSyncToken,
-                resource_types: JSON.stringify(RESOURCE_TYPES),
-            },
-            accessToken,
-        );
-        syncToken.set(data.sync_token);
-
-        let currentResources = get(todoistResources) || {};
-        currentResources = processTodoistData(currentResources, data, RESOURCE_TYPES);
-        const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone || "America/Chicago";
-        todoistResources.set({
-            ...currentResources,
-            dueTasks: filterAndSortDueTasks(
-                currentResources.items,
-                currentResources.contexts,
-                timeZone,
-            ),
-        });
-        success("Todoist data updated!");
-
         try {
             const [tasksResponse, projectsResponse, userResponse] = await Promise.all([
                 api.getTasks({ limit: 200 }),
@@ -69,15 +40,17 @@ export async function refreshData() {
             console.error("Error fetching data with TodoistApi:", apiTsError);
         }
 
-        return { resources: currentResources, error };
+        success("Todoist data updated!");
+
+        return { status: "success", error };
     } catch (err) {
         return setErrorState(err.message, {});
     }
 }
 
-export function setErrorState(error, currentResources) {
+export function setErrorState(error) {
     todoistError.set(error);
-    return { resources: currentResources, error };
+    return { status: "error", error };
 }
 
 export async function markTaskDone(taskID) {

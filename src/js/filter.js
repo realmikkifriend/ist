@@ -1,11 +1,33 @@
 import { DateTime } from "luxon";
 import { getTaskTime } from "./time";
 
+export function getDueTasks(data) {
+    const { tasks, contexts, user } = data;
+    const timeZone = user?.tz_info?.name || "local";
+
+    return filterAndSortTasks(tasks, contexts, timeZone);
+}
+
+export function filterAndSortTasks(tasks, contexts, timeZone) {
+    const contextLookup = createContextLookup(contexts);
+
+    if (timeZone) {
+        tasks = filterDueTasks(tasks, timeZone);
+    }
+
+    tasks.sort((a, b) => compareTasks(a, b, contextLookup, timeZone));
+    return tasks;
+}
+
 function createContextLookup(contexts) {
     return contexts.reduce((acc, context) => {
         acc[context.id] = context.childOrder;
         return acc;
     }, {});
+}
+
+function filterDueTasks(tasks, timeZone) {
+    return tasks.filter((task) => processDueProperties(task, timeZone));
 }
 
 function processDueProperties(task, timeZone) {
@@ -19,10 +41,6 @@ function processDueProperties(task, timeZone) {
         zone: timeZone,
     }).toJSDate();
     return task.due.dateObject < new Date();
-}
-
-function filterDueTasks(tasks, timeZone) {
-    return tasks.filter((task) => processDueProperties(task, timeZone));
 }
 
 function compareTasks(a, b, contextLookup, timeZone) {
@@ -39,45 +57,4 @@ function compareTasks(a, b, contextLookup, timeZone) {
     const dateA = DateTime.fromISO(a.due.datetime || a.due.date, { zone: timeZone }).toJSDate();
     const dateB = DateTime.fromISO(b.due.datetime || b.due.date, { zone: timeZone }).toJSDate();
     return dateA - dateB;
-}
-
-export function filterAndSortDueTasks(tasks, contexts, timeZone) {
-    const contextLookup = createContextLookup(contexts);
-
-    if (timeZone) {
-        tasks = filterDueTasks(tasks, timeZone);
-    }
-
-    tasks.sort((a, b) => compareTasks(a, b, contextLookup, timeZone));
-    return tasks;
-}
-
-export function getDueTasks(data) {
-    const { tasks, contexts, user } = data;
-    const timeZone = user?.tz_info?.name || "local";
-    let filteredTasks;
-
-    if (timeZone) {
-        filteredTasks = tasks.filter((task) => processDueProperties(task, timeZone));
-    }
-
-    const contextLookup = createContextLookup(contexts);
-
-    filteredTasks.sort((a, b) => {
-        const childOrderA = contextLookup[a.contextId] || 0;
-        const childOrderB = contextLookup[b.contextId] || 0;
-        if (childOrderA !== childOrderB) {
-            return childOrderA - childOrderB;
-        }
-
-        if (b.priority !== a.priority) {
-            return b.priority - a.priority;
-        }
-
-        const dateA = DateTime.fromISO(a.due.datetime || a.due.date, { zone: timeZone }).toJSDate();
-        const dateB = DateTime.fromISO(b.due.datetime || b.due.date, { zone: timeZone }).toJSDate();
-        return dateA - dateB;
-    });
-
-    return filteredTasks;
 }

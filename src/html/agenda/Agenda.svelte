@@ -5,7 +5,7 @@
     import { onMount, onDestroy } from "svelte";
     import { DateTime } from "luxon";
     import { todoistData } from "../../js/stores";
-    import { filterAndSortDueTasks } from "../../js/filter";
+    import { filterAndSortTasks } from "../../js/filter";
     import { getTasksForDate } from "./agenda";
     import AgendaTask from "./AgendaTask.svelte";
 
@@ -43,7 +43,7 @@
             : { tasks: [], tasksWithNoTime: [] });
 
         if (tasksWithNoTime.length > 2) {
-            tasksWithNoTime = filterAndSortDueTasks(tasksWithNoTime, $todoistData.contexts, false);
+            tasksWithNoTime = filterAndSortTasks(tasksWithNoTime, $todoistData.contexts, false);
         }
 
         if (title === "Today") {

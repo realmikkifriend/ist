@@ -1,6 +1,6 @@
 import { get } from "svelte/store";
 import { DateTime } from "luxon";
-import { todoistData, todoistAccessToken, todoistError, previousFirstDueTask } from "./stores";
+import { todoistData, todoistError, previousFirstDueTask } from "./stores";
 import { markTaskDone, deferTasks, refreshData } from "./api";
 import { updateFirstDueTask } from "./first";
 
@@ -60,14 +60,13 @@ export const handleTaskDone = async (taskID) => {
 };
 
 export const handleTaskDefer = async (taskUpdates) => {
-    let accessToken = get(todoistAccessToken);
     previousFirstDueTask.set(null);
 
     const updatedTaskResources = taskUpdates.map(([task, dateTime]) => [task.id, dateTime]);
     updateTaskResources(updatedTaskResources);
 
     try {
-        await deferTasks(taskUpdates, accessToken);
+        await deferTasks(taskUpdates);
     } catch (error) {
         todoistError.set(`Failed to defer tasks: ${error.message}`);
         return;

@@ -5,7 +5,6 @@
     import Footer from "../Footer.svelte";
     import {
         todoistAccessToken,
-        todoistResources,
         todoistData,
         todoistError,
         syncToken,
@@ -22,7 +21,6 @@
     function handleLogout() {
         toast.pop(0);
         todoistAccessToken.set("");
-        todoistResources.set({});
         todoistData.set({});
         todoistError.set(null);
         firstDueTask.set(null);

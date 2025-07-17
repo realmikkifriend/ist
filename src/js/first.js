@@ -25,11 +25,6 @@ const updateDueTasks = (dueTasks, contextId) => {
     return dueTasks;
 };
 
-const updateTaskNotes = (task, notes) => {
-    task.notes = notes.filter((note) => note.item_id === task.id);
-    return task;
-};
-
 export const updateFirstDueTask = () => {
     const $todoistData = get(todoistData);
     if (!$todoistData?.dueTasks?.length) {
