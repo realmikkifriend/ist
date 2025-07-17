@@ -142,3 +142,7 @@ export function processTodoistData(currentResources, data, RESOURCE_TYPES) {
 
     return currentResources;
 }
+
+export function cleanTodoistData(data) {
+    return data;
+}

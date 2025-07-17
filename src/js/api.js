@@ -10,7 +10,7 @@ import {
 } from "./stores";
 import { filterAndSortDueTasks } from "./filter";
 import { success } from "./toasts";
-import { processTodoistData } from "./process";
+import { processTodoistData, cleanTodoistData } from "./process";
 
 const API_URL = "https://api.todoist.com/sync/v9/sync";
 const CONTENT_TYPE = "application/x-www-form-urlencoded";
@@ -56,11 +56,13 @@ export async function refreshData() {
                 getEndpoint("user", accessToken),
             ]);
 
-            todoistData.set({
-                tasks: tasksResponse.results,
-                contexts: projectsResponse.results,
-                user: userResponse,
-            });
+            todoistData.set(
+                cleanTodoistData({
+                    tasks: tasksResponse.results,
+                    contexts: projectsResponse.results,
+                    user: userResponse,
+                }),
+            );
         } catch (apiTsError) {
             console.error("Error fetching data with TodoistApi:", apiTsError);
         }
