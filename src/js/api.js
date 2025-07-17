@@ -80,7 +80,7 @@ export function setErrorState(error, currentResources) {
     return { resources: currentResources, error };
 }
 
-export async function markTaskDone(taskID, accessToken) {
+export async function markTaskDone(taskID) {
     return await api.closeTask(taskID);
 }
 

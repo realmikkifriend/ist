@@ -1,13 +1,7 @@
 import { get } from "svelte/store";
 import { toast } from "@zerodevx/svelte-toast";
 import { success, newFirstTask } from "./toasts";
-import {
-    todoistResources,
-    todoistData,
-    userSettings,
-    firstDueTask,
-    previousFirstDueTask,
-} from "../js/stores";
+import { todoistData, userSettings, firstDueTask, previousFirstDueTask } from "../js/stores";
 import FirstDueTaskToast from "../html/FirstDueTaskToast.svelte";
 
 export const setFirstDueTask = (task) => {
@@ -16,7 +10,7 @@ export const setFirstDueTask = (task) => {
 };
 
 const filterTasksByContext = (tasks, contextId) =>
-    tasks.filter((task) => task.context_id === contextId);
+    tasks.filter((task) => task.contextId === contextId);
 
 const updateDueTasks = (dueTasks, contextId) => {
     if (contextId) {
@@ -53,7 +47,7 @@ export const updateFirstDueTask = () => {
     if (
         prevTask &&
         newTask.id !== prevTask.id &&
-        (!contextId || prevTask.context_id === contextId) &&
+        (!contextId || prevTask.contextId === contextId) &&
         window.location.hash !== "#today" &&
         window.location.hash !== "#tomorrow"
     ) {

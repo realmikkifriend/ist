@@ -4,7 +4,7 @@
     import AgendaHour from "./AgendaHour.svelte";
     import { onMount, onDestroy } from "svelte";
     import { DateTime } from "luxon";
-    import { todoistResources } from "../../js/stores";
+    import { todoistData } from "../../js/stores";
     import { filterAndSortDueTasks } from "../../js/filter";
     import { getTasksForDate } from "./agenda";
     import AgendaTask from "./AgendaTask.svelte";
@@ -18,7 +18,7 @@
     let headerGradientColor;
     let now;
 
-    $: $todoistResources, updatePage();
+    $: $todoistData, updatePage();
 
     const updatePage = () => {
         now = DateTime.now();
@@ -33,21 +33,17 @@
                   : null;
 
         if (window.location.hash === "#tomorrow") {
-            const tasksForTomorrow = getTasksForDate(now, $todoistResources);
+            const tasksForTomorrow = getTasksForDate(now, $todoistData);
 
             todayTasks = [...tasksForTomorrow.tasksWithNoTime, ...tasksForTomorrow.tasks];
         }
 
         ({ tasksWithNoTime, tasks } = targetDate
-            ? getTasksForDate(targetDate, $todoistResources)
+            ? getTasksForDate(targetDate, $todoistData)
             : { tasks: [], tasksWithNoTime: [] });
 
         if (tasksWithNoTime.length > 2) {
-            tasksWithNoTime = filterAndSortDueTasks(
-                tasksWithNoTime,
-                $todoistResources.contexts,
-                false,
-            );
+            tasksWithNoTime = filterAndSortDueTasks(tasksWithNoTime, $todoistData.contexts, false);
         }
 
         if (title === "Today") {
@@ -66,7 +62,7 @@
     };
 
     function getTaskColor(id) {
-        const context = $todoistResources.contexts.find((context) => context.id === id);
+        const context = $todoistData.contexts.find((context) => context.id === id);
         return context?.color || null;
     }
 
@@ -124,8 +120,8 @@
     }
 
     onMount(() => {
-        if ($todoistResources.items) {
-            $todoistResources.items.forEach((task) => {
+        if ($todoistData.tasks) {
+            $todoistData.tasks.forEach((task) => {
                 delete task.summoned;
                 delete task.firstDue;
             });
@@ -146,7 +142,7 @@
     {#if tasksWithNoTime.length > 0}
         <div class="mb-4 flex w-full flex-col items-center pl-[4.5rem] pr-2">
             {#each tasksWithNoTime as task}
-                <AgendaTask {task} color={getTaskColor(task.context_id)} />
+                <AgendaTask {task} color={getTaskColor(task.contextId)} />
             {/each}
         </div>
     {/if}

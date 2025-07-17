@@ -1,11 +1,11 @@
 import { get } from "svelte/store";
 import { DateTime } from "luxon";
-import { todoistResources, todoistAccessToken, todoistError, previousFirstDueTask } from "./stores";
+import { todoistData, todoistAccessToken, todoistError, previousFirstDueTask } from "./stores";
 import { markTaskDone, deferTasks, refreshData } from "./api";
 import { updateFirstDueTask } from "./first";
 
 const updateTaskResources = (taskUpdates) => {
-    todoistResources.update(($resources) => {
+    todoistData.update(($resources) => {
         taskUpdates.sort(([_, timeA], [__, timeB]) => new Date(timeA) - new Date(timeB));
 
         taskUpdates.forEach(([taskID, time]) => {
@@ -43,20 +43,14 @@ const updateTaskResources = (taskUpdates) => {
 };
 
 export const handleTaskDone = async (taskID) => {
-    let accessToken = get(todoistAccessToken);
     previousFirstDueTask.set(null);
-
-    if (!accessToken) {
-        todoistError.set("No access token found.");
-        throw new Error("No access token found.");
-    }
 
     const fiveMinutesFromNow = DateTime.now().plus({ minutes: 5 });
 
     updateTaskResources([[taskID, fiveMinutesFromNow]]);
 
     try {
-        await markTaskDone(taskID, accessToken);
+        await markTaskDone(taskID);
     } catch (error) {
         todoistError.set(`Failed to mark task done: ${error.message}`);
         return;

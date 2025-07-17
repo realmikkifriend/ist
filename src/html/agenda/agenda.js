@@ -4,11 +4,11 @@ import { toast } from "@zerodevx/svelte-toast";
 import { firstDueTask, previousFirstDueTask } from "../../js/stores";
 import { setFirstDueTask } from "../../js/first";
 
-export const getTasksForDate = (date, todoistResources) => {
+export const getTasksForDate = (date, todoistData) => {
     const startOfDay = date.startOf("day");
     const endOfDay = date.plus({ days: 1 }).startOf("day");
 
-    return todoistResources.items
+    return todoistData.tasks
         .filter((task) => {
             const taskDate = DateTime.fromISO(task.due.date);
             return (

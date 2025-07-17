@@ -163,8 +163,12 @@ export function cleanTodoistData(data) {
                 noteCount,
                 isCollapsed,
                 dayOrder,
+                projectId,
                 ...rest
             } = task;
+            if (projectId !== undefined) {
+                rest.contextId = projectId;
+            }
             return rest;
         });
     }

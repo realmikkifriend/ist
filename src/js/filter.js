@@ -3,7 +3,7 @@ import { getTaskTime } from "./time";
 
 function createContextLookup(contexts) {
     return contexts.reduce((acc, context) => {
-        acc[context.id] = context.child_order;
+        acc[context.id] = context.childOrder;
         return acc;
     }, {});
 }
@@ -14,11 +14,11 @@ function processDueProperties(task, timeZone) {
     }
 
     task.due.extractedTime = getTaskTime(task.due.string);
-    task.due.all_day = task.due.date && !task.due.extractedTime ? 1 : 0;
-    task.due.date_object = DateTime.fromISO(task.due.datetime || task.due.date, {
+    task.due.allDay = task.due.date && !task.due.extractedTime ? 1 : 0;
+    task.due.dateObject = DateTime.fromISO(task.due.datetime || task.due.date, {
         zone: timeZone,
     }).toJSDate();
-    return task.due.date_object < new Date();
+    return task.due.dateObject < new Date();
 }
 
 function filterDueTasks(tasks, timeZone) {
@@ -26,8 +26,8 @@ function filterDueTasks(tasks, timeZone) {
 }
 
 function compareTasks(a, b, contextLookup, timeZone) {
-    const childOrderA = contextLookup[a.context_id] || 0;
-    const childOrderB = contextLookup[b.context_id] || 0;
+    const childOrderA = contextLookup[a.contextId] || 0;
+    const childOrderB = contextLookup[b.contextId] || 0;
     if (childOrderA !== childOrderB) {
         return childOrderA - childOrderB;
     }
@@ -55,16 +55,17 @@ export function filterAndSortDueTasks(tasks, contexts, timeZone) {
 export function getDueTasks(data) {
     const { tasks, contexts, user } = data;
     const timeZone = user?.tz_info?.name || "local";
-    const contextLookup = createContextLookup(contexts);
-
     let filteredTasks;
+
     if (timeZone) {
         filteredTasks = tasks.filter((task) => processDueProperties(task, timeZone));
     }
 
+    const contextLookup = createContextLookup(contexts);
+
     filteredTasks.sort((a, b) => {
-        const childOrderA = contextLookup[a.context_id] || 0;
-        const childOrderB = contextLookup[b.context_id] || 0;
+        const childOrderA = contextLookup[a.contextId] || 0;
+        const childOrderB = contextLookup[b.contextId] || 0;
         if (childOrderA !== childOrderB) {
             return childOrderA - childOrderB;
         }

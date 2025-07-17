@@ -2,14 +2,14 @@
     import { createEventDispatcher } from "svelte";
     import { CalendarIcon, ClockIcon } from "@krowten/svelte-heroicons";
     import { DateTime } from "luxon";
-    import { todoistResources } from "../../js/stores";
+    import { todoistData } from "../../js/stores";
     import { createDateWithTime } from "../../js/time";
     import DatePicker from "./DatePicker.svelte";
     import TimePicker from "./TimePicker.svelte";
     export let task;
 
     let isTimeTabActive;
-    $: isTimeTabActive = task.due.all_day !== 1;
+    $: isTimeTabActive = task.due.allDay !== 1;
 
     const selectTab = (tab) => {
         isTimeTabActive = tab === "time";
@@ -19,7 +19,7 @@
 
     let tasks = [];
 
-    $: tasks = $todoistResources.items;
+    $: tasks = $todoistData.tasks;
 
     const dispatch = createEventDispatcher();
 

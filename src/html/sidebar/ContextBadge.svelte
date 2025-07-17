@@ -1,19 +1,11 @@
 <script>
     import { XMarkIcon } from "@krowten/svelte-heroicons";
     import { updateFirstDueTask } from "../../js/first";
-    import {
-        todoistResources,
-        userSettings,
-        firstDueTask,
-        previousFirstDueTask,
-    } from "../../js/stores";
+    import { todoistData, userSettings, firstDueTask, previousFirstDueTask } from "../../js/stores";
 
-    let resources,
-        selectedContextId,
+    let selectedContextId,
         dueTasksInContext = 0,
         currentContextName = "";
-
-    $: resources = $todoistResources;
 
     $: selectedContextId = $userSettings.selectedContextId;
 
@@ -22,13 +14,13 @@
     }
 
     function filterDueTasksInContext($firstDueTask) {
-        if (resources?.dueTasks && $firstDueTask) {
-            dueTasksInContext = resources.dueTasks.filter(
-                (task) => task.context_id === $firstDueTask.context_id,
+        if ($todoistData?.dueTasks && $firstDueTask) {
+            dueTasksInContext = $todoistData.dueTasks.filter(
+                (task) => task.contextId === $firstDueTask.contextId,
             ).length;
 
             currentContextName =
-                resources.contexts.find((c) => c.id === $firstDueTask.context_id)?.name || "";
+                $todoistData.contexts.find((c) => c.id === $firstDueTask.contextId)?.name || "";
         }
     }
 

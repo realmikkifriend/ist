@@ -1,24 +1,21 @@
 <script>
     import { XCircleIcon, CalendarIcon, ArrowsUpDownIcon } from "@krowten/svelte-heroicons";
-    import { todoistResources, userSettings, previousFirstDueTask } from "../../js/stores";
+    import { todoistData, userSettings, previousFirstDueTask } from "../../js/stores";
     import { getPriorityClasses } from "../../js/classes";
     import { openAgenda } from "../agenda/agenda";
     // import ContextReorderModal from "./ContextReorderModal.svelte";
-
-    let resources;
-    $: resources = $todoistResources;
 
     let dueTasksByContext = {};
 
     $: {
         dueTasksByContext =
-            resources.dueTasks?.length > 0
-                ? resources.dueTasks.reduce((acc, task) => {
-                      const context = acc[task.context_id] || { total: 0, priorities: {} };
+            $todoistData.dueTasks?.length > 0
+                ? $todoistData.dueTasks.reduce((acc, task) => {
+                      const context = acc[task.contextId] || { total: 0, priorities: {} };
                       context.total += 1;
                       context.priorities[task.priority] =
                           (context.priorities[task.priority] || 0) + 1;
-                      acc[task.context_id] = context;
+                      acc[task.contextId] = context;
                       return acc;
                   }, {})
                 : {};
@@ -80,7 +77,7 @@
     </label>
 </div>
 
-{#each resources.contexts as context}
+{#each $todoistData.contexts as context}
     {#if dueTasksByContext[context.id] && dueTasksByContext[context.id].total > 0}
         <button
             class:opacity-25={settings.selectedContextId &&

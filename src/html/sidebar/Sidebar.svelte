@@ -6,6 +6,7 @@
     import {
         todoistAccessToken,
         todoistResources,
+        todoistData,
         todoistError,
         syncToken,
         userSettings,
@@ -15,9 +16,6 @@
 
     export let hash;
 
-    let resources;
-    $: resources = $todoistResources;
-
     let selectedContextId;
     $: selectedContextId = $userSettings.selectedContextId;
 
@@ -25,6 +23,7 @@
         toast.pop(0);
         todoistAccessToken.set("");
         todoistResources.set({});
+        todoistData.set({});
         todoistError.set(null);
         firstDueTask.set(null);
         syncToken.set("*");
@@ -45,7 +44,7 @@
     <div class="drawer-side z-30">
         <label for="my-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
         <ul class="menu min-h-full w-80 bg-base-100 px-4 py-2 text-base-content">
-            {#if resources.contexts}
+            {#if $todoistData.contexts}
                 <Contexts />
             {/if}
 

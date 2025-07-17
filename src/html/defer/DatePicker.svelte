@@ -24,7 +24,7 @@
 
         let soonTasks = tasks.filter((task) => {
             const dueDate = DateTime.fromISO(task.due.date).setZone(tz);
-            return dueDate >= start && dueDate <= end && task.context_id === taskToDefer.context_id;
+            return dueDate >= start && dueDate <= end && task.contextId === taskToDefer.contextId;
         });
 
         const calendarCells = calendarElement.querySelectorAll("td.sdt-cal-td.svelte-hexbpx");

@@ -2,13 +2,7 @@
     import { onMount, onDestroy } from "svelte";
     import { DateTime } from "luxon";
     import { ArrowPathIcon } from "@krowten/svelte-heroicons";
-    import {
-        todoistResources,
-        todoistData,
-        todoistError,
-        userSettings,
-        firstDueTask,
-    } from "../js/stores";
+    import { todoistData, todoistError, userSettings, firstDueTask } from "../js/stores";
     import { updateFirstDueTask } from "../js/first";
     import { refreshData } from "../js/api";
     import { error } from "../js/toasts";
@@ -29,7 +23,6 @@
     $: {
         $userSettings.selectedContextId;
         $todoistData.dueTasks;
-        $todoistResources.dueTasks;
         updateFirstDueTask();
     }
 
@@ -92,7 +85,7 @@
     {#await dataPromise}
         <div class="hero">Loading...</div>
     {:then}
-        {#if $todoistResources.items}
+        {#if $todoistData.tasks}
             {#if $firstDueTask}
                 <Task task={$firstDueTask} on:done={handleDone} on:defer={handleDefer} />
             {:else}

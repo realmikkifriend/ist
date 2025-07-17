@@ -1,6 +1,6 @@
 <script>
     import { DateTime } from "luxon";
-    import { todoistResources } from "../../js/stores";
+    import { todoistData } from "../../js/stores";
     import { getQuarterHourPosition } from "../../js/classes";
     import { markTasks, calculateTaskPosition, calculateTaskStyle } from "./agenda";
     import AgendaTask from "./AgendaTask.svelte";
@@ -10,7 +10,7 @@
     const currentHour = title === "Today" && hour === now.hour;
 
     function getTaskColor(id) {
-        const context = $todoistResources.contexts.find((context) => context.id === id);
+        const context = $todoistData.contexts.find((context) => context.id === id);
         return context?.color || null;
     }
 
@@ -65,7 +65,7 @@
                         : 'brightness(1)'};
     "
                 >
-                    <AgendaTask {task} color={getTaskColor(task.context_id)} />
+                    <AgendaTask {task} color={getTaskColor(task.contextId)} />
                 </div>
             {/each}
         </div>
