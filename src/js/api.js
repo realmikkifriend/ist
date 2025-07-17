@@ -1,7 +1,13 @@
 import { get } from "svelte/store";
 import { v4 as uuidv4 } from "uuid";
 import { TodoistApi } from "@doist/todoist-api-typescript";
-import { todoistAccessToken, todoistResources, syncToken, todoistError } from "./stores";
+import {
+    todoistAccessToken,
+    todoistResources,
+    todoistData,
+    syncToken,
+    todoistError,
+} from "./stores";
 import { filterAndSortDueTasks } from "./filter";
 import { success } from "./toasts";
 import { processTodoistData } from "./process";
