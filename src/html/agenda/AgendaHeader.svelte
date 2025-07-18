@@ -1,5 +1,6 @@
 <script>
     import { XCircleIcon, CalendarIcon, BarsArrowUpIcon } from "@krowten/svelte-heroicons";
+    import { summonTask } from "./agenda";
     import { filterAndSortTasks } from "../../js/filter";
     import { todoistData } from "../../js/stores";
 
@@ -15,7 +16,10 @@
         $todoistData.reverseTasks = filterAndSortTasks(tasksForDate, $todoistData.contexts, {
             reverse: true,
         });
-        console.log($todoistData.reverseTasks);
+
+        if ($todoistData.reverseTasks.length > 0) {
+            summonTask($todoistData.reverseTasks[0], true);
+        }
     }
 
     function closeAgenda() {
