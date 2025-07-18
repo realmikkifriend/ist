@@ -101,8 +101,11 @@ export const calculateTaskStyle = (index, tasks) => {
     return `${marginClass} ${zIndexClass}`;
 };
 
-export function summonTask(task) {
-    if (!task.firstDue) {
+export function summonTask(task, enableSkip = false) {
+    if (!task.firstDue || enableSkip) {
+        if (enableSkip) {
+            task.skip = true;
+        }
         task.summoned = window.location.hash;
         setFirstDueTask(task);
         previousFirstDueTask.set(get(firstDueTask) || null);
