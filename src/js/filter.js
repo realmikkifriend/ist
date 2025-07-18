@@ -18,8 +18,8 @@ export function filterAndSortTasks(tasks, contexts, options = {}) {
     }
 
     filteredTasks.sort((a, b) => {
-        const result = compareTasks(a, b, contextLookup, timeZone);
-        return reverse ? -result : result;
+        const result = compareTasks(a, b, contextLookup, timeZone, reverse);
+        return result;
     });
     return filteredTasks;
 }
@@ -48,15 +48,27 @@ function processDueProperties(task, timeZone) {
     return task.due.dateObject < new Date();
 }
 
-function compareTasks(a, b, contextLookup, timeZone) {
-    const childOrderA = contextLookup[a.contextId] || 0;
-    const childOrderB = contextLookup[b.contextId] || 0;
-    if (childOrderA !== childOrderB) {
-        return childOrderA - childOrderB;
-    }
+function compareTasks(a, b, contextLookup, timeZone, reverse = false) {
+    if (reverse) {
+        if (a.priority !== b.priority) {
+            return a.priority - b.priority;
+        }
 
-    if (b.priority !== a.priority) {
-        return b.priority - a.priority;
+        const childOrderA = contextLookup[a.contextId] || 0;
+        const childOrderB = contextLookup[b.contextId] || 0;
+        if (childOrderA !== childOrderB) {
+            return childOrderB - childOrderA;
+        }
+    } else {
+        const childOrderA = contextLookup[a.contextId] || 0;
+        const childOrderB = contextLookup[b.contextId] || 0;
+        if (childOrderA !== childOrderB) {
+            return childOrderA - childOrderB;
+        }
+
+        if (b.priority !== a.priority) {
+            return b.priority - a.priority;
+        }
     }
 
     if (!timeZone) {
