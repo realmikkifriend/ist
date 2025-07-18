@@ -1,14 +1,21 @@
 <script>
     import { XCircleIcon, CalendarIcon, BarsArrowUpIcon } from "@krowten/svelte-heroicons";
+    import { filterAndSortTasks } from "../../js/filter";
+    import { todoistData } from "../../js/stores";
 
-    export let title, tasks, tasksWithNoTime, todayTasks, headerGradientColor;
+    export let title, tasks, tasksWithNoTime, todayTasks, tasksForDate, headerGradientColor;
+
+    let reverseSortedTasks;
 
     function switchView() {
         window.location.hash = window.location.hash === "#today" ? "#tomorrow" : "#today";
     }
 
     function viewReverseTaskList() {
-        // TODO: Implement functionality
+        $todoistData.reverseTasks = filterAndSortTasks(tasksForDate, $todoistData.contexts, {
+            reverse: true,
+        });
+        console.log($todoistData.reverseTasks);
     }
 
     function closeAgenda() {

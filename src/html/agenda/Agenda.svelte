@@ -142,7 +142,14 @@
 </script>
 
 <div class="mr-4 mt-[-2rem] max-w-lg sm:mx-auto sm:max-w-96" id="agenda">
-    <AgendaHeader {title} {tasks} {tasksWithNoTime} {todayTasks} {headerGradientColor} />
+    <AgendaHeader
+        {title}
+        {tasks}
+        {tasksWithNoTime}
+        {todayTasks}
+        {tasksForDate}
+        {headerGradientColor}
+    />
 
     {#if tasksWithNoTime.length > 0}
         <div class="mb-4 flex w-full flex-col items-center pl-[4.5rem] pr-2">
