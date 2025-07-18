@@ -43,7 +43,7 @@
             : { tasks: [], tasksWithNoTime: [] });
 
         if (tasksWithNoTime.length > 2) {
-            tasksWithNoTime = filterAndSortTasks(tasksWithNoTime, $todoistData.contexts, false);
+            tasksWithNoTime = filterAndSortTasks(tasksWithNoTime, $todoistData.contexts);
         }
 
         if (title === "Today") {

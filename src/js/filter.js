@@ -5,18 +5,23 @@ export function getDueTasks(data) {
     const { tasks, contexts, user } = data;
     const timeZone = user?.tz_info?.name || "local";
 
-    return filterAndSortTasks(tasks, contexts, timeZone);
+    return filterAndSortTasks(tasks, contexts, { timeZone });
 }
 
-export function filterAndSortTasks(tasks, contexts, timeZone) {
+export function filterAndSortTasks(tasks, contexts, options = {}) {
+    const { timeZone, reverse = false } = options;
     const contextLookup = createContextLookup(contexts);
 
+    let filteredTasks = tasks;
     if (timeZone) {
-        tasks = filterDueTasks(tasks, timeZone);
+        filteredTasks = filterDueTasks(filteredTasks, timeZone);
     }
 
-    tasks.sort((a, b) => compareTasks(a, b, contextLookup, timeZone));
-    return tasks;
+    filteredTasks.sort((a, b) => {
+        const result = compareTasks(a, b, contextLookup, timeZone);
+        return reverse ? -result : result;
+    });
+    return filteredTasks;
 }
 
 function createContextLookup(contexts) {
