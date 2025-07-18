@@ -1,7 +1,7 @@
 <script>
     import { XMarkIcon } from "@krowten/svelte-heroicons";
-    import { updateFirstDueTask } from "../../js/first";
-    import { todoistData, userSettings, firstDueTask, previousFirstDueTask } from "../../js/stores";
+    import { handleBadgeClick } from "./sidebar.js";
+    import { todoistData, userSettings, firstDueTask } from "../../js/stores";
 
     let selectedContextId,
         dueTasksInContext = 0,
@@ -23,27 +23,6 @@
                 $todoistData.contexts.find((c) => c.id === $firstDueTask.contextId)?.name || "";
         }
     }
-
-    function clearSelectedContextId() {
-        previousFirstDueTask.set(null);
-        userSettings.update((settings) => ({ ...settings, selectedContextId: null }));
-    }
-
-    function handleClick() {
-        if ($firstDueTask?.summoned) {
-            window.location.hash = $firstDueTask.summoned;
-
-            $firstDueTask.summoned = false;
-            if ($firstDueTask.skip) {
-                delete $firstDueTask.skip;
-                todoistData.update((data) => ({ ...data, reverseTasks: [] }));
-            }
-
-            updateFirstDueTask();
-        } else if (selectedContextId) {
-            clearSelectedContextId();
-        }
-    }
 </script>
 
 <button
@@ -57,7 +36,7 @@
            {selectedContextId ? 'text-primary' : ''} 
            {$firstDueTask?.summoned ? 'border-purple-400 text-purple-400' : ''}
            {$firstDueTask?.skip ? 'border-yellow-500 text-yellow-500' : ''}"
-    on:click={handleClick}
+    on:click={handleBadgeClick}
 >
     {#if $firstDueTask?.skip}
         low priority, defer?
