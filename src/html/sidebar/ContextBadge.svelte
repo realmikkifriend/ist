@@ -35,9 +35,7 @@
 
             $firstDueTask.summoned = false;
             if ($firstDueTask.skip) {
-                // Remove skip property
                 delete $firstDueTask.skip;
-                // Clear todoistData.reverseTasks
                 todoistData.update((data) => ({ ...data, reverseTasks: [] }));
             }
 
