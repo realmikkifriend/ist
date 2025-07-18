@@ -8,15 +8,18 @@ export const getTasksForDate = (date, todoistData) => {
     const startOfDay = date.startOf("day");
     const endOfDay = date.plus({ days: 1 }).startOf("day");
 
-    return todoistData.tasks
-        .filter((task) => {
-            const taskDate = DateTime.fromISO(task.due.date);
-            return (
-                task.due &&
-                taskDate.toMillis() >= startOfDay.toMillis() &&
-                taskDate.toMillis() < endOfDay.toMillis()
-            );
-        })
+    return todoistData.tasks.filter((task) => {
+        const taskDate = DateTime.fromISO(task.due.date);
+        return (
+            task.due &&
+            taskDate.toMillis() >= startOfDay.toMillis() &&
+            taskDate.toMillis() < endOfDay.toMillis()
+        );
+    });
+};
+
+export const sortAgendaTasks = (tasks) => {
+    return tasks
         .sort((a, b) => {
             const timeA = DateTime.fromISO(a.due.date).toMillis();
             const timeB = DateTime.fromISO(b.due.date).toMillis();

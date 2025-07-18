@@ -6,11 +6,12 @@
     import { DateTime } from "luxon";
     import { todoistData } from "../../js/stores";
     import { filterAndSortTasks } from "../../js/filter";
-    import { getTasksForDate } from "./agenda";
+    import { getTasksForDate, sortAgendaTasks } from "./agenda";
     import AgendaTask from "./AgendaTask.svelte";
 
     let title = "";
     let tasks,
+        tasksForDate,
         tasksWithNoTime,
         todayTasks = [];
     let hourSlots = Array.from({ length: 18 }, (_, i) => i + 6);
@@ -33,14 +34,18 @@
                   : null;
 
         if (window.location.hash === "#tomorrow") {
-            const tasksForTomorrow = getTasksForDate(now, $todoistData);
+            tasksForDate = getTasksForDate(now, $todoistData);
+            const tasksForTomorrow = sortAgendaTasks(tasksForDate);
 
             todayTasks = [...tasksForTomorrow.tasksWithNoTime, ...tasksForTomorrow.tasks];
         }
 
-        ({ tasksWithNoTime, tasks } = targetDate
-            ? getTasksForDate(targetDate, $todoistData)
-            : { tasks: [], tasksWithNoTime: [] });
+        if (targetDate) {
+            tasksForDate = getTasksForDate(targetDate, $todoistData);
+            ({ tasksWithNoTime, tasks } = sortAgendaTasks(tasksForDate));
+        } else {
+            tasksForDate = tasksWithNoTime = tasks = [];
+        }
 
         if (tasksWithNoTime.length > 2) {
             tasksWithNoTime = filterAndSortTasks(tasksWithNoTime, $todoistData.contexts);
