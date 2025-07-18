@@ -5,17 +5,25 @@ import { getDueTasks } from "./filter";
 import { success } from "./toasts";
 import { cleanTodoistData } from "./process";
 
-const CONTENT_TYPE = "application/x-www-form-urlencoded";
-const accessToken = get(todoistAccessToken);
+let accessToken;
+let api;
 
-const api = new TodoistApi(accessToken);
+function initializeApi() {
+    accessToken = get(todoistAccessToken);
+    if (accessToken) {
+        api = new TodoistApi(accessToken);
+    } else {
+        api = null;
+    }
+}
 
 export async function refreshData() {
-    let error = null;
-
+    initializeApi();
     if (!accessToken) {
         return setErrorState("No access token found.", {});
     }
+
+    let error = null;
 
     try {
         try {
@@ -52,10 +60,20 @@ export function setErrorState(error) {
 }
 
 export async function markTaskDone(taskID) {
+    initializeApi();
+    if (!accessToken) {
+        return setErrorState("No access token found.", {});
+    }
+
     return await api.closeTask(taskID);
 }
 
 export async function deferTasks(taskTimePairs) {
+    initializeApi();
+    if (!accessToken) {
+        return setErrorState("No access token found.", {});
+    }
+
     const updatePromises = taskTimePairs.map(([task, time]) => {
         const formattedDate = formatTaskDate(time);
         return api.updateTask(task.id, {
@@ -83,6 +101,7 @@ export async function deferTasks(taskTimePairs) {
 // }
 
 async function getEndpoint(endpoint, accessToken, params = {}) {
+    const CONTENT_TYPE = "application/x-www-form-urlencoded";
     const response = await fetch(`https://api.todoist.com/api/v1/${endpoint}`, {
         method: "POST",
         headers: {
