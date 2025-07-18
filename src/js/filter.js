@@ -59,6 +59,10 @@ function compareTasks(a, b, contextLookup, timeZone) {
         return b.priority - a.priority;
     }
 
+    if (!timeZone) {
+        return 0;
+    }
+
     const dateA = DateTime.fromISO(a.due.datetime || a.due.date, { zone: timeZone }).toJSDate();
     const dateB = DateTime.fromISO(b.due.datetime || b.due.date, { zone: timeZone }).toJSDate();
     return dateA - dateB;
