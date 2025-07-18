@@ -6,8 +6,6 @@
 
     export let title, tasks, tasksWithNoTime, todayTasks, tasksForDate, headerGradientColor;
 
-    let reverseSortedTasks;
-
     function switchView() {
         window.location.hash = window.location.hash === "#today" ? "#tomorrow" : "#today";
     }
