@@ -49,31 +49,19 @@ function processDueProperties(task, timeZone) {
 }
 
 function compareTasks(a, b, contextLookup, timeZone, reverse = false) {
-    if (reverse) {
-        if (a.priority !== b.priority) {
-            return a.priority - b.priority;
-        }
+    const [first, second] = reverse ? [a, b] : [b, a];
 
-        const childOrderA = contextLookup[a.contextId] || 0;
-        const childOrderB = contextLookup[b.contextId] || 0;
-        if (childOrderA !== childOrderB) {
-            return childOrderB - childOrderA;
-        }
-    } else {
-        const childOrderA = contextLookup[a.contextId] || 0;
-        const childOrderB = contextLookup[b.contextId] || 0;
-        if (childOrderA !== childOrderB) {
-            return childOrderA - childOrderB;
-        }
-
-        if (b.priority !== a.priority) {
-            return b.priority - a.priority;
-        }
+    if (first.priority !== second.priority) {
+        return first.priority - second.priority;
     }
 
-    if (!timeZone) {
-        return 0;
+    const orderA = contextLookup[a.contextId] || 0;
+    const orderB = contextLookup[b.contextId] || 0;
+    if (orderA !== orderB) {
+        return reverse ? orderB - orderA : orderA - orderB;
     }
+
+    if (!timeZone) return 0;
 
     const dateA = DateTime.fromISO(a.due.datetime || a.due.date, { zone: timeZone }).toJSDate();
     const dateB = DateTime.fromISO(b.due.datetime || b.due.date, { zone: timeZone }).toJSDate();
