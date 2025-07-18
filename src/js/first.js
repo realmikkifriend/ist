@@ -2,6 +2,7 @@ import { get } from "svelte/store";
 import { toast } from "@zerodevx/svelte-toast";
 import { success, newFirstTask } from "./toasts";
 import { todoistData, userSettings, firstDueTask, previousFirstDueTask } from "../js/stores";
+import { getTaskComments } from "../js/api";
 import FirstDueTaskToast from "../html/FirstDueTaskToast.svelte";
 
 export const setFirstDueTask = (task) => {
@@ -25,7 +26,12 @@ const updateDueTasks = (dueTasks, contextId) => {
     return dueTasks;
 };
 
-export const updateFirstDueTask = () => {
+const loadComments = async (taskId) => {
+    const comments = (await getTaskComments(taskId))?.results || [];
+    return comments;
+};
+
+export const updateFirstDueTask = async () => {
     const $todoistData = get(todoistData);
     if (!$todoistData?.dueTasks?.length) {
         setFirstDueTask(null);
@@ -38,6 +44,9 @@ export const updateFirstDueTask = () => {
     let dueTasks = updateDueTasks($todoistData.dueTasks, contextId);
 
     const newTask = dueTasks[0];
+
+    const comments = await loadComments(newTask.id);
+    newTask.comments = comments;
 
     if (
         prevTask &&

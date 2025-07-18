@@ -49,10 +49,8 @@
             </div>
         </div>
     </div>
-    {#if task.notes?.length}
-        {#key task.id}
-            <Comments comments={task.notes} />
-        {/key}
+    {#if task.comments}
+        <Comments comments={task.comments} />
     {/if}
 </div>
 

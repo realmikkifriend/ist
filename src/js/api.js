@@ -59,6 +59,20 @@ export function setErrorState(error) {
     return { status: "error", error };
 }
 
+export async function getTaskComments(taskId) {
+    initializeApi();
+    if (!accessToken) {
+        return setErrorState("No access token found.", {});
+    }
+
+    try {
+        const comments = await api.getComments({ taskId });
+        return comments;
+    } catch (error) {
+        return setErrorState(error.message, {});
+    }
+}
+
 export async function markTaskDone(taskID) {
     initializeApi();
     if (!accessToken) {

@@ -87,7 +87,9 @@
     {:then}
         {#if $todoistData.tasks}
             {#if $firstDueTask}
-                <Task task={$firstDueTask} on:done={handleDone} on:defer={handleDefer} />
+                {#key $firstDueTask}
+                    <Task task={$firstDueTask} on:done={handleDone} on:defer={handleDefer} />
+                {/key}
             {:else}
                 <NoTasks />
             {/if}
