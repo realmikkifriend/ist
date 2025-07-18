@@ -3,10 +3,8 @@
     import { CheckIcon, CalendarIcon, ClockIcon, ForwardIcon } from "@krowten/svelte-heroicons";
     import DeferModal from "../defer/DeferModal.svelte";
     import Comments from "./Comments.svelte";
-    import { handleBadgeClick } from "../sidebar/sidebar";
     import { getPriorityBorder } from "../../js/classes";
-    import { todoistData } from "../../js/stores";
-    import { summonTask } from "../agenda/agenda";
+    import { skipTask } from "../../js/first";
 
     export let task;
 
@@ -25,14 +23,7 @@
     };
 
     const handleSkip = () => {
-        const reverseTasks = $todoistData.reverseTasks;
-        const currentIndex = reverseTasks.findIndex((t) => t.id === task.id);
-        const nextIndex = currentIndex + 1;
-        if (nextIndex < reverseTasks.length) {
-            summonTask(reverseTasks[nextIndex], true);
-        } else {
-            handleBadgeClick();
-        }
+        skipTask(task);
     };
 </script>
 

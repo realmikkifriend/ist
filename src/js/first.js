@@ -4,6 +4,8 @@ import { success, newFirstTask } from "./toasts";
 import { todoistData, userSettings, firstDueTask, previousFirstDueTask } from "../js/stores";
 import { getTaskComments } from "../js/api";
 import FirstDueTaskToast from "../html/FirstDueTaskToast.svelte";
+import { summonTask } from "../html/agenda/agenda";
+import { handleBadgeClick } from "../html/sidebar/sidebar";
 
 export const setFirstDueTask = (task) => {
     firstDueTask.set(task);
@@ -29,6 +31,18 @@ const updateDueTasks = (dueTasks, contextId) => {
 const loadComments = async (taskId) => {
     const comments = (await getTaskComments(taskId))?.results || [];
     return comments;
+};
+
+export const skipTask = (task) => {
+    const $todoistData = get(todoistData);
+    const reverseTasks = $todoistData.reverseTasks;
+    const currentIndex = reverseTasks.findIndex((t) => t.id === task.id);
+    const nextIndex = currentIndex + 1;
+    if (nextIndex < reverseTasks.length) {
+        summonTask(reverseTasks[nextIndex], true);
+    } else {
+        handleBadgeClick();
+    }
 };
 
 export const updateFirstDueTask = async () => {
