@@ -106,7 +106,9 @@ export function summonTask(task, enableSkip = false) {
         if (enableSkip) {
             task.skip = true;
         }
-        task.summoned = window.location.hash;
+        const currentFirstDueSummoned = get(firstDueTask)?.summoned;
+        task.summoned = currentFirstDueSummoned || window.location.hash;
+
         setFirstDueTask(task);
         previousFirstDueTask.set(get(firstDueTask) || null);
     }
