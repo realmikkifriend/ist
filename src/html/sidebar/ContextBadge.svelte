@@ -34,6 +34,13 @@
             window.location.hash = $firstDueTask.summoned;
 
             $firstDueTask.summoned = false;
+            if ($firstDueTask.skip) {
+                // Remove skip property
+                delete $firstDueTask.skip;
+                // Clear todoistData.reverseTasks
+                todoistData.update((data) => ({ ...data, reverseTasks: [] }));
+            }
+
             updateFirstDueTask();
         } else if (selectedContextId) {
             clearSelectedContextId();
@@ -50,10 +57,13 @@
           : ''} 
            {selectedContextId ? 'opacity-75' : 'opacity-40'}
            {selectedContextId ? 'text-primary' : ''} 
-           {$firstDueTask?.summoned ? 'border-purple-400 text-purple-400' : ''}"
+           {$firstDueTask?.summoned ? 'border-purple-400 text-purple-400' : ''}
+           {$firstDueTask?.skip ? 'border-yellow-500 text-yellow-500' : ''}"
     on:click={handleClick}
 >
-    {#if $firstDueTask?.summoned}
+    {#if $firstDueTask?.skip}
+        low priority, defer?
+    {:else if $firstDueTask?.summoned}
         summoned task
     {:else}
         {dueTasksInContext} left in {currentContextName}
