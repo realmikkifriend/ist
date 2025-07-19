@@ -1,31 +1,13 @@
 <script>
     import { Bars3Icon, ArrowLeftOnRectangleIcon } from "@krowten/svelte-heroicons";
-    import { toast } from "@zerodevx/svelte-toast";
     import Contexts from "./Contexts.svelte";
     import Footer from "../Footer.svelte";
-    import {
-        todoistAccessToken,
-        todoistData,
-        todoistError,
-        userSettings,
-        dynalistAccessToken,
-        firstDueTask,
-    } from "../../js/stores";
+    import { todoistData, userSettings, handleLogout } from "../../js/stores";
 
     export let hash;
 
     let selectedContext;
     $: selectedContext = $userSettings.selectedContext;
-
-    function handleLogout() {
-        toast.pop(0);
-        todoistAccessToken.set("");
-        todoistData.set({});
-        todoistError.set(null);
-        firstDueTask.set(null);
-        userSettings.set({ selectedContext: null });
-        dynalistAccessToken.set("");
-    }
 </script>
 
 <div class="drawer">
