@@ -1,4 +1,5 @@
 <script>
+    import { writable } from "svelte/store";
     import Markdown from "svelte-exmarkdown";
     import { ArrowPathIcon } from "@krowten/svelte-heroicons";
     import DynalistChecklist from "./DynalistChecklist.svelte";
@@ -11,23 +12,31 @@
 
     export let url, accessToken;
 
-    let selectedType = "";
+    const dynalistStore = writable({
+        dynalistObject: undefined,
+        selectedType: "",
+        error: undefined,
+    });
 
     const loadPromise = loadDynalistComment(url, accessToken).then(
         ({ dynalistObject: obj, selectedType: type, error: err }) => {
             if (err) {
-                error(`Dynalist retrieval/processing error: ${err}`);
-                console.error("Dynalist retrieval/processing error:", err);
-                return { dynalistObject: undefined, selectedType: "", error: err };
+                const errorMsg = `Dynalist retrieval/processing error: ${err}`;
+                error(errorMsg);
+                console.error(errorMsg);
+                const errorState = { dynalistObject: undefined, selectedType: "", error: err };
+                dynalistStore.set(errorState);
+                return errorState;
             } else {
-                return { dynalistObject: obj, selectedType: type, error: undefined };
+                const newState = { dynalistObject: obj, selectedType: type, error: undefined };
+                dynalistStore.set(newState);
+                return newState;
             }
         },
     );
 
-    function handleTypeSelection(event) {
-        selectedType = event.detail.type;
-    }
+    const handleTypeSelection = ({ detail: { type } }) =>
+        dynalistStore.update((state) => ({ ...state, selectedType: type }));
 </script>
 
 {#await loadPromise}
@@ -37,30 +46,39 @@
 {:then result}
     {#if result.dynalistObject}
         <div class="relative">
-            {#if selectedType === ""}
+            {#if $dynalistStore.selectedType === ""}
                 {@html (() => {
-                    selectedType = result.selectedType;
+                    dynalistStore.update((state) => ({
+                        ...state,
+                        selectedType: result.selectedType,
+                    }));
                     return "";
                 })()}
             {/if}
 
-            {#if selectedType === "read"}
+            {#if $dynalistStore.selectedType === "read"}
                 <Markdown
-                    md={generateDynalistComment(result.dynalistObject) ||
+                    md={generateDynalistComment($dynalistStore.dynalistObject) ||
                         "Unsupported format, but stay tuned."}
                 />
-            {:else if selectedType === "checklist"}
-                <DynalistChecklist content={generateDynalistComment(result.dynalistObject)} />
-            {:else if selectedType === "count"}
-                <DynalistCount content={result.dynalistObject} />
-            {:else if selectedType === "rotating"}
-                <DynalistRotating content={result.dynalistObject} />
-            {:else if selectedType === "crossoff"}
-                <DynalistCrossOff content={result.dynalistObject} />
+            {:else if $dynalistStore.selectedType === "checklist"}
+                <DynalistChecklist
+                    content={generateDynalistComment($dynalistStore.dynalistObject)}
+                />
+            {:else if $dynalistStore.selectedType === "count"}
+                <DynalistCount content={$dynalistStore.dynalistObject} />
+            {:else if $dynalistStore.selectedType === "rotating"}
+                <DynalistRotating content={$dynalistStore.dynalistObject} />
+            {:else if $dynalistStore.selectedType === "crossoff"}
+                <DynalistCrossOff content={$dynalistStore.dynalistObject} />
             {/if}
 
-            {#key selectedType}
-                <DynalistTypeMenu {selectedType} {url} on:selectType={handleTypeSelection} />
+            {#key $dynalistStore.selectedType}
+                <DynalistTypeMenu
+                    selectedType={$dynalistStore.selectedType}
+                    {url}
+                    on:selectType={handleTypeSelection}
+                />
             {/key}
         </div>
     {:else}
