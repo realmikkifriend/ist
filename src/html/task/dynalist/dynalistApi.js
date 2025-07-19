@@ -1,12 +1,6 @@
 import { get } from "svelte/store";
 import { dynalistAccessToken } from "../../../js/stores";
 
-/**
- * Fetches a Dynalist document by URL and access token.
- * @param {string} url
- * @param {string} accessToken
- * @returns {Promise<{data: any, dynalistSubItem: string, error?: Error}>}
- */
 export async function fetchDynalistDocument(url, accessToken) {
     const lastIndex = url.lastIndexOf("/"),
         hashIndex = url.indexOf("#z=", lastIndex),
@@ -33,12 +27,6 @@ export async function fetchDynalistDocument(url, accessToken) {
     return { data, dynalistSubItem };
 }
 
-/**
- * Updates a Dynalist document.
- * @param {string} file_id
- * @param {Array} changes
- * @returns {Promise<{error: boolean, data?: any, message?: string}>}
- */
 export async function updateDynalist(file_id, changes) {
     const payload = {
         token: get(dynalistAccessToken),
@@ -58,4 +46,28 @@ export async function updateDynalist(file_id, changes) {
     return response.ok
         ? { error: false, data }
         : { error: true, message: "Network response was not ok" };
+}
+
+export async function handleToken(token) {
+    if (!/^[a-zA-Z0-9_]+$/.test(token)) {
+        return { success: false, error: "Invalid token format" };
+    }
+    return fetch("https://dynalist.io/api/v1/pref/get", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token, key: "inbox_location" }),
+    })
+        .then((response) => response.json().then((result) => ({ response, result })))
+        .then(({ response, result }) => {
+            if (response.ok && result._code !== "InvalidToken") {
+                return { success: true };
+            } else {
+                console.error("API request failed:", result);
+                return { success: false, error: "Invalid token" };
+            }
+        })
+        .catch((error) => {
+            console.error("Network or other error:", error);
+            return { success: false, error: "Network or other error" };
+        });
 }

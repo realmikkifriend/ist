@@ -3,6 +3,7 @@
     import { dynalistAccessToken } from "../../../js/stores";
     import { success } from "../../../js/toasts";
     import { getDynalistLogo } from "../../../js/logos";
+    import { handleToken as validateDynalistToken } from "./dynalistApi";
 
     let tempToken = "";
     let isSubmitting = false;
@@ -13,31 +14,14 @@
         isSubmitting = true;
         isTokenInvalid = false;
 
-        if (/^[a-zA-Z0-9_]+$/.test(tempToken)) {
-            try {
-                const response = await fetch("https://dynalist.io/api/v1/pref/get", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ token: tempToken, key: "inbox_location" }),
-                });
-                const result = await response.json();
-                if (response.ok && result._code !== "InvalidToken") {
-                    success("Dynalist access token set!");
-                    dynalistAccessToken.set(tempToken);
-                } else {
-                    console.error("API request failed:", result);
-                    isTokenInvalid = true;
-                }
-            } catch (error) {
-                console.error("Network or other error:", error);
-                isTokenInvalid = true;
-            } finally {
-                isSubmitting = false;
-            }
+        const result = await validateDynalistToken(tempToken);
+        if (result.success) {
+            success("Dynalist access token set!");
+            dynalistAccessToken.set(tempToken);
         } else {
-            isSubmitting = false;
             isTokenInvalid = true;
         }
+        isSubmitting = false;
     }
 </script>
 
