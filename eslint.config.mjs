@@ -8,8 +8,10 @@ export default defineConfig([
     { files: ["**/*.js"], languageOptions: { sourceType: "module" } },
     { files: ["**/*.{js,mjs,cjs}"], languageOptions: { globals: globals.browser } },
     functional.configs.externalVanillaRecommended,
-    functional.configs.recommended,
-    functional.configs.stylistic,
+    // functional.configs.recommended,
+    // functional.configs.strict,
+    // functional.configs.stylistic,
+    functional.configs.all,
     functional.configs.disableTypeChecked,
     {
         rules: {},
