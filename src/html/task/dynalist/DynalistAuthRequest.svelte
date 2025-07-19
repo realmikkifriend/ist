@@ -3,25 +3,37 @@
     import { dynalistAccessToken } from "../../../js/stores";
     import { success } from "../../../js/toasts";
     import { getDynalistLogo } from "../../../js/logos";
-    import { handleToken as validateDynalistToken } from "./dynalistApi";
-
-    let tempToken = "";
-    let isSubmitting = false;
-    let isTokenInvalid = false;
+    import { validateDynalistToken } from "./dynalistApi";
 
     async function handleToken(event) {
         event.preventDefault();
-        isSubmitting = true;
-        isTokenInvalid = false;
+
+        const form = event.target;
+        const tempToken = form.elements.token.value;
+
+        const submitBtn = form.querySelector("button[type='submit']");
+        if (submitBtn) submitBtn.disabled = true;
+
+        const spinner = form.querySelector(".spinner");
+        if (spinner) spinner.style.display = "inline-block";
+
+        const submitContent = form.querySelector(".submit-content");
+        if (submitContent) submitContent.style.display = "none";
+
+        const invalidToken = form.parentElement.querySelector(".invalid-token");
+        if (invalidToken) invalidToken.style.display = "none";
 
         const result = await validateDynalistToken(tempToken);
         if (result.success) {
             success("Dynalist access token set!");
             dynalistAccessToken.set(tempToken);
         } else {
-            isTokenInvalid = true;
+            if (invalidToken) invalidToken.style.display = "block";
         }
-        isSubmitting = false;
+
+        if (submitBtn) submitBtn.disabled = false;
+        if (spinner) spinner.style.display = "none";
+        if (submitContent) submitContent.style.display = "flex";
     }
 </script>
 
@@ -33,26 +45,25 @@
                 href="https://dynalist.io/developer"
                 class="href text-blue-500 hover:underline">Dynalist access</a
             >
-            {#if isTokenInvalid}
-                <p class="text-red-500">Invalid token</p>
-            {/if}
+            <p class="invalid-token text-red-500" style="display:none;">Invalid token</p>
         </div>
     </div>
-    {#if !isSubmitting}
-        <form class="flex gap-2" on:submit={handleToken}>
-            <input
-                type="text"
-                placeholder="Enter your token"
-                class="input min-w-4 flex-grow"
-                bind:value={tempToken}
-            />
+    <form class="flex gap-2" on:submit={handleToken}>
+        <input
+            type="text"
+            name="token"
+            placeholder="Enter your token"
+            class="input min-w-4 flex-grow"
+        />
+        <span class="submit-content" style="display:flex;">
             <button
                 type="submit"
                 class="btn flex-grow-0 bg-primary text-white hover:bg-primary hover:opacity-75"
                 ><KeyIcon class="h-5 w-5" /></button
             >
-        </form>
-    {:else}
-        <ArrowPathIcon class="h-6 w-6 animate-spin" />
-    {/if}
+        </span>
+        <span class="spinner" style="display:none;">
+            <ArrowPathIcon class="h-6 w-6 animate-spin" />
+        </span>
+    </form>
 </div>

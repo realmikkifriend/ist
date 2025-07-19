@@ -48,7 +48,7 @@ export async function updateDynalist(file_id, changes) {
         : { error: true, message: "Network response was not ok" };
 }
 
-export async function handleToken(token) {
+export async function validateDynalistToken(token) {
     if (!/^[a-zA-Z0-9_]+$/.test(token)) {
         return { success: false, error: "Invalid token format" };
     }
