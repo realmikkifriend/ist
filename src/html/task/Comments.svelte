@@ -1,18 +1,13 @@
 <script>
-    import { onMount } from "svelte";
     import Markdown from "svelte-exmarkdown";
     import DynalistComment from "./dynalist/DynalistComment.svelte";
     import DynalistAuthRequest from "./dynalist/DynalistAuthRequest.svelte";
     import { dynalistAccessToken } from "../../js/stores";
     export let comments;
 
-    let requiresAuthRequest = false;
-
-    onMount(() => {
-        requiresAuthRequest = comments.some((comment) =>
-            comment.content.startsWith("https://dynalist.io/d/"),
-        );
-    });
+    $: requiresAuthRequest = comments.some((comment) =>
+        comment.content.startsWith("https://dynalist.io/d/"),
+    );
 </script>
 
 <div class="prose mx-auto w-11/12 rounded-b-xl bg-accent p-4 text-primary-content">
