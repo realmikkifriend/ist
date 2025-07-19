@@ -23,8 +23,6 @@ export async function refreshData() {
         return setErrorState("No access token found.", {});
     }
 
-    let error = null;
-
     try {
         try {
             const [tasksResponse, projectsResponse, userResponse] = await Promise.all([
@@ -48,7 +46,7 @@ export async function refreshData() {
 
         success("Todoist data updated!");
 
-        return { status: "success", error };
+        return { status: "success", error: null };
     } catch (err) {
         return setErrorState(err.message, {});
     }
