@@ -55,7 +55,7 @@ export const updateFirstDueTask = async () => {
     const contextId = get(userSettings).selectedContextId;
     const prevTask = get(previousFirstDueTask);
 
-    let dueTasks = updateDueTasks($todoistData.dueTasks, contextId);
+    const dueTasks = updateDueTasks($todoistData.dueTasks, contextId);
 
     const newTask = dueTasks[0];
 
