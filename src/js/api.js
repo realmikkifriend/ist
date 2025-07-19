@@ -5,20 +5,14 @@ import { getDueTasks } from "./filter";
 import { success } from "./toasts";
 import { cleanTodoistData } from "./process";
 
-let accessToken;
-let api;
-
 function initializeApi() {
-    accessToken = get(todoistAccessToken);
-    if (accessToken) {
-        api = new TodoistApi(accessToken);
-    } else {
-        api = null;
-    }
+    const accessToken = get(todoistAccessToken);
+    const api = accessToken ? new TodoistApi(accessToken) : null;
+    return { accessToken, api };
 }
 
 export async function refreshData() {
-    initializeApi();
+    const { accessToken, api } = initializeApi();
     if (!accessToken) {
         return setErrorState("No access token found.", {});
     }
@@ -58,7 +52,7 @@ export function setErrorState(error) {
 }
 
 export async function getTaskComments(taskId) {
-    initializeApi();
+    const { accessToken, api } = initializeApi();
     if (!accessToken) {
         return setErrorState("No access token found.", {});
     }
@@ -72,7 +66,7 @@ export async function getTaskComments(taskId) {
 }
 
 export async function markTaskDone(taskID) {
-    initializeApi();
+    const { accessToken, api } = initializeApi();
     if (!accessToken) {
         return setErrorState("No access token found.", {});
     }
@@ -81,7 +75,7 @@ export async function markTaskDone(taskID) {
 }
 
 export async function deferTasks(taskTimePairs) {
-    initializeApi();
+    const { accessToken, api } = initializeApi();
     if (!accessToken) {
         return setErrorState("No access token found.", {});
     }
