@@ -1,43 +1,69 @@
 const createButtons = () => {
-    const buttons = [
-        {
-            text: `tomorrow`,
+    const buttonConfig = {
+        tomorrow: {
+            text: "tomorrow",
             ms: 0,
             styling: "basis-full",
             stylingButton: "h-6 bg-blue-900",
         },
-        { text: "1 minute", ms: 60 * 1000, styling: "basis-[48.5%]", stylingButton: "h-5" },
-        { text: "3 minutes", ms: 3 * 60 * 1000, styling: "basis-[48.5%]", stylingButton: "h-5" },
-        { text: "10 minutes", ms: 10 * 60 * 1000, styling: "basis-[48.5%]", stylingButton: "h-6" },
-        { text: "15 minutes", ms: 15 * 60 * 1000, styling: "basis-[48.5%]", stylingButton: "h-6" },
-        { text: "30 minutes", ms: 30 * 60 * 1000, styling: "basis-[48.5%]", stylingButton: "h-7" },
-        { text: "45 minutes", ms: 45 * 60 * 1000, styling: "basis-[48.5%]", stylingButton: "h-7" },
-        { text: "1 hour", ms: 60 * 60 * 1000, styling: "basis-[48.5%]", stylingButton: "h-7" },
-        { text: "90 minutes", ms: 90 * 60 * 1000, styling: "basis-[48.5%]", stylingButton: "h-7" },
-        { text: "2 hrs", ms: 2 * 60 * 60 * 1000, styling: "basis-[22.75%]", stylingButton: "h-7" },
-        { text: "3 hrs", ms: 3 * 60 * 60 * 1000, styling: "basis-[22.75%]", stylingButton: "h-7" },
-        { text: "4 hrs", ms: 4 * 60 * 60 * 1000, styling: "basis-[22.75%]", stylingButton: "h-7" },
-        { text: "6 hrs", ms: 6 * 60 * 60 * 1000, styling: "basis-[22.75%]", stylingButton: "h-7" },
-        { text: "8 hrs", ms: 8 * 60 * 60 * 1000, styling: "basis-[22.75%]", stylingButton: "h-7" },
-        {
-            text: "12 hrs",
-            ms: 12 * 60 * 60 * 1000,
-            styling: "basis-[22.75%]",
-            stylingButton: "h-7",
-        },
-        {
-            text: "18 hrs",
-            ms: 18 * 60 * 60 * 1000,
-            styling: "basis-[22.75%]",
-            stylingButton: "h-7",
-        },
-        {
-            text: "24 hrs",
-            ms: 24 * 60 * 60 * 1000,
-            styling: "basis-[22.75%]",
-            stylingButton: "h-7",
-        },
+
+        minutes: [
+            { value: 1, height: "h-5" },
+            { value: 3, height: "h-5" },
+            { value: 10, height: "h-6" },
+            { value: 15, height: "h-6" },
+            { value: 30, height: "h-7" },
+            { value: 45, height: "h-7" },
+        ],
+    };
+
+    const baseStyling = "basis-[22.75%]";
+    const largeStyling = "basis-[48.5%]";
+
+    const hoursValues = [
+        { value: 1, text: "1 hour", styling: largeStyling },
+        { value: 1.5, text: "90 minutes", styling: largeStyling },
+        { value: 2 },
+        { value: 3 },
+        { value: 4 },
+        { value: 6 },
+        { value: 8 },
+        { value: 12 },
+        { value: 18 },
+        { value: 24 },
     ];
+
+    buttonConfig.hours = hoursValues.map((item) => ({
+        value: item.value,
+        text: item.text || undefined,
+        height: "h-7",
+        styling: item.styling || baseStyling,
+    }));
+
+    const buttons = [];
+
+    buttons.push(buttonConfig.tomorrow);
+
+    buttonConfig.minutes.forEach(({ value, height }) => {
+        buttons.push({
+            text: `${value} minute${value > 1 ? "s" : ""}`,
+            ms: value * 60 * 1000,
+            styling: "basis-[48.5%]",
+            stylingButton: height,
+        });
+    });
+
+    buttonConfig.hours.forEach(({ value, text, height, styling }) => {
+        const displayText = text || `${value} hrs`;
+        const buttonStyling = styling || "basis-[22.75%]";
+
+        buttons.push({
+            text: displayText,
+            ms: value * 60 * 60 * 1000,
+            styling: buttonStyling,
+            stylingButton: height,
+        });
+    });
 
     const now = new Date();
     const nextMorning = new Date(now);
