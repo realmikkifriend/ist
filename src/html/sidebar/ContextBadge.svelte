@@ -1,16 +1,7 @@
 <script>
     import { XMarkIcon } from "@krowten/svelte-heroicons";
-    import { handleBadgeClick } from "./sidebar.js";
+    import { handleBadgeClick, getDueTaskCountByContext } from "./sidebar.js";
     import { todoistData, userSettings, firstDueTask } from "../../js/stores";
-
-    function getDueTasksInContext() {
-        if ($todoistData?.dueTasks && $firstDueTask) {
-            return $todoistData.dueTasks.filter(
-                (task) => task.contextId === $firstDueTask.contextId,
-            ).length;
-        }
-        return 0;
-    }
 
     function getContextName() {
         if ($userSettings?.selectedContext?.name) {
@@ -42,7 +33,7 @@
     {:else if $firstDueTask?.summoned}
         summoned task
     {:else}
-        {getDueTasksInContext()} left in {getContextName()}
+        {getDueTaskCountByContext($firstDueTask?.contextId)} left in {getContextName()}
     {/if}
     {#if $userSettings.selectedContext || $firstDueTask?.summoned}
         <p class="ml-1 block sm:hidden sm:group-hover:block">
