@@ -14,27 +14,29 @@ export const buttonConfig = {
         { value: 30, height: "h-7" },
         { value: 45, height: "h-7" },
     ],
+
+    hours: (() => {
+        const baseStyling = "basis-[22.75%]";
+        const largeStyling = "basis-[48.5%]";
+
+        const hoursValues = [
+            { value: 1, text: "1 hour", styling: largeStyling },
+            { value: 1.5, text: "90 minutes", styling: largeStyling },
+            { value: 2 },
+            { value: 3 },
+            { value: 4 },
+            { value: 6 },
+            { value: 8 },
+            { value: 12 },
+            { value: 18 },
+            { value: 24 },
+        ];
+
+        return hoursValues.map((item) => ({
+            value: item.value,
+            text: item.text || undefined,
+            height: "h-7",
+            styling: item.styling || baseStyling,
+        }));
+    })(),
 };
-
-const baseStyling = "basis-[22.75%]";
-const largeStyling = "basis-[48.5%]";
-
-const hoursValues = [
-    { value: 1, text: "1 hour", styling: largeStyling },
-    { value: 1.5, text: "90 minutes", styling: largeStyling },
-    { value: 2 },
-    { value: 3 },
-    { value: 4 },
-    { value: 6 },
-    { value: 8 },
-    { value: 12 },
-    { value: 18 },
-    { value: 24 },
-];
-
-buttonConfig.hours = hoursValues.map((item) => ({
-    value: item.value,
-    text: item.text || undefined,
-    height: "h-7",
-    styling: item.styling || baseStyling,
-}));
