@@ -5,7 +5,7 @@
     "scripts": {
         "start": "dotenv -- webpack serve --open --mode development --no-stats",
         "build": "webpack --mode production",
-        "test": "vitest run"
+        "test": "svelte-check && vitest run"
     },
     "repository": {
         "type": "git",
@@ -51,6 +51,7 @@
         "prettier-plugin-svelte": "^3.2.7",
         "prettier-plugin-tailwindcss": "^0.6.8",
         "style-loader": "^4.0.0",
+        "svelte-check": "^4.3.0",
         "svelty-picker": "^5.2.9",
         "tailwindcss": "^3.4.14",
         "vitest": "^1.6.0",
