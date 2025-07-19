@@ -40,10 +40,11 @@ const createButtons = () => {
     ];
 
     const now = new Date();
-    let hours = 0;
-    let previousFutureTime;
+    const nextMorning = new Date(now);
+    nextMorning.setDate(now.getDate() + 1);
+    nextMorning.setHours(6, 0, 0, 0);
 
-    buttons.forEach((button, index) => {
+    const processButton = (button, index, processedButtons) => {
         const futureTime = new Date(now.getTime() + button.ms);
 
         if (index > 2) {
@@ -51,38 +52,79 @@ const createButtons = () => {
             const roundedMinutes =
                 Math.round(futureTime.getMinutes() / roundingFactor) * roundingFactor;
             futureTime.setMinutes(roundedMinutes);
-            button.ms = futureTime.getTime() - now.getTime();
         }
-
-        const nextMorning = new Date(now);
-        nextMorning.setDate(now.getDate() + 1);
-        nextMorning.setHours(6, 0, 0, 0);
 
         if (futureTime.getDate() !== now.getDate()) {
-            if (index > 0 && previousFutureTime) {
-                futureTime.setTime(previousFutureTime.getTime() + hours * 60 * 60 * 1000);
-                hours++;
-            }
-            if (futureTime < nextMorning) {
-                if (hours === 0) {
-                    hours = Math.ceil((nextMorning - futureTime) / (1000 * 60 * 60));
-                    futureTime.setHours(futureTime.getHours() + hours);
-                    previousFutureTime = futureTime;
-                    hours = 1;
-                }
-            }
+            const previousProcessedButton = processedButtons[index - 1];
+            const adjustedFutureTime = calculateAdjustedTime(
+                futureTime,
+                nextMorning,
+                index,
+                previousProcessedButton,
+                processedButtons,
+            );
 
-            const hoursInFuture = Math.floor((futureTime - now) / (1000 * 60 * 60));
+            const hoursInFuture = Math.floor((adjustedFutureTime - now) / (1000 * 60 * 60));
 
-            button.stylingButton += " bg-blue-900";
-            button.ms = futureTime.getTime() - now.getTime();
-            button.text = `${hoursInFuture} hrs`;
+            return {
+                ...button,
+                ms: adjustedFutureTime.getTime() - now.getTime(),
+                text: `${hoursInFuture} hrs`,
+                stylingButton: button.stylingButton + " bg-blue-900",
+            };
         } else if (button.text !== "tomorrow") {
-            button.stylingButton += " bg-neutral";
+            return {
+                ...button,
+                ms: futureTime.getTime() - now.getTime(),
+                stylingButton: button.stylingButton + " bg-neutral",
+            };
         }
-    });
 
-    return buttons;
+        return {
+            ...button,
+            ms: futureTime.getTime() - now.getTime(),
+        };
+    };
+
+    const calculateAdjustedTime = (
+        futureTime,
+        nextMorning,
+        index,
+        previousButton,
+        processedButtons,
+    ) => {
+        const adjustedTime = new Date(futureTime);
+
+        const lastCrossedButton = processedButtons
+            .slice(0, index)
+            .reverse()
+            .find((btn) => btn && new Date(now.getTime() + btn.ms).getDate() !== now.getDate());
+
+        if (index > 0 && lastCrossedButton) {
+            const hoursToAdd = processedButtons
+                .slice(0, index)
+                .filter(
+                    (btn) => btn && new Date(now.getTime() + btn.ms).getDate() !== now.getDate(),
+                ).length;
+
+            const lastCrossedTime = new Date(now.getTime() + lastCrossedButton.ms);
+            adjustedTime.setTime(lastCrossedTime.getTime() + hoursToAdd * 60 * 60 * 1000);
+        }
+
+        if (adjustedTime < nextMorning) {
+            const hoursUntilMorning = Math.ceil((nextMorning - adjustedTime) / (1000 * 60 * 60));
+            adjustedTime.setHours(adjustedTime.getHours() + hoursUntilMorning);
+        }
+
+        return adjustedTime;
+    };
+
+    return buttons.map((button, index, array) => {
+        const processedButtons = array
+            .slice(0, index)
+            .map((btn, i) => (i < index ? processButton(btn, i, array.slice(0, i)) : null));
+        return processButton(button, index, processedButtons);
+    });
 };
 
 export default createButtons;
