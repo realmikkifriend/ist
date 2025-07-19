@@ -79,26 +79,28 @@ export function getQuarterHourPosition(position) {
 }
 
 export function getGradientColor(totalTasks) {
-    const gradientBlue = "bg-gradient-to-r from-blue-900 to-blue-700";
-    const gradientGreen = "bg-gradient-to-r from-green-900 to-green-700";
-    const gradientDarkGreen = "bg-gradient-to-r from-emerald-900 to-emerald-700";
-    const gradientOrange = "bg-gradient-to-r from-orange-800 to-orange-600";
-    const gradientRed = "bg-gradient-to-r from-red-900 to-red-700";
+    const gradients = {
+        blue: "bg-gradient-to-r from-blue-900 to-blue-700",
+        green: "bg-gradient-to-r from-green-900 to-green-700",
+        darkGreen: "bg-gradient-to-r from-emerald-900 to-emerald-700",
+        orange: "bg-gradient-to-r from-orange-800 to-orange-600",
+        red: "bg-gradient-to-r from-red-900 to-red-700",
+    };
 
     if (window.location.hash === "#tomorrow") {
         switch (true) {
             case totalTasks > 20:
-                return gradientRed;
+                return gradients.red;
             case totalTasks >= 19:
-                return gradientOrange;
+                return gradients.orange;
             case totalTasks >= 17:
                 return null;
             case totalTasks >= 15:
-                return gradientDarkGreen;
+                return gradients.darkGreen;
             case totalTasks >= 12:
-                return gradientGreen;
+                return gradients.green;
             case totalTasks < 12:
-                return gradientBlue;
+                return gradients.blue;
             default:
                 return null;
         }
@@ -108,17 +110,17 @@ export function getGradientColor(totalTasks) {
         const todayThreshold = 14 - hourAdjustment;
 
         if (totalTasks < todayThreshold - 2) {
-            return gradientBlue;
+            return gradients.blue;
         } else if (totalTasks === todayThreshold - 2) {
-            return gradientGreen;
+            return gradients.green;
         } else if (totalTasks === todayThreshold - 1) {
-            return gradientDarkGreen;
+            return gradients.darkGreen;
         } else if (totalTasks === todayThreshold) {
             return null;
         } else if (totalTasks === todayThreshold + 1) {
-            return gradientOrange;
+            return gradients.orange;
         } else if (totalTasks > todayThreshold + 1) {
-            return gradientRed;
+            return gradients.red;
         } else {
             return "";
         }
