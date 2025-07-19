@@ -7,46 +7,32 @@
     import DynalistRotating from "./DynalistRotating.svelte";
     import DynalistCrossOff from "./DynalistCrossOff.svelte";
     import DynalistTypeMenu from "./DynalistTypeMenu.svelte";
-    import { fetchDynalistDocument, processNode, generateDynalistComment } from "./dynalist";
+    import { loadDynalistComment, generateDynalistComment } from "./dynalist";
     import { error } from "../../../js/toasts";
 
     export let url, accessToken;
 
     let dynalistObject;
     let selectedType = "";
+    let loading = true;
 
     onMount(async () => {
-        try {
-            const { data, dynalistSubItem } = await fetchDynalistDocument(url, accessToken);
-            let rootNode;
-
-            data.nodes.forEach((node) => {
-                // correct Dynalist-flavored Markdown
-                if (node.content) node.content = node.content.replace(/__(.*?)__/g, "_$1_");
-            });
-
-            rootNode = data.nodes.find((node) => node.id === (dynalistSubItem || "root"));
-
-            if (rootNode) {
-                dynalistObject = processNode(rootNode, data);
-                dynalistObject.file_id = data.file_id;
-
-                const validTypes = ["read", "checklist", "rotating", "crossoff"];
-                const firstWordMatch = dynalistObject.note.match(/^count \d+(\/|$)[\s\S]*$/);
-
-                selectedType =
-                    validTypes.includes(dynalistObject.note) || firstWordMatch
-                        ? firstWordMatch
-                            ? "count"
-                            : dynalistObject.note
-                        : "read";
-            } else {
-                console.error("Specified node not in document.");
-            }
-        } catch (e) {
-            error(`Dynalist retrieval/processing error: ${e}`);
-            console.error("Dynalist retrieval/processing error:", e);
+        loading = true;
+        const {
+            dynalistObject: obj,
+            selectedType: type,
+            error: err,
+        } = await loadDynalistComment(url, accessToken);
+        if (err) {
+            error(`Dynalist retrieval/processing error: ${err}`);
+            console.error("Dynalist retrieval/processing error:", err);
+            dynalistObject = undefined;
+            selectedType = "";
+        } else {
+            dynalistObject = obj;
+            selectedType = type;
         }
+        loading = false;
     });
 
     function handleTypeSelection(event) {
@@ -54,7 +40,11 @@
     }
 </script>
 
-{#if dynalistObject}
+{#if loading}
+    <span class="flex items-center">
+        <ArrowPathIcon class="mr-2 h-4 w-4 animate-spin" /> Retrieving Dynalist document...
+    </span>
+{:else if dynalistObject}
     <div class="relative">
         {#if selectedType === "read"}
             <Markdown
@@ -76,7 +66,5 @@
         {/key}
     </div>
 {:else}
-    <span class="flex items-center">
-        <ArrowPathIcon class="mr-2 h-4 w-4 animate-spin" /> Retrieving Dynalist document...
-    </span>
+    <span class="flex items-center text-red-600"> Error loading Dynalist document. </span>
 {/if}
