@@ -85,13 +85,10 @@ export const calculateTaskPosition = (task, previousTaskDue) => {
 };
 
 export const calculateTaskStyle = (index, tasks) => {
-    let count = 0;
-    let currentIndex = index;
-
-    while (currentIndex >= 0 && tasks[currentIndex].closeTiming) {
-        count++;
-        currentIndex--;
-    }
+    const count = tasks
+        .slice(0, index + 1)
+        .reverse()
+        .reduce((acc, task) => (task.closeTiming ? acc + 1 : acc), 0);
 
     const isIndented = count % 2 !== 0;
 
