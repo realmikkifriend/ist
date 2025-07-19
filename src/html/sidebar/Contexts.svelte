@@ -3,29 +3,17 @@
     import { todoistData, userSettings, previousFirstDueTask } from "../../js/stores";
     import { getPriorityClasses } from "../../js/classes";
     import { openAgenda } from "../agenda/agenda";
+    import { getDueTasksGroupedByContext } from "./sidebar.js";
     // import ContextReorderModal from "./ContextReorderModal.svelte";
 
     let dueTasksByContext = {};
 
     $: {
-        dueTasksByContext =
-            $todoistData.dueTasks?.length > 0
-                ? $todoistData.dueTasks.reduce((acc, task) => {
-                      const context = acc[task.contextId] || { total: 0, priorities: {} };
-                      context.total += 1;
-                      context.priorities[task.priority] =
-                          (context.priorities[task.priority] || 0) + 1;
-                      acc[task.contextId] = context;
-                      return acc;
-                  }, {})
-                : {};
+        dueTasksByContext = getDueTasksGroupedByContext();
     }
 
     let settings;
     $: settings = $userSettings;
-
-    let modal;
-    let modalOpen = false;
 
     function closeDrawer() {
         const drawerCheckbox = document.getElementById("my-drawer");
@@ -54,15 +42,18 @@
         }
     }
 
-    function openModal() {
-        modal.showModal();
-        modalOpen = true;
-    }
+    // let modal;
+    // let modalOpen = false;
 
-    function closeModal() {
-        modal.close();
-        modalOpen = false;
-    }
+    // function openModal() {
+    //     modal.showModal();
+    //     modalOpen = true;
+    // }
+
+    // function closeModal() {
+    //     modal.close();
+    //     modalOpen = false;
+    // }
 </script>
 
 <div class="mb-2 ml-2 flex items-center justify-between">
