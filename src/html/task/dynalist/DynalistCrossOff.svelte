@@ -2,7 +2,8 @@
     import { onMount } from "svelte";
     import { BackspaceIcon } from "@krowten/svelte-heroicons";
     import Markdown from "svelte-exmarkdown";
-    import { generateDynalistComment, updateDynalist } from "./dynalist";
+    import { generateDynalistComment } from "./dynalist";
+    import { updateDynalist } from "./dynalistApi";
     import { success } from "../../../js/toasts";
 
     export let content;

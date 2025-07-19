@@ -3,7 +3,8 @@
     import { ArrowUturnDownIcon } from "@krowten/svelte-heroicons";
     import { DateTime } from "luxon";
     import Markdown from "svelte-exmarkdown";
-    import { generateDynalistComment, updateDynalist } from "./dynalist";
+    import { generateDynalistComment } from "./dynalist";
+    import { updateDynalist } from "./dynalistApi";
     import { success } from "../../../js/toasts";
 
     export let content;

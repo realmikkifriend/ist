@@ -6,10 +6,7 @@
     import { dynalistAccessToken } from "../../js/stores";
     export let comments;
 
-    let accessToken,
-        requiresAuthRequest = false;
-
-    $: accessToken = $dynalistAccessToken;
+    let requiresAuthRequest = false;
 
     onMount(() => {
         requiresAuthRequest = comments.some((comment) =>
@@ -19,15 +16,15 @@
 </script>
 
 <div class="prose mx-auto w-11/12 rounded-b-xl bg-accent p-4 text-primary-content">
-    {#if requiresAuthRequest && !accessToken}
+    {#if requiresAuthRequest && !$dynalistAccessToken}
         <DynalistAuthRequest />
         <div class="divider my-1" />
     {/if}
 
     {#each comments as comment, i}
         {#if comment.content.startsWith("https://dynalist.io/d/")}
-            {#if accessToken}
-                <DynalistComment url={comment.content} {accessToken} />
+            {#if $dynalistAccessToken}
+                <DynalistComment url={comment.content} />
             {:else}
                 Dynalist URL detected but no access code stored.
             {/if}

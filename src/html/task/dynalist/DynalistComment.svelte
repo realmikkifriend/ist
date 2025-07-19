@@ -10,7 +10,7 @@
     import { loadDynalistComment, generateDynalistComment } from "./dynalist";
     import { error } from "../../../js/toasts";
 
-    export let url, accessToken;
+    export let url;
 
     const dynalistStore = writable({
         dynalistObject: undefined,
@@ -18,7 +18,7 @@
         error: undefined,
     });
 
-    const loadPromise = loadDynalistComment(url, accessToken).then(
+    const loadPromise = loadDynalistComment(url).then(
         ({ dynalistObject: obj, selectedType: type, error: err }) => {
             if (err) {
                 const errorMsg = `Dynalist retrieval/processing error: ${err}`;

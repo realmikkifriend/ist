@@ -1,6 +1,6 @@
 <script>
     import { success } from "../../../js/toasts";
-    import { updateDynalist } from "./dynalist";
+    import { updateDynalist } from "./dynalistApi";
     export let content;
 
     let [_, total, current, date] =
