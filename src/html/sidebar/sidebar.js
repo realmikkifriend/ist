@@ -21,7 +21,7 @@ export function getDueTaskCountByContext(contextId) {
     return 0;
 }
 
-export function clearSelectedContext() {
+function clearSelectedContext() {
     previousFirstDueTask.set(null);
     userSettings.update((settings) => ({ ...settings, selectedContext: null }));
 }
