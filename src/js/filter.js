@@ -12,16 +12,12 @@ export function filterAndSortTasks(tasks, contexts, options = {}) {
     const { timeZone, reverse = false } = options;
     const contextLookup = createContextLookup(contexts);
 
-    let filteredTasks = tasks;
-    if (timeZone) {
-        filteredTasks = filterDueTasks(filteredTasks, timeZone);
-    }
+    const filteredTasks = timeZone ? filterDueTasks(tasks, timeZone) : tasks;
 
-    filteredTasks.sort((a, b) => {
-        const result = compareTasks(a, b, contextLookup, timeZone, reverse);
-        return result;
+    const sortedTasks = [...filteredTasks].sort((a, b) => {
+        return compareTasks(a, b, contextLookup, timeZone, reverse);
     });
-    return filteredTasks;
+    return sortedTasks;
 }
 
 function createContextLookup(contexts) {
