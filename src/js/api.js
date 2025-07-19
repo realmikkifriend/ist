@@ -45,7 +45,7 @@ export async function refreshData() {
     return { status: "success", error: null };
 }
 
-export function setErrorState(error) {
+function setErrorState(error) {
     todoistError.set(error);
     return { status: "error", error };
 }
