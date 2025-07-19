@@ -7,45 +7,35 @@ export async function fetchDynalistDocument(url, accessToken) {
         dynalistFileID = url.slice(lastIndex + 1, hashIndex === -1 ? undefined : hashIndex),
         dynalistSubItem = hashIndex === -1 ? undefined : url.slice(hashIndex + 3);
 
-    let data;
+    const response = await fetch("https://dynalist.io/api/v1/doc/read", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            token: accessToken,
+            file_id: dynalistFileID,
+        }),
+    });
 
-    try {
-        const response = await fetch("https://dynalist.io/api/v1/doc/read", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                token: accessToken,
-                file_id: dynalistFileID,
-            }),
-        });
+    const data = await response.json();
 
-        if (!response.ok) {
-            throw new Error(`${response.statusText}`);
-        }
-
-        data = await response.json();
-
-        if (data._code === "NotFound") {
-            throw new Error(data._msg);
-        }
-    } catch (error) {
-        throw data._msg;
+    if (!response.ok || data._code === "NotFound") {
+        return { error: new Error(response.statusText || data._msg) };
     }
 
     return { data, dynalistSubItem };
 }
 
 export function processNode(node, data) {
-    const { created, modified, collapsed, checked, ...filteredNode } = node;
+    const { checked, ...filteredNode } = node;
 
     if (checked) return null;
 
     if (node.children && node.children.length > 0) {
         filteredNode.children = node.children
             .map((childId) => {
-                let child = data.nodes.find((node) => node.id === childId);
+                const child = data.nodes.find((node) => node.id === childId);
 
                 return child ? processNode(child, data) : null;
             })
@@ -78,23 +68,18 @@ export async function updateDynalist(file_id, changes) {
         changes,
     };
 
-    try {
-        const response = await fetch("https://dynalist.io/api/v1/doc/edit", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(payload),
-        });
+    const response = await fetch("https://dynalist.io/api/v1/doc/edit", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+    });
 
-        if (!response.ok) {
-            throw new Error("Network response was not ok");
-        }
-
-        await response.json();
-    } catch (error) {
-        console.error("Failed to add note to Dynalist API", error);
-    }
+    const data = await response.json();
+    return response.ok
+        ? { error: false, data }
+        : { error: true, message: "Network response was not ok" };
 }
 
 export function parseList(content) {
