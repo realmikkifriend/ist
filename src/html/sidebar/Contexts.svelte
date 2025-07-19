@@ -4,13 +4,8 @@
     import { getPriorityClasses } from "../../js/classes";
     import { openAgenda } from "../agenda/agenda";
     import { getDueTasksGroupedByContext } from "./sidebar.js";
-    // import ContextReorderModal from "./ContextReorderModal.svelte";
 
-    let dueTasksByContext = {};
-
-    $: {
-        dueTasksByContext = getDueTasksGroupedByContext();
-    }
+    $: dueTasksByContext = $todoistData ? getDueTasksGroupedByContext($todoistData) : {};
 
     let settings;
     $: settings = $userSettings;
