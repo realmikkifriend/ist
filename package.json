@@ -27,7 +27,6 @@
         "@tailwindcss/typography": "^0.5.13",
         "chrono-node": "^2.7.6",
         "luxon": "^3.4.4",
-        "svelte": "^4.2.18",
         "svelte-exmarkdown": "^3.0.5",
         "svelte-loader": "^3.2.4",
         "svelte-persisted-store": "^0.11.0"
@@ -55,6 +54,7 @@
         "prettier-plugin-svelte": "^3.2.7",
         "prettier-plugin-tailwindcss": "^0.6.8",
         "style-loader": "^4.0.0",
+        "svelte": "^4.2.20",
         "svelte-check": "^4.3.0",
         "svelty-picker": "^5.2.9",
         "tailwindcss": "^3.4.14",
