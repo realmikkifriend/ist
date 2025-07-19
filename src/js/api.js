@@ -17,33 +17,32 @@ export async function refreshData() {
         return setErrorState("No access token found.", {});
     }
 
-    try {
-        try {
-            const [tasksResponse, projectsResponse, userResponse] = await Promise.all([
-                api.getTasks({ limit: 200 }),
-                api.getProjects(),
-                getEndpoint("user", accessToken),
-            ]);
-
-            const cleanedData = cleanTodoistData({
-                tasks: tasksResponse.results,
-                contexts: projectsResponse.results,
-                user: userResponse,
-            });
-
-            const dueTasks = getDueTasks(cleanedData);
-
-            todoistData.set({ ...cleanedData, dueTasks });
-        } catch (apiTsError) {
-            console.error("Error fetching data with TodoistApi:", apiTsError);
-        }
-
-        success("Todoist data updated!");
-
-        return { status: "success", error: null };
-    } catch (err) {
+    const [tasksResponse, projectsResponse, userResponse] = await Promise.all([
+        api.getTasks({ limit: 200 }),
+        api.getProjects(),
+        getEndpoint("user", accessToken),
+    ]).catch((err) => {
+        console.error("Error fetching data:", err);
         return setErrorState(err.message, {});
+    });
+
+    if (!tasksResponse || !projectsResponse || !userResponse) {
+        return;
     }
+
+    const cleanedData = cleanTodoistData({
+        tasks: tasksResponse.results,
+        contexts: projectsResponse.results,
+        user: userResponse,
+    });
+
+    const dueTasks = getDueTasks(cleanedData);
+
+    todoistData.set({ ...cleanedData, dueTasks });
+
+    success("Todoist data updated!");
+
+    return { status: "success", error: null };
 }
 
 export function setErrorState(error) {
@@ -57,12 +56,7 @@ export async function getTaskComments(taskId) {
         return setErrorState("No access token found.", {});
     }
 
-    try {
-        const comments = await api.getComments({ taskId });
-        return comments;
-    } catch (error) {
-        return setErrorState(error.message, {});
-    }
+    return api.getComments({ taskId }).catch((error) => setErrorState(error.message, {}));
 }
 
 export async function markTaskDone(taskID) {
@@ -117,11 +111,7 @@ async function getEndpoint(endpoint, accessToken, params = {}) {
         body: new URLSearchParams(params),
     });
 
-    if (!response.ok) {
-        throw new Error(`Error: ${response.status}`);
-    }
-
-    return response.json();
+    return response.ok ? response.json() : Promise.resolve({ error: `Error: ${response.status}` });
 }
 
 function formatTaskDate(time) {
