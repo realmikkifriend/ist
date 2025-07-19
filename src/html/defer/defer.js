@@ -1,5 +1,87 @@
 import { DateTime } from "luxon";
 import { getPriorityClasses } from "../../js/classes";
+import { createDateWithTime } from "../../js/time";
+import createButtons from "./deferButtons";
+
+export function updateMilliseconds(task, tasks) {
+    const buttons = createButtons();
+
+    const tomorrowDate = DateTime.now().plus({ days: 1 }),
+        result = createDateWithTime(task.due.string, tomorrowDate),
+        now = DateTime.now();
+
+    if (result.newDate === null) {
+        buttons[0].text = "";
+        buttons[0].ms = 0;
+    } else {
+        const tomorrow = result.newDate,
+            extractedTime = result.extractedTime,
+            tomorrowInMS = tomorrow.diff(now).milliseconds;
+
+        buttons[0].text = `tomorrow ${extractedTime}`;
+        buttons[0].ms = tomorrowInMS;
+    }
+
+    const initialSoonTasks = tasks.filter((task) => {
+        const dueDateTime = DateTime.fromISO(task.due.date);
+        return (
+            dueDateTime.isValid &&
+            task.due.date.includes("T") &&
+            dueDateTime.diffNow("hours").hours <= 25
+        );
+    });
+
+    buttons.slice(1).reduce(
+        (acc, button, index) => {
+            const i = index + 1;
+            const futureTime = now.plus({ milliseconds: button.ms });
+            const nextFutureTime =
+                i + 1 < buttons.length ? now.plus({ milliseconds: buttons[i + 1].ms }) : null;
+            const isTomorrow =
+                now.startOf("day").toMillis() !== futureTime.startOf("day").toMillis();
+            const timeFormat = futureTime.toFormat("h:mm a");
+
+            buttons[i].time = isTomorrow ? `<i>${timeFormat}</i>` : timeFormat;
+
+            const { matchedTasks, remainingTasks } = acc.remainingTasks.reduce(
+                (taskAcc, task) => {
+                    const dueDateTime = DateTime.fromISO(task.due.date);
+                    const isWithinFutureTime = nextFutureTime ? dueDateTime < nextFutureTime : true;
+                    const isValidTime = i === 1 ? dueDateTime >= now : dueDateTime >= futureTime;
+
+                    if (isWithinFutureTime && isValidTime) {
+                        return {
+                            matchedTasks: [...taskAcc.matchedTasks, task],
+                            remainingTasks: taskAcc.remainingTasks,
+                        };
+                    }
+
+                    return {
+                        matchedTasks: taskAcc.matchedTasks,
+                        remainingTasks: [...taskAcc.remainingTasks, task],
+                    };
+                },
+                { matchedTasks: [], remainingTasks: [] },
+            );
+
+            Object.assign(buttons[i], { count: 0, priority: 0 });
+
+            const count = matchedTasks.length > 0 ? matchedTasks.length : "";
+            const priority =
+                matchedTasks.length > 0
+                    ? Math.max(...matchedTasks.map((task) => task.priority))
+                    : "";
+
+            buttons[i].count = count;
+            buttons[i].priority = priority;
+
+            return { remainingTasks };
+        },
+        { remainingTasks: initialSoonTasks },
+    );
+
+    return buttons;
+}
 
 export function updateCalendarCells(calendarElement, tz, tasks, taskToDefer) {
     if (!calendarElement) return;
