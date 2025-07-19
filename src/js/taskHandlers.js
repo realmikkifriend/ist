@@ -6,7 +6,7 @@ import { updateFirstDueTask } from "./first";
 
 const updateTaskResources = (taskUpdates) => {
     todoistData.update(($resources) => {
-        taskUpdates.sort(([_, timeA], [__, timeB]) => new Date(timeA) - new Date(timeB));
+        taskUpdates.sort(([, timeA], [, timeB]) => new Date(timeA) - new Date(timeB));
 
         taskUpdates.forEach(([taskID, time]) => {
             const index = $resources.dueTasks.findIndex((task) => task.id === taskID);
@@ -49,12 +49,11 @@ export const handleTaskDone = async (taskID) => {
 
     updateTaskResources([[taskID, fiveMinutesFromNow]]);
 
-    try {
-        await markTaskDone(taskID);
-    } catch (error) {
+    const result = await markTaskDone(taskID).catch((error) => {
         todoistError.set(`Failed to mark task done: ${error.message}`);
-        return;
-    }
+        return null;
+    });
+    if (!result) return;
 
     refreshData();
 };
@@ -65,12 +64,11 @@ export const handleTaskDefer = async (taskUpdates) => {
     const updatedTaskResources = taskUpdates.map(([task, dateTime]) => [task.id, dateTime]);
     updateTaskResources(updatedTaskResources);
 
-    try {
-        await deferTasks(taskUpdates);
-    } catch (error) {
+    const result = await deferTasks(taskUpdates).catch((error) => {
         todoistError.set(`Failed to defer tasks: ${error.message}`);
-        return;
-    }
+        return null;
+    });
+    if (!result) return;
 
     refreshData();
 };
