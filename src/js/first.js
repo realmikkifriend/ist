@@ -15,11 +15,11 @@ export const setFirstDueTask = (task) => {
 const filterTasksByContext = (tasks, contextId) =>
     tasks.filter((task) => task.contextId === contextId);
 
-const updateDueTasks = (dueTasks, contextId) => {
-    if (contextId) {
-        const filteredDueTasks = filterTasksByContext(dueTasks, contextId);
+const updateDueTasks = (dueTasks, selectedContext) => {
+    if (selectedContext?.id) {
+        const filteredDueTasks = filterTasksByContext(dueTasks, selectedContext.id);
         if (!filteredDueTasks.length) {
-            userSettings.update((settings) => ({ ...settings, selectedContextId: null }));
+            userSettings.update((settings) => ({ ...settings, selectedContext: null }));
             success("No more tasks in context! Showing all due tasks...");
             return dueTasks;
         }
@@ -52,10 +52,10 @@ export const updateFirstDueTask = async () => {
         return;
     }
 
-    const contextId = get(userSettings).selectedContextId;
+    const selectedContext = get(userSettings).selectedContext;
     const prevTask = get(previousFirstDueTask);
 
-    const dueTasks = updateDueTasks($todoistData.dueTasks, contextId);
+    const dueTasks = updateDueTasks($todoistData.dueTasks, selectedContext);
 
     const newTask = dueTasks[0];
 
@@ -65,7 +65,7 @@ export const updateFirstDueTask = async () => {
     if (
         prevTask &&
         newTask.id !== prevTask.id &&
-        (!contextId || prevTask.contextId === contextId) &&
+        (!selectedContext?.id || prevTask.contextId === selectedContext.id) &&
         window.location.hash !== "#today" &&
         window.location.hash !== "#tomorrow"
     ) {

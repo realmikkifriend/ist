@@ -3,37 +3,36 @@
     import { handleBadgeClick } from "./sidebar.js";
     import { todoistData, userSettings, firstDueTask } from "../../js/stores";
 
-    let selectedContextId,
-        dueTasksInContext = 0,
-        currentContextName = "";
-
-    $: selectedContextId = $userSettings.selectedContextId;
-
-    $: {
-        filterDueTasksInContext($firstDueTask);
-    }
-
-    function filterDueTasksInContext($firstDueTask) {
+    function getDueTasksInContext() {
         if ($todoistData?.dueTasks && $firstDueTask) {
-            dueTasksInContext = $todoistData.dueTasks.filter(
+            return $todoistData.dueTasks.filter(
                 (task) => task.contextId === $firstDueTask.contextId,
             ).length;
-
-            currentContextName =
-                $todoistData.contexts.find((c) => c.id === $firstDueTask.contextId)?.name || "";
         }
+        return 0;
+    }
+
+    function getContextName() {
+        if ($userSettings?.selectedContext?.name) {
+            return $userSettings.selectedContext.name;
+        }
+        if ($todoistData?.contexts) {
+            const context = $todoistData.contexts.find((c) => c.id === $firstDueTask.contextId);
+            if (context) return context.name;
+        }
+        return "";
     }
 </script>
 
 <button
     class="group badge badge-outline items-center whitespace-nowrap
-           {selectedContextId
+           {$userSettings.selectedContext
         ? 'cursor-pointer'
         : !$firstDueTask?.summoned
           ? 'cursor-default'
-          : ''} 
-           {selectedContextId ? 'opacity-75' : 'opacity-40'}
-           {selectedContextId ? 'text-primary' : ''} 
+          : ''}
+           {$userSettings.selectedContext ? 'opacity-75' : 'opacity-40'}
+           {$userSettings.selectedContext ? 'text-primary' : ''}
            {$firstDueTask?.summoned ? 'border-purple-400 text-purple-400' : ''}
            {$firstDueTask?.skip ? 'border-yellow-500 text-yellow-500' : ''}"
     on:click={handleBadgeClick}
@@ -43,9 +42,9 @@
     {:else if $firstDueTask?.summoned}
         summoned task
     {:else}
-        {dueTasksInContext} left in {currentContextName}
+        {getDueTasksInContext()} left in {getContextName()}
     {/if}
-    {#if selectedContextId || $firstDueTask?.summoned}
+    {#if $userSettings.selectedContext || $firstDueTask?.summoned}
         <p class="ml-1 block sm:hidden sm:group-hover:block">
             <XMarkIcon class="h-4 w-4" />
         </p>

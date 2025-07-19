@@ -14,8 +14,8 @@
 
     export let hash;
 
-    let selectedContextId;
-    $: selectedContextId = $userSettings.selectedContextId;
+    let selectedContext;
+    $: selectedContext = $userSettings.selectedContext;
 
     function handleLogout() {
         toast.pop(0);
@@ -23,7 +23,7 @@
         todoistData.set({});
         todoistError.set(null);
         firstDueTask.set(null);
-        userSettings.set({ selectedContextId: null });
+        userSettings.set({ selectedContext: null });
         dynalistAccessToken.set("");
     }
 </script>

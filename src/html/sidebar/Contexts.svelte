@@ -36,14 +36,20 @@
 
     function handleContextClick(contextId) {
         previousFirstDueTask.set(null);
-        const newContextId = settings.selectedContextId === contextId ? null : contextId;
+        const isCurrentlySelected = settings.selectedContext?.id === contextId;
+        const newSelectedContext = isCurrentlySelected
+            ? null
+            : {
+                  id: contextId,
+                  name: $todoistData.contexts.find((c) => c.id === contextId)?.name || "",
+              };
 
         userSettings.update((settings) => ({
             ...settings,
-            selectedContextId: newContextId,
+            selectedContext: newSelectedContext,
         }));
 
-        if (newContextId !== null) {
+        if (newSelectedContext !== null) {
             closeDrawer();
         }
     }
@@ -80,8 +86,8 @@
 {#each $todoistData.contexts as context}
     {#if dueTasksByContext[context.id] && dueTasksByContext[context.id].total > 0}
         <button
-            class:opacity-25={settings.selectedContextId &&
-                settings.selectedContextId !== context.id}
+            class:opacity-25={settings.selectedContext &&
+                settings.selectedContext.id !== context.id}
             class="mb-2 rounded-lg bg-secondary text-base-100"
             on:click={() => handleContextClick(context.id)}
         >

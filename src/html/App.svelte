@@ -21,7 +21,7 @@
     const hash = writable(window.location.hash);
 
     $: {
-        $userSettings.selectedContextId;
+        $userSettings.selectedContext;
         $todoistData.dueTasks;
         updateFirstDueTask();
     }
@@ -75,7 +75,9 @@
     <Sidebar hash={$hash} />
 
     {#if $firstDueTask && $hash !== "#today" && $hash !== "#tomorrow"}
-        <ContextBadge class="ml-4" />
+        {#key ($firstDueTask, $todoistData)}
+            <ContextBadge class="ml-4" />
+        {/key}
     {/if}
 </div>
 
