@@ -1,31 +1,27 @@
 <script>
-    import { onMount } from "svelte";
     import Markdown from "svelte-exmarkdown";
     import { BackwardIcon } from "@krowten/svelte-heroicons";
     import { parseList } from "./dynalist";
+
     export let content;
 
-    let checklistItems,
-        currentIndex = 0,
-        errorMessage = null;
-
-    onMount(() => {
-        if (!content) {
-            errorMessage = "No checklist content provided.";
-            return;
-        }
-        if (content.error) {
-            errorMessage = content.error.message || "Failed to load Dynalist checklist.";
-            return;
+    $: checklistItems = (() => {
+        if (!content || content.error) {
+            return [];
         }
         const result = parseList(content);
-        if (result instanceof Error) {
-            errorMessage = "Failed to parse checklist content.";
-            checklistItems = [];
-        } else {
-            checklistItems = result;
-        }
-    });
+        return result instanceof Error ? [] : result;
+    })();
+
+    $: currentIndex = 0;
+
+    $: errorMessage = !content
+        ? "No checklist content provided."
+        : content.error
+          ? content.error.message || "Failed to load Dynalist checklist."
+          : checklistItems.length === 0
+            ? "Failed to parse checklist content."
+            : null;
 
     function showNextItem(event) {
         const buttonElement = event.currentTarget;
