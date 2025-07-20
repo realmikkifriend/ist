@@ -26,37 +26,44 @@
     async function showNextItem() {
         buttonElement.classList.add("animate-ping");
 
-        const itemToMove = checklistItems.splice(0, 1)[0];
-        checklistItems = [...checklistItems, itemToMove];
+        const itemToMove = checklistItems[0];
+        const newChecklistItems = [...checklistItems.slice(1), itemToMove];
+        checklistItems = newChecklistItems;
 
-        try {
-            const changes = [
-                {
-                    action: "move",
-                    node_id: itemToMove.id,
-                    parent_id: content.id,
-                    index: -1,
-                },
-            ];
+        const changes = [
+            {
+                action: "move",
+                node_id: itemToMove.id,
+                parent_id: content.id,
+                index: -1,
+            },
+        ];
 
-            if (!itemToMove.note || isMonthYearFormat(itemToMove.note)) {
-                const today = DateTime.now();
-                const newMonthYear = today.toFormat("LLLL yyyy");
+        if (!itemToMove.note || isMonthYearFormat(itemToMove.note)) {
+            const today = DateTime.now();
+            const newMonthYear = today.toFormat("LLLL yyyy");
 
-                changes.push({
-                    action: "edit",
-                    node_id: itemToMove.id,
-                    note: newMonthYear,
-                });
-            }
-
-            await updateDynalist(content.file_id, changes);
-
-            success("Sent to bottom of list in Dynalist!");
-            buttonElement.classList.remove("animate-ping");
-        } catch (error) {
-            console.error("Failed to update Dynalist:", error);
+            changes.push({
+                action: "edit",
+                node_id: itemToMove.id,
+                note: newMonthYear,
+            });
         }
+
+        const result = await updateDynalist(content.file_id, changes).then(
+            () => {
+                success("Sent to bottom of list in Dynalist!");
+                buttonElement.classList.remove("animate-ping");
+                return true;
+            },
+            (error) => {
+                console.error("Failed to update Dynalist:", error);
+                buttonElement.classList.remove("animate-ping");
+                return false;
+            },
+        );
+
+        return result;
     }
 </script>
 
