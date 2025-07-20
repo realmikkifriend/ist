@@ -17,7 +17,6 @@
         todayTasks: [],
     });
     const hourSlots = Array.from({ length: 18 }, (_, i) => i + 6);
-    let displayHours = {};
     let now;
 
     $: $todoistData, updatePage();
@@ -33,6 +32,23 @@
             (window.location.hash === "#tomorrow" ? agendaData.todayTasks?.length || 0 : 0);
 
         return getGradientColor(totalTasks);
+    }
+
+    function getDisplayHours(agendaData, now, hourSlots) {
+        if (getTitle() === "Today") {
+            const result = {};
+            hourSlots.forEach((hour) => {
+                const hourTasks = agendaData.tasks.filter(
+                    (task) => DateTime.fromISO(task.due.date).hour === hour,
+                );
+                result[hour] = hour >= now.hour || hourTasks.length > 0;
+            });
+            return result;
+        } else {
+            const result = {};
+            hourSlots.forEach((hour) => (result[hour] = true));
+            return result;
+        }
     }
 
     const updatePage = () => {
@@ -76,18 +92,6 @@
         };
 
         agendaStore.set(newAgendaData);
-
-        if (currentTitle === "Today") {
-            displayHours = {};
-            hourSlots.forEach((hour) => {
-                const hourTasks = newAgendaData.tasks.filter(
-                    (task) => DateTime.fromISO(task.due.date).hour === hour,
-                );
-                displayHours[hour] = hour >= now.hour || hourTasks.length > 0;
-            });
-        } else {
-            hourSlots.forEach((hour) => (displayHours[hour] = true));
-        }
     };
 
     function getTaskColor(id) {
@@ -133,7 +137,7 @@
         <div class="w-[99%] overflow-hidden pr-1">
             {#key (now.hour, $agendaStore.tasks)}
                 {#each hourSlots as hour (hour)}
-                    {#if displayHours[hour]}
+                    {#if getDisplayHours($agendaStore, now, hourSlots)[hour]}
                         <AgendaHour
                             title={getTitle()}
                             {hour}
