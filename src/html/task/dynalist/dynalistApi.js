@@ -1,13 +1,13 @@
 import { get } from "svelte/store";
 import { dynalistAccessToken } from "../../../js/stores";
 
-export async function fetchDynalistDocument(url, accessToken) {
+export function fetchDynalistDocument(url, accessToken) {
     const lastIndex = url.lastIndexOf("/"),
         hashIndex = url.indexOf("#z=", lastIndex),
         dynalistFileID = url.slice(lastIndex + 1, hashIndex === -1 ? undefined : hashIndex),
         dynalistSubItem = hashIndex === -1 ? undefined : url.slice(hashIndex + 3);
 
-    const response = await fetch("https://dynalist.io/api/v1/doc/read", {
+    return fetch("https://dynalist.io/api/v1/doc/read", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -16,15 +16,29 @@ export async function fetchDynalistDocument(url, accessToken) {
             token: accessToken,
             file_id: dynalistFileID,
         }),
-    });
-
-    const data = await response.json();
-
-    if (!response.ok || data._code === "NotFound") {
-        return { error: new Error(response.statusText || data._msg) };
-    }
-
-    return { data, dynalistSubItem };
+    })
+        .then((response) =>
+            response
+                .json()
+                .then((data) => ({ response, data }))
+                .catch(() => ({ response, data: null, jsonError: true })),
+        )
+        .then(({ response, data, jsonError }) => {
+            if (jsonError) {
+                return { error: new Error("Failed to parse Dynalist response as JSON") };
+            }
+            if (!response.ok || (data && data._code === "NotFound")) {
+                return {
+                    error: new Error(
+                        response.statusText || (data && data._msg) || "Dynalist document not found",
+                    ),
+                };
+            }
+            return { data, dynalistSubItem };
+        })
+        .catch((error) => ({
+            error: new Error(error?.message || "Unknown error fetching Dynalist document"),
+        }));
 }
 
 export async function updateDynalist(file_id, changes) {

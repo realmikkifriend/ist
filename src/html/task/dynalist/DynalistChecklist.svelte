@@ -6,14 +6,29 @@
     export let content;
 
     let checklistItems,
-        buttonElement,
-        currentIndex = 0;
+        currentIndex = 0,
+        errorMessage = null;
 
     onMount(() => {
-        checklistItems = parseList(content);
+        if (!content) {
+            errorMessage = "No checklist content provided.";
+            return;
+        }
+        if (content.error) {
+            errorMessage = content.error.message || "Failed to load Dynalist checklist.";
+            return;
+        }
+        const result = parseList(content);
+        if (result instanceof Error) {
+            errorMessage = "Failed to parse checklist content.";
+            checklistItems = [];
+        } else {
+            checklistItems = result;
+        }
     });
 
-    function showNextItem() {
+    function showNextItem(event) {
+        const buttonElement = event.currentTarget;
         buttonElement.parentElement.classList.add("line-through", "text-secondary");
         buttonElement.classList.add("bg-secondary", "border-secondary");
 
@@ -27,7 +42,9 @@
     }
 </script>
 
-{#if checklistItems && currentIndex < checklistItems.length - 1}
+{#if errorMessage}
+    <div class="italic text-error">{errorMessage}</div>
+{:else if checklistItems && currentIndex < checklistItems.length - 1}
     <div class="mt-2">
         <em class="absolute -left-0.5 -top-3.5 text-nowrap text-xs opacity-25">
             <span class="mr-0.5 inline-block w-7"
@@ -35,7 +52,6 @@
             >
         </em>
         <button
-            bind:this={buttonElement}
             class="float-left mr-2 mt-1 inline-block h-5 w-5 cursor-pointer border-2 border-primary-content transition-colors"
             on:click={showNextItem}
         />
