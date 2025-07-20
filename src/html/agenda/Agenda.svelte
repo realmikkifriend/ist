@@ -18,7 +18,6 @@
     });
     const hourSlots = Array.from({ length: 18 }, (_, i) => i + 6);
     let displayHours = {};
-    let headerGradientColor;
     let now;
 
     $: $todoistData, updatePage();
@@ -26,6 +25,15 @@
     const getTitle = () => {
         return window.location.hash.replace("#", "").replace(/^./, (c) => c.toUpperCase());
     };
+
+    function computeHeaderGradientColor(agendaData) {
+        const totalTasks =
+            (agendaData.tasks?.length || 0) +
+            (agendaData.tasksWithNoTime?.length || 0) +
+            (window.location.hash === "#tomorrow" ? agendaData.todayTasks?.length || 0 : 0);
+
+        return getGradientColor(totalTasks);
+    }
 
     const updatePage = () => {
         now = DateTime.now();
@@ -80,13 +88,6 @@
         } else {
             hourSlots.forEach((hour) => (displayHours[hour] = true));
         }
-
-        const totalTasks =
-            (newAgendaData.tasks?.length || 0) +
-            (newAgendaData.tasksWithNoTime?.length || 0) +
-            (window.location.hash === "#tomorrow" ? newAgendaData.todayTasks?.length || 0 : 0);
-
-        headerGradientColor = getGradientColor(totalTasks);
     };
 
     function getTaskColor(id) {
@@ -114,12 +115,11 @@
 {#key $agendaStore.tasks}
     <div class="mr-4 mt-[-2rem] max-w-lg sm:mx-auto sm:max-w-96" id="agenda">
         <AgendaHeader
-            title={getTitle()}
-            tasks={$agendaStore.tasks}
-            tasksWithNoTime={$agendaStore.tasksWithNoTime}
-            todayTasks={$agendaStore.todayTasks}
-            tasksForDate={$agendaStore.tasksForDate}
-            {headerGradientColor}
+            agendaData={$agendaStore}
+            displayData={{
+                title: getTitle(),
+                headerGradientColor: computeHeaderGradientColor($agendaStore),
+            }}
         />
 
         {#if $agendaStore.tasksWithNoTime.length > 0}
