@@ -4,7 +4,11 @@
     import { filterAndSortTasks } from "../../js/filter";
     import { todoistData } from "../../js/stores";
 
-    export let title, tasks, tasksWithNoTime, todayTasks, tasksForDate, headerGradientColor;
+    export let agendaData, displayData;
+
+    // Destructure for easier access
+    $: ({ tasks, tasksWithNoTime, todayTasks, tasksForDate } = agendaData);
+    $: ({ title, headerGradientColor } = displayData);
 
     function switchView() {
         window.location.hash = window.location.hash === "#today" ? "#tomorrow" : "#today";
