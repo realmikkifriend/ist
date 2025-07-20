@@ -1,14 +1,14 @@
 <script>
-    import AgendaHeader from "./AgendaHeader.svelte";
-    import AgendaHour from "./AgendaHour.svelte";
     import { onMount, onDestroy } from "svelte";
     import { writable } from "svelte/store";
     import { DateTime } from "luxon";
     import { todoistData } from "../../js/stores";
+    import { getGradientColor } from "../../js/classes";
     import { filterAndSortTasks } from "../../js/filter";
     import { getTasksForDate, sortAgendaTasks } from "./agenda";
+    import AgendaHeader from "./AgendaHeader.svelte";
+    import AgendaHour from "./AgendaHour.svelte";
     import AgendaTask from "./AgendaTask.svelte";
-    import { getGradientColor } from "../../js/classes.js";
 
     const agendaStore = writable({
         tasks: [],
