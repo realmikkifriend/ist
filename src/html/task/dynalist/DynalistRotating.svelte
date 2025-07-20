@@ -1,5 +1,5 @@
 <script>
-    import { onMount } from "svelte";
+    import { writable } from "svelte/store";
     import { ArrowUturnDownIcon } from "@krowten/svelte-heroicons";
     import { DateTime } from "luxon";
     import Markdown from "svelte-exmarkdown";
@@ -9,81 +9,98 @@
 
     export let content;
 
-    let checklistItems, buttonElement;
+    const rotationIndex = writable(0);
+    const isLoading = writable(false);
 
-    onMount(() => {
-        checklistItems = content.children;
-    });
+    $: checklistItems = content?.children || [];
+    $: rotatedItems = rotateArray(checklistItems, $rotationIndex);
+    $: currentItem = rotatedItems[0];
+    $: hasItems = checklistItems.length > 0;
 
-    function isMonthYearFormat(dateString) {
-        dateString = dateString.trim();
-        const fullMonthFormat = DateTime.fromFormat(dateString, "LLLL yyyy");
-        const shortMonthFormat = DateTime.fromFormat(dateString, "LLL yyyy");
+    const rotateArray = (arr, index) => {
+        if (!arr || arr.length === 0) return [];
+        const normalizedIndex = index % arr.length;
+        return [...arr.slice(normalizedIndex), ...arr.slice(0, normalizedIndex)];
+    };
 
+    const isMonthYearFormat = (dateString) => {
+        const trimmed = dateString?.trim() || "";
+        const fullMonthFormat = DateTime.fromFormat(trimmed, "LLLL yyyy");
+        const shortMonthFormat = DateTime.fromFormat(trimmed, "LLL yyyy");
         return fullMonthFormat.isValid || shortMonthFormat.isValid;
-    }
+    };
 
-    async function showNextItem() {
-        buttonElement.classList.add("animate-ping");
-
-        const itemToMove = checklistItems[0];
-        const newChecklistItems = [...checklistItems.slice(1), itemToMove];
-        checklistItems = newChecklistItems;
-
+    const createUpdateChanges = (item) => {
         const changes = [
             {
                 action: "move",
-                node_id: itemToMove.id,
+                node_id: item.id,
                 parent_id: content.id,
                 index: -1,
             },
         ];
 
-        if (!itemToMove.note || isMonthYearFormat(itemToMove.note)) {
+        if (!item.note || isMonthYearFormat(item.note)) {
             const today = DateTime.now();
             const newMonthYear = today.toFormat("LLLL yyyy");
-
             changes.push({
                 action: "edit",
-                node_id: itemToMove.id,
+                node_id: item.id,
                 note: newMonthYear,
             });
         }
 
-        const result = await updateDynalist(content.file_id, changes).then(
-            () => {
-                success("Sent to bottom of list in Dynalist!");
-                buttonElement.classList.remove("animate-ping");
-                return true;
-            },
-            (error) => {
-                console.error("Failed to update Dynalist:", error);
-                buttonElement.classList.remove("animate-ping");
-                return false;
-            },
-        );
+        return changes;
+    };
 
-        return result;
-    }
+    const handleUpdateSuccess = () => {
+        success("Sent to bottom of list in Dynalist!");
+        isLoading.set(false);
+        return true;
+    };
+
+    const handleUpdateError = (error) => {
+        console.error("Failed to update Dynalist:", error);
+        isLoading.set(false);
+        return false;
+    };
+
+    const showNextItem = async () => {
+        if (!currentItem || $isLoading) return false;
+
+        isLoading.set(true);
+        rotationIndex.update((index) => (index + 1) % checklistItems.length);
+
+        const changes = createUpdateChanges(currentItem);
+
+        return updateDynalist(content.file_id, changes).then(
+            handleUpdateSuccess,
+            handleUpdateError,
+        );
+    };
 </script>
 
-{#if checklistItems?.length > 0}
+{#if hasItems}
     <div class="mt-2">
         <button
-            bind:this={buttonElement}
-            class="float-left mr-2 mt-0.5 inline-block h-5 w-5 cursor-pointer rounded bg-primary p-1 pb-5 pr-5"
-            on:click={showNextItem}><ArrowUturnDownIcon class="h-4 w-4" /></button
+            class="float-left mr-2 mt-0.5 inline-block h-5 w-5 cursor-pointer rounded bg-primary p-1 pb-5 pr-5 {$isLoading
+                ? 'animate-ping'
+                : ''}"
+            on:click={showNextItem}
+            disabled={$isLoading}
         >
+            <ArrowUturnDownIcon class="h-4 w-4" />
+        </button>
 
-        {#key checklistItems}
+        {#key $rotationIndex}
             <em class="absolute -top-3.5 left-0 text-nowrap text-xs opacity-25">
                 <span class="mr-0.5 inline-block w-7">&infin;{checklistItems.length}</span>
-                {#if checklistItems[0].note && isMonthYearFormat(checklistItems[0].note)}
-                    <span>last completed {checklistItems[0].note}</span>
+                {#if currentItem?.note && isMonthYearFormat(currentItem.note)}
+                    <span>last completed {currentItem.note}</span>
                 {/if}
             </em>
             <Markdown
-                md={`${checklistItems[0].content}\n${generateDynalistComment(checklistItems[0])}`}
+                md={`${currentItem?.content || ""}\n${generateDynalistComment(currentItem)}`}
             />
         {/key}
     </div>
