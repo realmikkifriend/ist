@@ -1,5 +1,5 @@
 <script>
-    import { onMount } from "svelte";
+    import { writable } from "svelte/store";
     import { BackspaceIcon } from "@krowten/svelte-heroicons";
     import Markdown from "svelte-exmarkdown";
     import { generateDynalistComment } from "./dynalist";
@@ -8,17 +8,16 @@
 
     export let content;
 
-    let checklistItems, buttonElement;
+    const removedItemIds = writable(new Set());
 
-    onMount(() => {
-        checklistItems = content.children;
-    });
+    $: checklistItems = content?.children?.filter((item) => !$removedItemIds.has(item.id)) || [];
 
-    async function showNextItem() {
+    const createShowNextItemHandler = (buttonElement) => async () => {
+        if (checklistItems.length === 0) return;
+
         buttonElement.classList.add("animate-ping");
 
         const itemToRemove = checklistItems[0];
-        checklistItems = [...checklistItems].slice(1);
 
         try {
             const changes = [
@@ -31,23 +30,36 @@
 
             await updateDynalist(content.file_id, changes);
 
+            removedItemIds.update((ids) => new Set([...ids, itemToRemove.id]));
             success("Removed from list in Dynalist!");
             buttonElement.classList.remove("animate-ping");
         } catch (error) {
             console.error("Failed to update Dynalist:", error);
+            buttonElement.classList.remove("animate-ping");
         }
-    }
+    };
+
+    const buttonAction = (node) => {
+        const handleClick = createShowNextItemHandler(node);
+        node.addEventListener("click", handleClick);
+
+        return {
+            destroy() {
+                node.removeEventListener("click", handleClick);
+            },
+        };
+    };
 </script>
 
-{#if checklistItems?.length > 0}
+{#if checklistItems.length > 0}
     <div class="mt-2">
         <em class="absolute -top-3.5 left-0 text-nowrap text-xs opacity-25">
             <span>{checklistItems.length} remaining</span>
         </em>
         <button
-            bind:this={buttonElement}
+            use:buttonAction
             class="float-left mr-2 mt-0.5 inline-block h-5 w-5 cursor-pointer rounded bg-primary p-1 pb-5 pr-5"
-            on:click={showNextItem}><BackspaceIcon class="h-4 w-4" /></button
+            ><BackspaceIcon class="h-4 w-4" /></button
         >
         {#key checklistItems}
             <Markdown
