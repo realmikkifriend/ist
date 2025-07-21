@@ -69,7 +69,7 @@
     </label>
 </div>
 
-{#each $todoistData.contexts as context}
+{#each $todoistData.contexts as context, index (index)}
     {#if dueTasksByContext[context.id] && dueTasksByContext[context.id].total > 0}
         <button
             class:opacity-25={settings.selectedContext &&
@@ -80,9 +80,9 @@
             <div class="card-body gap-0 px-2 py-1">
                 <p class="card-title text-lg font-bold">{context.name}</p>
                 <div class="flex flex-row items-start space-x-2">
-                    {#each Object.keys(dueTasksByContext[context.id].priorities).sort((a, b) => b - a) as priority}
+                    {#each Object.keys(dueTasksByContext[context.id].priorities).sort((a, b) => b - a) as priority, index (index)}
                         <div class="flex flex-row items-start space-x-1 py-1">
-                            {#each Array(dueTasksByContext[context.id].priorities[priority]).fill() as _}
+                            {#each Array(dueTasksByContext[context.id].priorities[priority]).fill() as _, index (index)}
                                 <div
                                     class="badge badge-xs h-1 w-2 border-none p-1 {getPriorityClasses(
                                         priority,
