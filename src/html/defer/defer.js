@@ -47,7 +47,7 @@ function updateButtonWithTasks(button, matchedTasks) {
 function formatButtonTime(futureTime, now) {
     const isTomorrow = now.startOf("day").toMillis() !== futureTime.startOf("day").toMillis();
     const timeFormat = futureTime.toFormat("h:mm a");
-    return isTomorrow ? `<i>${timeFormat}</i>` : timeFormat;
+    return isTomorrow ? `*${timeFormat}` : timeFormat;
 }
 
 export function updateMilliseconds(task, tasks) {

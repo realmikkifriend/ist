@@ -38,8 +38,12 @@
             </button>
             {#if button.time}
                 <div class="flex max-h-4 w-full justify-between overflow-hidden text-xs opacity-65">
-                    <span class="w-fit overflow-hidden text-left text-secondary"
-                        >{@html button.time}</span
+                    <span
+                        class="w-fit overflow-hidden text-left text-secondary"
+                        class:italic={button.time && button.time.startsWith("*")}
+                        >{button.time && button.time.startsWith("*")
+                            ? button.time.slice(1)
+                            : button.time}</span
                     >
                     <span
                         class="badge badge-xs mt-0.5 w-fit overflow-hidden text-right font-bold {getPriorityClasses(
