@@ -2,7 +2,7 @@
     import { Icon, Bars3, ArrowLeftOnRectangle } from "svelte-hero-icons";
     import Contexts from "./Contexts.svelte";
     import Footer from "../Footer.svelte";
-    import { todoistData, userSettings, handleLogout } from "../../js/stores";
+    import { todoistData, handleLogout } from "../../js/stores";
 
     export let hash;
 </script>
