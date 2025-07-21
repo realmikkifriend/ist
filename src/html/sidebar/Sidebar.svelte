@@ -5,9 +5,6 @@
     import { todoistData, userSettings, handleLogout } from "../../js/stores";
 
     export let hash;
-
-    let selectedContext;
-    $: selectedContext = $userSettings.selectedContext;
 </script>
 
 <div class="drawer">

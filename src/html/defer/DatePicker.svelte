@@ -3,19 +3,19 @@
     import { DateTime } from "luxon";
     import SveltyPicker from "svelty-picker";
     import { updateCalendarCells } from "./defer.js";
+
     export let taskToDefer, tz, tasks;
 
-    let calendarElement, valueDefault;
+    let calendarElement;
 
-    let tomorrow = DateTime.now().setZone(tz).plus({ days: 1 });
-    let tomorrowStr = tomorrow.toISODate();
+    const tomorrowStr = DateTime.now().setZone(tz).plus({ days: 1 }).toISODate();
 
     afterUpdate(() => updateCalendarCells(calendarElement, tz, tasks, taskToDefer));
 
     const dispatch = createEventDispatcher();
 
     const handleDefer = ({ detail: rawTime }) => {
-        valueDefault = undefined;
+        // valueDefault = undefined;
         dispatch("defer", { rawTime });
     };
 </script>
@@ -25,7 +25,6 @@
     on:click={() => updateCalendarCells(calendarElement, tz, tasks, taskToDefer)}
 >
     <SveltyPicker
-        bind:value={valueDefault}
         startDate={tomorrowStr}
         pickerOnly="true"
         mode="date"
