@@ -1,5 +1,6 @@
 <script>
-    import { onMount, onDestroy } from "svelte";
+    import { onMount } from "svelte";
+    import { writable } from "svelte/store";
     import { DateTime } from "luxon";
     import { ArrowPathIcon } from "@krowten/svelte-heroicons";
     import { todoistData, todoistError, userSettings, firstDueTask } from "../js/stores";
@@ -12,12 +13,8 @@
     import NoTasks from "./NoTasks.svelte";
     import Task from "./task/Task.svelte";
     import Agenda from "./agenda/Agenda.svelte";
-    import { writable } from "svelte/store";
 
-    let autoRefresh,
-        isSpinning = false,
-        dataPromise;
-
+    let isSpinning = false;
     const hash = writable(window.location.hash);
 
     $: {
@@ -33,15 +30,13 @@
 
         updateHash();
 
-        dataPromise = handleRefresh();
+        handleRefresh();
 
-        autoRefresh = setInterval(async () => {
+        const interval = setInterval(async () => {
             await handleRefresh();
         }, 300000);
-    });
 
-    onDestroy(() => {
-        clearInterval(autoRefresh);
+        return () => clearInterval(interval);
     });
 
     const handleDone = ({
@@ -67,6 +62,8 @@
             isSpinning = false;
         });
     };
+
+    const dataPromise = () => handleRefresh();
 </script>
 
 <div class="flex w-fit items-center">
@@ -82,7 +79,7 @@
 {#if $hash === "#today" || $hash === "#tomorrow"}
     <Agenda />
 {:else}
-    {#await dataPromise}
+    {#await dataPromise()}
         <div class="hero">Loading...</div>
     {:then}
         {#if $todoistData.tasks}
