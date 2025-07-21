@@ -23,7 +23,6 @@
     "dependencies": {
         "@doist/todoist-api-typescript": "^5.0.2",
         "@fontsource/clear-sans": "^5.0.11",
-        "@krowten/svelte-heroicons": "^0.1.0",
         "@tailwindcss/typography": "^0.5.13",
         "chrono-node": "^2.7.6",
         "luxon": "^3.4.4",
