@@ -14,7 +14,7 @@
     import Task from "./task/Task.svelte";
     import Agenda from "./agenda/Agenda.svelte";
 
-    let isSpinning = false;
+    const isSpinning = writable(false);
     const hash = writable(window.location.hash);
 
     $: {
@@ -56,10 +56,10 @@
     };
 
     const handleRefresh = async () => {
-        isSpinning = true;
+        isSpinning.set(true);
 
         await refreshData().finally(() => {
-            isSpinning = false;
+            isSpinning.set(false);
         });
     };
 
@@ -103,5 +103,5 @@
 {/if}
 
 <button class="fixed bottom-2 right-2 z-20 rounded-md bg-base-100 p-1" on:click={handleRefresh}>
-    <ArrowPathIcon class="h-6 w-6 {isSpinning ? 'animate-spin' : ''}" />
+    <ArrowPathIcon class="h-6 w-6 {$isSpinning ? 'animate-spin' : ''}" />
 </button>
