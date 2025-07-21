@@ -63,11 +63,9 @@
     const handleRefresh = async () => {
         isSpinning = true;
 
-        try {
-            await refreshData();
-        } finally {
+        await refreshData().finally(() => {
             isSpinning = false;
-        }
+        });
     };
 </script>
 
@@ -103,11 +101,7 @@
     {/await}
 
     {#if $todoistError}
-        {@html error(
-            $todoistError.includes("NetworkError")
-                ? "Offline..."
-                : `Error loading Todoist data: ${$todoistError}`,
-        ) && ""}
+        {error($todoistError)}
     {/if}
 {/if}
 
