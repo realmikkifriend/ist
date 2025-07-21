@@ -2,7 +2,7 @@
     import { ArrowPathIcon, KeyIcon } from "@krowten/svelte-heroicons";
     import { dynalistAccessToken } from "../../../js/stores";
     import { success } from "../../../js/toasts";
-    import { getDynalistLogo } from "../../../js/logos";
+    import Logo from "../../Logo.svelte";
     import { validateDynalistToken } from "./dynalistApi";
 
     async function handleToken(event) {
@@ -39,7 +39,7 @@
 
 <div class="dynalistPrompt w-full">
     <div class="flex h-auto items-center space-x-1">
-        {@html getDynalistLogo(8)}
+        <Logo type="dynalist" size={8} />
         <div class="overflow-x-hidden text-nowrap">
             Provide <a
                 href="https://dynalist.io/developer"

@@ -1,4 +1,5 @@
 <script>
+    import { createEventDispatcher } from "svelte";
     import {
         ChevronDownIcon,
         ListBulletIcon,
@@ -7,8 +8,7 @@
         ArrowPathRoundedSquareIcon,
         InboxIcon,
     } from "@krowten/svelte-heroicons";
-    import { createEventDispatcher } from "svelte";
-    import { getDynalistLogo } from "../../../js/logos";
+    import Logo from "../../Logo.svelte";
 
     export let selectedType, url;
 
@@ -33,7 +33,7 @@
         role="button"
         class="btn m-0 h-2 min-h-8 gap-0 border-transparent bg-accent p-1 pb-3 pt-0 shadow-none hover:bg-primary"
     >
-        {@html getDynalistLogo(6)}
+        <Logo type="dynalist" size={6} />
         <ChevronDownIcon class="h-3 w-3" />
     </div>
     <ul tabindex="-1" class="menu dropdown-content z-20 mr-[-4rem] w-fit rounded-lg bg-neutral p-1">

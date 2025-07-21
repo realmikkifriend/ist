@@ -1,6 +1,6 @@
 <script>
-    import { getTodoistLogo } from "../js/logos";
     import { getAuthStateParameter, getAuthorizationUrl } from "@doist/todoist-api-typescript";
+    import Logo from "./Logo.svelte";
     import Footer from "./Footer.svelte";
 
     const TODOIST_CLIENT_ID = process.env.TODOIST_CLIENT_ID;
@@ -22,7 +22,7 @@
             </p>
             <div>
                 <a class="btn btn-outline btn-primary items-center text-lg" href={todoistAuthURL}>
-                    {@html getTodoistLogo()}
+                    <Logo type="todoist" style="max-height: 55%;" />
                     <p class="pb-1">Continue with Todoist</p>
                 </a>
             </div>
