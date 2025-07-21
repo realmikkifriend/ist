@@ -66,7 +66,7 @@
                 <div class="flex flex-row items-start space-x-2">
                     {#each Object.keys($dueTasksByContext[context.id].priorities).sort((a, b) => b - a) as priority, index (index)}
                         <div class="flex flex-row items-start space-x-1 py-1">
-                            {#each Array($dueTasksByContext[context.id].priorities[priority]).fill() as _, index (index)}
+                            {#each Array($dueTasksByContext[context.id].priorities[priority]).fill() as index (index)}
                                 <div
                                     class="badge badge-xs h-1 w-2 border-none p-1 {getPriorityClasses(
                                         priority,
