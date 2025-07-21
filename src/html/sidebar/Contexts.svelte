@@ -1,11 +1,14 @@
 <script>
-    import { XCircleIcon, CalendarIcon, ArrowsUpDownIcon } from "@krowten/svelte-heroicons";
+    import { derived } from "svelte/store";
+    import { XCircleIcon, CalendarIcon } from "@krowten/svelte-heroicons";
     import { todoistData, userSettings, previousFirstDueTask } from "../../js/stores";
     import { getPriorityClasses } from "../../js/classes";
     import { openAgenda } from "../agenda/agenda";
     import { getDueTasksGroupedByContext } from "./sidebar.js";
 
-    $: dueTasksByContext = $todoistData ? getDueTasksGroupedByContext($todoistData) : {};
+    const dueTasksByContext = derived(todoistData, ($todoistData) =>
+        $todoistData ? getDueTasksGroupedByContext($todoistData) : {},
+    );
 
     function closeDrawer() {
         const drawerCheckbox = document.getElementById("my-drawer");
@@ -51,7 +54,7 @@
 </div>
 
 {#each $todoistData.contexts as context, index (index)}
-    {#if dueTasksByContext[context.id] && dueTasksByContext[context.id].total > 0}
+    {#if $dueTasksByContext[context.id] && $dueTasksByContext[context.id].total > 0}
         <button
             class:opacity-25={$userSettings.selectedContext &&
                 $userSettings.selectedContext.id !== context.id}
@@ -61,9 +64,9 @@
             <div class="card-body gap-0 px-2 py-1">
                 <p class="card-title text-lg font-bold">{context.name}</p>
                 <div class="flex flex-row items-start space-x-2">
-                    {#each Object.keys(dueTasksByContext[context.id].priorities).sort((a, b) => b - a) as priority, index (index)}
+                    {#each Object.keys($dueTasksByContext[context.id].priorities).sort((a, b) => b - a) as priority, index (index)}
                         <div class="flex flex-row items-start space-x-1 py-1">
-                            {#each Array(dueTasksByContext[context.id].priorities[priority]).fill() as _, index (index)}
+                            {#each Array($dueTasksByContext[context.id].priorities[priority]).fill() as _, index (index)}
                                 <div
                                     class="badge badge-xs h-1 w-2 border-none p-1 {getPriorityClasses(
                                         priority,
