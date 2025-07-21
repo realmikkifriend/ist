@@ -5,17 +5,13 @@
 
     export let task, tasks;
 
-    let buttons = [];
+    $: buttons = updateMilliseconds(task, tasks);
 
-    const updateButtons = () => {
-        buttons = updateMilliseconds(task, tasks);
+    const triggerButtonUpdate = () => {
+        tasks = [...tasks];
     };
 
-    onMount(() => {
-        updateButtons();
-    });
-
-    const interval = setInterval(updateButtons, 30000);
+    const interval = setInterval(triggerButtonUpdate, 30000);
 
     onDestroy(() => {
         clearInterval(interval);
