@@ -6,24 +6,29 @@
 
     export let taskToDefer, tz, tasks;
 
-    let calendarElement;
-
     const tomorrowStr = DateTime.now().setZone(tz).plus({ days: 1 }).toISODate();
-
-    afterUpdate(() => updateCalendarCells(calendarElement, tz, tasks, taskToDefer));
 
     const dispatch = createEventDispatcher();
 
     const handleDefer = ({ detail: rawTime }) => {
-        // valueDefault = undefined;
         dispatch("defer", { rawTime });
     };
+
+    const handleButtonClick = (event) => {
+        updateCalendarCells(event.currentTarget, tz, tasks, taskToDefer);
+    };
+
+    const handleAfterUpdate = () => {
+        const buttonElement = document.querySelector("button[data-calendar-button]");
+        if (buttonElement) {
+            updateCalendarCells(buttonElement, tz, tasks, taskToDefer);
+        }
+    };
+
+    afterUpdate(handleAfterUpdate);
 </script>
 
-<button
-    bind:this={calendarElement}
-    on:click={() => updateCalendarCells(calendarElement, tz, tasks, taskToDefer)}
->
+<button data-calendar-button on:click={handleButtonClick}>
     <SveltyPicker
         startDate={tomorrowStr}
         pickerOnly="true"
