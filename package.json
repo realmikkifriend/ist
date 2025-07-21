@@ -5,7 +5,10 @@
     "scripts": {
         "start": "dotenv -- webpack serve --open --mode development --no-stats",
         "build": "webpack --mode production",
-        "test": "svelte-check && vitest run"
+        "test": "svelte-check && vitest run",
+        "test:coverage": "svelte-check && vitest run --coverage",
+        "test:watch": "vitest",
+        "test:coverage:watch": "vitest --coverage"
     },
     "repository": {
         "type": "git",
@@ -35,6 +38,7 @@
         "@sveltejs/vite-plugin-svelte": "^3.1.2",
         "@testing-library/jest-dom": "^6.4.5",
         "@testing-library/svelte": "^5.2.4",
+        "@vitest/coverage-v8": "^3.2.4",
         "@zerodevx/svelte-toast": "^0.9.5",
         "autoprefixer": "^10.4.20",
         "css-loader": "^7.1.1",
