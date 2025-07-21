@@ -1,6 +1,6 @@
 <script>
     import { createEventDispatcher } from "svelte";
-    import { writable } from "svelte/store";
+    import { writable, derived } from "svelte/store";
     import { CalendarIcon, ClockIcon } from "@krowten/svelte-heroicons";
     import { DateTime } from "luxon";
     import { todoistData } from "../../js/stores";
@@ -19,9 +19,7 @@
 
     const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "America/Chicago";
 
-    let tasks = [];
-
-    $: tasks = $todoistData.tasks;
+    const tasks = derived(todoistData, ($todoistData) => $todoistData.tasks);
 
     const dispatch = createEventDispatcher();
 
@@ -70,11 +68,11 @@
             </div>
         </div>
 
-        {#key tasks}
+        {#key $tasks}
             {#if $isTimeTabActive}
-                <TimePicker {task} {tasks} on:defer={handleDefer} />
+                <TimePicker {task} tasks={$tasks} on:defer={handleDefer} />
             {:else}
-                <DatePicker taskToDefer={task} {tz} {tasks} on:defer={handleDefer} />
+                <DatePicker taskToDefer={task} {tz} tasks={$tasks} on:defer={handleDefer} />
             {/if}
         {/key}
     {/key}
