@@ -41,6 +41,8 @@ export default defineConfig([
                     },
                 },
             ],
+            "jsdoc/no-types": "off",
+            "jsdoc/require-param-type": "error",
         },
     },
     // -----------------------------------
