@@ -29,20 +29,22 @@
 </script>
 
 <div class="mt-2 flex w-72 flex-row flex-wrap gap-x-2 gap-y-1">
-    {#each buttons as { text, ms, styling, stylingButton, time, count, priority }}
-        <div class={styling}>
+    {#each buttons as button (button.ms)}
+        <div class={button.styling}>
             <button
-                class="btn min-h-4 w-full rounded-md px-1 hover:bg-secondary {stylingButton}"
-                on:click={() => handleDefer(ms)}
-                >{text}
+                class="btn min-h-4 w-full rounded-md px-1 hover:bg-secondary {button.stylingButton}"
+                on:click={() => handleDefer(button.ms)}
+                >{button.text}
             </button>
-            {#if time}
+            {#if button.time}
                 <div class="flex max-h-4 w-full justify-between overflow-hidden text-xs opacity-65">
-                    <span class="w-fit overflow-hidden text-left text-secondary">{@html time}</span>
+                    <span class="w-fit overflow-hidden text-left text-secondary"
+                        >{@html button.time}</span
+                    >
                     <span
                         class="badge badge-xs mt-0.5 w-fit overflow-hidden text-right font-bold {getPriorityClasses(
-                            priority,
-                        )}">{count}</span
+                            button.priority,
+                        )}">{button.count}</span
                     >
                 </div>
             {/if}
