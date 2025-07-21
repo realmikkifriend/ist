@@ -239,4 +239,18 @@ describe("getGradientColor", () => {
             expect(getGradientColor(tasks, hash)).toBe(expected);
         });
     });
+
+    it("handles non-numeric task values", () => {
+        // Test the default case in #tomorrow switch statement
+        expect(getGradientColor(NaN, "#tomorrow")).toBe(null);
+        expect(getGradientColor(Infinity, "#tomorrow")).toBe(
+            "bg-gradient-to-r from-red-900 to-red-700",
+        );
+        expect(getGradientColor(-Infinity, "#tomorrow")).toBe(
+            "bg-gradient-to-r from-blue-900 to-blue-700",
+        );
+
+        // Test the else case in #today logic
+        expect(getGradientColor(NaN, "#today")).toBe("");
+    });
 });
