@@ -18,9 +18,9 @@
     const hash = writable(window.location.hash);
 
     $: {
-        $userSettings.selectedContext;
-        $todoistData.dueTasks;
-        updateFirstDueTask();
+        if ($userSettings.selectedContext || $todoistData.dueTasks) {
+            updateFirstDueTask();
+        }
     }
 
     onMount(() => {
