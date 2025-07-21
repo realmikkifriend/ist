@@ -1,5 +1,6 @@
 <script>
     import { createEventDispatcher } from "svelte";
+    import { writable } from "svelte/store";
     import { CalendarIcon, ClockIcon } from "@krowten/svelte-heroicons";
     import { DateTime } from "luxon";
     import { todoistData } from "../../js/stores";
@@ -9,11 +10,11 @@
 
     export let task;
 
-    let isTimeTabActive;
-    $: isTimeTabActive = task.due.allDay !== 1;
+    const isTimeTabActive = writable(false);
+    $: isTimeTabActive.set(task.due.allDay !== 1);
 
     const selectTab = (tab) => {
-        isTimeTabActive = tab === "time";
+        isTimeTabActive.set(tab === "time");
     };
 
     const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "America/Chicago";
@@ -25,7 +26,7 @@
     const dispatch = createEventDispatcher();
 
     const handleDefer = ({ detail: { rawTime } }) => {
-        isTimeTabActive = true;
+        isTimeTabActive.set(true);
 
         const time =
             typeof rawTime === "number"
@@ -55,7 +56,7 @@
                     <button
                         role="tab"
                         tabindex="0"
-                        class={tab === (isTimeTabActive ? "time" : "calendar")
+                        class={tab === ($isTimeTabActive ? "time" : "calendar")
                             ? "tab tab-active"
                             : "tab bg-neutral"}
                         on:click={() => selectTab(tab)}
@@ -70,7 +71,7 @@
         </div>
 
         {#key tasks}
-            {#if isTimeTabActive}
+            {#if $isTimeTabActive}
                 <TimePicker {task} {tasks} on:defer={handleDefer} />
             {:else}
                 <DatePicker taskToDefer={task} {tz} {tasks} on:defer={handleDefer} />
