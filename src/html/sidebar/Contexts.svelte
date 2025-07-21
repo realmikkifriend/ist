@@ -7,9 +7,6 @@
 
     $: dueTasksByContext = $todoistData ? getDueTasksGroupedByContext($todoistData) : {};
 
-    let settings;
-    $: settings = $userSettings;
-
     function closeDrawer() {
         const drawerCheckbox = document.getElementById("my-drawer");
         if (drawerCheckbox) {
@@ -19,7 +16,7 @@
 
     function handleContextClick(contextId) {
         previousFirstDueTask.set(null);
-        const isCurrentlySelected = settings.selectedContext?.id === contextId;
+        const isCurrentlySelected = $userSettings.selectedContext?.id === contextId;
         const newSelectedContext = isCurrentlySelected
             ? null
             : {
@@ -72,8 +69,8 @@
 {#each $todoistData.contexts as context, index (index)}
     {#if dueTasksByContext[context.id] && dueTasksByContext[context.id].total > 0}
         <button
-            class:opacity-25={settings.selectedContext &&
-                settings.selectedContext.id !== context.id}
+            class:opacity-25={$userSettings.selectedContext &&
+                $userSettings.selectedContext.id !== context.id}
             class="mb-2 rounded-lg bg-secondary text-base-100"
             on:click={() => handleContextClick(context.id)}
         >
