@@ -1,11 +1,6 @@
 <script>
     import { writable } from "svelte/store";
-    import {
-        parseCountData,
-        getAdjustedData,
-        handleCount,
-        calculateLabel,
-    } from "./dynalistCount.js";
+    import { parseCountData, handleCount, calculateLabel } from "./dynalistCount.js";
 
     export let content;
 
@@ -13,7 +8,11 @@
     const options = ["+1", "+5", "+10"];
 
     const initialData = parseCountData(content.note);
-    const countData = writable(getAdjustedData(initialData, todayFormatted));
+    const countData = writable(
+        initialData.date !== todayFormatted
+            ? { ...initialData, date: todayFormatted, current: 0 }
+            : initialData,
+    );
 
     async function handleCountClick(option) {
         const updatedData = await handleCount(option, $countData, content);

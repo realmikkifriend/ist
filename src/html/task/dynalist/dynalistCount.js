@@ -8,34 +8,20 @@ export const parseCountData = (note) => {
     return { total, current, date };
 };
 
-export const getAdjustedData = (data, today) => {
-    if (data.date !== today) {
-        return { ...data, date: today, current: 0 };
-    }
-    return data;
-};
-
-const createUpdatedCountData = (currentData, increment) => ({
-    ...currentData,
-    current: (+currentData.current || 0) + increment,
-});
-
-const createNoteString = (total, current, date) => `count ${total}/${current} ${date}`;
-
-const createApiChanges = (nodeId, noteString) => [
-    {
-        action: "edit",
-        node_id: nodeId,
-        note: noteString,
-    },
-];
-
 export async function handleCount(option, countData, content) {
     const todayFormatted = new Date().toLocaleDateString("en-CA");
     const increment = +option.slice(1);
-    const updatedData = createUpdatedCountData(countData, increment);
-    const newNote = createNoteString(updatedData.total, updatedData.current, todayFormatted);
-    const changes = createApiChanges(content.id, newNote);
+    const updatedData = {
+        ...countData,
+        current: (+countData.current || 0) + increment,
+    };
+    const changes = [
+        {
+            action: "edit",
+            node_id: content.id,
+            note: `count ${updatedData.total}/${updatedData.current} ${todayFormatted}`,
+        },
+    ];
 
     await updateDynalist(content.file_id, changes);
 
