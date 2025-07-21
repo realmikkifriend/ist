@@ -8,10 +8,7 @@
     import OAuthCallback from "./OAuthCallback.svelte";
     import "../css/styles.css";
 
-    let accessToken;
-    $: accessToken = $todoistAccessToken;
-
-    $: if (window.location.search.startsWith("?code") && accessToken) {
+    $: if (window.location.search.startsWith("?code") && $todoistAccessToken) {
         window.history.pushState({ path: "/" }, "", "/");
     }
 </script>
@@ -22,7 +19,7 @@
     <SvelteToast target="success" />
 </div>
 
-{#if !accessToken}
+{#if !$todoistAccessToken}
     {#if window.location.search.startsWith("?code")}
         <OAuthCallback />
     {:else}
