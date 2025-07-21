@@ -37,6 +37,15 @@
 
     const handleTypeSelection = ({ detail: { type } }) =>
         dynalistStore.update((state) => ({ ...state, selectedType: type }));
+
+    $: if ($dynalistStore.selectedType === "" && $dynalistStore.dynalistObject) {
+        dynalistStore.update((state) => ({
+            ...state,
+            selectedType: state.dynalistObject
+                ? loadPromise.then((result) => result.selectedType)
+                : "",
+        }));
+    }
 </script>
 
 {#await loadPromise}
@@ -46,16 +55,6 @@
 {:then result}
     {#if result.dynalistObject}
         <div class="relative">
-            {#if $dynalistStore.selectedType === ""}
-                {@html (() => {
-                    dynalistStore.update((state) => ({
-                        ...state,
-                        selectedType: result.selectedType,
-                    }));
-                    return "";
-                })()}
-            {/if}
-
             {#if $dynalistStore.selectedType === "read"}
                 <Markdown
                     md={generateDynalistComment($dynalistStore.dynalistObject) ||
