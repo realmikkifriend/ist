@@ -5,7 +5,7 @@ import type { QuarterHourPosition, GradientType } from "../../types/agenda.js";
 
 /**
  * Returns background and text color classes for a given priority.
- * @param priority - The priority level (1 to 4).
+ * @param {Priority} priority - The priority level (1 to 4).
  * @returns The corresponding Tailwind CSS classes for the priority.
  */
 export const getPriorityClasses = (priority: Priority): string =>
@@ -18,7 +18,7 @@ export const getPriorityClasses = (priority: Priority): string =>
 
 /**
  * Returns the border color class for a given priority.
- * @param priority - The priority level (1 to 4).
+ * @param {Priority} priority - The priority level (1 to 4).
  * @returns The corresponding Tailwind CSS border class for the priority.
  */
 export const getPriorityBorder = (priority: Priority): string =>
@@ -77,7 +77,7 @@ export const borderClasses: Record<ColorName, string> = {
 
 /**
  * Returns the CSS class for positioning an element based on a quarter hour.
- * @param position - The quarter hour position (0.25, 0.5, or 0.75).
+ * @param {QuarterHourPosition} position - The quarter hour position (0.25, 0.5, or 0.75).
  * @returns The corresponding Tailwind CSS top position class.
  */
 export const getQuarterHourPosition = (position: QuarterHourPosition): string =>
@@ -89,8 +89,8 @@ export const getQuarterHourPosition = (position: QuarterHourPosition): string =>
 
 /**
  * Determines a gradient background class based on the total number of tasks and a hash string.
- * @param totalTasks - The total number of tasks.
- * @param hash - The hash string, e.g., "#today", "#tomorrow", or others.
+ * @param {number} totalTasks - The total number of tasks.
+ * @param {string} hash - The hash string, e.g., "#today", "#tomorrow", or others.
  * @returns The gradient CSS class string, null, or an empty string depending on conditions.
  */
 export function getGradientColor(totalTasks: number, hash: string): string | null {
