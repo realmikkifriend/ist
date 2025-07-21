@@ -1,5 +1,5 @@
 <script>
-    import { createEventDispatcher, onDestroy, onMount } from "svelte";
+    import { createEventDispatcher, onDestroy } from "svelte";
     import { getPriorityClasses } from "../../js/classes";
     import { updateMilliseconds } from "./defer.js";
 
