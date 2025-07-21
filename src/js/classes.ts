@@ -1,35 +1,8 @@
+import type { Priority, ColorName } from "../../types/todoist.js";
+import type { QuarterHourPosition, GradientType } from "../../types/agenda.js";
+
 // This code may appear redundant, but ensures that Svelte exports all necessary classes.
 
-// Type definitions
-type Priority = 1 | 2 | 3 | 4;
-
-type ColorName =
-    | "berry_red"
-    | "red"
-    | "orange"
-    | "yellow"
-    | "olive_green"
-    | "lime_green"
-    | "green"
-    | "mint_green"
-    | "teal"
-    | "sky_blue"
-    | "light_blue"
-    | "blue"
-    | "grape"
-    | "violet"
-    | "lavender"
-    | "magenta"
-    | "salmon"
-    | "charcoal"
-    | "grey"
-    | "taupe";
-
-type QuarterHourPosition = 0.25 | 0.5 | 0.75;
-
-type GradientType = "blue" | "green" | "darkGreen" | "orange" | "red";
-
-// Priority classes mapping
 const priorityClasses: Record<Priority, string> = {
     1: "bg-priority-1 text-white",
     2: "bg-priority-2 text-white",

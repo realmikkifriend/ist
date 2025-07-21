@@ -22,7 +22,8 @@
     "include": [
         "src/**/*.ts",
         "src/**/*.tsx",
-        "src/**/*.svelte"
+        "src/**/*.svelte",
+        "types/**/*.ts"
     ],
     "exclude": [
         "node_modules"
