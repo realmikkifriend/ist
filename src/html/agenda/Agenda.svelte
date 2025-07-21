@@ -53,8 +53,6 @@
     const updatePage = () => {
         const now = DateTime.now();
 
-        const currentTitle = getTitle();
-
         const targetDate =
             window.location.hash === "#today"
                 ? now
