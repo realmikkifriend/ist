@@ -33,19 +33,6 @@
             closeDrawer();
         }
     }
-
-    // let modal;
-    // let modalOpen = false;
-
-    // function openModal() {
-    //     modal.showModal();
-    //     modalOpen = true;
-    // }
-
-    // function closeModal() {
-    //     modal.close();
-    //     modalOpen = false;
-    // }
 </script>
 
 <div class="mb-2 ml-2 flex items-center justify-between">
@@ -53,9 +40,6 @@
         <button on:click={() => openAgenda("today")}>
             <CalendarIcon class="h-7 w-8" />
         </button>
-        <!-- <button on:click={openModal}>
-            <ArrowsUpDownIcon class="h-7 w-8" />
-        </button> -->
     </div>
     <h1 class="text-2xl font-bold">Contexts</h1>
     <label
@@ -93,7 +77,3 @@
         </button>
     {/if}
 {/each}
-
-<!-- <dialog id="reorder_modal" class="modal" bind:this={modal} on:close={closeModal}>
-    <ContextReorderModal {modalOpen} />
-</dialog> -->
