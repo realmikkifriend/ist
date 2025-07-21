@@ -4,13 +4,14 @@ import { defineConfig } from "eslint/config";
 import functional from "eslint-plugin-functional";
 import svelte from "eslint-plugin-svelte";
 import tseslint from "typescript-eslint";
+import jsdoc from "eslint-plugin-jsdoc";
 
 export default defineConfig([
     { files: ["**/*.{js,mjs,cjs}"], plugins: { js }, extends: ["js/recommended"] },
     { files: ["**/*.js"], languageOptions: { sourceType: "module" } },
     { files: ["**/*.{js,mjs,cjs}"], languageOptions: { globals: globals.browser } },
     // -----------------------------------
-    // `     TypeScript ESLint
+    // `     TypeScript
     ...tseslint.configs.recommended,
     {
         files: ["**/*.{ts,tsx}"],
@@ -20,6 +21,26 @@ export default defineConfig([
                 project: "./tsconfig.json",
                 tsconfigRootDir: import.meta.dirname,
             },
+        },
+    },
+    // -----------------------------------
+    // `     JSDoc
+    jsdoc.configs["flat/recommended-typescript"],
+    jsdoc.configs["flat/contents-typescript"],
+    {
+        files: ["**/*.ts"],
+        plugins: {
+            jsdoc,
+        },
+        rules: {
+            "jsdoc/require-jsdoc": [
+                "warn",
+                {
+                    require: {
+                        ArrowFunctionExpression: true,
+                    },
+                },
+            ],
         },
     },
     // -----------------------------------
@@ -33,7 +54,4 @@ export default defineConfig([
     // functional.configs.stylistic,
     functional.configs.all,
     functional.configs.disableTypeChecked,
-    {
-        rules: {},
-    },
 ]);
