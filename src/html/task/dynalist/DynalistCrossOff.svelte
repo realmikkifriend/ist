@@ -19,24 +19,25 @@
 
         const itemToRemove = checklistItems[0];
 
-        try {
-            const changes = [
-                {
-                    action: "edit",
-                    node_id: itemToRemove.id,
-                    checked: true,
-                },
-            ];
+        const changes = [
+            {
+                action: "edit",
+                node_id: itemToRemove.id,
+                checked: true,
+            },
+        ];
 
-            await updateDynalist(content.file_id, changes);
-
-            removedItemIds.update((ids) => new Set([...ids, itemToRemove.id]));
-            success("Removed from list in Dynalist!");
-            buttonElement.classList.remove("animate-ping");
-        } catch (error) {
-            console.error("Failed to update Dynalist:", error);
-            buttonElement.classList.remove("animate-ping");
-        }
+        await updateDynalist(content.file_id, changes)
+            .then(() => {
+                removedItemIds.update((ids) => new Set([...ids, itemToRemove.id]));
+                success("Removed from list in Dynalist!");
+            })
+            .catch((error) => {
+                console.error("Failed to update Dynalist:", error);
+            })
+            .finally(() => {
+                buttonElement.classList.remove("animate-ping");
+            });
     };
 
     const buttonAction = (node) => {
