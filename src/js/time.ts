@@ -9,7 +9,7 @@ import { DateTime } from "luxon";
 export const getTaskTime = (dueString: string): { hour: number; minute: number } | null => {
     const dueParsed: ParsedResult | undefined = parse(dueString)[0];
 
-    if (!dueParsed?.index) return null;
+    if (!dueParsed) return null;
 
     const date: Date = dueParsed.start.date();
 
