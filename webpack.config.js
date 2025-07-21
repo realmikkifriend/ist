@@ -13,7 +13,7 @@ module.exports = {
         alias: {
             svelte: path.resolve("node_modules", "svelte/src/runtime"),
         },
-        extensions: [".mjs", ".js", ".svelte"],
+        extensions: [".mjs", ".js", ".ts", ".svelte"],
         mainFields: ["svelte", "browser", "module", "main"],
         conditionNames: ["svelte", "browser", "import"],
     },
@@ -22,6 +22,11 @@ module.exports = {
             {
                 test: /\.svelte$/,
                 use: "svelte-loader",
+            },
+            {
+                test: /\.ts$/,
+                use: "ts-loader",
+                exclude: /node_modules/,
             },
             {
                 test: /\.css$/,

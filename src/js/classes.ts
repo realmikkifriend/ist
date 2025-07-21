@@ -1,28 +1,58 @@
 // This code may appear redundant, but ensures that Svelte exports all necessary classes.
 
-const priorityClasses = {
+// Type definitions
+type Priority = 1 | 2 | 3 | 4;
+
+type ColorName =
+    | "berry_red"
+    | "red"
+    | "orange"
+    | "yellow"
+    | "olive_green"
+    | "lime_green"
+    | "green"
+    | "mint_green"
+    | "teal"
+    | "sky_blue"
+    | "light_blue"
+    | "blue"
+    | "grape"
+    | "violet"
+    | "lavender"
+    | "magenta"
+    | "salmon"
+    | "charcoal"
+    | "grey"
+    | "taupe";
+
+type QuarterHourPosition = 0.25 | 0.5 | 0.75;
+
+type GradientType = "blue" | "green" | "darkGreen" | "orange" | "red";
+
+// Priority classes mapping
+const priorityClasses: Record<Priority, string> = {
     1: "bg-priority-1 text-white",
     2: "bg-priority-2 text-white",
     3: "bg-priority-3 text-white",
     4: "bg-priority-4 text-white",
 };
 
-export const getPriorityClasses = (priority) => {
+export const getPriorityClasses = (priority: Priority): string => {
     return priorityClasses[priority] || "";
 };
 
-const priorityBorders = {
+const priorityBorders: Record<Priority, string> = {
     1: "border-b-priority-1",
     2: "border-b-priority-2",
     3: "border-b-priority-3",
     4: "border-b-priority-4",
 };
 
-export const getPriorityBorder = (priority) => {
+export const getPriorityBorder = (priority: Priority): string => {
     return priorityBorders[priority] || "";
 };
 
-export const colorClasses = {
+export const colorClasses: Record<ColorName, string> = {
     berry_red: "bg-pink-600",
     red: "bg-red-500",
     orange: "bg-orange-500",
@@ -45,7 +75,7 @@ export const colorClasses = {
     taupe: "bg-red-100",
 };
 
-export const borderClasses = {
+export const borderClasses: Record<ColorName, string> = {
     berry_red: "border-pink-600",
     red: "border-red-500",
     orange: "border-orange-500",
@@ -68,18 +98,18 @@ export const borderClasses = {
     taupe: "border-red-100",
 };
 
-const positionClasses = {
+const positionClasses: Record<QuarterHourPosition, string> = {
     0.25: "top-[25%]",
     0.5: "top-[50%]",
     0.75: "top-[75%]",
 };
 
-export function getQuarterHourPosition(position) {
+export function getQuarterHourPosition(position: QuarterHourPosition): string {
     return positionClasses[position] || "";
 }
 
-export function getGradientColor(totalTasks) {
-    const gradients = {
+export function getGradientColor(totalTasks: number): string | null {
+    const gradients: Record<GradientType, string> = {
         blue: "bg-gradient-to-r from-blue-900 to-blue-700",
         green: "bg-gradient-to-r from-green-900 to-green-700",
         darkGreen: "bg-gradient-to-r from-emerald-900 to-emerald-700",
@@ -105,9 +135,9 @@ export function getGradientColor(totalTasks) {
                 return null;
         }
     } else if (window.location.hash === "#today") {
-        const currentHour = new Date().getHours();
-        const hourAdjustment = currentHour > 8 ? currentHour - 8 : 0;
-        const todayThreshold = 14 - hourAdjustment;
+        const currentHour: number = new Date().getHours();
+        const hourAdjustment: number = currentHour > 8 ? currentHour - 8 : 0;
+        const todayThreshold: number = 14 - hourAdjustment;
 
         if (totalTasks < todayThreshold - 2) {
             return gradients.blue;
