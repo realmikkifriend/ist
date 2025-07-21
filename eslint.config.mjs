@@ -12,13 +12,14 @@ export default defineConfig([
     { files: ["**/*.{js,mjs,cjs}"], languageOptions: { globals: globals.browser } },
     // -----------------------------------
     // `     TypeScript
-    ...tseslint.configs.recommended,
+    ...tseslint.configs.recommendedTypeChecked,
     {
-        files: ["**/*.{ts,tsx}"],
+        files: ["**/*.ts", "**/*.tsx"],
+        plugins: { js },
+        extends: ["js/recommended"],
         languageOptions: {
-            globals: globals.browser,
             parserOptions: {
-                project: "./tsconfig.json",
+                projectService: true,
                 tsconfigRootDir: import.meta.dirname,
             },
         },
