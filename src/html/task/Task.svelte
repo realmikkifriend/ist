@@ -9,7 +9,6 @@
     export let task;
 
     const dispatch = createEventDispatcher();
-    let modal;
 
     const handleDone = () => {
         if (task.summoned) window.location.hash = task.summoned;
@@ -17,13 +16,17 @@
     };
 
     const handleDefer = ({ detail: { task, time } }) => {
-        modal.close();
+        document.getElementById("defer_modal").close();
         if (task.summoned) window.location.hash = task.summoned;
         dispatch("defer", { task, time });
     };
 
     const handleSkip = () => {
         skipTask(task);
+    };
+
+    const openModal = () => {
+        document.getElementById("defer_modal").showModal();
     };
 </script>
 
@@ -55,7 +58,7 @@
                 {/if}
                 <button
                     class="text-md btn btn-secondary h-8 min-h-8 content-center p-4"
-                    on:click={() => modal.showModal()}
+                    on:click={openModal}
                 >
                     {#if task.due.allDay === 1}
                         <CalendarIcon class="h-5 w-5 [&>path]:stroke-[3]" />
@@ -71,6 +74,6 @@
     {/if}
 </div>
 
-<dialog id="defer_modal" class="modal" bind:this={modal}>
+<dialog id="defer_modal" class="modal">
     <DeferModal {task} on:defer={handleDefer} />
 </dialog>
