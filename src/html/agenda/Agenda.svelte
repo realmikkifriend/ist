@@ -17,7 +17,6 @@
         todayTasks: [],
     });
     const hourSlots = Array.from({ length: 18 }, (_, i) => i + 6);
-    let now;
 
     $: $todoistData, updatePage();
 
@@ -52,7 +51,7 @@
     }
 
     const updatePage = () => {
-        now = DateTime.now();
+        const now = DateTime.now();
 
         const currentTitle = getTitle();
 
@@ -135,13 +134,13 @@
         {/if}
 
         <div class="w-[99%] overflow-hidden pr-1">
-            {#key (now.hour, $agendaStore.tasks)}
+            {#key (DateTime.now().hour, $agendaStore.tasks)}
                 {#each hourSlots as hour (hour)}
-                    {#if getDisplayHours($agendaStore, now, hourSlots)[hour]}
+                    {#if getDisplayHours($agendaStore, DateTime.now(), hourSlots)[hour]}
                         <AgendaHour
                             title={getTitle()}
                             {hour}
-                            {now}
+                            now={DateTime.now()}
                             tasks={$agendaStore.tasks.filter(
                                 (task) => DateTime.fromISO(task.due.date).hour === hour,
                             )}
