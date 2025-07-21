@@ -54,4 +54,10 @@ export default defineConfig([
     // functional.configs.stylistic,
     functional.configs.all,
     functional.configs.disableTypeChecked,
+    {
+        files: ["**/*.spec.js"],
+        rules: Object.fromEntries(
+            Object.keys(functional.configs.all.rules).map((rule) => [rule, "off"]),
+        ),
+    },
 ]);
