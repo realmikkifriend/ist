@@ -46,9 +46,11 @@
 
         const data = await response.json();
 
-        data.access_token
-            ? todoistAccessToken.set(data.access_token)
-            : console.error("Failed to exchange code for token", data);
+        if (data.access_token) {
+            todoistAccessToken.set(data.access_token);
+        } else {
+            console.error("Failed to exchange code for token", data);
+        }
     }
 </script>
 
