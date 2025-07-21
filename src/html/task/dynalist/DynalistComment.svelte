@@ -1,7 +1,7 @@
 <script>
     import { writable } from "svelte/store";
     import Markdown from "svelte-exmarkdown";
-    import { ArrowPathIcon } from "@krowten/svelte-heroicons";
+    import { Icon, ArrowPath } from "svelte-hero-icons";
     import DynalistChecklist from "./DynalistChecklist.svelte";
     import DynalistCount from "./DynalistCount.svelte";
     import DynalistRotating from "./DynalistRotating.svelte";
@@ -50,7 +50,7 @@
 
 {#await loadPromise}
     <span class="flex items-center">
-        <ArrowPathIcon class="mr-2 h-4 w-4 animate-spin" /> Retrieving Dynalist document...
+        <Icon src={ArrowPath} class="mr-2 h-4 w-4 animate-spin" /> Retrieving Dynalist document...
     </span>
 {:then result}
     {#if result.dynalistObject}

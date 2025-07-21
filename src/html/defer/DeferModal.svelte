@@ -1,7 +1,7 @@
 <script>
     import { createEventDispatcher } from "svelte";
     import { writable, derived } from "svelte/store";
-    import { CalendarIcon, ClockIcon } from "@krowten/svelte-heroicons";
+    import { Icon, Calendar, Clock } from "svelte-hero-icons";
     import { DateTime } from "luxon";
     import { todoistData } from "../../js/stores";
     import { createDateWithTime } from "../../js/time";
@@ -59,8 +59,8 @@
                             : "tab bg-neutral"}
                         on:click={() => selectTab(tab)}
                     >
-                        <svelte:component
-                            this={tab === "time" ? ClockIcon : CalendarIcon}
+                        <Icon
+                            src={tab === "time" ? Clock : Calendar}
                             class="h-5 w-5 [&>path]:stroke-[3]"
                         />
                     </button>

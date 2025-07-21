@@ -1,5 +1,5 @@
 <script>
-    import { Bars3Icon, ArrowLeftOnRectangleIcon } from "@krowten/svelte-heroicons";
+    import { Icon, Bars3, ArrowLeftOnRectangle } from "svelte-hero-icons";
     import Contexts from "./Contexts.svelte";
     import Footer from "../Footer.svelte";
     import { todoistData, userSettings, handleLogout } from "../../js/stores";
@@ -12,7 +12,7 @@
     <div class="drawer-content flex flex-row items-center">
         <label for="my-drawer" class="btn drawer-button mt-0 bg-transparent hover:bg-primary">
             {#if hash !== "#today" && hash !== "#tomorrow"}
-                <Bars3Icon class="h-8 w-8" />
+                <Icon src={Bars3} class="h-8 w-8" />
             {/if}
         </label>
     </div>
@@ -26,7 +26,7 @@
             <div class="mt-auto">
                 <Footer />
                 <button class="btn btn-secondary w-full" on:click={handleLogout}
-                    ><ArrowLeftOnRectangleIcon class="h-6 w-6" />Log Out</button
+                    ><Icon src={ArrowLeftOnRectangle} class="h-6 w-6" />Log Out</button
                 >
             </div>
         </ul>

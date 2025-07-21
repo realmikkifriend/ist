@@ -1,6 +1,6 @@
 <script>
     import { writable } from "svelte/store";
-    import { ArrowUturnDownIcon } from "@krowten/svelte-heroicons";
+    import { Icon, ArrowUturnDown } from "svelte-hero-icons";
     import { DateTime } from "luxon";
     import Markdown from "svelte-exmarkdown";
     import { generateDynalistComment } from "./dynalist";
@@ -89,7 +89,7 @@
             on:click={showNextItem}
             disabled={$isLoading}
         >
-            <ArrowUturnDownIcon class="h-4 w-4" />
+            <Icon src={ArrowUturnDown} class="h-4 w-4" />
         </button>
 
         {#key $rotationIndex}

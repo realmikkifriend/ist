@@ -1,5 +1,5 @@
 <script>
-    import { ArrowPathIcon, KeyIcon } from "@krowten/svelte-heroicons";
+    import { Icon, ArrowPath, Key } from "svelte-hero-icons";
     import { dynalistAccessToken } from "../../../js/stores";
     import { success } from "../../../js/toasts";
     import Logo from "../../Logo.svelte";
@@ -59,11 +59,11 @@
             <button
                 type="submit"
                 class="btn flex-grow-0 bg-primary text-white hover:bg-primary hover:opacity-75"
-                ><KeyIcon class="h-5 w-5" /></button
+                ><Icon src={Key} class="h-5 w-5" /></button
             >
         </span>
         <span class="spinner" style="display:none;">
-            <ArrowPathIcon class="h-6 w-6 animate-spin" />
+            <Icon src={ArrowPath} class="h-6 w-6 animate-spin" />
         </span>
     </form>
 </div>

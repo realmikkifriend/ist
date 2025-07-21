@@ -1,6 +1,6 @@
 <script>
     import { derived } from "svelte/store";
-    import { XCircleIcon, CalendarIcon } from "@krowten/svelte-heroicons";
+    import { Icon, XCircle, Calendar } from "svelte-hero-icons";
     import { todoistData, userSettings, previousFirstDueTask } from "../../js/stores";
     import { getPriorityClasses } from "../../js/classes";
     import { openAgenda } from "../agenda/agenda";
@@ -41,7 +41,7 @@
 <div class="mb-2 ml-2 flex items-center justify-between">
     <div class="buttons">
         <button on:click={() => openAgenda("today")}>
-            <CalendarIcon class="h-7 w-8" />
+            <Icon src={Calendar} class="h-7 w-8" />
         </button>
     </div>
     <h1 class="text-2xl font-bold">Contexts</h1>
@@ -49,7 +49,7 @@
         for="my-drawer"
         class="btn drawer-button bg-transparent px-0 hover:border-transparent hover:bg-transparent"
     >
-        <XCircleIcon class="h-7 w-8" />
+        <Icon src={XCircle} class="h-7 w-8" />
     </label>
 </div>
 

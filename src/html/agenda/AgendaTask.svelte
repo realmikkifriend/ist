@@ -1,6 +1,6 @@
 <script>
     import { DateTime } from "luxon";
-    import { InboxArrowDownIcon, InboxIcon } from "@krowten/svelte-heroicons";
+    import { Icon, InboxArrowDown, Inbox } from "svelte-hero-icons";
     import { getPriorityClasses, colorClasses, borderClasses } from "../../js/classes";
     import { summonTask } from "./agenda";
 
@@ -26,9 +26,9 @@
         {/if}
 
         {#if task.firstDue}
-            <InboxIcon class="h-3 min-h-3 w-4 min-w-4" />
+            <Icon src={Inbox} class="h-3 min-h-3 w-4 min-w-4" />
         {:else}
-            <InboxArrowDownIcon class="h-3 min-h-3 w-4 min-w-4" />
+            <Icon src={InboxArrowDown} class="h-3 min-h-3 w-4 min-w-4" />
         {/if}
     </button>
 

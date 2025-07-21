@@ -1,5 +1,5 @@
 <script>
-    import { CalendarIcon } from "@krowten/svelte-heroicons";
+    import { Icon, Calendar } from "svelte-hero-icons";
     import { openAgenda } from "./agenda/agenda";
 
     const buttonClasses =
@@ -11,10 +11,10 @@
 
     <div class="mt-3 flex flex-row space-x-4">
         <button class={buttonClasses} on:click={() => openAgenda("today")}>
-            <CalendarIcon class="h-4 w-5" /> <span>Today</span>
+            <Icon src={Calendar} class="h-4 w-5" /> <span>Today</span>
         </button>
         <button class={buttonClasses} on:click={() => openAgenda("tomorrow")}>
-            <CalendarIcon class="h-4 w-5" /> <span>Tomorrow</span>
+            <Icon src={Calendar} class="h-4 w-5" /> <span>Tomorrow</span>
         </button>
     </div>
 </div>

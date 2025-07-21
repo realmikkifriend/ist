@@ -1,6 +1,6 @@
 <script>
     import { writable } from "svelte/store";
-    import { BackspaceIcon } from "@krowten/svelte-heroicons";
+    import { Icon, Backspace } from "svelte-hero-icons";
     import Markdown from "svelte-exmarkdown";
     import { generateDynalistComment } from "./dynalist";
     import { updateDynalist } from "./dynalistApi";
@@ -60,7 +60,7 @@
         <button
             use:buttonAction
             class="float-left mr-2 mt-0.5 inline-block h-5 w-5 cursor-pointer rounded bg-primary p-1 pb-5 pr-5"
-            ><BackspaceIcon class="h-4 w-4" /></button
+            ><Icon src={Backspace} class="h-4 w-4" /></button
         >
         {#key checklistItems}
             <Markdown

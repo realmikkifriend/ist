@@ -1,5 +1,5 @@
 <script>
-    import { XCircleIcon, CalendarIcon, BarsArrowUpIcon } from "@krowten/svelte-heroicons";
+    import { Icon, XCircle, Calendar, BarsArrowUp } from "svelte-hero-icons";
     import { summonTask } from "./agenda";
     import { filterAndSortTasks } from "../../js/filter";
     import { todoistData } from "../../js/stores";
@@ -33,13 +33,13 @@
         on:click={switchView}
         class="rounded-full p-1 transition-colors duration-200 hover:bg-blue-800"
     >
-        <CalendarIcon class="h-5 w-6" />
+        <Icon src={Calendar} class="h-5 w-6" />
     </button>
     <button
         on:click={viewReverseTaskList}
         class="rounded-full p-1 transition-colors duration-200 hover:bg-blue-800"
     >
-        <BarsArrowUpIcon class="h-5 w-6" />
+        <Icon src={BarsArrowUp} class="h-5 w-6" />
     </button>
     <div class="flex flex-grow flex-col items-center">
         <h1 class="flex-1 text-center">{title}</h1>
@@ -59,6 +59,6 @@
         on:click={closeAgenda}
         class="rounded-full p-1 transition-colors duration-200 hover:bg-red-700"
     >
-        <XCircleIcon class="h-5 w-6" />
+        <Icon src={XCircle} class="h-5 w-6" />
     </button>
 </div>

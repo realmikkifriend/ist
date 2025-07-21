@@ -1,6 +1,6 @@
 <script>
     import { createEventDispatcher } from "svelte";
-    import { CheckIcon, CalendarIcon, ClockIcon, ForwardIcon } from "@krowten/svelte-heroicons";
+    import { Icon, Check, Calendar, Clock, Forward } from "svelte-hero-icons";
     import DeferModal from "../defer/DeferModal.svelte";
     import Comments from "./Comments.svelte";
     import { getPriorityBorder } from "../../js/classes";
@@ -45,7 +45,7 @@
                         title="skip task"
                         on:click={handleSkip}
                     >
-                        <ForwardIcon class="h-5 w-5 [&>path]:stroke-[3]" />
+                        <Icon src={Forward} class="h-5 w-5 [&>path]:stroke-[3]" />
                     </button>
                 {:else}
                     <button
@@ -53,7 +53,7 @@
                         title={task.due.string ? `repeats ${task.due.string}` : "one-time task"}
                         on:click={handleDone}
                     >
-                        <CheckIcon class="h-5 w-5 [&>path]:stroke-[3]" />
+                        <Icon src={Check} class="h-5 w-5 [&>path]:stroke-[3]" />
                     </button>
                 {/if}
                 <button
@@ -61,9 +61,9 @@
                     on:click={openModal}
                 >
                     {#if task.due.allDay === 1}
-                        <CalendarIcon class="h-5 w-5 [&>path]:stroke-[3]" />
+                        <Icon src={Calendar} class="h-5 w-5 [&>path]:stroke-[3]" />
                     {:else}
-                        <ClockIcon class="h-5 w-5 [&>path]:stroke-[3]" />
+                        <Icon src={Clock} class="h-5 w-5 [&>path]:stroke-[3]" />
                     {/if}
                 </button>
             </div>

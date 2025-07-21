@@ -1,6 +1,6 @@
 <script>
     import Markdown from "svelte-exmarkdown";
-    import { BackwardIcon } from "@krowten/svelte-heroicons";
+    import { Icon, Backward } from "svelte-hero-icons";
     import { writable } from "svelte/store";
     import { parseList } from "./dynalist";
 
@@ -66,7 +66,7 @@
             class:bg-primary={$currentIndex === checklistItems.length - 1}
             on:click={() => currentIndex.set(0)}
         >
-            <BackwardIcon class="h-5 w-5" />
+            <Icon src={Backward} class="h-5 w-5" />
         </button>
     </div>
 {/if}

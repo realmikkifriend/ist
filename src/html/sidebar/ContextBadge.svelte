@@ -1,5 +1,5 @@
 <script>
-    import { XMarkIcon } from "@krowten/svelte-heroicons";
+    import { Icon, XMark } from "svelte-hero-icons";
     import { handleBadgeClick, getDueTaskCountByContext } from "./sidebar.js";
     import { todoistData, userSettings, firstDueTask } from "../../js/stores";
 
@@ -37,7 +37,7 @@
     {/if}
     {#if $userSettings.selectedContext || $firstDueTask?.summoned}
         <p class="ml-1 block sm:hidden sm:group-hover:block">
-            <XMarkIcon class="h-4 w-4" />
+            <Icon src={XMark} class="h-4 w-4" />
         </p>
     {/if}
 </button>
