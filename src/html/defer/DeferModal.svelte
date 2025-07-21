@@ -6,6 +6,7 @@
     import { createDateWithTime } from "../../js/time";
     import DatePicker from "./DatePicker.svelte";
     import TimePicker from "./TimePicker.svelte";
+
     export let task;
 
     let isTimeTabActive;
@@ -24,24 +25,23 @@
     const dispatch = createEventDispatcher();
 
     const handleDefer = ({ detail: { rawTime } }) => {
-        let time;
         isTimeTabActive = true;
 
-        if (typeof rawTime === "number") {
-            const now = DateTime.now().setZone(tz);
-            time = now.plus({ milliseconds: rawTime });
-        } else if (typeof rawTime === "string") {
-            const date = DateTime.fromISO(rawTime);
-            const tomorrow = DateTime.now().plus({ days: 1 }).setZone(tz);
+        const time =
+            typeof rawTime === "number"
+                ? DateTime.now().setZone(tz).plus({ milliseconds: rawTime })
+                : (() => {
+                      const date = DateTime.fromISO(rawTime);
+                      const tomorrow = DateTime.now().plus({ days: 1 }).setZone(tz);
 
-            const extracted = createDateWithTime(task.due.string, tomorrow);
-            if (extracted.newDate === null) {
-                time = date;
-            } else {
-                const { hour, minute } = extracted.newDate;
-                time = date.set({ hour, minute });
-            }
-        }
+                      const extracted = createDateWithTime(task.due.string, tomorrow);
+                      if (extracted.newDate === null) {
+                          return date;
+                      } else {
+                          const { hour, minute } = extracted.newDate;
+                          return date.set({ hour, minute });
+                      }
+                  })();
 
         dispatch("defer", { task, time });
     };
@@ -51,7 +51,7 @@
     {#key task}
         <div class="flex justify-center">
             <div role="tablist" class="tabs-boxed tabs w-2/3 bg-neutral">
-                {#each ["time", "calendar"] as tab}
+                {#each ["time", "calendar"] as tab (tab)}
                     <button
                         role="tab"
                         tabindex="0"
