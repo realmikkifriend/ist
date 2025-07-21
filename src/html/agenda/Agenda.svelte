@@ -18,7 +18,7 @@
     });
     const hourSlots = Array.from({ length: 18 }, (_, i) => i + 6);
 
-    $: $todoistData, updatePage();
+    $: if ($todoistData) updatePage();
 
     const getTitle = () => {
         return window.location.hash.replace("#", "").replace(/^./, (c) => c.toUpperCase());
@@ -30,7 +30,7 @@
             (agendaData.tasksWithNoTime?.length || 0) +
             (window.location.hash === "#tomorrow" ? agendaData.todayTasks?.length || 0 : 0);
 
-        return getGradientColor(totalTasks);
+        return getGradientColor(totalTasks, window.location.hash);
     }
 
     function getDisplayHours(agendaData, now, hourSlots) {

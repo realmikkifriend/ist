@@ -3,27 +3,21 @@ import type { QuarterHourPosition, GradientType } from "../../types/agenda.js";
 
 // This code may appear redundant, but ensures that Svelte exports all necessary classes.
 
-const priorityClasses: Record<Priority, string> = {
-    1: "bg-priority-1 text-white",
-    2: "bg-priority-2 text-white",
-    3: "bg-priority-3 text-white",
-    4: "bg-priority-4 text-white",
-};
+export const getPriorityClasses = (priority: Priority): string =>
+    ({
+        1: "bg-priority-1 text-white",
+        2: "bg-priority-2 text-white",
+        3: "bg-priority-3 text-white",
+        4: "bg-priority-4 text-white",
+    })[priority] || "";
 
-export const getPriorityClasses = (priority: Priority): string => {
-    return priorityClasses[priority] || "";
-};
-
-const priorityBorders: Record<Priority, string> = {
-    1: "border-b-priority-1",
-    2: "border-b-priority-2",
-    3: "border-b-priority-3",
-    4: "border-b-priority-4",
-};
-
-export const getPriorityBorder = (priority: Priority): string => {
-    return priorityBorders[priority] || "";
-};
+export const getPriorityBorder = (priority: Priority): string =>
+    ({
+        1: "border-b-priority-1",
+        2: "border-b-priority-2",
+        3: "border-b-priority-3",
+        4: "border-b-priority-4",
+    })[priority] || "";
 
 export const colorClasses: Record<ColorName, string> = {
     berry_red: "bg-pink-600",
@@ -71,17 +65,14 @@ export const borderClasses: Record<ColorName, string> = {
     taupe: "border-red-100",
 };
 
-const positionClasses: Record<QuarterHourPosition, string> = {
-    0.25: "top-[25%]",
-    0.5: "top-[50%]",
-    0.75: "top-[75%]",
-};
+export const getQuarterHourPosition = (position: QuarterHourPosition): string =>
+    ({
+        0.25: "top-[25%]",
+        0.5: "top-[50%]",
+        0.75: "top-[75%]",
+    })[position] || "";
 
-export function getQuarterHourPosition(position: QuarterHourPosition): string {
-    return positionClasses[position] || "";
-}
-
-export function getGradientColor(totalTasks: number): string | null {
+export function getGradientColor(totalTasks: number, hash: string): string | null {
     const gradients: Record<GradientType, string> = {
         blue: "bg-gradient-to-r from-blue-900 to-blue-700",
         green: "bg-gradient-to-r from-green-900 to-green-700",
@@ -90,7 +81,7 @@ export function getGradientColor(totalTasks: number): string | null {
         red: "bg-gradient-to-r from-red-900 to-red-700",
     };
 
-    if (window.location.hash === "#tomorrow") {
+    if (hash === "#tomorrow") {
         switch (true) {
             case totalTasks > 20:
                 return gradients.red;
@@ -107,7 +98,7 @@ export function getGradientColor(totalTasks: number): string | null {
             default:
                 return null;
         }
-    } else if (window.location.hash === "#today") {
+    } else if (hash === "#today") {
         const currentHour: number = new Date().getHours();
         const hourAdjustment: number = currentHour > 8 ? currentHour - 8 : 0;
         const todayThreshold: number = 14 - hourAdjustment;
