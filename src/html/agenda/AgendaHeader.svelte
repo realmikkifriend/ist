@@ -6,7 +6,6 @@
 
     export let agendaData, displayData;
 
-    // Destructure for easier access
     $: ({ tasks, tasksWithNoTime, todayTasks, tasksForDate } = agendaData);
     $: ({ title, headerGradientColor } = displayData);
 
