@@ -51,7 +51,7 @@
                     $countData.total
                         ? 'bg-neutral'
                         : 'bg-primary'}"
-                    on:click={(event) => handleCountClick(option)}
+                    on:click={() => handleCountClick(option)}
                 >
                     {option}
                 </button>
