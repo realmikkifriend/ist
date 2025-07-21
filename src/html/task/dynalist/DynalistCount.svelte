@@ -2,6 +2,7 @@
     import { writable } from "svelte/store";
     import { success } from "../../../js/toasts";
     import { updateDynalist } from "./dynalistApi";
+
     export let content;
 
     const parseCountData = (note) => {
@@ -130,7 +131,7 @@
             </small>
         </span>
         <span class="flex flex-nowrap items-end">
-            {#each options as option}
+            {#each options as option, index (index)}
                 <button
                     class="btn ml-1 h-8 min-h-8 px-1 pb-1 pt-0 text-primary-content hover:bg-base-100 active:bg-primary {$countData.current >=
                     $countData.total

@@ -37,7 +37,7 @@
         <ChevronDownIcon class="h-3 w-3" />
     </div>
     <ul tabindex="-1" class="menu dropdown-content z-20 mr-[-4rem] w-fit rounded-lg bg-neutral p-1">
-        {#each iconPairs as { component: IconComponent, label, type }, index}
+        {#each iconPairs as { component: IconComponent, label, type }, index (index)}
             {#if index === 0}
                 <span class="cursor-default text-nowrap text-center text-xs"
                     >&mdash;read <a target="_blank" href={url}>original document</a>&mdash;</span

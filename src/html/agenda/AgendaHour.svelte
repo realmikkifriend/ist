@@ -38,7 +38,7 @@
             ? 'z-20'
             : 'z-10'} h-24 w-[70%] flex-grow border-2 border-t-0 border-gray-700 group-first:border-t-2"
     >
-        {#each [0.25, 0.5, 0.75] as position}
+        {#each [0.25, 0.5, 0.75] as position, index (index)}
             <div
                 class={`absolute left-0 w-full border-t border-gray-800 ${getQuarterHourPosition(position)}`}
             ></div>
@@ -55,7 +55,7 @@
             </div>
         {/if}
         <div class="clipped flex w-full flex-col py-0.5 pr-1">
-            {#each processedTasks as task, index}
+            {#each processedTasks as task, index (index)}
                 <div
                     class="task-container w-[98%] {calculateTaskStyle(index, processedTasks)}"
                     style="
