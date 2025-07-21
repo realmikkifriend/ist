@@ -2,7 +2,7 @@
     import { onMount } from "svelte";
     import { writable } from "svelte/store";
     import { DateTime } from "luxon";
-    import { ArrowPathIcon } from "@krowten/svelte-heroicons";
+    import { Icon, ArrowPath } from "svelte-hero-icons";
     import { todoistData, todoistError, userSettings, firstDueTask } from "../js/stores";
     import { updateFirstDueTask } from "../js/first";
     import { refreshData } from "../js/api";
@@ -103,5 +103,5 @@
 {/if}
 
 <button class="fixed bottom-2 right-2 z-20 rounded-md bg-base-100 p-1" on:click={handleRefresh}>
-    <ArrowPathIcon class="h-6 w-6 {$isSpinning ? 'animate-spin' : ''}" />
+    <Icon src={ArrowPath} class="h-6 w-6 {$isSpinning ? 'animate-spin' : ''}" />
 </button>

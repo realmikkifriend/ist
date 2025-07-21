@@ -58,6 +58,7 @@
         "style-loader": "^4.0.0",
         "svelte": "^4.2.20",
         "svelte-check": "^4.3.0",
+        "svelte-hero-icons": "^5.2.0",
         "svelty-picker": "^5.2.9",
         "tailwindcss": "^3.4.14",
         "ts-loader": "^9.5.2",
