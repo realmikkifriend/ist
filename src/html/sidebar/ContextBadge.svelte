@@ -1,6 +1,6 @@
 <script>
     import { Icon, XMark } from "svelte-hero-icons";
-    import { handleBadgeClick, getDueTaskCountByContext } from "./sidebar.js";
+    import { handleBadgeClick, getDueTaskCountByContext } from "./sidebar.ts";
     import { todoistData, userSettings, firstDueTask } from "../../js/stores";
 
     function getContextName() {

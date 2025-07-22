@@ -4,7 +4,7 @@
     import { todoistData, userSettings, previousFirstDueTask } from "../../js/stores";
     import { getPriorityClasses } from "../../js/classes";
     import { openAgenda } from "../agenda/agenda";
-    import { getDueTasksGroupedByContext } from "./sidebar.js";
+    import { getDueTasksGroupedByContext } from "./sidebar.ts";
 
     const dueTasksByContext = derived(todoistData, ($todoistData) =>
         $todoistData ? getDueTasksGroupedByContext($todoistData) : {},
