@@ -7,7 +7,7 @@ export interface TimeButtonConfig {
     ms?: number;
 }
 
-export interface ButtonConfig {
+export interface DeferButtonConfig {
     tomorrow: TimeButtonConfig;
     minutes: TimeButtonConfig[];
     hours: TimeButtonConfig[];

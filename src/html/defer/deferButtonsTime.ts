@@ -1,9 +1,9 @@
-import type { TimeButtonConfig, ButtonConfig } from "../../../types/defer";
+import type { TimeButtonConfig, DeferButtonConfig } from "../../../types/defer";
 
 /**
  * Button configuration for defer buttons (time-based).
  */
-export const buttonConfig: ButtonConfig = {
+export const buttonConfig: DeferButtonConfig = {
     tomorrow: {
         text: "tomorrow",
         ms: 0,
