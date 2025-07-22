@@ -1,4 +1,9 @@
-export const buttonConfig = {
+import type { TimeButtonConfig, ButtonConfig } from "../../../types/defer";
+
+/**
+ * Button configuration for defer buttons (time-based).
+ */
+export const buttonConfig: ButtonConfig = {
     tomorrow: {
         text: "tomorrow",
         ms: 0,
@@ -15,11 +20,11 @@ export const buttonConfig = {
         { value: 45, height: "h-7" },
     ],
 
-    hours: (() => {
+    hours: ((): TimeButtonConfig[] => {
         const baseStyling = "basis-[22.75%]";
         const largeStyling = "basis-[48.5%]";
 
-        const hoursValues = [
+        const hoursValues: Array<Partial<TimeButtonConfig> & { value: number }> = [
             { value: 1, text: "1 hour", styling: largeStyling },
             { value: 1.5, text: "90 minutes", styling: largeStyling },
             { value: 2 },

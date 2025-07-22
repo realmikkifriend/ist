@@ -1,4 +1,4 @@
-import { buttonConfig } from "./deferButtonsTime.js";
+import { buttonConfig } from "./deferButtonsTime.ts";
 
 const createButtons = () => {
     const buttons = [];
