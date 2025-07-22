@@ -37,6 +37,7 @@ export default defineConfig([
             "jsdoc/require-jsdoc": [
                 "warn",
                 {
+                    publicOnly: true,
                     require: {
                         ArrowFunctionExpression: true,
                     },
