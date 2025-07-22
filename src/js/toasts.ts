@@ -1,17 +1,32 @@
 import { toast } from "@zerodevx/svelte-toast";
+import type { SvelteComponent } from "svelte";
+import type { ToastConfig } from "../../types/interface";
 
-const baseConfig = {
+/**
+ * Base configuration for all toasts.
+ */
+const baseConfig: ToastConfig = {
     intro: { x: 16000 },
 };
 
-const createToastConfig = (overrides) => ({
+/**
+ * Creates a toast configuration object by merging the base config with overrides.
+ * @param {Partial<ToastConfig>} overrides - Partial configuration to override base settings.
+ * @returns {ToastConfig} The merged toast configuration.
+ */
+const createToastConfig = (overrides: Partial<ToastConfig>): ToastConfig => ({
     ...baseConfig,
     ...overrides,
 });
 
-export const success = (m) => {
+/**
+ * Shows a success toast with a custom message.
+ * @param {string} m - The message to display in the toast.
+ * @returns {number} The toast ID.
+ */
+export const success = (m: string): number => {
     toast.pop({ target: "success" });
-    toast.push(
+    return toast.push(
         m,
         createToastConfig({
             theme: {
@@ -26,7 +41,16 @@ export const success = (m) => {
     );
 };
 
-export const newFirstTask = (component, onClickHandler) => {
+/**
+ * Shows a custom toast with a Svelte component and a click handler.
+ * @param {typeof SvelteComponent} component - The Svelte component to render in the toast.
+ * @param {() => void} onClickHandler - Function to call when the component is clicked.
+ * @returns {number} The toast ID.
+ */
+export const newFirstTask = (
+    component: typeof SvelteComponent,
+    onClickHandler: () => void,
+): number => {
     toast.pop({ target: "wait" });
     const toastInstance = toast.push(
         createToastConfig({
@@ -47,9 +71,15 @@ export const newFirstTask = (component, onClickHandler) => {
             target: "wait",
         }),
     );
+    return toastInstance;
 };
 
-export const error = (m) =>
+/**
+ * Shows an error toast with a custom message.
+ * @param {string} m - The error message to display in the toast.
+ * @returns {number} The toast ID.
+ */
+export const error = (m: string): number =>
     toast.push(
         m,
         createToastConfig({
