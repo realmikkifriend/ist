@@ -1,69 +1,5 @@
-/**
- * Mocks must be defined/imported before any other imports!
- */
+import { vi } from "vitest";
 
-// --- svelte-persisted-store ---
-vi.mock("svelte-persisted-store", () => ({
-    persisted: vi.fn((key, initial) => {
-        let value = initial;
-        return {
-            set: vi.fn((v) => {
-                value = v;
-            }),
-            update: vi.fn((fn) => {
-                value = fn(value);
-            }),
-            subscribe: (fn) => {
-                fn(value);
-                return () => {};
-            },
-            _get: () => value,
-        };
-    }),
-}));
-
-// --- svelte/store ---
-export const get = vi.fn();
-vi.mock("svelte/store", async (importOriginal) => {
-    const actual = await importOriginal();
-    return {
-        ...actual,
-        get,
-        writable: vi.fn((initial) => {
-            let value = initial;
-            return {
-                set: vi.fn((v) => {
-                    value = v;
-                }),
-                update: vi.fn((fn) => {
-                    value = fn(value);
-                }),
-                subscribe: (fn) => {
-                    fn(value);
-                    return () => {};
-                },
-                _get: () => value,
-            };
-        }),
-    };
-});
-
-// --- @zerodevx/svelte-toast ---
-vi.mock("@zerodevx/svelte-toast", () => {
-    const pop = vi.fn();
-    return {
-        toast: { pop },
-        __popMock: pop,
-    };
-});
-
-// --- ../../src/js/first.js ---
-export const updateFirstDueTaskMock = vi.fn();
-vi.mock("../../src/js/first.js", () => ({
-    updateFirstDueTask: updateFirstDueTaskMock,
-}));
-
-// --- ../../src/js/stores ---
 function createMockStore(initial) {
     let value = initial;
     return {
@@ -81,6 +17,36 @@ function createMockStore(initial) {
     };
 }
 
+// --- svelte-persisted-store ---
+vi.mock("svelte-persisted-store", () => ({
+    persisted: vi.fn((key, initial) => createMockStore(initial)),
+}));
+
+// --- svelte/store ---
+export const get = vi.fn();
+vi.mock("svelte/store", async (importOriginal) => {
+    const actual = await importOriginal();
+    return {
+        ...actual,
+        get,
+        writable: vi.fn((initial) => createMockStore(initial)),
+    };
+});
+
+// --- @zerodevx/svelte-toast ---
+const pop = vi.fn();
+vi.mock("@zerodevx/svelte-toast", () => ({
+    toast: { pop },
+    __popMock: pop,
+}));
+
+// --- ../../src/js/first.js ---
+export const updateFirstDueTaskMock = vi.fn();
+vi.mock("../../src/js/first.js", () => ({
+    updateFirstDueTask: updateFirstDueTaskMock,
+}));
+
+// --- ../../src/js/stores ---
 export const todoistAccessToken = createMockStore("");
 export const dynalistAccessToken = createMockStore("");
 export const todoistData = createMockStore({
@@ -106,16 +72,4 @@ export const stores = {
     handleLogout,
 };
 
-vi.mock("../../src/js/stores", () => ({
-    todoistAccessToken,
-    dynalistAccessToken,
-    todoistData,
-    todoistError,
-    userSettings,
-    firstDueTask,
-    previousFirstDueTask,
-    handleLogout,
-}));
-
-// Place imports at the end to avoid hoisting errors
-import { vi } from "vitest";
+vi.mock("../../src/js/stores", () => ({ ...stores }));
