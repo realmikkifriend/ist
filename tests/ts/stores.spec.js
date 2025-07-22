@@ -1,5 +1,3 @@
-// test/stores.spec.js
-
 /**
  * Mocks must be defined before any imports!
  */
@@ -61,7 +59,7 @@ import {
     firstDueTask,
     previousFirstDueTask,
     handleLogout,
-} from "../src/js/stores";
+} from "../../src/js/stores";
 import { __popMock as popMock } from "@zerodevx/svelte-toast";
 
 describe("stores", () => {

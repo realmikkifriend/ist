@@ -6,7 +6,7 @@ import {
     borderClasses,
     getQuarterHourPosition,
     getGradientColor,
-} from "../src/js/classes.ts";
+} from "../../src/js/classes.ts";
 
 describe("getPriorityClasses", () => {
     it("returns correct classes for all valid priorities", () => {

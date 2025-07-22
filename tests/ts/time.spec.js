@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { DateTime } from "luxon";
-import { getTaskTime, createDateWithTime } from "../src/js/time";
+import { getTaskTime, createDateWithTime } from "../../src/js/time";
 
 describe("getTaskTime", () => {
     it("extracts hour and minute from a string with time", () => {
