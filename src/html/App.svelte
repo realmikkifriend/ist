@@ -11,7 +11,7 @@
     import Sidebar from "./sidebar/Sidebar.svelte";
     import ContextBadge from "./sidebar/ContextBadge.svelte";
     import NoTasks from "./NoTasks.svelte";
-    import Task from "./task/Task.svelte";
+    import TaskDisplay from "./task/TaskDisplay.svelte";
     import Agenda from "./agenda/Agenda.svelte";
 
     const isSpinning = writable(false);
@@ -85,7 +85,7 @@
         {#if $todoistData.tasks}
             {#if $firstDueTask}
                 {#key $firstDueTask}
-                    <Task task={$firstDueTask} on:done={handleDone} on:defer={handleDefer} />
+                    <TaskDisplay task={$firstDueTask} on:done={handleDone} on:defer={handleDefer} />
                 {/key}
             {:else}
                 <NoTasks />
