@@ -12,9 +12,8 @@ export default defineConfig({
             reporter: ["text", "json", "html"],
             exclude: [
                 "node_modules/**",
-                "test/**",
+                "tests/**",
                 "**/*.spec.js",
-                "**/*.test.js",
                 "**/*.config.*",
                 "vitest-setup.js",
             ],
