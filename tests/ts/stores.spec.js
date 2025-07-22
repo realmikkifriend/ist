@@ -1,4 +1,4 @@
-import "./_mocks.js";
+import { get, updateFirstDueTaskMock, stores } from "./_mocks.js";
 import { describe, it, expect, beforeEach } from "vitest";
 import {
     todoistAccessToken,
