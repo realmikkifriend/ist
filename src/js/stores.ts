@@ -1,8 +1,7 @@
 import { writable, Writable } from "svelte/store";
 import { persisted } from "svelte-persisted-store";
 import { toast } from "@zerodevx/svelte-toast";
-import type { TodoistData } from "../../types/todoist";
-import type { Task } from "@doist/todoist-api-typescript";
+import type { TodoistData, Task } from "../../types/todoist";
 
 /**
  * Stores the Todoist access token.

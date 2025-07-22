@@ -1,4 +1,4 @@
-import type { Task, PersonalProject } from "@doist/todoist-api-typescript";
+import type { Task as BaseTask, PersonalProject } from "@doist/todoist-api-typescript";
 
 export type Context = PersonalProject;
 
@@ -32,3 +32,16 @@ export type ColorName =
     | "charcoal"
     | "grey"
     | "taupe";
+
+export interface Task extends BaseTask {
+    contextId?: string;
+    summoned?: string | boolean;
+    skip?: boolean;
+}
+
+export interface DueTasksGroupedByContext {
+    [contextId: string]: {
+        total: number;
+        priorities: { [priority: number]: number };
+    };
+}
