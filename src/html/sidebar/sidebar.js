@@ -1,6 +1,6 @@
 import { get } from "svelte/store";
 import { updateFirstDueTask } from "../../js/first.js";
-import { todoistData, userSettings, firstDueTask, previousFirstDueTask } from "../../js/stores.js";
+import { todoistData, userSettings, firstDueTask, previousFirstDueTask } from "../../js/stores.ts";
 
 export function getDueTasksGroupedByContext() {
     const $todoistData = get(todoistData);

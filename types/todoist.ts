@@ -1,3 +1,14 @@
+import type { Task, PersonalProject } from "@doist/todoist-api-typescript";
+
+export type Context = PersonalProject;
+
+export interface TodoistData {
+    tasks: Task[];
+    contexts: Context[];
+    dueTasks: Task[];
+    reverseTasks: Task[];
+}
+
 export type Priority = 1 | 2 | 3 | 4;
 
 export type ColorName =
