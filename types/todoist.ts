@@ -1,4 +1,8 @@
-import type { Task as BaseTask, PersonalProject } from "@doist/todoist-api-typescript";
+import type {
+    Task as BaseTask,
+    PersonalProject,
+    User as BaseUser,
+} from "@doist/todoist-api-typescript";
 
 export type Context = PersonalProject;
 
@@ -37,6 +41,25 @@ export interface Task extends BaseTask {
     contextId?: string;
     summoned?: string | boolean;
     skip?: boolean;
+
+    due: Due | null;
+}
+interface Due {
+    allDay?: number;
+    isRecurring: boolean;
+    date: string;
+    dateObject?: Date;
+    datetime?: string | null | undefined;
+    extractedTime?: { hour: number; minute: number } | null;
+    lang?: string | null | undefined;
+    string: string;
+    timezone?: string | null | undefined;
+}
+
+export interface User extends BaseUser {
+    tz_info?: {
+        name?: string;
+    };
 }
 
 export interface DueTasksGroupedByContext {
@@ -44,4 +67,10 @@ export interface DueTasksGroupedByContext {
         total: number;
         priorities: { [priority: number]: number };
     };
+}
+
+export interface DueTasksData {
+    tasks: Task[];
+    contexts: Context[];
+    user?: User;
 }
