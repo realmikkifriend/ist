@@ -37,25 +37,24 @@
         )} bg-neutral text-primary-content"
     >
         <div class="card-body pb-7">
+            {#if task.skip}
+                <button
+                    class="text-md btn btn-ghost btn-sm absolute right-0 top-0 h-8 min-h-8 content-center p-4"
+                    title="skip task"
+                    on:click={handleSkip}
+                >
+                    <Icon src={Forward} class="h-5 w-5 stroke-yellow-500 [&>path]:stroke-[3]" />
+                </button>
+            {/if}
             <h2 class="card-title text-center text-3xl">{task.content}</h2>
             <div class="card-actions justify-center">
-                {#if task.skip}
-                    <button
-                        class="text-md btn btn-ghost btn-sm h-8 min-h-8 content-center p-4"
-                        title="skip task"
-                        on:click={handleSkip}
-                    >
-                        <Icon src={Forward} class="h-5 w-5 [&>path]:stroke-[3]" />
-                    </button>
-                {:else}
-                    <button
-                        class="text-md btn btn-primary h-8 min-h-8 content-center p-4"
-                        title={task.due.string ? `repeats ${task.due.string}` : "one-time task"}
-                        on:click={handleDone}
-                    >
-                        <Icon src={Check} class="h-5 w-5 [&>path]:stroke-[3]" />
-                    </button>
-                {/if}
+                <button
+                    class="text-md btn btn-primary h-8 min-h-8 content-center p-4"
+                    title={task.due.string ? `repeats ${task.due.string}` : "one-time task"}
+                    on:click={handleDone}
+                >
+                    <Icon src={Check} class="h-5 w-5 [&>path]:stroke-[3]" />
+                </button>
                 <button
                     class="text-md btn btn-secondary h-8 min-h-8 content-center p-4"
                     on:click={openModal}
