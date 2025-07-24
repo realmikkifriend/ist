@@ -47,7 +47,6 @@ function clearSelectedContext(): void {
  */
 export function handleBadgeClick(): void {
     const $firstDueTask = get(firstDueTask);
-    const $todoistData = get(todoistData);
     const selectedContext = get(userSettings).selectedContext;
 
     if ($firstDueTask?.summoned) {
@@ -57,9 +56,6 @@ export function handleBadgeClick(): void {
         $firstDueTask.summoned = false;
         if ($firstDueTask.skip) {
             delete $firstDueTask.skip;
-            if ($todoistData && typeof todoistData.update === "function") {
-                todoistData.update((data: typeof $todoistData) => ({ ...data, reverseTasks: [] }));
-            }
         }
 
         // eslint-disable-next-line
