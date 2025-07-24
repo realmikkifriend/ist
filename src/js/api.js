@@ -37,9 +37,23 @@ export async function refreshData() {
     });
 
     const dueTasks = getDueTasks(cleanedData);
-    const reverseTasks = getReverseTasks(cleanedData);
 
-    todoistData.set({ ...cleanedData, dueTasks, reverseTasks });
+    const reverseTasksTomorrow = getReverseTasks(cleanedData);
+
+    const now = new Date();
+    const reverseTasksToday = reverseTasksTomorrow.filter((task) => {
+        if (!task.due || !(task.due.dateObject instanceof Date)) return false;
+        return task.due.dateObject.toDateString() === now.toDateString();
+    });
+
+    todoistData.set({
+        ...cleanedData,
+        dueTasks,
+        reverseTasks: {
+            tomorrow: reverseTasksTomorrow,
+            today: reverseTasksToday,
+        },
+    });
 
     success("Todoist data updated!");
 

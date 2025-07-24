@@ -14,9 +14,12 @@
     }
 
     function viewReverseTaskList() {
-        const reverseTasks = $todoistData.reverseTasks || [];
+        const reverseTasks =
+            title === "Today"
+                ? $todoistData.reverseTasks.today
+                : $todoistData.reverseTasks.tomorrow;
 
-        if (reverseTasks.length > 0) {
+        if (reverseTasks && reverseTasks.length > 0) {
             summonTask(reverseTasks[0], true);
         }
     }

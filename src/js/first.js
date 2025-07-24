@@ -35,7 +35,10 @@ const loadComments = async (taskId) => {
 
 export const skipTask = (task) => {
     const $todoistData = get(todoistData);
-    const reverseTasks = $todoistData.reverseTasks;
+    const reverseTasks =
+        task.summoned === "#today"
+            ? $todoistData.reverseTasks.today
+            : $todoistData.reverseTasks.tomorrow;
     const currentIndex = reverseTasks.findIndex((t) => t.id === task.id);
     const nextIndex = currentIndex + 1;
     if (nextIndex < reverseTasks.length) {

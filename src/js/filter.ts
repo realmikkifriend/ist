@@ -43,7 +43,12 @@ export function filterAndSortTasks(
     const { timeZone, reverse = false } = options;
     const contextLookup = createContextLookup(contexts);
 
-    const filteredTasks = timeZone ? filterDueTasks(tasks, timeZone) : tasks;
+    const date = new Date();
+    if (reverse) {
+        date.setDate(date.getDate() + 1);
+    }
+
+    const filteredTasks = timeZone ? filterDueTasks(tasks, timeZone, date) : tasks;
 
     const sortedTasks = [...filteredTasks].sort((a, b) => {
         return compareTasks(a, b, contextLookup, timeZone, reverse);
@@ -67,19 +72,21 @@ function createContextLookup(contexts: Context[]): Record<string, number> {
  * Filters tasks to only those that are due.
  * @param {Task[]} tasks - The list of tasks.
  * @param {string} timeZone - The time zone to use for date comparisons.
+ * @param {Date} date - The date used for comparison.
  * @returns {Task[]} The filtered due tasks.
  */
-function filterDueTasks(tasks: Task[], timeZone: string): Task[] {
-    return tasks.filter((task) => processDueProperties(task, timeZone));
+function filterDueTasks(tasks: Task[], timeZone: string, date: Date): Task[] {
+    return tasks.filter((task) => processDueProperties(task, timeZone, date));
 }
 
 /**
  * Processes the due properties of a task and determines if it is due.
  * @param {Task} task - The task to process.
  * @param {string} timeZone - The time zone to use for date comparisons.
+ * @param {Date} date - The date used for comparison.
  * @returns {boolean} True if the task is due, false otherwise.
  */
-function processDueProperties(task: Task, timeZone: string): boolean {
+function processDueProperties(task: Task, timeZone: string, date: Date): boolean {
     if (!task.due) {
         return false;
     }
@@ -89,7 +96,7 @@ function processDueProperties(task: Task, timeZone: string): boolean {
     task.due.dateObject = DateTime.fromISO(task.due.datetime || task.due.date, {
         zone: timeZone,
     }).toJSDate();
-    return task.due.dateObject < new Date();
+    return task.due.dateObject < date;
 }
 
 /**
