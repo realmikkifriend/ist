@@ -14,12 +14,10 @@
     }
 
     function viewReverseTaskList() {
-        $todoistData.reverseTasks = filterAndSortTasks(tasksForDate, $todoistData.contexts, {
-            reverse: true,
-        });
+        const reverseTasks = $todoistData.reverseTasks || [];
 
-        if ($todoistData.reverseTasks.length > 0) {
-            summonTask($todoistData.reverseTasks[0], true);
+        if (reverseTasks.length > 0) {
+            summonTask(reverseTasks[0], true);
         }
     }
 

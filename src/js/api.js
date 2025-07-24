@@ -1,7 +1,7 @@
 import { get } from "svelte/store";
 import { TodoistApi } from "@doist/todoist-api-typescript";
 import { todoistAccessToken, todoistData, todoistError } from "./stores";
-import { getDueTasks } from "./filter";
+import { getDueTasks, getReverseTasks } from "./filter";
 import { success } from "./toasts";
 import { cleanTodoistData } from "./process";
 
@@ -37,8 +37,9 @@ export async function refreshData() {
     });
 
     const dueTasks = getDueTasks(cleanedData);
+    const reverseTasks = getReverseTasks(cleanedData);
 
-    todoistData.set({ ...cleanedData, dueTasks });
+    todoistData.set({ ...cleanedData, dueTasks, reverseTasks });
 
     success("Todoist data updated!");
 

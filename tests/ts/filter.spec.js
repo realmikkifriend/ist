@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { getDueTasks, filterAndSortTasks } from "../../src/js/filter";
+import { getDueTasks, getReverseTasks, filterAndSortTasks } from "../../src/js/filter";
 import { DateTime } from "luxon";
 
 // Mock getTaskTime to always return null (no extracted time) unless specified
@@ -85,6 +85,41 @@ describe("filter.ts", () => {
                 data.tasks,
                 data.contexts,
                 expect.objectContaining({ timeZone: "America/Chicago" }),
+            );
+            spy.mockRestore();
+        });
+    });
+
+    describe("getReverseTasks", () => {
+        it("returns only due tasks (past dates) in reverse order", () => {
+            const data = {
+                tasks: [
+                    makeTask({ id: 1, due: { string: "yesterday", date: pastDate }, priority: 1 }),
+                    makeTask({ id: 2, due: { string: "yesterday", date: pastDate }, priority: 2 }),
+                    makeTask({ id: 3, due: { string: "tomorrow", date: futureDate }, priority: 3 }),
+                    makeTask({ id: 4 }), // no due
+                ],
+                contexts: sampleContexts,
+                user: { tz_info: { name: "UTC" } },
+            };
+            // Normal due tasks: [1,2] (priority 1 before 2)
+            // Reverse: [2,1]
+            const result = getReverseTasks(data);
+            expect(result.map((t) => t.id)).toEqual([2, 1]);
+        });
+
+        it("uses user timeZone if provided, else defaults to 'local', and sets reverse: true", () => {
+            const data = {
+                tasks: [makeTask({ id: 1, due: { string: "past", date: pastDate } })],
+                contexts: sampleContexts,
+                user: { tz_info: { name: "America/Chicago" } },
+            };
+            const spy = vi.spyOn({ filterAndSortTasks }, "filterAndSortTasks");
+            getReverseTasks(data);
+            expect(spy).toHaveBeenCalledWith(
+                data.tasks,
+                data.contexts,
+                expect.objectContaining({ timeZone: "America/Chicago", reverse: true }),
             );
             spy.mockRestore();
         });

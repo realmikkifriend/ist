@@ -15,6 +15,18 @@ export function getDueTasks(data: DueTasksData): Task[] {
 }
 
 /**
+ * Returns the list of reverse tasks, filtered and sorted in reverse order.
+ * @param {DueTasksData} data - The data object containing tasks, contexts, and user.
+ * @returns {Task[]} The filtered and reverse-sorted tasks.
+ */
+export function getReverseTasks(data: DueTasksData): Task[] {
+    const { tasks, contexts, user } = data;
+    const timeZone = user?.tz_info?.name || "local";
+
+    return filterAndSortTasks(tasks, contexts, { timeZone, reverse: true });
+}
+
+/**
  * Filters and sorts tasks based on due date, context, and priority.
  * @param {Task[]} tasks - The list of tasks.
  * @param {Context[]} contexts - The list of contexts.
