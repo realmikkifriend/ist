@@ -3,7 +3,7 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const Dotenv = require("dotenv-webpack");
 
 module.exports = {
-    entry: "./src/js/index.js",
+    entry: "./src/js/index.ts",
     output: {
         filename: "bundle.js",
         path: path.resolve(__dirname, "dist"),
