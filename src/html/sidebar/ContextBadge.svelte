@@ -1,30 +1,8 @@
 <script lang="ts">
     import { Icon, XMark } from "svelte-hero-icons";
     import { handleBadgeClick, getDueTaskCountByContext } from "./sidebar";
-    import { todoistData, userSettings, firstDueTask } from "../../js/stores";
-    import type { UserSettings } from "../../../types/interface";
-
-    // Locally extend selectedContext type to match usage in this component
-    type SelectedContext = { id: string; name: string };
-    interface UserSettingsWithContext extends Omit<UserSettings, "selectedContext"> {
-        selectedContext: SelectedContext | null;
-    }
-
-    /**
-     * Get the name of the current context, either from user settings or from the first due task's context.
-     * @returns - The context name, or an empty string if not found.
-     */
-    function getContextName(): string {
-        const settings = $userSettings as UserSettingsWithContext;
-        if (settings?.selectedContext?.name) {
-            return settings.selectedContext.name;
-        }
-        if ($todoistData?.contexts) {
-            const context = $todoistData.contexts.find((c) => c.id === $firstDueTask?.contextId);
-            if (context && "name" in context) return context.name;
-        }
-        return "";
-    }
+    import { userSettings, firstDueTask } from "../../js/stores";
+    import { getContextName } from "../../js/first";
 </script>
 
 <button

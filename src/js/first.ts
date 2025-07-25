@@ -11,6 +11,25 @@ import type { Task, Comment, TodoistData } from "../../types/todoist";
 import type { UserSettings } from "../../types/interface";
 
 /**
+ * Get the name of the current context, either from user settings or from the first due task's context.
+ * @returns - The context name, or an empty string if not found.
+ */
+export function getContextName(): string {
+    const $userSettings = get(userSettings);
+    const $todoistData = get(todoistData);
+    const $firstDueTask = get(firstDueTask);
+
+    if ($userSettings?.selectedContext?.name) {
+        return $userSettings.selectedContext.name;
+    }
+    if ($todoistData?.contexts) {
+        const context = $todoistData.contexts.find((c) => c.id === $firstDueTask?.contextId);
+        if (context && typeof context.name === "string") return context.name;
+    }
+    return "";
+}
+
+/**
  * Set the first due task in the store.
  * @param {Task | null} task - The task to set as the first due task.
  * @returns {void}

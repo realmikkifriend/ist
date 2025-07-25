@@ -16,5 +16,5 @@ export type ToastConfig = {
 };
 
 export interface UserSettings {
-    selectedContext: { id: string } | null;
+    selectedContext: { id: string; name: string } | null;
 }
