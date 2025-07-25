@@ -1,5 +1,4 @@
 import { todoistData, todoistError, previousFirstDueTask } from "./stores";
-// @ts-expect-error until types added
 import { markTaskDone, deferTasks, refreshData } from "./api";
 import { updateFirstDueTask } from "./first";
 import { get } from "svelte/store";
@@ -83,17 +82,16 @@ export async function handleTaskDone(taskID: string): Promise<void> {
 
 /**
  * Defers multiple tasks and updates the resources accordingly.
- * @param {TaskUpdates} taskUpdates - An array of [Task, Date | DateTime | string] tuples.
+ * @param {Array<[Task, DateTime]>} taskUpdates - An array of [Task, DateTime] tuples.
  * @returns Promise&lt;void>
  */
-export async function handleTaskDefer(
-    taskUpdates: Array<[Task, Date | DateTime | string]>,
-): Promise<void> {
+export async function handleTaskDefer(taskUpdates: Array<[Task, DateTime]>): Promise<void> {
     previousFirstDueTask.set(null);
 
-    const updatedTaskResources: Array<[string, Date | DateTime | string]> = taskUpdates.map(
-        ([task, dateTime]) => [task.id, dateTime],
-    );
+    const updatedTaskResources: Array<[string, DateTime]> = taskUpdates.map(([task, dateTime]) => [
+        task.id,
+        dateTime,
+    ]);
     updateTaskResources(updatedTaskResources);
 
     // eslint-disable-next-line

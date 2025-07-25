@@ -2,7 +2,6 @@ import { get } from "svelte/store";
 import { toast } from "@zerodevx/svelte-toast";
 import { success, newFirstTask } from "./toasts";
 import { todoistData, userSettings, firstDueTask, previousFirstDueTask } from "./stores";
-// @ts-expect-error until file is converted to TypeScript
 import { getTaskComments } from "./api";
 import FirstDueTaskToast from "../html/FirstDueTaskToast.svelte";
 import { summonTask } from "../html/agenda/agenda";
@@ -59,7 +58,7 @@ const updateDueTasks = (dueTasks: Task[], contextId: string | null): Task[] => {
  */
 const loadComments = async (taskId: string): Promise<Comment[]> => {
     // eslint-disable-next-line
-    const comments = (await getTaskComments(taskId))?.results || [];
+    const comments = (await getTaskComments(taskId)) || [];
     return comments as Comment[];
 };
 
