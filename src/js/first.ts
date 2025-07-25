@@ -8,9 +8,9 @@ import FirstDueTaskToast from "../html/FirstDueTaskToast.svelte";
 // @ts-expect-error until file is converted to TypeScript
 import { summonTask } from "../html/agenda/agenda";
 import { handleBadgeClick } from "../html/sidebar/sidebar";
-import type { Task, TodoistData } from "../../types/todoist";
+import type { SvelteComponent } from "svelte";
+import type { Task, Comment, TodoistData } from "../../types/todoist";
 import type { UserSettings } from "../../types/interface";
-import type { Comment } from "@doist/todoist-api-typescript";
 
 /**
  * Set the first due task in the store.
@@ -117,7 +117,9 @@ export const updateFirstDueTask = async (): Promise<void> => {
         // eslint-disable-next-line
         window.location.hash !== "#tomorrow"
     ) {
-        newFirstTask(FirstDueTaskToast, () => setFirstDueTask(newTask));
+        newFirstTask(FirstDueTaskToast as unknown as typeof SvelteComponent, () =>
+            setFirstDueTask(newTask),
+        );
     } else {
         toast.pop({ target: "wait" });
         setFirstDueTask(newTask);
