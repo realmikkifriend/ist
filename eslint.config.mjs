@@ -51,6 +51,37 @@ export default defineConfig([
     // -----------------------------------
     // `     eslint-plugin-svelte
     ...svelte.configs.recommended,
+    {
+        files: ["**/*.svelte"],
+        languageOptions: {
+            parser: "svelte-eslint-parser",
+            parserOptions: {
+                parser: "@typescript-eslint/parser",
+                projectService: true,
+                tsconfigRootDir: import.meta.dirname,
+            },
+            globals: globals.browser,
+        },
+        plugins: { svelte, jsdoc, functional, "@typescript-eslint": tseslint.plugin },
+        extends: [
+            "plugin:svelte/recommended",
+            "plugin:functional/all",
+            "plugin:jsdoc/recommended-typescript",
+            "plugin:jsdoc/contents-typescript",
+            "plugin:@typescript-eslint/recommended-type-checked",
+        ],
+        rules: {
+            "jsdoc/require-jsdoc": [
+                "warn",
+                {
+                    publicOnly: true,
+                    require: {
+                        ArrowFunctionExpression: true,
+                    },
+                },
+            ],
+        },
+    },
     // -----------------------------------
     // `     eslint-plugin-functional
     // functional.configs.externalVanillaRecommended,
