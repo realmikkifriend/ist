@@ -1,5 +1,6 @@
-import { parse, ParsedResult } from "chrono-node";
+import { parse } from "chrono-node";
 import { DateTime } from "luxon";
+import type { ParsedResult } from "chrono-node";
 
 /**
  * Extracts the time from a due string, if available.

@@ -1,4 +1,4 @@
-import { Task } from "./todoist";
+import type { Task } from "./todoist";
 
 export type QuarterHourPosition = 0.25 | 0.5 | 0.75;
 

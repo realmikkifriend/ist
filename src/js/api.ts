@@ -1,11 +1,5 @@
 import { get } from "svelte/store";
-import {
-    TodoistApi,
-    TodoistRequestError,
-    UpdateTaskArgs,
-    PersonalProject,
-    WorkspaceProject,
-} from "@doist/todoist-api-typescript";
+import { TodoistApi, TodoistRequestError } from "@doist/todoist-api-typescript";
 import { todoistAccessToken, todoistData, todoistError } from "./stores";
 import { getDueTasks, getReverseTasks } from "./filter";
 import { success } from "./toasts";
@@ -13,6 +7,11 @@ import { toast } from "@zerodevx/svelte-toast";
 import { cleanTodoistData } from "./process";
 import type { Task, Comment, TodoistData, Context, User } from "../../types/todoist";
 import type { DateTime } from "luxon";
+import type {
+    UpdateTaskArgs,
+    PersonalProject,
+    WorkspaceProject,
+} from "@doist/todoist-api-typescript";
 
 /**
  * Initializes the Todoist API with the current access token.
