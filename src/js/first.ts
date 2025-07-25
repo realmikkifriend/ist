@@ -54,12 +54,10 @@ const updateDueTasks = (dueTasks: Task[], contextId: string | null): Task[] => {
 /**
  * Load comments for a task.
  * @param {string} taskId - The ID of the task to retrieve comments for.
- * @returns {Promise<Comment[]>} The list of comments.
+ * @returns {Promise<Comment[]>} The list of comments, or an empty array if an error occurred.
  */
 const loadComments = async (taskId: string): Promise<Comment[]> => {
-    // eslint-disable-next-line
-    const comments = (await getTaskComments(taskId)) || [];
-    return comments as Comment[];
+    return await getTaskComments(taskId);
 };
 
 /**
@@ -109,9 +107,7 @@ export const updateFirstDueTask = async (): Promise<void> => {
         prevTask &&
         newTask.id !== prevTask.id &&
         (!selectedContextId || prevTask.contextId === selectedContextId) &&
-        // eslint-disable-next-line
         window.location.hash !== "#today" &&
-        // eslint-disable-next-line
         window.location.hash !== "#tomorrow"
     ) {
         newFirstTask(FirstDueTaskToast as unknown as typeof SvelteComponent, () =>

@@ -9,6 +9,7 @@ import {
 import { todoistAccessToken, todoistData, todoistError } from "./stores";
 import { getDueTasks, getReverseTasks } from "./filter";
 import { success } from "./toasts";
+import { toast } from "@zerodevx/svelte-toast";
 import { cleanTodoistData } from "./process";
 import type { Task, Comment, TodoistData, Context, User } from "../../types/todoist";
 import type { DateTime } from "luxon";
@@ -34,7 +35,7 @@ export async function refreshData(): Promise<
 > {
     const { accessToken, api } = initializeApi();
     if (!accessToken || !api) {
-        return setErrorState("No access token found.");
+        return setErrorState(new TodoistRequestError("No access token found."));
     }
 
     const result = await Promise.all([
@@ -52,7 +53,7 @@ export async function refreshData(): Promise<
         if (typeof err === "string") {
             return setErrorState(new TodoistRequestError(err));
         }
-        return setErrorState("Unknown error");
+        return setErrorState(new TodoistRequestError("Unknown error"));
     });
 
     if (!Array.isArray(result)) {
@@ -121,42 +122,40 @@ export async function refreshData(): Promise<
  * @param {TodoistRequestError | string} error - The error object or message.
  * @returns {{ status: "error"; error: TodoistRequestError | string }} - Results of error function.
  */
-function setErrorState(error: TodoistRequestError | string): {
+function setErrorState(error: TodoistRequestError): {
     status: "error";
-    error: TodoistRequestError | string;
+    error: TodoistRequestError;
 } {
-    const errorMsg = error instanceof TodoistRequestError ? error.message : error;
-    todoistError.set(errorMsg);
+    todoistError.set(error.message);
     return { status: "error", error };
 }
 
 /**
  * Gets comments for a specific task.
  * @param {string} taskId - The ID of the task for which comments will be retrieved.
- * @returns {Promise<Comment[] | { status: "error"; error: TodoistRequestError | string }>} - Results of comment retrieval.
+ * @returns {Promise<Comment[]>} - Results of comment retrieval, or empty array if error.
  */
-export async function getTaskComments(
-    taskId: string,
-): Promise<Comment[] | { status: "error"; error: TodoistRequestError | string }> {
+export async function getTaskComments(taskId: string): Promise<Comment[]> {
     const { accessToken, api } = initializeApi();
     if (!accessToken || !api) {
-        return setErrorState("No access token found.");
+        toast.push("Failed to load comments: No access token found.");
+        return [];
     }
 
     return api
         .getComments({ taskId })
         .then((response) => response.results)
         .catch((error: unknown) => {
-            if (error instanceof TodoistRequestError) {
-                return setErrorState(error);
-            }
-            if (error instanceof Error) {
-                return setErrorState(new TodoistRequestError(error.message));
-            }
-            if (typeof error === "string") {
-                return setErrorState(new TodoistRequestError(error));
-            }
-            return setErrorState("Unknown error");
+            const message =
+                error instanceof TodoistRequestError
+                    ? error.message
+                    : error instanceof Error
+                      ? error.message
+                      : typeof error === "string"
+                        ? error
+                        : "Unknown error";
+            toast.push(`Failed to load comments: ${message}`);
+            return [];
         });
 }
 
@@ -170,7 +169,7 @@ export async function markTaskDone(
 ): Promise<void | { status: "error"; error: TodoistRequestError | string }> {
     const { accessToken, api } = initializeApi();
     if (!accessToken || !api) {
-        return setErrorState("No access token found.");
+        return setErrorState(new TodoistRequestError("No access token found."));
     }
 
     return api
@@ -186,7 +185,7 @@ export async function markTaskDone(
             if (typeof error === "string") {
                 return setErrorState(new TodoistRequestError(error));
             }
-            return setErrorState("Unknown error");
+            return setErrorState(new TodoistRequestError("Unknown error"));
         });
 }
 
@@ -200,7 +199,7 @@ export async function deferTasks(
 ): Promise<(void | { status: "error"; error: TodoistRequestError | string })[]> {
     const { accessToken, api } = initializeApi();
     if (!accessToken || !api) {
-        return [setErrorState("No access token found.")];
+        return [setErrorState(new TodoistRequestError("No access token found."))];
     }
 
     const updatePromises = taskTimePairs.map(([task, time]) => {
@@ -226,7 +225,7 @@ export async function deferTasks(
                 if (typeof error === "string") {
                     return setErrorState(new TodoistRequestError(error));
                 }
-                return setErrorState("Unknown error");
+                return setErrorState(new TodoistRequestError("Unknown error"));
             });
     });
 
