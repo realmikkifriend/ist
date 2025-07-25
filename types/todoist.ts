@@ -2,9 +2,12 @@ import type {
     Task as BaseTask,
     PersonalProject,
     User as BaseUser,
+    Comment as BaseComment,
 } from "@doist/todoist-api-typescript";
 
 export type Context = PersonalProject;
+
+export type Comment = BaseComment;
 
 export interface TodoistData {
     tasks: Task[];
