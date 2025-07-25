@@ -1,5 +1,5 @@
-<script>
-    export let onClick;
+<script lang="ts">
+    export let onClick: (() => void) | undefined;
 
     export function handleClick() {
         if (typeof onClick === "function") {
