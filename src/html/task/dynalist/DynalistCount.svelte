@@ -1,25 +1,33 @@
-<script>
+<script lang="ts">
     import { writable } from "svelte/store";
     import { parseCountData, handleCount, calculateLabel } from "./dynalistCount";
+    import type { Writable } from "svelte/store";
+    import type { DynalistNode, DynalistCountData, LabelInfo } from "../../../../types/dynalist";
 
-    export let content;
+    export let content: DynalistNode;
 
-    const todayFormatted = new Date().toLocaleDateString("en-CA");
-    const options = ["+1", "+5", "+10"];
+    const todayFormatted: string = new Date().toLocaleDateString("en-CA");
+    const options: string[] = ["+1", "+5", "+10"];
 
-    const initialData = parseCountData(content.note);
-    const countData = writable(
+    const initialData: DynalistCountData = parseCountData(content.note ?? "");
+
+    const countData: Writable<DynalistCountData> = writable(
         initialData.date !== todayFormatted
             ? { ...initialData, date: todayFormatted, current: 0 }
             : initialData,
     );
 
-    async function handleCountClick(option) {
-        const updatedData = await handleCount(option, $countData, content);
+    /**
+     * Handles a click on a count option button.
+     * Updates the count data store with the new value.
+     * @param option - The increment option selected (e.g., "+1", "+5", "+10")
+     */
+    async function handleCountClick(option: string): Promise<void> {
+        const updatedData: DynalistCountData = await handleCount(option, $countData, content);
         countData.set(updatedData);
     }
 
-    $: labelInfo = calculateLabel($countData);
+    $: labelInfo = calculateLabel($countData) as LabelInfo;
 </script>
 
 <span class="flex w-full flex-col justify-between">

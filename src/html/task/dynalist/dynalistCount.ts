@@ -9,12 +9,16 @@ import type { DynalistCountData, DynalistContent } from "../../../../types/dynal
  */
 export const parseCountData = (note: string): DynalistCountData => {
     const match = note.match(/count (\d+)(?:\/(\d+))?\s*(\d{4}-\d{1,2}-\d{1,2})?/);
-    if (!match) return {};
-    const [total, current, date] = match.slice(1);
+    if (!match) {
+        return { total: 0, current: 0 };
+    }
+    const [totalStr, currentStr, date] = match.slice(1);
+    const total = totalStr !== undefined ? parseInt(totalStr, 10) : 0;
+    const current = currentStr !== undefined ? parseInt(currentStr, 10) : 0;
     return {
-        total: total !== undefined ? parseInt(total, 10) : undefined,
-        current: current !== undefined ? parseInt(current, 10) : undefined,
-        date,
+        total,
+        current,
+        ...(date ? { date } : {}),
     };
 };
 
@@ -34,7 +38,7 @@ export async function handleCount(
     const increment = +option.slice(1);
     const updatedData: DynalistCountData = {
         ...countData,
-        current: (countData.current ?? 0) + increment,
+        current: countData.current + increment,
     };
     const changes = [
         {
@@ -57,7 +61,7 @@ export async function handleCount(
  * @returns {{ label: string; classes: string }} The label and CSS classes.
  */
 export function calculateLabel(countData: DynalistCountData): { label: string; classes: string } {
-    const { current = 0, total = 0 } = countData;
+    const { current, total } = countData;
     const now = new Date();
     const startHour = 8;
     const endHour = 22;

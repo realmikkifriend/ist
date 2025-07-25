@@ -1,6 +1,6 @@
 export interface DynalistCountData {
-    total?: number;
-    current?: number;
+    total: number;
+    current: number;
     date?: string;
 }
 
@@ -37,3 +37,8 @@ export interface DynalistDocumentData {
     file_id: string;
     nodes: DynalistNode[];
 }
+
+export type LabelInfo = {
+    label: string;
+    classes: string;
+};
