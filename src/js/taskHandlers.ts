@@ -4,9 +4,7 @@ import { updateFirstDueTask } from "./first";
 import { get } from "svelte/store";
 import { DateTime } from "luxon";
 import { TodoistRequestError } from "@doist/todoist-api-typescript";
-import type { Task, TodoistData } from "../../types/todoist";
-
-type TaskUpdates = Array<[string, Date | DateTime | string]>;
+import type { Task, TodoistData, TaskUpdates } from "../../types/todoist";
 
 /**
  * Updates the dueTasks resource in the todoistData store based on the provided task updates.

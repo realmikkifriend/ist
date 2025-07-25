@@ -1,3 +1,4 @@
+import type { DateTime } from "luxon";
 import type {
     Task as BaseTask,
     PersonalProject,
@@ -87,3 +88,5 @@ export interface DueTasksData {
     contexts: Context[];
     user?: User;
 }
+
+export type TaskUpdates = Array<[string, Date | DateTime | string]>;
