@@ -158,14 +158,13 @@ export function summonTask(
             task.skip = true;
         }
         const currentFirstDueSummoned = get(firstDueTask)?.summoned;
-        // eslint-disable-next-line
+
         task.summoned = currentFirstDueSummoned || window.location.hash;
 
         setFirstDueTask(task);
         previousFirstDueTask.set(get(firstDueTask) || null);
     }
 
-    // eslint-disable-next-line
     window.location.hash = "";
 }
 
@@ -176,10 +175,8 @@ export function summonTask(
  */
 export function openAgenda(agendaType: string = "today"): void {
     toast.pop({ target: "wait" });
-    // eslint-disable-next-line
     window.location.hash = agendaType;
 
-    // eslint-disable-next-line
     const drawerCheckbox = document.getElementById("my-drawer") as HTMLInputElement | null;
     if (drawerCheckbox) {
         drawerCheckbox.checked = false;

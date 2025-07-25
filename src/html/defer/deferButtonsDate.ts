@@ -70,21 +70,18 @@ export function shouldHighlightTomorrow(
  * @returns {HTMLDivElement} - A DOM element of dots.
  */
 export function createTaskDots(tasks: Task[]): HTMLDivElement {
-    // eslint-disable-next-line
     const dotContainer = document.createElement("div");
     dotContainer.className =
         "dot-container flex space-x-0.5 justify-center items-center h-1 mt-[-0.5rem]";
 
     const visibleTasks = tasks.slice(0, 3);
     const elements = visibleTasks.map((task) => {
-        // eslint-disable-next-line
         const div = document.createElement("div");
         div.className = `w-1 h-1 rounded-full ${getPriorityClasses(task.priority as Priority)}`;
         return div;
     });
 
     if (tasks.length > 3) {
-        // eslint-disable-next-line
         const plusDiv = document.createElement("div");
         plusDiv.textContent = "+";
         plusDiv.className = `text-[0.65rem] text-secondary h-[1.1rem] w-1 ml-0`;

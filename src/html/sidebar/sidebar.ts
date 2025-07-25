@@ -49,7 +49,6 @@ export function handleBadgeClick(): void {
     const selectedContext = get(userSettings).selectedContext;
 
     if ($firstDueTask?.summoned) {
-        // eslint-disable-next-line no-undef
         window.location.hash = $firstDueTask.summoned as string;
 
         $firstDueTask.summoned = false;

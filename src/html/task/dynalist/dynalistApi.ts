@@ -22,7 +22,6 @@ export function fetchDynalistDocument(
         dynalistFileID = url.slice(lastIndex + 1, hashIndex === -1 ? undefined : hashIndex),
         dynalistSubItem = hashIndex === -1 ? undefined : url.slice(hashIndex + 3);
 
-    // eslint-disable-next-line
     return fetch("https://dynalist.io/api/v1/doc/read", {
         method: "POST",
         headers: {
@@ -82,7 +81,6 @@ export async function updateDynalist(
         changes,
     };
 
-    // eslint-disable-next-line
     const response = await fetch("https://dynalist.io/api/v1/doc/edit", {
         method: "POST",
         headers: {
@@ -108,7 +106,6 @@ export async function validateDynalistToken(token: string): Promise<ValidateDyna
     if (!/^[a-zA-Z0-9_]+$/.test(token)) {
         return { success: false, error: "Invalid token format" };
     }
-    // eslint-disable-next-line
     return fetch("https://dynalist.io/api/v1/pref/get", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -121,13 +118,11 @@ export async function validateDynalistToken(token: string): Promise<ValidateDyna
             if (response.ok && isObj(result) && result._code !== "InvalidToken") {
                 return { success: true };
             } else {
-                // eslint-disable-next-line
                 console.error("API request failed:", result);
                 return { success: false, error: "Invalid token", data: result };
             }
         })
         .catch((error) => {
-            // eslint-disable-next-line
             console.error("Network or other error:", error);
             return { success: false, error: "Network or other error" };
         });
