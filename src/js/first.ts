@@ -52,15 +52,6 @@ const updateDueTasks = (dueTasks: Task[], contextId: string | null): Task[] => {
 };
 
 /**
- * Load comments for a task.
- * @param {string} taskId - The ID of the task to retrieve comments for.
- * @returns {Promise<Comment[]>} The list of comments, or an empty array if an error occurred.
- */
-const loadComments = async (taskId: string): Promise<Comment[]> => {
-    return await getTaskComments(taskId);
-};
-
-/**
  * Skip the current task and summon the next one.
  * @param {Task} task - The task to skip.
  * @returns {void}
@@ -100,7 +91,7 @@ export const updateFirstDueTask = async (): Promise<void> => {
 
     const newTask: Task = dueTasks[0];
 
-    const comments = await loadComments(newTask.id);
+    const comments = await getTaskComments(newTask.id);
     (newTask as Task & { comments: Comment[] }).comments = comments;
 
     if (
