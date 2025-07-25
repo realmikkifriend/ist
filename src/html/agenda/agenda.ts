@@ -4,7 +4,7 @@ import { firstDueTask, previousFirstDueTask } from "../../js/stores";
 import { setFirstDueTask } from "../../js/first";
 import { DateTime } from "luxon";
 import type { Task, TodoistData } from "../../../types/todoist";
-import type { SortedAgendaTasks } from "../../../types/agenda";
+import type { AgendaData } from "../../../types/agenda";
 
 /**
  * Get all tasks for a specific date.
@@ -30,9 +30,9 @@ export const getTasksForDate = (date: DateTime, todoistData: TodoistData): Task[
 /**
  * Sort agenda tasks by due date and priority, and group by time presence.
  * @param {Task[]} tasks - The tasks to sort.
- * @returns {SortedAgendaTasks} Sorted and grouped tasks.
+ * @returns {AgendaData} Sorted and grouped tasks.
  */
-export const sortAgendaTasks = (tasks: Task[]): SortedAgendaTasks => {
+export const sortAgendaTasks = (tasks: Task[]): AgendaData => {
     return tasks
         .sort((a, b) => {
             const timeA = DateTime.fromISO(a.due?.date ?? "").toMillis();
@@ -42,7 +42,7 @@ export const sortAgendaTasks = (tasks: Task[]): SortedAgendaTasks => {
             }
             return timeA - timeB;
         })
-        .reduce<SortedAgendaTasks>(
+        .reduce<AgendaData>(
             (acc, task) => {
                 if (task.due?.date && task.due.date.includes("T")) {
                     acc.tasks.push(task);
@@ -51,7 +51,7 @@ export const sortAgendaTasks = (tasks: Task[]): SortedAgendaTasks => {
                 }
                 return acc;
             },
-            { tasksWithNoTime: [], tasks: [] },
+            { tasksWithNoTime: [], tasks: [], todayTasks: [], tasksForDate: [] },
         );
 };
 

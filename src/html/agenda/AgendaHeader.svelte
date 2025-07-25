@@ -1,19 +1,29 @@
-<script>
+<script lang="ts">
     import { Icon, XCircle, Calendar, BarsArrowUp } from "svelte-hero-icons";
     import { summonTask } from "./agenda";
-    import { filterAndSortTasks } from "../../js/filter";
+    // import { filterAndSortTasks } from "../../js/filter";
     import { todoistData } from "../../js/stores";
+    // import type { Task } from "../../../types/todoist";
+    import type { AgendaData, DisplayData } from "../../../types/agenda";
+    // import type { GradientType } from "../../../types/agenda";
 
-    export let agendaData, displayData;
+    export let agendaData: AgendaData;
+    export let displayData: DisplayData;
 
-    $: ({ tasks, tasksWithNoTime, todayTasks, tasksForDate } = agendaData);
+    $: ({ tasks, tasksWithNoTime, todayTasks } = agendaData);
     $: ({ title, headerGradientColor } = displayData);
 
-    function switchView() {
+    /**
+     * Switches the agenda view between "today" and "tomorrow".
+     */
+    function switchView(): void {
         window.location.hash = window.location.hash === "#today" ? "#tomorrow" : "#today";
     }
 
-    function viewReverseTaskList() {
+    /**
+     * Summons the first task from the reverse task list for the current view.
+     */
+    function viewReverseTaskList(): void {
         const reverseTasks =
             title === "Today"
                 ? $todoistData.reverseTasks.today
@@ -24,7 +34,10 @@
         }
     }
 
-    function closeAgenda() {
+    /**
+     * Closes the agenda by clearing the location hash.
+     */
+    function closeAgenda(): void {
         window.location.hash = "";
     }
 </script>
