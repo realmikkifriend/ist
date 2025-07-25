@@ -2,27 +2,22 @@
     import Markdown from "svelte-exmarkdown";
     import { Icon, Backward } from "svelte-hero-icons";
     import { writable } from "svelte/store";
-    import { parseList, hasError } from "./dynalist";
-    import type { DynalistContent } from "../../../../types/dynalist";
+    import { hasError } from "./dynalist";
+    import type { DynalistContent, DynalistNode } from "../../../../types/dynalist";
 
     export let content: DynalistContent | undefined;
 
     const currentIndex = writable(0);
 
-    $: checklistItems = (() => {
-        if (!content || hasError(content)) {
-            return [];
-        }
-        const result = parseList(typeof content === "string" ? content : "");
-        return result instanceof Error ? [] : result;
-    })();
+    $: checklistItems =
+        content && Array.isArray(content?.children) ? (content.children as DynalistNode[]) : [];
 
     $: errorMessage = !content
         ? "No checklist content provided."
         : hasError(content)
           ? content.error?.message || "Failed to load Dynalist checklist."
           : checklistItems.length === 0
-            ? "Failed to parse checklist content."
+            ? "No checklist items found."
             : null;
 
     /**
@@ -47,18 +42,16 @@
 
 {#if errorMessage}
     <div class="italic text-error">{errorMessage}</div>
-{:else if checklistItems && $currentIndex < checklistItems.length - 1}
+{:else if checklistItems && $currentIndex < checklistItems.length}
     <div class="mt-2">
         <em class="absolute -left-0.5 -top-3.5 text-nowrap text-xs opacity-25">
-            <span class="mr-0.5 inline-block w-7"
-                >{$currentIndex + 1}/{checklistItems.length - 1}</span
-            >
+            <span class="mr-0.5 inline-block w-7">{$currentIndex + 1}/{checklistItems.length}</span>
         </em>
         <button
             class="float-left mr-2 mt-1 inline-block h-5 w-5 cursor-pointer border-2 border-primary-content transition-colors"
             on:click={showNextItem}
         />
-        <Markdown md={checklistItems[$currentIndex]} />
+        <Markdown md={checklistItems[$currentIndex]?.content ?? ""} />
     </div>
 {:else}
     <span class="italic">End of list!</span>
