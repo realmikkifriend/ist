@@ -2,7 +2,6 @@
     import { getAuthStateParameter, getAuthorizationUrl } from "@doist/todoist-api-typescript";
     // @ts-expect-error until file is converted to TypeScript
     import Logo from "./Logo.svelte";
-    // @ts-expect-error until file is converted to TypeScript
     import Footer from "./Footer.svelte";
 
     const TODOIST_CLIENT_ID: string | undefined = process.env.TODOIST_CLIENT_ID;

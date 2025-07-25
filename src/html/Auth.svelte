@@ -5,9 +5,7 @@
     import "@fontsource/clear-sans/700.css";
     // @ts-expect-error until file is converted to TypeScript
     import App from "./App.svelte";
-    // @ts-expect-error until file is converted to TypeScript
     import LandingPage from "./Landing.svelte";
-    // @ts-expect-error until file is converted to TypeScript
     import OAuthCallback from "./OAuthCallback.svelte";
     import "../css/styles.css";
 
