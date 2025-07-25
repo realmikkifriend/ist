@@ -98,7 +98,7 @@ export const updateFirstDueTask = async (): Promise<void> => {
         return;
     }
 
-    const selectedContextId: string | null = get(userSettings).selectedContext;
+    const selectedContextId: string | null = get(userSettings).selectedContext?.id ?? null;
     const prevTask: Task | null = get(previousFirstDueTask);
 
     const dueTasks: Task[] = updateDueTasks($todoistData.dueTasks, selectedContextId);
