@@ -1,5 +1,4 @@
 import { success } from "../../../js/toasts";
-// @ts-expect-error until file is converted to TypeScript
 import { updateDynalist } from "./dynalistApi";
 import { DynalistCountData, DynalistContent } from "../../../../types/dynalist";
 
@@ -45,7 +44,6 @@ export async function handleCount(
         },
     ];
 
-    // eslint-disable-next-line
     await updateDynalist(content.file_id, changes);
 
     success("Updated count!");
