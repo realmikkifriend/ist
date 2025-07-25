@@ -42,3 +42,24 @@ export type LabelInfo = {
     label: string;
     classes: string;
 };
+
+export type DynalistTaskType = "read" | "checklist" | "count" | "rotating" | "crossoff";
+
+export type DynalistChange =
+    | {
+          action: "move";
+          node_id: string;
+          parent_id: string;
+          index: number;
+      }
+    | {
+          action: "edit";
+          node_id: string;
+          note: string;
+      };
+
+export interface DynalistStoreState {
+    dynalistObject?: DynalistContent;
+    selectedType: DynalistTaskType | "";
+    error?: string;
+}

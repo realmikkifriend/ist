@@ -1,8 +1,6 @@
 <script lang="ts">
     import Markdown from "svelte-exmarkdown";
-    // @ts-expect-error until file is converted to TypeScript
     import DynalistComment from "./dynalist/DynalistComment.svelte";
-    // @ts-expect-error until file is converted to TypeScript
     import DynalistAuthRequest from "./dynalist/DynalistAuthRequest.svelte";
     import { dynalistAccessToken } from "../../js/stores";
     import type { Comment } from "../../../types/todoist";

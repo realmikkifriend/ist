@@ -1,29 +1,42 @@
-<script>
+<script lang="ts">
     import { Icon, ArrowPath, Key } from "svelte-hero-icons";
     import { dynalistAccessToken } from "../../../js/stores";
     import { success } from "../../../js/toasts";
+    // @ts-expect-error until file is converted to TypeScript
     import Logo from "../../Logo.svelte";
     import { validateDynalistToken } from "./dynalistApi";
+    import type { ValidateDynalistTokenResult } from "../../../../types/dynalist";
 
-    async function handleToken(event) {
+    /**
+     * Handles the submission of the Dynalist access token form.
+     * Validates the token and updates the UI based on the result.
+     * @param event - The form submit event
+     */
+    async function handleToken(event: SubmitEvent): Promise<void> {
         event.preventDefault();
 
-        const form = event.target;
-        const tempToken = form.elements.token.value;
+        const form = event.target as HTMLFormElement;
+        const tokenElement = form.elements.namedItem("token");
+        let tempToken = "";
+        if (tokenElement instanceof HTMLInputElement) {
+            tempToken = tokenElement.value;
+        }
 
         const submitBtn = form.querySelector("button[type='submit']");
-        if (submitBtn) submitBtn.disabled = true;
+        if (submitBtn instanceof HTMLButtonElement) submitBtn.disabled = true;
 
         const spinner = form.querySelector(".spinner");
-        if (spinner) spinner.style.display = "inline-block";
+        if (spinner instanceof HTMLElement) spinner.style.display = "inline-block";
 
         const submitContent = form.querySelector(".submit-content");
-        if (submitContent) submitContent.style.display = "none";
+        if (submitContent instanceof HTMLElement) submitContent.style.display = "none";
 
-        const invalidToken = form.parentElement.querySelector(".invalid-token");
+        const invalidToken = form.parentElement?.querySelector(
+            ".invalid-token",
+        ) as HTMLParagraphElement | null;
         if (invalidToken) invalidToken.style.display = "none";
 
-        const result = await validateDynalistToken(tempToken);
+        const result: ValidateDynalistTokenResult = await validateDynalistToken(tempToken);
         if (result.success) {
             success("Dynalist access token set!");
             dynalistAccessToken.set(tempToken);
@@ -31,9 +44,9 @@
             if (invalidToken) invalidToken.style.display = "block";
         }
 
-        if (submitBtn) submitBtn.disabled = false;
-        if (spinner) spinner.style.display = "none";
-        if (submitContent) submitContent.style.display = "flex";
+        if (submitBtn instanceof HTMLButtonElement) submitBtn.disabled = false;
+        if (spinner instanceof HTMLElement) spinner.style.display = "none";
+        if (submitContent instanceof HTMLElement) submitContent.style.display = "flex";
     }
 </script>
 

@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     import { createEventDispatcher } from "svelte";
     import {
         Icon,
@@ -9,11 +9,20 @@
         ArrowPathRoundedSquare,
         Inbox,
     } from "svelte-hero-icons";
+    // @ts-expect-error until file is converted to TypeScript
     import Logo from "../../Logo.svelte";
+    import type { DynalistTaskType } from "../../../../types/dynalist";
 
-    export let selectedType, url;
+    export let selectedType: DynalistTaskType;
+    export let url: string;
 
-    const iconPairs = [
+    interface IconPair {
+        icon: typeof ListBullet;
+        label: string;
+        type: DynalistTaskType;
+    }
+
+    const iconPairs: IconPair[] = [
         { icon: ListBullet, label: "Read", type: "read" },
         { icon: ClipboardDocumentCheck, label: "Checklist", type: "checklist" },
         { icon: SquaresPlus, label: "Count", type: "count" },
@@ -21,10 +30,14 @@
         { icon: Inbox, label: "Cross Off", type: "crossoff" },
     ];
 
-    const dispatcher = createEventDispatcher();
+    const dispatcher = createEventDispatcher<{ selectType: { type: DynalistTaskType } }>();
 
-    function handleSelectType(label) {
-        dispatcher("selectType", { type: label });
+    /**
+     * Dispatches a selectType event with the chosen Dynalist task type.
+     * @param type - The selected Dynalist task type.
+     */
+    function handleSelectType(type: DynalistTaskType): void {
+        dispatcher("selectType", { type });
     }
 </script>
 

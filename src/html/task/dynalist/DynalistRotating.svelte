@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     import { writable } from "svelte/store";
     import { Icon, ArrowUturnDown } from "svelte-hero-icons";
     import { DateTime } from "luxon";
@@ -6,32 +6,50 @@
     import { generateDynalistComment } from "./dynalist";
     import { updateDynalist } from "./dynalistApi";
     import { success } from "../../../js/toasts";
+    import type { Writable } from "svelte/store";
+    import type { DynalistContent, DynalistNode, DynalistChange } from "../../../../types/dynalist";
 
-    export let content;
+    export let content: DynalistContent;
 
-    const rotationIndex = writable(0);
-    const isLoading = writable(false);
+    const rotationIndex: Writable<number> = writable(0);
+    const isLoading: Writable<boolean> = writable(false);
 
-    $: checklistItems = content?.children || [];
+    $: checklistItems = (content?.children as DynalistNode[]) || [];
     $: rotatedItems = rotateArray(checklistItems, $rotationIndex);
     $: currentItem = rotatedItems[0];
     $: hasItems = checklistItems.length > 0;
 
-    const rotateArray = (arr, index) => {
+    /**
+     * Rotates an array by the given index.
+     * @param arr - The array to rotate.
+     * @param index - The index to rotate by.
+     * @returns The rotated array.
+     */
+    function rotateArray<T>(arr: T[], index: number): T[] {
         if (!arr || arr.length === 0) return [];
         const normalizedIndex = index % arr.length;
         return [...arr.slice(normalizedIndex), ...arr.slice(0, normalizedIndex)];
-    };
+    }
 
-    const isMonthYearFormat = (dateString) => {
+    /**
+     * Checks if a date string is in "Month Year" format.
+     * @param dateString - The date string to check.
+     * @returns True if the string is in "Month Year" format, false otherwise.
+     */
+    function isMonthYearFormat(dateString?: string): boolean {
         const trimmed = dateString?.trim() || "";
         const fullMonthFormat = DateTime.fromFormat(trimmed, "LLLL yyyy");
         const shortMonthFormat = DateTime.fromFormat(trimmed, "LLL yyyy");
         return fullMonthFormat.isValid || shortMonthFormat.isValid;
-    };
+    }
 
-    const createUpdateChanges = (item) => {
-        const changes = [
+    /**
+     * Creates an array of changes for updating a Dynalist item.
+     * @param item - The Dynalist node to update.
+     * @returns An array of changes.
+     */
+    function createUpdateChanges(item: DynalistNode): DynalistChange[] {
+        const changes: DynalistChange[] = [
             {
                 action: "move",
                 node_id: item.id,
@@ -51,21 +69,34 @@
         }
 
         return changes;
-    };
+    }
 
-    const handleUpdateSuccess = () => {
+    /**
+     * Handles a successful update to Dynalist.
+     * @returns True if the update was successful.
+     */
+    function handleUpdateSuccess(): boolean {
         success("Sent to bottom of list in Dynalist!");
         isLoading.set(false);
         return true;
-    };
+    }
 
-    const handleUpdateError = (error) => {
+    /**
+     * Handles an error during update to Dynalist.
+     * @param error - The error object.
+     * @returns False to indicate failure.
+     */
+    function handleUpdateError(error: unknown): boolean {
         console.error("Failed to update Dynalist:", error);
         isLoading.set(false);
         return false;
-    };
+    }
 
-    const showNextItem = async () => {
+    /**
+     * Rotates to the next item in the checklist and updates Dynalist.
+     * @returns A promise resolving to true if successful, false otherwise.
+     */
+    async function showNextItem(): Promise<boolean> {
         if (!currentItem || $isLoading) return false;
 
         isLoading.set(true);
@@ -77,7 +108,7 @@
             handleUpdateSuccess,
             handleUpdateError,
         );
-    };
+    }
 </script>
 
 {#if hasItems}

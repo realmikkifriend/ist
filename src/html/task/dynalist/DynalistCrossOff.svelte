@@ -1,52 +1,73 @@
-<script>
+<script lang="ts">
     import { writable } from "svelte/store";
     import { Icon, Backspace } from "svelte-hero-icons";
     import Markdown from "svelte-exmarkdown";
     import { generateDynalistComment } from "./dynalist";
     import { updateDynalist } from "./dynalistApi";
     import { success } from "../../../js/toasts";
+    import type { Writable } from "svelte/store";
+    import type { DynalistContent, DynalistNode } from "../../../../types/dynalist";
 
-    export let content;
+    export let content: DynalistContent;
 
-    const removedItemIds = writable(new Set());
+    const removedItemIds: Writable<Set<string>> = writable(new Set());
 
-    $: checklistItems = content?.children?.filter((item) => !$removedItemIds.has(item.id)) || [];
+    $: checklistItems =
+        (content?.children as DynalistNode[])?.filter((item) => !$removedItemIds.has(item.id)) ||
+        [];
 
-    const createShowNextItemHandler = (buttonElement) => async () => {
-        if (checklistItems.length === 0) return;
+    /**
+     * Creates a handler function to cross off the next checklist item when the button is clicked.
+     * Adds animation, updates Dynalist via API, and updates the removed items store.
+     * @param buttonElement - The button DOM element to animate.
+     * @returns An async function to handle the click event.
+     */
+    const createShowNextItemHandler =
+        (buttonElement: HTMLButtonElement) => async (): Promise<void> => {
+            if (checklistItems.length === 0) return;
 
-        buttonElement.classList.add("animate-ping");
+            buttonElement.classList.add("animate-ping");
 
-        const itemToRemove = checklistItems[0];
+            const itemToRemove = checklistItems[0];
 
-        const changes = [
-            {
-                action: "edit",
-                node_id: itemToRemove.id,
-                checked: true,
-            },
-        ];
+            const changes = [
+                {
+                    action: "edit",
+                    node_id: itemToRemove.id,
+                    checked: true,
+                },
+            ];
 
-        await updateDynalist(content.file_id, changes)
-            .then(() => {
-                removedItemIds.update((ids) => new Set([...ids, itemToRemove.id]));
-                success("Removed from list in Dynalist!");
-            })
-            .catch((error) => {
-                console.error("Failed to update Dynalist:", error);
-            })
-            .finally(() => {
-                buttonElement.classList.remove("animate-ping");
-            });
-    };
+            await updateDynalist(content.file_id, changes)
+                .then(() => {
+                    removedItemIds.update((ids) => new Set([...ids, itemToRemove.id]));
+                    success("Removed from list in Dynalist!");
+                })
+                .catch((error: unknown) => {
+                    console.error("Failed to update Dynalist:", error);
+                })
+                .finally(() => {
+                    buttonElement.classList.remove("animate-ping");
+                });
+        };
 
-    const buttonAction = (node) => {
+    /**
+     * Svelte action to attach the cross-off handler to a button element.
+     * Cleans up the event listener when the element is destroyed.
+     * @param node - The button DOM element.
+     * @returns An object with a destroy method for cleanup.
+     */
+    const buttonAction = (node: HTMLButtonElement) => {
         const handleClick = createShowNextItemHandler(node);
-        node.addEventListener("click", handleClick);
+        // Wrap the async handler to avoid returning a Promise to the event system
+        const syncHandler = () => {
+            void handleClick();
+        };
+        node.addEventListener("click", syncHandler);
 
         return {
             destroy() {
-                node.removeEventListener("click", handleClick);
+                node.removeEventListener("click", syncHandler);
             },
         };
     };

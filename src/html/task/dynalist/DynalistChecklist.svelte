@@ -1,38 +1,44 @@
-<script>
+<script lang="ts">
     import Markdown from "svelte-exmarkdown";
     import { Icon, Backward } from "svelte-hero-icons";
     import { writable } from "svelte/store";
-    import { parseList } from "./dynalist";
+    import { parseList, hasError } from "./dynalist";
+    import type { DynalistContent } from "../../../../types/dynalist";
 
-    export let content;
+    export let content: DynalistContent | undefined;
 
     const currentIndex = writable(0);
 
     $: checklistItems = (() => {
-        if (!content || content.error) {
+        if (!content || hasError(content)) {
             return [];
         }
-        const result = parseList(content);
+        const result = parseList(typeof content === "string" ? content : "");
         return result instanceof Error ? [] : result;
     })();
 
     $: errorMessage = !content
         ? "No checklist content provided."
-        : content.error
-          ? content.error.message || "Failed to load Dynalist checklist."
+        : hasError(content)
+          ? content.error?.message || "Failed to load Dynalist checklist."
           : checklistItems.length === 0
             ? "Failed to parse checklist content."
             : null;
 
-    function showNextItem(event) {
-        const buttonElement = event.currentTarget;
-        buttonElement.parentElement.classList.add("line-through", "text-secondary");
+    /**
+     * Handles the click event to show the next checklist item.
+     * Adds visual feedback, then advances the current index after a delay.
+     * @param event - The click event from the button
+     */
+    function showNextItem(event: MouseEvent) {
+        const buttonElement = event.currentTarget as HTMLElement;
+        buttonElement.parentElement?.classList.add("line-through", "text-secondary");
         buttonElement.classList.add("bg-secondary", "border-secondary");
 
         setTimeout(() => {
             if ($currentIndex < checklistItems.length - 1) {
                 currentIndex.update((n) => n + 1);
-                buttonElement.parentElement.classList.remove("line-through", "text-secondary");
+                buttonElement.parentElement?.classList.remove("line-through", "text-secondary");
                 buttonElement.classList.remove("bg-secondary", "border-secondary");
             }
         }, 200);

@@ -139,3 +139,12 @@ export function parseList(content: string): string[] {
         return result;
     }, []);
 }
+
+/**
+ * Returns whether the provided object has an error property.
+ * @param {unknown} obj - The object to check for an error property.
+ * @returns True if the object has an error property, false otherwise.
+ */
+export function hasError(obj: unknown): obj is { error: { message?: string } } {
+    return typeof obj === "object" && obj !== null && "error" in obj;
+}

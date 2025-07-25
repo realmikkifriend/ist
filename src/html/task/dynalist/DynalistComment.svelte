@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     import { writable } from "svelte/store";
     import Markdown from "svelte-exmarkdown";
     import { Icon, ArrowPath } from "svelte-hero-icons";
@@ -7,42 +7,80 @@
     import DynalistRotating from "./DynalistRotating.svelte";
     import DynalistCrossOff from "./DynalistCrossOff.svelte";
     import DynalistTypeMenu from "./DynalistTypeMenu.svelte";
-    import { loadDynalistComment, generateDynalistComment } from "./dynalist";
-    import { error } from "../../../js/toasts";
+    import { loadDynalistComment, generateDynalistComment, hasError } from "./dynalist";
+    import { error as showError } from "../../../js/toasts";
+    import type { Writable } from "svelte/store";
+    import type {
+        DynalistContent,
+        DynalistTaskType,
+        DynalistStoreState,
+    } from "../../../../types/dynalist";
 
-    export let url;
+    export let url: string;
 
-    const dynalistStore = writable({
+    const dynalistStore: Writable<DynalistStoreState> = writable({
         dynalistObject: undefined,
         selectedType: "",
         error: undefined,
     });
 
-    const loadPromise = loadDynalistComment(url).then(
-        ({ dynalistObject: obj, selectedType: type, error: err }) => {
-            if (err) {
-                const errorMsg = `Dynalist retrieval/processing error: ${err}`;
-                error(errorMsg);
+    const loadPromise: Promise<DynalistStoreState> = loadDynalistComment(url).then(
+        (value: { dynalistObject?: DynalistContent; selectedType?: string; error?: unknown }) => {
+            const { dynalistObject, selectedType, error } = value;
+            if (error) {
+                let errorMsg: string;
+                if (hasError(error) && typeof error.error.message === "string") {
+                    errorMsg = `Dynalist retrieval/processing error: ${error.error.message}`;
+                } else {
+                    errorMsg = `Dynalist retrieval/processing error`;
+                }
+
+                showError(errorMsg);
                 console.error(errorMsg);
-                const errorState = { dynalistObject: undefined, selectedType: "", error: err };
-                dynalistStore.set(errorState);
-                return errorState;
+
+                return {
+                    dynalistObject: undefined,
+                    selectedType: "",
+                };
             } else {
-                const newState = { dynalistObject: obj, selectedType: type, error: undefined };
+                const validTypes: (DynalistTaskType | "")[] = [
+                    "read",
+                    "checklist",
+                    "count",
+                    "rotating",
+                    "crossoff",
+                    "",
+                ];
+                const safeSelectedType =
+                    selectedType && validTypes.includes(selectedType as DynalistTaskType | "")
+                        ? (selectedType as DynalistTaskType | "")
+                        : "";
+                const newState: DynalistStoreState = {
+                    dynalistObject,
+                    selectedType: safeSelectedType,
+                    error: undefined,
+                };
                 dynalistStore.set(newState);
                 return newState;
             }
         },
     );
 
-    const handleTypeSelection = ({ detail: { type } }) =>
-        dynalistStore.update((state) => ({ ...state, selectedType: type }));
+    /**
+     * Handles selection of a Dynalist type from the menu.
+     * @param event - The event containing the selected type.
+     * @returns nothing, but updates Dynalist store setting
+     */
+    const handleTypeSelection = (event: CustomEvent<{ type: DynalistTaskType }>) =>
+        dynalistStore.update((state) => ({ ...state, selectedType: event.detail.type }));
 
     $: if ($dynalistStore.selectedType === "" && $dynalistStore.dynalistObject) {
         dynalistStore.update((state) => ({
             ...state,
             selectedType: state.dynalistObject
-                ? loadPromise.then((result) => result.selectedType)
+                ? (loadPromise.then((result) => result.selectedType) as unknown as
+                      | DynalistTaskType
+                      | "")
                 : "",
         }));
     }
@@ -57,24 +95,24 @@
         <div class="relative">
             {#if $dynalistStore.selectedType === "read"}
                 <Markdown
-                    md={generateDynalistComment($dynalistStore.dynalistObject) ||
+                    md={generateDynalistComment(result.dynalistObject) ||
                         "Unsupported format, but stay tuned."}
                 />
             {:else if $dynalistStore.selectedType === "checklist"}
-                <DynalistChecklist
-                    content={generateDynalistComment($dynalistStore.dynalistObject)}
-                />
+                <DynalistChecklist content={result.dynalistObject} />
             {:else if $dynalistStore.selectedType === "count"}
-                <DynalistCount content={$dynalistStore.dynalistObject} />
+                <DynalistCount content={result.dynalistObject} />
             {:else if $dynalistStore.selectedType === "rotating"}
-                <DynalistRotating content={$dynalistStore.dynalistObject} />
+                <DynalistRotating content={result.dynalistObject} />
             {:else if $dynalistStore.selectedType === "crossoff"}
-                <DynalistCrossOff content={$dynalistStore.dynalistObject} />
+                <DynalistCrossOff content={result.dynalistObject} />
             {/if}
 
             {#key $dynalistStore.selectedType}
                 <DynalistTypeMenu
-                    selectedType={$dynalistStore.selectedType}
+                    selectedType={$dynalistStore.selectedType === ""
+                        ? "read"
+                        : $dynalistStore.selectedType}
                     {url}
                     on:selectType={handleTypeSelection}
                 />
