@@ -1,6 +1,6 @@
 import { DateTime } from "luxon";
 import { getPriorityClasses } from "../../js/classes";
-import type { Task } from "../../../types/todoist";
+import type { Task, Priority } from "../../../types/todoist";
 
 /**
  * Returns the start and end DateTime for a given month/year string.
@@ -79,8 +79,7 @@ export function createTaskDots(tasks: Task[]): HTMLDivElement {
     const elements = visibleTasks.map((task) => {
         // eslint-disable-next-line
         const div = document.createElement("div");
-        // @ts-expect-error getPriorityClasses may not have TS types until converted
-        div.className = `w-1 h-1 rounded-full ${getPriorityClasses(task.priority)}`;
+        div.className = `w-1 h-1 rounded-full ${getPriorityClasses(task.priority as Priority)}`;
         return div;
     });
 
