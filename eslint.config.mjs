@@ -3,8 +3,10 @@ import globals from "globals";
 import { defineConfig } from "eslint/config";
 import functional from "eslint-plugin-functional";
 import svelte from "eslint-plugin-svelte";
+import svelteParser from "svelte-eslint-parser";
 import tseslint from "typescript-eslint";
 import jsdoc from "eslint-plugin-jsdoc";
+import svelteConfig from "./svelte.config.mjs";
 
 export default defineConfig([
     { files: ["**/*.{js,mjs,cjs}"], plugins: { js }, extends: ["js/recommended"] },
@@ -52,34 +54,19 @@ export default defineConfig([
     // `     eslint-plugin-svelte
     ...svelte.configs.recommended,
     {
-        files: ["**/*.svelte"],
+        files: ["**/*.svelte", "**/*.svelte.ts"],
         languageOptions: {
-            parser: "svelte-eslint-parser",
+            parser: svelteParser,
             parserOptions: {
-                parser: "@typescript-eslint/parser",
-                projectService: true,
+                project: "./tsconfig.json",
                 tsconfigRootDir: import.meta.dirname,
-            },
-            globals: globals.browser,
-        },
-        plugins: { svelte, jsdoc, functional, "@typescript-eslint": tseslint.plugin },
-        extends: [
-            "plugin:svelte/recommended",
-            "plugin:functional/all",
-            "plugin:jsdoc/recommended-typescript",
-            "plugin:jsdoc/contents-typescript",
-            "plugin:@typescript-eslint/recommended-type-checked",
-        ],
-        rules: {
-            "jsdoc/require-jsdoc": [
-                "warn",
-                {
-                    publicOnly: true,
-                    require: {
-                        ArrowFunctionExpression: true,
-                    },
+                extraFileExtensions: [".svelte", ".svelte.ts"],
+                parser: "@typescript-eslint/parser",
+                svelteFeatures: {
+                    experimentalGenerics: true,
                 },
-            ],
+                svelteConfig,
+            },
         },
     },
     // -----------------------------------
@@ -90,6 +77,12 @@ export default defineConfig([
     // functional.configs.stylistic,
     functional.configs.all,
     functional.configs.disableTypeChecked,
+    {
+        files: ["**/*.svelte"],
+        rules: {
+            "functional/no-let": "off",
+        },
+    },
     {
         files: ["**/*.spec.js"],
         rules: Object.fromEntries(
