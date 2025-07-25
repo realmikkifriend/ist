@@ -1,18 +1,19 @@
+import type { Priority } from "./todoist";
+
 export interface ButtonConfig {
     value?: number;
     height?: string;
     text?: string;
     ms?: number;
-}
-
-export interface TimeButtonConfig extends ButtonConfig {
     styling?: string;
     stylingButton?: string;
 }
 
+export type TimeButtonConfig = ButtonConfig;
+
 export interface DateButtonConfig extends ButtonConfig {
     count?: number | string;
-    priority?: number | string;
+    priority?: Priority;
     time?: string;
 }
 

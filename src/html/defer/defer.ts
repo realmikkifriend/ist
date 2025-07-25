@@ -1,7 +1,7 @@
 import { DateTime } from "luxon";
 import { createDateWithTime } from "../../js/time";
 import createButtons from "./deferButtons";
-import type { Task } from "../../../types/todoist";
+import type { Task, Priority } from "../../../types/todoist";
 import type { DateButtonConfig } from "../../../types/defer";
 
 /**
@@ -70,7 +70,9 @@ function getTasksInTimeRange(
 function updateButtonWithTasks(button: DateButtonConfig, matchedTasks: Task[]): void {
     button.count = matchedTasks.length > 0 ? matchedTasks.length : "";
     button.priority =
-        matchedTasks.length > 0 ? Math.max(...matchedTasks.map((task) => task.priority ?? 1)) : "";
+        matchedTasks.length > 0
+            ? (Math.max(...matchedTasks.map((task) => task.priority ?? 1)) as Priority)
+            : undefined;
 }
 
 /**
