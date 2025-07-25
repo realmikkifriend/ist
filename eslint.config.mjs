@@ -22,6 +22,7 @@ export default defineConfig([
                 projectService: true,
                 tsconfigRootDir: import.meta.dirname,
             },
+            globals: globals.browser,
         },
     },
     // -----------------------------------
