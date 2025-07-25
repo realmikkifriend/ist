@@ -13,7 +13,10 @@ export interface TodoistData {
     tasks: Task[];
     contexts: Context[];
     dueTasks: Task[];
-    reverseTasks: Task[];
+    reverseTasks: {
+        tomorrow: Task[];
+        today: Task[];
+    };
 }
 
 export interface CleanableTodoistData {

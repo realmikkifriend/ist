@@ -21,7 +21,7 @@ export const todoistData = persisted<TodoistData>("todoist_data", {
     tasks: [],
     contexts: [],
     dueTasks: [],
-    reverseTasks: [],
+    reverseTasks: { tomorrow: [], today: [] },
 });
 
 /**
@@ -57,7 +57,7 @@ export function handleLogout(): void {
         tasks: [],
         contexts: [],
         dueTasks: [],
-        reverseTasks: [],
+        reverseTasks: { tomorrow: [], today: [] },
     });
     todoistError.set(null);
     firstDueTask.set(null);
