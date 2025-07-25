@@ -5,7 +5,6 @@ import { todoistData, userSettings, firstDueTask, previousFirstDueTask } from ".
 // @ts-expect-error until file is converted to TypeScript
 import { getTaskComments } from "./api";
 import FirstDueTaskToast from "../html/FirstDueTaskToast.svelte";
-// @ts-expect-error until file is converted to TypeScript
 import { summonTask } from "../html/agenda/agenda";
 import { handleBadgeClick } from "../html/sidebar/sidebar";
 import type { SvelteComponent } from "svelte";
@@ -80,7 +79,6 @@ export const skipTask = (task: Task): void => {
     const currentIndex = reverseTasks.findIndex((t) => t.id === task.id);
     const nextIndex = currentIndex + 1;
     if (nextIndex < reverseTasks.length) {
-        // eslint-disable-next-line
         summonTask(reverseTasks[nextIndex], true);
     } else {
         handleBadgeClick();
