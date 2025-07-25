@@ -1,6 +1,6 @@
 import { DateTime } from "luxon";
 import { createDateWithTime } from "../../js/time";
-import createButtons from "./deferButtons";
+import createButtons from "./deferButtons.ts";
 
 function setupTomorrowButton(buttons, task) {
     const now = DateTime.now();
