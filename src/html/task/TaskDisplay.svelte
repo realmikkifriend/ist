@@ -1,40 +1,58 @@
-<script>
+<script lang="ts">
     import { createEventDispatcher } from "svelte";
     import { Icon, Check, Calendar, Clock, Forward } from "svelte-hero-icons";
+    // @ts-expect-error until file is converted to TypeScript
     import DeferModal from "../defer/DeferModal.svelte";
     import Comments from "./Comments.svelte";
     import { getPriorityBorder } from "../../js/classes";
     import { skipTask } from "../../js/first";
+    import type { Task, Priority } from "../../../types/todoist";
 
-    export let task;
+    export let task: Task;
 
-    const dispatch = createEventDispatcher();
+    const priorityBorderClass = getPriorityBorder(task.priority as Priority);
 
-    const handleDone = () => {
-        if (task.summoned) window.location.hash = task.summoned;
+    const dispatch = createEventDispatcher<{
+        done: { task: Task };
+        defer: { task: Task; time: string };
+    }>();
+
+    /**
+     * Handles marking the task as done and dispatches a "done" event.
+     */
+    const handleDone = (): void => {
+        if (task.summoned) window.location.hash = String(task.summoned);
         dispatch("done", { task });
     };
 
-    const handleDefer = ({ detail: { task, time } }) => {
-        document.getElementById("defer_modal").close();
-        if (task.summoned) window.location.hash = task.summoned;
-        dispatch("defer", { task, time });
+    /**
+     * Handles deferring the task, closes the modal, and dispatches a "defer" event.
+     * @param event - The event containing the deferred task and time.
+     */
+    const handleDefer = (event: CustomEvent<{ task: Task; time: string }>): void => {
+        (document.getElementById("defer_modal") as HTMLDialogElement | null)?.close();
+        if (event.detail.task.summoned) window.location.hash = String(event.detail.task.summoned);
+        dispatch("defer", { task: event.detail.task, time: event.detail.time });
     };
 
-    const handleSkip = () => {
+    /**
+     * Handles skipping the task.
+     */
+    const handleSkip = (): void => {
         skipTask(task);
     };
 
-    const openModal = () => {
-        document.getElementById("defer_modal").showModal();
+    /**
+     * Opens the defer modal dialog.
+     */
+    const openModal = (): void => {
+        (document.getElementById("defer_modal") as HTMLDialogElement | null)?.showModal();
     };
 </script>
 
 <div class="mx-auto mt-4 max-w-72 sm:mt-2 sm:max-w-sm">
     <div
-        class="card mt-0 rounded-xl border-b-[0.75rem] border-opacity-50 {getPriorityBorder(
-            task.priority,
-        )} bg-neutral text-primary-content"
+        class={`card mt-0 rounded-xl border-b-[0.75rem] border-opacity-50 bg-neutral text-primary-content ${priorityBorderClass}`}
     >
         <div class="card-body pb-7">
             {#if task.skip}
@@ -50,7 +68,7 @@
             <div class="card-actions justify-center">
                 <button
                     class="text-md btn btn-primary h-8 min-h-8 content-center p-4"
-                    title={task.due.string ? `repeats ${task.due.string}` : "one-time task"}
+                    title={task.due?.string ? `repeats ${task.due.string}` : "one-time task"}
                     on:click={handleDone}
                 >
                     <Icon src={Check} class="h-5 w-5 [&>path]:stroke-[3]" />
@@ -59,7 +77,7 @@
                     class="text-md btn btn-secondary h-8 min-h-8 content-center p-4"
                     on:click={openModal}
                 >
-                    {#if task.due.allDay === 1}
+                    {#if task.due?.allDay === 1}
                         <Icon src={Calendar} class="h-5 w-5 [&>path]:stroke-[3]" />
                     {:else}
                         <Icon src={Clock} class="h-5 w-5 [&>path]:stroke-[3]" />
