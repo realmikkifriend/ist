@@ -1,6 +1,6 @@
 <script>
     import { writable } from "svelte/store";
-    import { parseCountData, handleCount, calculateLabel } from "./dynalistCount.js";
+    import { parseCountData, handleCount, calculateLabel } from "./dynalistCount";
 
     export let content;
 
