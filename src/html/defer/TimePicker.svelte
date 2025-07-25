@@ -1,7 +1,7 @@
 <script>
     import { createEventDispatcher, onDestroy } from "svelte";
     import { getPriorityClasses } from "../../js/classes";
-    import { updateMilliseconds } from "./defer.js";
+    import { updateMilliseconds } from "./defer";
 
     export let task, tasks;
 
