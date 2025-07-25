@@ -19,7 +19,7 @@ function handleOverdueTasks(tasks: Task[]): void {
     if (overdueTasks.length > 0) {
         const taskUpdates: [Task, DateTime][] = overdueTasks.map((task) => {
             const extracted = task.due?.string ? createDateWithTime(task.due.string, today) : null;
-            const time = extracted?.newDate || today;
+            const time: DateTime = extracted?.newDate ?? today;
             return [task, time];
         });
 
