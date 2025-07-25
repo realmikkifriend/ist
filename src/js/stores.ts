@@ -2,6 +2,7 @@ import { writable, Writable } from "svelte/store";
 import { persisted } from "svelte-persisted-store";
 import { toast } from "@zerodevx/svelte-toast";
 import type { TodoistData, Task } from "../../types/todoist";
+import type { UserSettings } from "../../types/interface";
 
 /**
  * Stores the Todoist access token.
@@ -31,9 +32,6 @@ export const todoistError: Writable<string | null> = writable(null);
 /**
  * Stores user settings.
  */
-export interface UserSettings {
-    selectedContext: string | null;
-}
 export const userSettings = persisted<UserSettings>("user_settings", {
     selectedContext: null,
 });
