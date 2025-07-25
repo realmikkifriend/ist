@@ -56,8 +56,7 @@ export function handleBadgeClick(): void {
             delete $firstDueTask.skip;
         }
 
-        // eslint-disable-next-line
-        updateFirstDueTask();
+        void updateFirstDueTask();
     } else if (selectedContext) {
         clearSelectedContext();
     }

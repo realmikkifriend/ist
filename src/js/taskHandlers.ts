@@ -52,8 +52,7 @@ export function updateTaskResources(taskUpdates: TaskUpdates): void {
         return $resources;
     });
 
-    // eslint-disable-next-line
-    updateFirstDueTask();
+    void updateFirstDueTask();
 }
 
 /**
@@ -68,16 +67,13 @@ export async function handleTaskDone(taskID: string): Promise<void> {
 
     updateTaskResources([[taskID, fiveMinutesFromNow]]);
 
-    // eslint-disable-next-line
     const result = await markTaskDone(taskID).catch((error: any) => {
-        // eslint-disable-next-line
         todoistError.set(`Failed to mark task done: ${error.message}`);
         return null;
     });
     if (!result) return;
 
-    // eslint-disable-next-line
-    refreshData();
+    void refreshData();
 }
 
 /**
@@ -94,14 +90,11 @@ export async function handleTaskDefer(taskUpdates: Array<[Task, DateTime]>): Pro
     ]);
     updateTaskResources(updatedTaskResources);
 
-    // eslint-disable-next-line
     const result = await deferTasks(taskUpdates).catch((error: any) => {
-        // eslint-disable-next-line
         todoistError.set(`Failed to defer tasks: ${error.message}`);
         return null;
     });
     if (!result) return;
 
-    // eslint-disable-next-line
-    refreshData();
+    void refreshData();
 }
