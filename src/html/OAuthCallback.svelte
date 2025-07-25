@@ -1,28 +1,32 @@
-<script>
+<script lang="ts">
     import { onMount } from "svelte";
     import { todoistAccessToken } from "../js/stores";
 
-    const TODOIST_CLIENT_ID = process.env.TODOIST_CLIENT_ID;
-    const TODOIST_CLIENT_SECRET = process.env.TODOIST_CLIENT_SECRET;
-    const TODOIST_REDIRECT_URI = process.env.TODOIST_REDIRECT_URI;
+    const TODOIST_CLIENT_ID: string | undefined = process.env.TODOIST_CLIENT_ID;
+    const TODOIST_CLIENT_SECRET: string | undefined = process.env.TODOIST_CLIENT_SECRET;
+    const TODOIST_REDIRECT_URI: string | undefined = process.env.TODOIST_REDIRECT_URI;
 
-    onMount(() => {
+    onMount((): void => {
         if (!TODOIST_CLIENT_ID || !TODOIST_CLIENT_SECRET || !TODOIST_REDIRECT_URI) {
             console.error("Missing environment variables for Todoist OAuth");
             return;
         }
 
-        const urlParams = new URLSearchParams(window.location.search),
-            code = urlParams.get("code");
+        const urlParams = new URLSearchParams(window.location.search);
+        const code = urlParams.get("code");
 
         if (code) {
-            exchangeCodeForToken(code);
+            void exchangeCodeForToken(code);
         } else {
             console.error("No code found in URL parameters");
         }
     });
 
-    async function exchangeCodeForToken(code) {
+    /**
+     * Exchanges the authorization code for a Todoist access token and stores it.
+     * @param code - The authorization code from the OAuth callback.
+     */
+    async function exchangeCodeForToken(code: string): Promise<void> {
         const response = await fetch("https://todoist.com/oauth/access_token", {
             method: "POST",
             headers: {
@@ -44,12 +48,17 @@
             return;
         }
 
-        const data = await response.json();
-
-        if (data.access_token) {
-            todoistAccessToken.set(data.access_token);
+        const json: unknown = await response.json();
+        let accessToken: string | undefined;
+        if (typeof json === "object" && json !== null) {
+            if (typeof (json as { access_token?: unknown }).access_token === "string") {
+                accessToken = (json as { access_token: string }).access_token;
+            }
+        }
+        if (accessToken) {
+            todoistAccessToken.set(accessToken);
         } else {
-            console.error("Failed to exchange code for token", data);
+            console.error("Failed to exchange code for token", json);
         }
     }
 </script>
