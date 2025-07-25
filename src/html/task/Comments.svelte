@@ -1,13 +1,24 @@
-<script>
+<script lang="ts">
     import Markdown from "svelte-exmarkdown";
+    // @ts-expect-error until file is converted to TypeScript
     import DynalistComment from "./dynalist/DynalistComment.svelte";
+    // @ts-expect-error until file is converted to TypeScript
     import DynalistAuthRequest from "./dynalist/DynalistAuthRequest.svelte";
     import { dynalistAccessToken } from "../../js/stores";
+    import type { Comment } from "../../../types/todoist";
 
-    export let comments;
+    export let comments: Comment[];
 
-    $: requiresAuthRequest = comments.some((comment) =>
-        comment.content.startsWith("https://dynalist.io/d/"),
+    /**
+     * Whether any comment requires a Dynalist auth request.
+     */
+    $: requiresAuthRequest = comments.some(
+        /**
+         * Checks if a comment's content starts with a Dynalist URL.
+         * @param comment - The comment object to check.
+         * @returns True if the comment is a Dynalist URL.
+         */
+        (comment: Comment): boolean => comment.content.startsWith("https://dynalist.io/d/"),
     );
 </script>
 

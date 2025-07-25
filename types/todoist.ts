@@ -55,6 +55,7 @@ export interface Task extends BaseTask {
     contextId?: string;
     summoned?: string | boolean;
     skip?: boolean;
+    firstDue?: boolean;
 
     due: Due | null;
 }

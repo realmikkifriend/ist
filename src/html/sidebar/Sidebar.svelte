@@ -1,10 +1,12 @@
-<script>
+<script lang="ts">
     import { Icon, Bars3, ArrowLeftOnRectangle } from "svelte-hero-icons";
+    // @ts-expect-error until file is converted to TypeScript
     import Contexts from "./Contexts.svelte";
+    // @ts-expect-error until file is converted to TypeScript
     import Footer from "../Footer.svelte";
     import { todoistData, handleLogout } from "../../js/stores";
 
-    export let hash;
+    export let hash: string;
 </script>
 
 <div class="drawer">
