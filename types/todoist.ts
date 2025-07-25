@@ -16,6 +16,13 @@ export interface TodoistData {
     reverseTasks: Task[];
 }
 
+export interface CleanableTodoistData {
+    tasks?: Task[];
+    contexts?: Context[];
+    user?: User;
+    [key: string]: unknown;
+}
+
 export type Priority = 1 | 2 | 3 | 4;
 
 export type ColorName =

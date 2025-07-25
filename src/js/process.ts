@@ -1,8 +1,14 @@
-import { DateTime } from "luxon";
 import { createDateWithTime } from "./time";
-import { handleTaskDefer } from "../js/taskHandlers";
+import { handleTaskDefer } from "./taskHandlers";
+import { DateTime } from "luxon";
+import type { Task, Context, User, CleanableTodoistData } from "../../types/todoist";
 
-function handleOverdueTasks(tasks) {
+/**
+ * Handles overdue tasks by deferring them to today.
+ * @param {Task[]} tasks - Array of Task objects to check for overdue status.
+ * @returns {void}
+ */
+function handleOverdueTasks(tasks: Task[]): void {
     const today = DateTime.now().startOf("day");
     const overdueTasks =
         tasks.filter((task) => {
@@ -11,32 +17,51 @@ function handleOverdueTasks(tasks) {
         }) || [];
 
     if (overdueTasks.length > 0) {
-        const taskUpdates = overdueTasks.map((task) => {
+        const taskUpdates: [Task, DateTime][] = overdueTasks.map((task) => {
             const extracted = task.due?.string ? createDateWithTime(task.due.string, today) : null;
             const time = extracted?.newDate || today;
             return [task, time];
         });
 
-        handleTaskDefer(taskUpdates);
+        void handleTaskDefer(taskUpdates);
     }
 }
 
-function cleanDataArray(dataArray, propsToRemove, renameMap = {}) {
-    return dataArray.map((item) =>
-        propsToRemove.reduce(
-            (acc, prop) => {
-                if (renameMap[prop] && acc[prop] !== undefined) {
-                    acc[renameMap[prop]] = acc[prop];
+/**
+ * Removes specified properties from each object in the array and optionally renames properties.
+ * @template T
+ * @param {T[]} dataArray - Array of objects to clean.
+ * @param {string[]} propsToRemove - Properties to remove from each object.
+ * @param {Record<string, string>} renameMap - Map of properties to rename (oldName: newName).
+ * @returns {Partial<T>[]} - Array of cleaned objects.
+ */
+function cleanDataArray<T extends object>(
+    dataArray: T[],
+    propsToRemove: string[],
+    renameMap: Record<string, string> = {},
+): Partial<T>[] {
+    return dataArray.map((item) => {
+        const result: Partial<T> = { ...item };
+        return propsToRemove.reduce((acc, prop) => {
+            if (Object.prototype.hasOwnProperty.call(acc, prop)) {
+                if (renameMap[prop]) {
+                    (acc as Record<string, unknown>)[renameMap[prop]] = (
+                        acc as Record<string, unknown>
+                    )[prop];
                 }
-                delete acc[prop];
-                return acc;
-            },
-            { ...item },
-        ),
-    );
+                delete (acc as Record<string, unknown>)[prop];
+            }
+            return acc;
+        }, result);
+    });
 }
 
-export function cleanTodoistData(data) {
+/**
+ * Cleans Todoist data by removing unnecessary properties and renaming as needed.
+ * @param {CleanableTodoistData} data - The Todoist data object to clean.
+ * @returns {CleanableTodoistData} - The cleaned data object.
+ */
+export function cleanTodoistData(data: CleanableTodoistData): CleanableTodoistData {
     if (data.tasks) {
         handleOverdueTasks(data.tasks);
         const taskPropsToRemove = [
@@ -61,7 +86,11 @@ export function cleanTodoistData(data) {
         const taskRenameMap = {
             projectId: "contextId",
         };
-        data.tasks = cleanDataArray(data.tasks, taskPropsToRemove, taskRenameMap);
+        data.tasks = cleanDataArray(
+            data.tasks,
+            taskPropsToRemove,
+            taskRenameMap,
+        ) as unknown as Task[];
     }
 
     if (data.contexts) {
@@ -80,7 +109,7 @@ export function cleanTodoistData(data) {
             "isShared",
             "parentId",
         ];
-        data.contexts = cleanDataArray(data.contexts, contextPropsToRemove);
+        data.contexts = cleanDataArray(data.contexts, contextPropsToRemove) as unknown as Context[];
     }
 
     if (data.user) {
@@ -133,7 +162,7 @@ export function cleanTodoistData(data) {
             "weekend_start_day",
         ];
 
-        data.user = cleanDataArray([data.user], userPropsToRemove)[0];
+        data.user = cleanDataArray([data.user], userPropsToRemove)[0] as unknown as User;
     }
 
     return data;
