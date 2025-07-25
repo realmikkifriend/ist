@@ -10,6 +10,13 @@ export interface DynalistContent {
     [key: string]: unknown;
 }
 
+export interface DynalistNode extends DynalistContent {
+    checked?: boolean;
+    children?: DynalistNode[] | string[];
+    note?: string;
+    content?: string;
+}
+
 export interface DynalistApiResultBase {
     error?: string;
     data?: unknown;
@@ -24,4 +31,9 @@ export interface FetchDynalistDocumentResult extends DynalistApiResultBase {
 
 export interface ValidateDynalistTokenResult extends DynalistApiResultBase {
     success: boolean;
+}
+
+export interface DynalistDocumentData {
+    file_id: string;
+    nodes: DynalistNode[];
 }
