@@ -1,6 +1,6 @@
 import { get } from "svelte/store";
 // @ts-expect-error until file is converted to TypeScript
-import { updateFirstDueTask } from "../../js/first.js";
+import { updateFirstDueTask } from "../../js/first.ts";
 import { todoistData, userSettings, firstDueTask, previousFirstDueTask } from "../../js/stores";
 import type { Task, DueTasksGroupedByContext } from "../../../types/todoist";
 

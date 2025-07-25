@@ -1,7 +1,6 @@
 import { todoistData, todoistError, previousFirstDueTask } from "./stores";
 // @ts-expect-error until types added
 import { markTaskDone, deferTasks, refreshData } from "./api";
-// @ts-expect-error until types added
 import { updateFirstDueTask } from "./first";
 import { get } from "svelte/store";
 import { DateTime } from "luxon";
