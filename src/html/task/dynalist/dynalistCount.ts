@@ -1,18 +1,7 @@
 import { success } from "../../../js/toasts";
 // @ts-expect-error until file is converted to TypeScript
 import { updateDynalist } from "./dynalistApi";
-
-export interface DynalistCountData {
-    total?: number;
-    current?: number;
-    date?: string;
-}
-
-export interface DynalistContent {
-    id: string;
-    file_id: string;
-    [key: string]: unknown;
-}
+import { DynalistCountData, DynalistContent } from "../../../../types/dynalist";
 
 /**
  * Parses count data from a Dynalist note string.
