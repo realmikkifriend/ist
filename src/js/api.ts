@@ -42,7 +42,6 @@ export async function refreshData(): Promise<
         api.getProjects(),
         getEndpoint("user", accessToken),
     ]).catch((err: unknown) => {
-        // eslint-disable-next-line
         console.error("Error fetching data:", err);
         if (err instanceof TodoistRequestError) {
             return setErrorState(err);
@@ -247,7 +246,6 @@ async function getEndpoint(
     params: Record<string, string> = {},
 ): Promise<unknown> {
     const CONTENT_TYPE = "application/x-www-form-urlencoded";
-    // eslint-disable-next-line
     const response = await fetch(`https://api.todoist.com/api/v1/${endpoint}`, {
         method: "POST",
         headers: {
