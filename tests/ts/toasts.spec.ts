@@ -2,17 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import type { Mock } from "vitest";
 import type { ToastConfig } from "../../types/interface";
 import type { SvelteComponent } from "svelte";
-
-vi.mock("@zerodevx/svelte-toast", () => {
-    const pop: Mock = vi.fn();
-    const push: Mock = vi.fn(() => 42);
-    return {
-        toast: {
-            pop,
-            push,
-        },
-    };
-});
+import "../../tests/helpers/mockToast";
 
 import { toast } from "@zerodevx/svelte-toast";
 import { success, error, newFirstTask } from "../../src/js/toasts";

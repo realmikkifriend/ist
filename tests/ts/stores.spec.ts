@@ -1,19 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { get } from "svelte/store";
-import type { Mock } from "vitest";
 import type { TodoistData, Task } from "../../types/todoist";
 import type { UserSettings } from "../../types/interface";
-
-vi.mock("@zerodevx/svelte-toast", () => {
-    const pop: Mock = vi.fn();
-    const push: Mock = vi.fn();
-    return {
-        toast: {
-            pop,
-            push,
-        },
-    };
-});
+import "../../tests/helpers/mockToast";
 
 import { toast } from "@zerodevx/svelte-toast";
 import {
