@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     import { createEventDispatcher } from "svelte";
     import { writable, derived } from "svelte/store";
     import { Icon, Calendar, Clock } from "svelte-hero-icons";
@@ -7,33 +7,64 @@
     import { createDateWithTime } from "../../js/time";
     import DatePicker from "./DatePicker.svelte";
     import TimePicker from "./TimePicker.svelte";
+    import type { Writable, Readable } from "svelte/store";
+    import type { Task } from "../../../types/todoist";
 
-    export let task;
+    export let task: Task;
 
-    const isTimeTabActive = writable(false);
-    $: isTimeTabActive.set(task.due.allDay !== 1);
+    const isTimeTabActive: Writable<boolean> = writable(false);
+    $: isTimeTabActive.set(Boolean(task.due && task.due.allDay !== 1));
 
-    const selectTab = (tab) => {
+    /**
+     * Selects the active tab ("time" or "calendar").
+     * @param tab - The tab to activate.
+     */
+    function selectTab(tab: "time" | "calendar"): void {
         isTimeTabActive.set(tab === "time");
-    };
+    }
+    /**
+     * Helper to safely select tab from string (for template use).
+     * @param tab - Defer modal tab to be selected.
+     */
+    function selectTabSafe(tab: string): void {
+        selectTab(tab as "time" | "calendar");
+    }
 
-    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "America/Chicago";
+    const tz: string = Intl.DateTimeFormat().resolvedOptions().timeZone || "America/Chicago";
 
-    const tasks = derived(todoistData, ($todoistData) => $todoistData.tasks);
+    const tasks: Readable<Task[]> = derived(todoistData, ($todoistData) => $todoistData.tasks);
 
-    const dispatch = createEventDispatcher();
+    interface DeferEventDetail {
+        rawTime: string | number;
+    }
 
-    const handleDefer = ({ detail: { rawTime } }) => {
+    interface DeferEvent {
+        detail: DeferEventDetail;
+    }
+
+    const dispatch = createEventDispatcher<{
+        defer: { task: Task; time: DateTime };
+    }>();
+
+    /**
+     * Handles the defer event from the child component.
+     * Calculates the new time and dispatches the "defer" event.
+     * @param event - The event containing the raw time to defer to.
+     */
+    function handleDefer(event: DeferEvent): void {
+        const { rawTime } = event.detail;
         isTimeTabActive.set(true);
 
-        const time =
+        const time: DateTime =
             typeof rawTime === "number"
                 ? DateTime.now().setZone(tz).plus({ milliseconds: rawTime })
                 : (() => {
                       const date = DateTime.fromISO(rawTime);
                       const tomorrow = DateTime.now().plus({ days: 1 }).setZone(tz);
 
-                      const extracted = createDateWithTime(task.due.string, tomorrow);
+                      const extracted = task.due
+                          ? createDateWithTime(task.due.string, tomorrow)
+                          : { newDate: null };
                       if (extracted.newDate === null) {
                           return date;
                       } else {
@@ -43,7 +74,7 @@
                   })();
 
         dispatch("defer", { task, time });
-    };
+    }
 </script>
 
 <div class="modal-box flex min-h-[65%] w-fit flex-col justify-center">
@@ -57,7 +88,7 @@
                         class={tab === ($isTimeTabActive ? "time" : "calendar")
                             ? "tab tab-active"
                             : "tab bg-neutral"}
-                        on:click={() => selectTab(tab)}
+                        on:click={() => selectTabSafe(tab)}
                     >
                         <Icon
                             src={tab === "time" ? Clock : Calendar}

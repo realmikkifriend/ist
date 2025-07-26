@@ -1,11 +1,11 @@
 <script lang="ts">
     import { createEventDispatcher } from "svelte";
     import { Icon, Check, Calendar, Clock, Forward } from "svelte-hero-icons";
-    // @ts-expect-error until file is converted to TypeScript
     import DeferModal from "../defer/DeferModal.svelte";
     import Comments from "./Comments.svelte";
     import { getPriorityBorder } from "../../js/classes";
     import { skipTask } from "../../js/first";
+    import { DateTime } from "luxon";
     import type { Task, Priority } from "../../../types/todoist";
 
     export let task: Task;
@@ -27,12 +27,13 @@
 
     /**
      * Handles deferring the task, closes the modal, and dispatches a "defer" event.
-     * @param event - The event containing the deferred task and time.
+     * @param event - The event containing the deferred task and time (as DateTime).
      */
-    const handleDefer = (event: CustomEvent<{ task: Task; time: string }>): void => {
+    const handleDefer = (event: CustomEvent<{ task: Task; time: DateTime }>): void => {
         (document.getElementById("defer_modal") as HTMLDialogElement | null)?.close();
         if (event.detail.task.summoned) window.location.hash = String(event.detail.task.summoned);
-        dispatch("defer", { task: event.detail.task, time: event.detail.time });
+        // Convert DateTime to ISO string before dispatching
+        dispatch("defer", { task: event.detail.task, time: event.detail.time.toISO() ?? "" });
     };
 
     /**
