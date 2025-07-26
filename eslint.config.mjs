@@ -81,6 +81,12 @@ export default defineConfig([
         files: ["**/*.svelte"],
         rules: {
             "functional/no-let": "off",
+            "@typescript-eslint/no-unused-vars": [
+                "error",
+                {
+                    argsIgnorePattern: "^_",
+                },
+            ],
         },
     },
     {
