@@ -112,23 +112,35 @@ export function compareTasks(
     timeZone?: string,
     reverse: boolean = false,
 ): number {
-    const [first, second] = reverse ? [a, b] : [b, a];
+    const applyReverse = (val: number) => (reverse ? -val : val);
 
-    if (first.priority !== second.priority) {
-        return first.priority - second.priority;
+    if (a.priority !== b.priority) {
+        return applyReverse(b.priority - a.priority);
     }
 
-    const orderA = contextLookup[a.contextId ?? ""] || 0;
-    const orderB = contextLookup[b.contextId ?? ""] || 0;
-    if (orderA !== orderB) {
-        return reverse ? orderB - orderA : orderA - orderB;
+    const aHasContext = Boolean(a.contextId);
+    const bHasContext = Boolean(b.contextId);
+
+    if (aHasContext !== bHasContext) {
+        return applyReverse(aHasContext ? 1 : -1);
     }
 
-    if (!timeZone) return 0;
+    if (aHasContext && bHasContext) {
+        const orderA = contextLookup[a.contextId!];
+        const orderB = contextLookup[b.contextId!];
+        if (orderA !== orderB) {
+            return applyReverse(orderA - orderB);
+        }
+    }
 
-    if (!a.due || !b.due) return 0;
+    if (!timeZone || !a.due || !b.due) return 0;
 
     const dateA = DateTime.fromISO(a.due.datetime || a.due.date, { zone: timeZone }).toJSDate();
     const dateB = DateTime.fromISO(b.due.datetime || b.due.date, { zone: timeZone }).toJSDate();
-    return reverse ? dateB.getTime() - dateA.getTime() : dateA.getTime() - dateB.getTime();
+
+    if (dateA.getTime() !== dateB.getTime()) {
+        return applyReverse(dateA.getTime() - dateB.getTime());
+    }
+
+    return 0;
 }

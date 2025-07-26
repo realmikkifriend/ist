@@ -63,13 +63,7 @@ type MakeTaskParams = {
  * @param {string} params.content - The mocked task's content.
  * @returns {Task} A mock Task object.
  */
-export function makeTask({
-    id,
-    due,
-    priority = 1,
-    contextId = "c1",
-    content = "",
-}: MakeTaskParams): Task {
+export function makeTask({ id, due, priority = 1, contextId, content = "" }: MakeTaskParams): Task {
     return {
         id: String(id),
         content,
@@ -85,8 +79,8 @@ export function makeTask({
               }
             : null,
         priority,
-        contextId,
-        projectId: contextId,
+        contextId: contextId === undefined ? undefined : contextId, // Explicitly set to undefined if passed as undefined
+        projectId: contextId === undefined ? undefined : contextId, // Also for projectId
         url: "",
         labels: [],
     };
