@@ -1,12 +1,21 @@
-import { vi } from "vitest";
+import { vi, type MockInstance } from "vitest";
+
+let getHoursSpy: MockInstance<() => number> | null = null;
 
 /**
  * Mocks date for tests.
  * @param {Date} now - The provided date object.
- * @returns The mocked date.
+ * @param {number} [mockedLocalHour] - Optional hour to return for getHours().
+ * @returns The original Date constructor.
  */
-export function mockDate(now: Date) {
+export function mockDate(now: Date, mockedLocalHour?: number) {
     const OriginalDate = globalThis.Date;
+
+    if (mockedLocalHour !== undefined) {
+        now.setHours(mockedLocalHour);
+        getHoursSpy = vi.spyOn(OriginalDate.prototype, "getHours").mockReturnValue(mockedLocalHour);
+    }
+
     vi.stubGlobal(
         "Date",
         Object.assign(
@@ -33,4 +42,8 @@ export function mockDate(now: Date) {
  */
 export function restoreDate(OriginalDate: DateConstructor) {
     globalThis.Date = OriginalDate;
+    if (getHoursSpy) {
+        getHoursSpy.mockRestore();
+        getHoursSpy = null;
+    }
 }

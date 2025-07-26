@@ -151,7 +151,7 @@ describe("getGradientColor", () => {
     let OriginalDate: DateConstructor;
 
     beforeEach(() => {
-        OriginalDate = mockDate(new Date("2025-07-22T10:00:00.000Z"));
+        OriginalDate = mockDate(new Date("2025-07-22T10:00:00.000Z"), 10);
     });
 
     afterEach(() => {
@@ -202,7 +202,7 @@ describe("getGradientColor", () => {
 
         it("handles early morning hours correctly", () => {
             restoreDate(OriginalDate); // Restore before re-mocking
-            OriginalDate = mockDate(new Date("2025-07-22T06:00:00.000Z"));
+            OriginalDate = mockDate(new Date("2025-07-22T06:00:00.000Z"), 6);
 
             const testCases: { tasks: number; expected: string | null }[] = [
                 { tasks: 11, expected: "bg-gradient-to-r from-blue-900 to-blue-700" },
