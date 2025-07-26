@@ -1,23 +1,48 @@
-<script>
+<script lang="ts">
     import { derived } from "svelte/store";
     import { Icon, XCircle, Calendar } from "svelte-hero-icons";
     import { todoistData, userSettings, previousFirstDueTask } from "../../js/stores";
     import { getPriorityClasses } from "../../js/classes";
-    import { openAgenda } from "../agenda/agenda";
-    import { getDueTasksGroupedByContext } from "./sidebar.ts";
 
-    const dueTasksByContext = derived(todoistData, ($todoistData) =>
-        $todoistData ? getDueTasksGroupedByContext($todoistData) : {},
+    /**
+     * Returns the CSS class for a given priority string.
+     * This moves the type assertion logic out of the template and into the script section.
+     * @param priorityStr - The given priority.
+     * @returns The Tailwind classes that correspond to the priority.
+     */
+    function getPriorityBadgeClass(priorityStr: string): string {
+        // Priority is a number enum, so coerce to number and cast to Priority
+        return getPriorityClasses(+priorityStr as Priority);
+    }
+    import { openAgenda } from "../agenda/agenda";
+    import { getDueTasksGroupedByContext } from "./sidebar";
+    import type { Readable } from "svelte/motion";
+    import type { DueTasksGroupedByContext, Priority } from "../../../types/todoist";
+
+    /**
+     * A derived store grouping due tasks by context.
+     */
+    const dueTasksByContext: Readable<DueTasksGroupedByContext> = derived(
+        todoistData,
+        ($todoistData) => ($todoistData ? getDueTasksGroupedByContext() : {}),
     );
 
-    function closeDrawer() {
-        const drawerCheckbox = document.getElementById("my-drawer");
+    /**
+     * Closes the sidebar drawer by unchecking the drawer checkbox.
+     */
+    function closeDrawer(): void {
+        const drawerCheckbox = document.getElementById("my-drawer") as HTMLInputElement | null;
         if (drawerCheckbox) {
             drawerCheckbox.checked = false;
         }
     }
 
-    function handleContextClick(contextId) {
+    /**
+     * Handles clicking on a context button.
+     * Updates the selected context in user settings and closes the drawer if a new context is selected.
+     * @param contextId - The ID of the context that was clicked.
+     */
+    function handleContextClick(contextId: string): void {
         previousFirstDueTask.set(null);
         const isCurrentlySelected = $userSettings.selectedContext?.id === contextId;
         const newSelectedContext = isCurrentlySelected
@@ -64,12 +89,12 @@
             <div class="card-body gap-0 px-2 py-1">
                 <p class="card-title text-lg font-bold">{context.name}</p>
                 <div class="flex flex-row items-start space-x-2">
-                    {#each Object.keys($dueTasksByContext[context.id].priorities).sort((a, b) => b - a) as priority, index (index)}
+                    {#each Object.keys($dueTasksByContext[context.id].priorities).sort((a, b) => +b - +a) as priorityStr, index (index)}
                         <div class="flex flex-row items-start space-x-1 py-1">
-                            {#each Array($dueTasksByContext[context.id].priorities[priority]).fill() as index (index)}
+                            {#each Array.from( { length: $dueTasksByContext[context.id].priorities[+priorityStr] }, ) as _, badgeIndex (badgeIndex)}
                                 <div
-                                    class="badge badge-xs h-1 w-2 border-none p-1 {getPriorityClasses(
-                                        priority,
+                                    class="badge badge-xs h-1 w-2 border-none p-1 {getPriorityBadgeClass(
+                                        priorityStr,
                                     )}"
                                 ></div>
                             {/each}
