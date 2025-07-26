@@ -3,7 +3,6 @@
     import { todoistAccessToken } from "../js/stores";
     import "@fontsource/clear-sans/400.css";
     import "@fontsource/clear-sans/700.css";
-    // @ts-expect-error until file is converted to TypeScript
     import App from "./App.svelte";
     import LandingPage from "./Landing.svelte";
     import OAuthCallback from "./OAuthCallback.svelte";

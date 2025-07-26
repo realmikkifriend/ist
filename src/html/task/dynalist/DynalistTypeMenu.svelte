@@ -9,7 +9,6 @@
         ArrowPathRoundedSquare,
         Inbox,
     } from "svelte-hero-icons";
-    // @ts-expect-error until file is converted to TypeScript
     import Logo from "../../Logo.svelte";
     import type { DynalistTaskType } from "../../../../types/dynalist";
 

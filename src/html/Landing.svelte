@@ -1,6 +1,5 @@
 <script lang="ts">
     import { getAuthStateParameter, getAuthorizationUrl } from "@doist/todoist-api-typescript";
-    // @ts-expect-error until file is converted to TypeScript
     import Logo from "./Logo.svelte";
     import Footer from "./Footer.svelte";
 

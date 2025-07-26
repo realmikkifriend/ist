@@ -2,7 +2,6 @@
     import { Icon, ArrowPath, Key } from "svelte-hero-icons";
     import { dynalistAccessToken } from "../../../js/stores";
     import { success } from "../../../js/toasts";
-    // @ts-expect-error until file is converted to TypeScript
     import Logo from "../../Logo.svelte";
     import { validateDynalistToken } from "./dynalistApi";
     import type { ValidateDynalistTokenResult } from "../../../../types/dynalist";

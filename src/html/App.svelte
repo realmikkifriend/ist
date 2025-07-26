@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     import { onMount } from "svelte";
     import { writable } from "svelte/store";
     import { DateTime } from "luxon";
@@ -6,56 +6,88 @@
     import { todoistData, todoistError, userSettings, firstDueTask } from "../js/stores";
     import { updateFirstDueTask } from "../js/first";
     import { refreshData } from "../js/api";
-    import { error } from "../js/toasts";
+    import { error as showError } from "../js/toasts";
     import { handleTaskDone, handleTaskDefer } from "../js/taskHandlers";
     import Sidebar from "./sidebar/Sidebar.svelte";
     import ContextBadge from "./sidebar/ContextBadge.svelte";
     import NoTasks from "./NoTasks.svelte";
     import TaskDisplay from "./task/TaskDisplay.svelte";
     import Agenda from "./agenda/Agenda.svelte";
+    import type { Writable } from "svelte/store";
+    import type { Task } from "../../types/todoist";
 
-    const isSpinning = writable(false);
-    const hash = writable(window.location.hash);
+    const isSpinning: Writable<boolean> = writable(false);
+    const hash: Writable<string> = writable(window.location.hash);
 
     $: {
         if ($userSettings.selectedContext || $todoistData.dueTasks) {
-            updateFirstDueTask();
+            void updateFirstDueTask();
         }
     }
 
+    /**
+     * Sets up hash change listener and periodic refresh on mount.
+     * @returns {() => void} Cleanup function to remove interval and event listener.
+     */
     onMount(() => {
-        const updateHash = () => hash.set(window.location.hash);
+        /**
+         * Updates the hash store with the current window location hash.
+         * @returns Current browser location.
+         */
+        const updateHash = (): void => hash.set(window.location.hash);
 
         window.addEventListener("hashchange", updateHash);
 
         updateHash();
 
-        handleRefresh();
+        void handleRefresh();
 
-        const interval = setInterval(async () => {
-            await handleRefresh();
+        const interval = setInterval(() => {
+            void handleRefresh();
         }, 300000);
 
-        return () => clearInterval(interval);
+        return () => {
+            clearInterval(interval);
+            window.removeEventListener("hashchange", updateHash);
+        };
     });
 
-    const handleDone = ({
-        detail: {
+    /**
+     * Handles the "done" event from TaskDisplay.
+     * @param event - Event containing the task id in detail.
+     * @param event.detail - Contains the event information.
+     * @param event.detail.task - The task being affected.
+     * @param event.detail.task.id - The ID of the task being marked done.
+     */
+    const handleDone = (event: { detail: { task: { id: string } } }): void => {
+        const {
             task: { id: taskID },
-        },
-    }) => {
-        handleTaskDone(taskID);
+        } = event.detail;
+        void handleTaskDone(taskID);
     };
 
-    const handleDefer = ({ detail: { task, time } }) => {
-        if (DateTime.isDateTime(time)) {
-            handleTaskDefer([[task, time]]);
+    /**
+     * Handles the "defer" event from TaskDisplay.
+     * @param event - Event containing the task and time in detail.
+     * @param event.detail - Contains the event information.
+     * @param event.detail.task - The task being affected.
+     * @param event.detail.time - The time the task will be deferred to.
+     */
+    const handleDefer = (event: CustomEvent<{ task: Task; time: string }>): void => {
+        const { task, time } = event.detail;
+        const dateTime = DateTime.fromISO(time);
+        if (dateTime.isValid) {
+            void handleTaskDefer([[task, dateTime]]);
         } else {
-            error("Received unexpected type of date...");
+            showError("Received unexpected type of date...");
         }
     };
 
-    const handleRefresh = async () => {
+    /**
+     * Refreshes Todoist data and manages the spinning state.
+     * @returns Promise that resolves when data is refreshed and spinning state is updated.
+     */
+    const handleRefresh = async (): Promise<void> => {
         isSpinning.set(true);
 
         await refreshData().finally(() => {
@@ -63,15 +95,19 @@
         });
     };
 
-    const dataPromise = () => handleRefresh();
+    /**
+     * Returns a promise for refreshing data, for use in Svelte's {#await}.
+     * @returns Promise for refreshing data.
+     */
+    const dataPromise = (): Promise<void> => handleRefresh();
 </script>
 
 <div class="flex w-fit items-center">
     <Sidebar hash={$hash} />
 
     {#if $firstDueTask && $hash !== "#today" && $hash !== "#tomorrow"}
-        {#key ($firstDueTask, $todoistData)}
-            <ContextBadge class="ml-4" />
+        {#key $firstDueTask.id}
+            <ContextBadge />
         {/key}
     {/if}
 </div>
@@ -84,7 +120,7 @@
     {:then}
         {#if $todoistData.tasks}
             {#if $firstDueTask}
-                {#key $firstDueTask}
+                {#key $firstDueTask.id}
                     <TaskDisplay task={$firstDueTask} on:done={handleDone} on:defer={handleDefer} />
                 {/key}
             {:else}
@@ -98,7 +134,7 @@
     {/await}
 
     {#if $todoistError}
-        {error($todoistError)}
+        {showError($todoistError)}
     {/if}
 {/if}
 

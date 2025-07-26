@@ -1,6 +1,5 @@
 <script lang="ts">
     import { Icon, Bars3, ArrowLeftOnRectangle } from "svelte-hero-icons";
-    // @ts-expect-error until file is converted to TypeScript
     import Contexts from "./Contexts.svelte";
     import Footer from "../Footer.svelte";
     import { todoistData, handleLogout } from "../../js/stores";
