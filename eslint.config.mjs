@@ -92,6 +92,7 @@ export default defineConfig([
     {
         files: ["**/*.spec.ts"],
         rules: {
+            "functional/no-let": "off",
             "@typescript-eslint/no-unused-vars": [
                 "error",
                 {
