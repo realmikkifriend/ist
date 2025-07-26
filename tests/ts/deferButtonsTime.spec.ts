@@ -1,10 +1,17 @@
 import { describe, it, expect } from "vitest";
 import { buttonConfig } from "../../src/html/defer/deferButtonsTime";
+import type { DeferButtonConfig, TimeButtonConfig } from "../../types/defer";
 
 describe("buttonConfig", () => {
+    it("should match DeferButtonConfig type", () => {
+        const config: DeferButtonConfig = buttonConfig;
+        expect(config).toBeDefined();
+    });
+
     it("should have a tomorrow button with correct properties", () => {
         expect(buttonConfig).toHaveProperty("tomorrow");
-        expect(buttonConfig.tomorrow).toMatchObject({
+        const tomorrow: TimeButtonConfig = buttonConfig.tomorrow;
+        expect(tomorrow).toMatchObject({
             text: "tomorrow",
             ms: 0,
             styling: "basis-full",
@@ -12,9 +19,13 @@ describe("buttonConfig", () => {
         });
     });
 
-    it("should have a minutes array with correct values", () => {
+    it("should have a minutes array with correct values and types", () => {
         expect(buttonConfig).toHaveProperty("minutes");
         expect(Array.isArray(buttonConfig.minutes)).toBe(true);
+        buttonConfig.minutes.forEach((minute) => {
+            expect(typeof minute.value).toBe("number");
+            expect(typeof minute.height).toBe("string");
+        });
         expect(buttonConfig.minutes).toEqual([
             { value: 1, height: "h-5" },
             { value: 3, height: "h-5" },
@@ -25,12 +36,21 @@ describe("buttonConfig", () => {
         ]);
     });
 
-    it("should have an hours array with correct structure and values", () => {
+    it("should have an hours array with correct structure, values, and types", () => {
         expect(buttonConfig).toHaveProperty("hours");
         expect(Array.isArray(buttonConfig.hours)).toBe(true);
         const hours = buttonConfig.hours;
 
         expect(hours.length).toBe(10);
+
+        hours.forEach((hour) => {
+            expect(typeof hour.value).toBe("number");
+            expect(typeof hour.height).toBe("string");
+            expect(typeof hour.styling).toBe("string");
+            if (hour.text !== undefined) {
+                expect(typeof hour.text).toBe("string");
+            }
+        });
 
         expect(hours[0]).toMatchObject({
             value: 1,
@@ -45,12 +65,12 @@ describe("buttonConfig", () => {
             styling: "basis-[48.5%]",
         });
 
-        for (let i = 2; i < hours.length; i++) {
-            expect(hours[i]).toHaveProperty("value");
-            expect(hours[i]).toHaveProperty("height", "h-7");
-            expect(hours[i]).toHaveProperty("styling", "basis-[22.75%]");
-            expect(hours[i].text === undefined || typeof hours[i].text === "string").toBe(true);
-        }
+        hours.slice(2).forEach((hour) => {
+            expect(hour).toHaveProperty("value");
+            expect(hour).toHaveProperty("height", "h-7");
+            expect(hour).toHaveProperty("styling", "basis-[22.75%]");
+            expect(hour.text === undefined || typeof hour.text === "string").toBe(true);
+        });
 
         const expectedValues = [1, 1.5, 2, 3, 4, 6, 8, 12, 18, 24];
         expect(hours.map((h) => h.value)).toEqual(expectedValues);
