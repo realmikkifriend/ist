@@ -51,7 +51,37 @@ export type ColorName =
     | "grey"
     | "taupe";
 
-export interface Task extends BaseTask {
+export type Task = Omit<
+    BaseTask,
+    | "userId"
+    | "sectionId"
+    | "parentId"
+    | "addedByUid"
+    | "assignedByUid"
+    | "responsibleUid"
+    | "deadline"
+    | "checked"
+    | "description"
+    | "isDeleted"
+    | "addedAt"
+    | "completedAt"
+    | "duration"
+    | "childOrder"
+    | "updatedAt"
+    | "noteCount"
+    | "isCollapsed"
+    | "dayOrder"
+    | "projectId"
+> & {
+    userId?: string;
+    checked?: boolean;
+    description?: string;
+    isDeleted?: boolean;
+    noteCount?: number;
+    isCollapsed?: boolean;
+    dayOrder?: number;
+    projectId?: string;
+
     contextId?: string;
     summoned?: string | boolean;
     skip?: boolean;
@@ -59,7 +89,7 @@ export interface Task extends BaseTask {
     comments?: Comment[];
 
     due: Due | null;
-}
+};
 interface Due {
     allDay?: number;
     isRecurring: boolean;

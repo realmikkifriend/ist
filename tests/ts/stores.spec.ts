@@ -4,7 +4,6 @@ import type { Mock } from "vitest";
 import type { TodoistData, Task } from "../../types/todoist";
 import type { UserSettings } from "../../types/interface";
 
-// Mock @zerodevx/svelte-toast as in toasts.spec.ts
 vi.mock("@zerodevx/svelte-toast", () => {
     const pop: Mock = vi.fn();
     const push: Mock = vi.fn();
@@ -29,13 +28,10 @@ import {
 } from "../../src/js/stores";
 
 describe("stores", () => {
-    // Minimal valid Task object for tests
     const mockTask: Task = {
         id: "1",
         content: "Test Task",
         projectId: "proj1",
-        sectionId: null,
-        parentId: null,
         priority: 1,
         url: "",
         due: null,
@@ -43,22 +39,12 @@ describe("stores", () => {
         userId: "user1",
         description: "",
         isDeleted: false,
-        responsibleUid: null,
-        duration: null,
-        addedByUid: null,
-        assignedByUid: null,
-        deadline: null,
         checked: false,
-        addedAt: null,
-        completedAt: null,
-        updatedAt: null,
-        childOrder: 0,
         noteCount: 0,
         dayOrder: 0,
         isCollapsed: false,
     };
 
-    // Minimal valid selectedContext (PersonalProject)
     const mockContext = {
         id: "ctx1",
         name: "Context 1",

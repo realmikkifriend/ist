@@ -85,7 +85,7 @@ export async function refreshData(): Promise<
         tasks: tasksResponse.results,
         contexts,
         user,
-    });
+    }) as { tasks: Task[]; contexts: Context[]; user?: User };
 
     const todoistDataObj: TodoistData = {
         tasks: cleanedData.tasks ?? [],

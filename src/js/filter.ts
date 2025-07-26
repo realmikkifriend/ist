@@ -44,9 +44,6 @@ export function filterAndSortTasks(
     const contextLookup = createContextLookup(contexts);
 
     const date = new Date();
-    if (reverse) {
-        date.setDate(date.getDate() + 1);
-    }
 
     const filteredTasks = timeZone ? filterDueTasks(tasks, timeZone, date) : tasks;
 
@@ -61,7 +58,7 @@ export function filterAndSortTasks(
  * @param {Context[]} contexts - The list of contexts.
  * @returns {Record<string, number>} The context lookup object.
  */
-function createContextLookup(contexts: Context[]): Record<string, number> {
+export function createContextLookup(contexts: Context[]): Record<string, number> {
     return contexts.reduce((acc: Record<string, number>, context: Context) => {
         acc[context.id] = context.childOrder;
         return acc;
@@ -75,7 +72,7 @@ function createContextLookup(contexts: Context[]): Record<string, number> {
  * @param {Date} date - The date used for comparison.
  * @returns {Task[]} The filtered due tasks.
  */
-function filterDueTasks(tasks: Task[], timeZone: string, date: Date): Task[] {
+export function filterDueTasks(tasks: Task[], timeZone: string, date: Date): Task[] {
     return tasks.filter((task) => processDueProperties(task, timeZone, date));
 }
 
@@ -86,7 +83,7 @@ function filterDueTasks(tasks: Task[], timeZone: string, date: Date): Task[] {
  * @param {Date} date - The date used for comparison.
  * @returns {boolean} True if the task is due, false otherwise.
  */
-function processDueProperties(task: Task, timeZone: string, date: Date): boolean {
+export function processDueProperties(task: Task, timeZone: string, date: Date): boolean {
     if (!task.due) {
         return false;
     }
@@ -108,7 +105,7 @@ function processDueProperties(task: Task, timeZone: string, date: Date): boolean
  * @param {boolean} [reverse] - Whether to reverse the sort order. Defaults to false.
  * @returns {number} The comparison result.
  */
-function compareTasks(
+export function compareTasks(
     a: Task,
     b: Task,
     contextLookup: Record<string, number>,
@@ -133,5 +130,5 @@ function compareTasks(
 
     const dateA = DateTime.fromISO(a.due.datetime || a.due.date, { zone: timeZone }).toJSDate();
     const dateB = DateTime.fromISO(b.due.datetime || b.due.date, { zone: timeZone }).toJSDate();
-    return dateA.getTime() - dateB.getTime();
+    return reverse ? dateB.getTime() - dateA.getTime() : dateA.getTime() - dateB.getTime();
 }
