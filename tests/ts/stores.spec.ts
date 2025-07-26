@@ -1,8 +1,9 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { get } from "svelte/store";
-import type { TodoistData, Task } from "../../types/todoist";
+import type { TodoistData } from "../../types/todoist";
 import type { UserSettings } from "../../types/interface";
 import "../../tests/helpers/mockToast";
+import { mockTask, mockContext } from "../helpers/testData";
 
 import { toast } from "@zerodevx/svelte-toast";
 import {
@@ -17,49 +18,6 @@ import {
 } from "../../src/js/stores";
 
 describe("stores", () => {
-    const mockTask: Task = {
-        id: "1",
-        content: "Test Task",
-        projectId: "proj1",
-        priority: 1,
-        url: "",
-        due: null,
-        labels: [],
-        userId: "user1",
-        description: "",
-        isDeleted: false,
-        checked: false,
-        noteCount: 0,
-        dayOrder: 0,
-        isCollapsed: false,
-    };
-
-    const mockContext = {
-        id: "ctx1",
-        name: "Context 1",
-        url: "",
-        parentId: null,
-        isDeleted: false,
-        updatedAt: null,
-        childOrder: 0,
-        description: "",
-        isCollapsed: false,
-        canAssignTasks: false,
-        color: "berry_red",
-        shared: false,
-        syncId: null,
-        teamInbox: false,
-        inboxProject: false,
-        order: 0,
-        viewStyle: "list",
-        defaultOrder: 0,
-        isShared: false,
-        createdAt: null,
-        isArchived: false,
-        isFavorite: false,
-        isFrozen: false,
-    };
-
     beforeEach(() => {
         todoistAccessToken.set("");
         dynalistAccessToken.set("");

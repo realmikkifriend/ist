@@ -7,8 +7,9 @@ import {
     processDueProperties,
     filterDueTasks,
 } from "../../src/js/filter";
-import type { Task, Context, DueTasksData } from "../../types/todoist";
+import type { Task, DueTasksData } from "../../types/todoist";
 import { mockDate, restoreDate } from "../helpers/mockDate";
+import { sampleContexts, makeTask } from "../helpers/testData";
 
 vi.mock("../../src/js/time", () => ({
     getTaskTime: vi.fn(() => null),
@@ -16,82 +17,6 @@ vi.mock("../../src/js/time", () => ({
 
 const NOW = new Date("2025-07-22T20:00:00.000Z");
 let OriginalDate: DateConstructor;
-
-const sampleContexts: Context[] = [
-    {
-        id: "c1",
-        name: "Work",
-        childOrder: 1,
-        color: "berry_red",
-        inboxProject: false,
-        parentId: null,
-        viewStyle: "list",
-        url: "",
-        isDeleted: false,
-        updatedAt: null,
-        description: "",
-        isCollapsed: false,
-        canAssignTasks: false,
-        createdAt: null,
-        isArchived: false,
-        isFavorite: false,
-        isFrozen: false,
-        defaultOrder: 0,
-        isShared: false,
-    },
-    {
-        id: "c2",
-        name: "Home",
-        childOrder: 2,
-        color: "berry_red",
-        inboxProject: false,
-        parentId: null,
-        viewStyle: "list",
-        url: "",
-        isDeleted: false,
-        updatedAt: null,
-        description: "",
-        isCollapsed: false,
-        canAssignTasks: false,
-        createdAt: null,
-        isArchived: false,
-        isFavorite: false,
-        isFrozen: false,
-        defaultOrder: 0,
-        isShared: false,
-    },
-];
-
-type MakeTaskParams = {
-    id: number | string;
-    due?: Partial<NonNullable<Task["due"]>>;
-    priority?: 1 | 2 | 3 | 4;
-    contextId?: string;
-    content?: string;
-};
-
-function makeTask({ id, due, priority = 1, contextId = "c1", content = "" }: MakeTaskParams): Task {
-    return {
-        id: String(id),
-        content,
-        due: due
-            ? {
-                  isRecurring: false,
-                  date: due.date ?? "",
-                  string: due.string ?? "",
-                  datetime: due.datetime ?? null,
-                  lang: due.lang ?? null,
-                  timezone: due.timezone ?? null,
-                  ...due,
-              }
-            : null,
-        priority,
-        contextId,
-        projectId: contextId,
-        url: "",
-        labels: [],
-    };
-}
 
 const pastDate = "2025-07-21";
 const futureDate = "2025-07-23";

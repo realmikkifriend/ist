@@ -11,6 +11,7 @@ import {
     previousFirstDueTaskSetSpy,
 } from "../../tests/helpers/mockStores";
 import { mockWindowLocation } from "../../tests/helpers/mockWindowLocation";
+import { makeTask } from "../helpers/testData";
 
 let getDueTasksGroupedByContext: typeof import("../../src/html/sidebar/sidebar").getDueTasksGroupedByContext;
 let getDueTaskCountByContext: typeof import("../../src/html/sidebar/sidebar").getDueTaskCountByContext;
@@ -57,12 +58,12 @@ describe("sidebar.ts", () => {
 
         it("groups tasks by context and counts priorities", () => {
             const tasks = [
-                { contextId: "a", priority: 1 },
-                { contextId: "a", priority: 2 },
-                { contextId: "b", priority: 1 },
-                { contextId: "a", priority: 1 },
+                makeTask({ id: 1, contextId: "a", priority: 1 }),
+                makeTask({ id: 2, contextId: "a", priority: 2 }),
+                makeTask({ id: 3, contextId: "b", priority: 1 }),
+                makeTask({ id: 4, contextId: "a", priority: 1 }),
             ];
-            mockGet.mockReturnValueOnce({ dueTasks: tasks }); // Corrected
+            mockGet.mockReturnValueOnce({ dueTasks: tasks });
             const result = getDueTasksGroupedByContext();
             expect(result).toEqual({
                 a: { total: 3, priorities: { 1: 2, 2: 1 } },
@@ -73,22 +74,26 @@ describe("sidebar.ts", () => {
 
     describe("getDueTaskCountByContext", () => {
         it("returns 0 if no dueTasks", () => {
-            mockGet.mockReturnValueOnce({ dueTasks: [] }); // Corrected
+            mockGet.mockReturnValueOnce({ dueTasks: [] });
             const count = getDueTaskCountByContext("a");
             expect(count).toBe(0);
         });
 
         it("returns 0 if contextId is falsy", () => {
             mockGet.mockReturnValueOnce({
-                dueTasks: [{ contextId: "a" }],
-            }); // Corrected
+                dueTasks: [makeTask({ id: 1, contextId: "a" })],
+            });
             const count = getDueTaskCountByContext("");
             expect(count).toBe(0);
         });
 
         it("counts tasks for the given contextId", () => {
-            const tasks = [{ contextId: "a" }, { contextId: "b" }, { contextId: "a" }];
-            mockGet.mockReturnValueOnce({ dueTasks: tasks }); // Corrected
+            const tasks = [
+                makeTask({ id: 1, contextId: "a" }),
+                makeTask({ id: 2, contextId: "b" }),
+                makeTask({ id: 3, contextId: "a" }),
+            ];
+            mockGet.mockReturnValueOnce({ dueTasks: tasks });
             const count = getDueTaskCountByContext("a");
             expect(count).toBe(2);
         });
