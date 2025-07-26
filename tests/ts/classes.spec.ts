@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import {
     getPriorityClasses,
     getPriorityBorder,
@@ -9,6 +9,7 @@ import {
 } from "../../src/js/classes";
 import type { Priority, ColorName } from "../../types/todoist.js";
 import type { QuarterHourPosition } from "../../types/agenda.js";
+import { mockDate, restoreDate } from "../helpers/mockDate";
 
 describe("getPriorityClasses", () => {
     it("returns correct classes for all valid priorities", () => {
@@ -147,20 +148,14 @@ describe("getQuarterHourPosition", () => {
 });
 
 describe("getGradientColor", () => {
-    const originalDate = globalThis.Date;
+    let OriginalDate: DateConstructor;
 
     beforeEach(() => {
-        const mockDate = vi.fn(() => ({
-            getHours: () => 10,
-        })) as unknown as DateConstructor;
-        mockDate.now = originalDate.now;
-        mockDate.parse = originalDate.parse;
-        mockDate.UTC = originalDate.UTC;
-        globalThis.Date = mockDate;
+        OriginalDate = mockDate(new Date("2025-07-22T10:00:00.000Z"));
     });
 
     afterEach(() => {
-        globalThis.Date = originalDate;
+        restoreDate(OriginalDate);
     });
 
     describe("for #tomorrow hash", () => {
@@ -206,13 +201,8 @@ describe("getGradientColor", () => {
         });
 
         it("handles early morning hours correctly", () => {
-            const mockDate = vi.fn(() => ({
-                getHours: () => 6,
-            })) as unknown as DateConstructor;
-            mockDate.now = originalDate.now;
-            mockDate.parse = originalDate.parse;
-            mockDate.UTC = originalDate.UTC;
-            globalThis.Date = mockDate;
+            restoreDate(OriginalDate); // Restore before re-mocking
+            OriginalDate = mockDate(new Date("2025-07-22T06:00:00.000Z"));
 
             const testCases: { tasks: number; expected: string | null }[] = [
                 { tasks: 11, expected: "bg-gradient-to-r from-blue-900 to-blue-700" },

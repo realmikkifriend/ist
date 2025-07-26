@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, afterEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import {
     getDueTasks,
     getReverseTasks,
@@ -8,30 +8,14 @@ import {
     filterDueTasks,
 } from "../../src/js/filter";
 import type { Task, Context, DueTasksData } from "../../types/todoist";
+import { mockDate, restoreDate } from "../helpers/mockDate";
 
 vi.mock("../../src/js/time", () => ({
     getTaskTime: vi.fn(() => null),
 }));
 
 const NOW = new Date("2025-07-22T20:00:00.000Z");
-const OriginalDate = globalThis.Date;
-vi.stubGlobal(
-    "Date",
-    Object.assign(
-        function FakeDate(...args: unknown[]): Date {
-            if (args.length === 0) {
-                return new OriginalDate(NOW.getTime());
-            }
-            return new OriginalDate(...(args as ConstructorParameters<typeof Date>));
-        },
-        {
-            now: () => NOW.getTime(),
-            parse: OriginalDate.parse,
-            UTC: OriginalDate.UTC,
-            [Symbol.species]: OriginalDate,
-        },
-    ),
-);
+let OriginalDate: DateConstructor;
 
 const sampleContexts: Context[] = [
     {
@@ -113,8 +97,13 @@ const pastDate = "2025-07-21";
 const futureDate = "2025-07-23";
 
 describe("filter.ts", () => {
+    beforeEach(() => {
+        OriginalDate = mockDate(NOW);
+    });
+
     afterEach(() => {
         vi.clearAllMocks();
+        restoreDate(OriginalDate);
     });
 
     describe("getDueTasks", () => {
