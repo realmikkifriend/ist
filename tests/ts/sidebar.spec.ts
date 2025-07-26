@@ -10,6 +10,7 @@ import {
     userSettingsUpdateSpy,
     previousFirstDueTaskSetSpy,
 } from "../../tests/helpers/mockStores";
+import { mockWindowLocation } from "../../tests/helpers/mockWindowLocation";
 
 let getDueTasksGroupedByContext: typeof import("../../src/html/sidebar/sidebar").getDueTasksGroupedByContext;
 let getDueTaskCountByContext: typeof import("../../src/html/sidebar/sidebar").getDueTaskCountByContext;
@@ -94,23 +95,14 @@ describe("sidebar.ts", () => {
     });
 
     describe("handleBadgeClick", () => {
-        const originalLocation = { value: undefined as Location | undefined };
+        let restoreWindowLocation: () => void;
 
         beforeEach(() => {
-            originalLocation.value = globalThis.window?.location;
-            Object.defineProperty(globalThis.window, "location", {
-                value: { hash: "" },
-                configurable: true,
-                writable: true,
-            });
+            restoreWindowLocation = mockWindowLocation({ hash: "" });
         });
 
         afterEach(() => {
-            Object.defineProperty(globalThis.window, "location", {
-                value: originalLocation.value,
-                configurable: true,
-                writable: true,
-            });
+            restoreWindowLocation();
         });
 
         it("navigates to summoned hash, resets summoned/skip, and updates first due task", () => {
