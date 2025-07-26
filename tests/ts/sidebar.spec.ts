@@ -15,11 +15,6 @@ let getDueTasksGroupedByContext: typeof import("../../src/html/sidebar/sidebar")
 let getDueTaskCountByContext: typeof import("../../src/html/sidebar/sidebar").getDueTaskCountByContext;
 let handleBadgeClick: typeof import("../../src/html/sidebar/sidebar").handleBadgeClick;
 
-function resetMocks() {
-    resetStoreMocks();
-    updateFirstDueTask.mockClear();
-}
-
 describe("sidebar.ts", () => {
     beforeAll(async () => {
         vi.doMock("svelte/store", async (importOriginal) => {
@@ -44,11 +39,12 @@ describe("sidebar.ts", () => {
     });
 
     beforeEach(() => {
-        resetMocks();
+        resetStoreMocks();
     });
 
     afterEach(() => {
-        resetMocks();
+        resetStoreMocks();
+        vi.clearAllMocks();
     });
 
     describe("getDueTasksGroupedByContext", () => {
