@@ -90,6 +90,17 @@ export default defineConfig([
         },
     },
     {
+        files: ["**/*.spec.ts"],
+        rules: {
+            "@typescript-eslint/no-unused-vars": [
+                "error",
+                {
+                    argsIgnorePattern: "^_",
+                },
+            ],
+        },
+    },
+    {
         files: ["**/*.spec.js"],
         rules: Object.fromEntries(
             Object.keys(functional.configs.all.rules).map((rule) => [rule, "off"]),
