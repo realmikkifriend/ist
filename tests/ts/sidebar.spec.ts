@@ -1,44 +1,48 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach, beforeAll } from "vitest";
 import type { Mock } from "vitest";
+
+export const mockGet = vi.fn();
+
+let updateFirstDueTask: Mock;
+
 import {
-    getDueTasksGroupedByContext,
-    getDueTaskCountByContext,
-    handleBadgeClick,
-} from "../../src/html/sidebar/sidebar";
+    resetStoreMocks,
+    userSettingsUpdateSpy,
+    previousFirstDueTaskSetSpy,
+} from "../../tests/helpers/mockStores";
 
-vi.mock("../../src/js/first", () => ({
-    updateFirstDueTask: vi.fn(() => Promise.resolve()),
-}));
-import { updateFirstDueTask } from "../../src/js/first";
-
-vi.mock("svelte/store", async () => {
-    const actual = await vi.importActual<typeof import("svelte/store")>("svelte/store");
-    return {
-        ...actual,
-        get: vi.fn(),
-    };
-});
-vi.mock("../../src/js/stores", () => ({
-    todoistData: {},
-    userSettings: {
-        selectedContext: null,
-        update: vi.fn(),
-    },
-    firstDueTask: {},
-    previousFirstDueTask: { set: vi.fn() },
-}));
-
-import { get } from "svelte/store";
-import { userSettings, previousFirstDueTask } from "../../src/js/stores";
+let getDueTasksGroupedByContext: typeof import("../../src/html/sidebar/sidebar").getDueTasksGroupedByContext;
+let getDueTaskCountByContext: typeof import("../../src/html/sidebar/sidebar").getDueTaskCountByContext;
+let handleBadgeClick: typeof import("../../src/html/sidebar/sidebar").handleBadgeClick;
 
 function resetMocks() {
-    (get as Mock).mockReset();
-    (userSettings.update as Mock).mockReset();
-    (previousFirstDueTask.set as Mock).mockReset();
-    (updateFirstDueTask as Mock).mockClear();
+    resetStoreMocks();
+    updateFirstDueTask.mockClear();
 }
 
 describe("sidebar.ts", () => {
+    beforeAll(async () => {
+        vi.doMock("svelte/store", async (importOriginal) => {
+            const actual = await importOriginal<typeof import("svelte/store")>();
+            return {
+                ...actual,
+                get: mockGet,
+            };
+        });
+
+        vi.doMock("../../src/js/first", () => ({
+            updateFirstDueTask: vi.fn(() => Promise.resolve()),
+        }));
+
+        const sidebarModule = await import("../../src/html/sidebar/sidebar");
+        getDueTasksGroupedByContext = sidebarModule.getDueTasksGroupedByContext;
+        getDueTaskCountByContext = sidebarModule.getDueTaskCountByContext;
+        handleBadgeClick = sidebarModule.handleBadgeClick;
+
+        const firstModule = await import("../../src/js/first");
+        updateFirstDueTask = firstModule.updateFirstDueTask as Mock;
+    });
+
     beforeEach(() => {
         resetMocks();
     });
@@ -49,7 +53,7 @@ describe("sidebar.ts", () => {
 
     describe("getDueTasksGroupedByContext", () => {
         it("returns an empty object if no dueTasks", () => {
-            (get as Mock).mockReturnValueOnce({});
+            mockGet.mockReturnValueOnce({ dueTasks: [] }); // Corrected: return just the content of todoistData
             const result = getDueTasksGroupedByContext();
             expect(result).toEqual({});
         });
@@ -61,7 +65,7 @@ describe("sidebar.ts", () => {
                 { contextId: "b", priority: 1 },
                 { contextId: "a", priority: 1 },
             ];
-            (get as Mock).mockReturnValueOnce({ dueTasks: tasks });
+            mockGet.mockReturnValueOnce({ dueTasks: tasks }); // Corrected
             const result = getDueTasksGroupedByContext();
             expect(result).toEqual({
                 a: { total: 3, priorities: { 1: 2, 2: 1 } },
@@ -72,22 +76,22 @@ describe("sidebar.ts", () => {
 
     describe("getDueTaskCountByContext", () => {
         it("returns 0 if no dueTasks", () => {
-            (get as Mock).mockReturnValueOnce({});
+            mockGet.mockReturnValueOnce({ dueTasks: [] }); // Corrected
             const count = getDueTaskCountByContext("a");
             expect(count).toBe(0);
         });
 
         it("returns 0 if contextId is falsy", () => {
-            (get as Mock).mockReturnValueOnce({
+            mockGet.mockReturnValueOnce({
                 dueTasks: [{ contextId: "a" }],
-            });
+            }); // Corrected
             const count = getDueTaskCountByContext("");
             expect(count).toBe(0);
         });
 
         it("counts tasks for the given contextId", () => {
             const tasks = [{ contextId: "a" }, { contextId: "b" }, { contextId: "a" }];
-            (get as Mock).mockReturnValueOnce({ dueTasks: tasks });
+            mockGet.mockReturnValueOnce({ dueTasks: tasks }); // Corrected
             const count = getDueTaskCountByContext("a");
             expect(count).toBe(2);
         });
@@ -115,9 +119,9 @@ describe("sidebar.ts", () => {
 
         it("navigates to summoned hash, resets summoned/skip, and updates first due task", () => {
             const summonedTask = { summoned: "#foo", skip: true };
-            (get as Mock)
-                .mockReturnValueOnce(summonedTask)
-                .mockReturnValueOnce({ selectedContext: null });
+            mockGet
+                .mockReturnValueOnce(summonedTask) // For $firstDueTask
+                .mockReturnValueOnce({ selectedContext: null }); // For selectedContext
 
             handleBadgeClick();
 
@@ -128,21 +132,25 @@ describe("sidebar.ts", () => {
         });
 
         it("clears selected context if no summoned, but selectedContext is set", () => {
-            (get as Mock).mockReturnValueOnce({}).mockReturnValueOnce({ selectedContext: "abc" });
+            mockGet
+                .mockReturnValueOnce({ summoned: false }) // For $firstDueTask
+                .mockReturnValueOnce({ selectedContext: "abc" }); // For selectedContext
 
             handleBadgeClick();
 
-            expect(previousFirstDueTask.set).toHaveBeenCalledWith(null);
-            expect(userSettings.update).toHaveBeenCalled();
+            expect(previousFirstDueTaskSetSpy).toHaveBeenCalledWith(null);
+            expect(userSettingsUpdateSpy).toHaveBeenCalled();
         });
 
         it("does nothing if no summoned and no selectedContext", () => {
-            (get as Mock).mockReturnValueOnce({}).mockReturnValueOnce({ selectedContext: null });
+            mockGet
+                .mockReturnValueOnce({ summoned: false }) // For $firstDueTask
+                .mockReturnValueOnce({ selectedContext: null }); // For selectedContext
 
             handleBadgeClick();
 
-            expect(previousFirstDueTask.set).not.toHaveBeenCalled();
-            expect(userSettings.update).not.toHaveBeenCalled();
+            expect(previousFirstDueTaskSetSpy).not.toHaveBeenCalled();
+            expect(userSettingsUpdateSpy).not.toHaveBeenCalled();
         });
     });
 });
