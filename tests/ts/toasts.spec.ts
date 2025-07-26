@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import type { Mock } from "vitest";
 import type { ToastConfig } from "../../types/interface";
 import type { SvelteComponent } from "svelte";
@@ -8,7 +8,7 @@ import { toast } from "@zerodevx/svelte-toast";
 import { success, error, newFirstTask } from "../../src/js/toasts";
 
 describe("toasts", () => {
-    beforeEach(() => {
+    afterEach(() => {
         vi.clearAllMocks();
     });
 

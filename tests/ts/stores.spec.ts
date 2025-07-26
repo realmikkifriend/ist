@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { get } from "svelte/store";
 import type { TodoistData, Task } from "../../types/todoist";
 import type { UserSettings } from "../../types/interface";
@@ -73,6 +73,9 @@ describe("stores", () => {
         userSettings.set({ selectedContext: null });
         firstDueTask.set(null);
         previousFirstDueTask.set(null);
+    });
+
+    afterEach(() => {
         vi.clearAllMocks();
     });
 
