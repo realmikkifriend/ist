@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     export let type,
         size = 8,
         style = ""; // additional styles
