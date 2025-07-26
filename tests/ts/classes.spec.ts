@@ -6,7 +6,9 @@ import {
     borderClasses,
     getQuarterHourPosition,
     getGradientColor,
-} from "../../src/js/classes.ts";
+} from "../../src/js/classes";
+import type { Priority, ColorName } from "../../types/todoist.js";
+import type { QuarterHourPosition } from "../../types/agenda.js";
 
 describe("getPriorityClasses", () => {
     it("returns correct classes for all valid priorities", () => {
@@ -18,13 +20,13 @@ describe("getPriorityClasses", () => {
         };
 
         Object.entries(expectedClasses).forEach(([priority, expectedClass]) => {
-            expect(getPriorityClasses(Number(priority))).toBe(expectedClass);
+            expect(getPriorityClasses(Number(priority) as Priority)).toBe(expectedClass);
         });
     });
 
     it("returns empty string for invalid priorities", () => {
-        [0, 5, -1, null, undefined].forEach((invalidPriority) => {
-            expect(getPriorityClasses(invalidPriority)).toBe("");
+        [0, 5, -1, null, undefined].forEach((invalidPriority: unknown) => {
+            expect(getPriorityClasses(invalidPriority as Priority)).toBe("");
         });
     });
 });
@@ -39,20 +41,20 @@ describe("getPriorityBorder", () => {
         };
 
         Object.entries(expectedBorders).forEach(([priority, expectedBorder]) => {
-            expect(getPriorityBorder(Number(priority))).toBe(expectedBorder);
+            expect(getPriorityBorder(Number(priority) as Priority)).toBe(expectedBorder);
         });
     });
 
     it("returns empty string for invalid priorities", () => {
-        [0, 5, -1, null, undefined].forEach((invalidPriority) => {
-            expect(getPriorityBorder(invalidPriority)).toBe("");
+        [0, 5, -1, null, undefined].forEach((invalidPriority: unknown) => {
+            expect(getPriorityBorder(invalidPriority as Priority)).toBe("");
         });
     });
 });
 
 describe("colorClasses", () => {
     it("contains all expected color mappings", () => {
-        const expectedColors = {
+        const expectedColors: Record<ColorName, string> = {
             berry_red: "bg-pink-600",
             red: "bg-red-500",
             orange: "bg-orange-500",
@@ -76,7 +78,7 @@ describe("colorClasses", () => {
         };
 
         Object.entries(expectedColors).forEach(([colorName, expectedClass]) => {
-            expect(colorClasses[colorName]).toBe(expectedClass);
+            expect(colorClasses[colorName as ColorName]).toBe(expectedClass);
         });
 
         expect(Object.keys(colorClasses)).toHaveLength(20);
@@ -85,7 +87,7 @@ describe("colorClasses", () => {
 
 describe("borderClasses", () => {
     it("contains all expected border color mappings", () => {
-        const expectedBorders = {
+        const expectedBorders: Record<ColorName, string> = {
             berry_red: "border-pink-600",
             red: "border-red-500",
             orange: "border-orange-500",
@@ -109,7 +111,7 @@ describe("borderClasses", () => {
         };
 
         Object.entries(expectedBorders).forEach(([colorName, expectedClass]) => {
-            expect(borderClasses[colorName]).toBe(expectedClass);
+            expect(borderClasses[colorName as ColorName]).toBe(expectedClass);
         });
 
         expect(Object.keys(borderClasses)).toHaveLength(20);
@@ -131,26 +133,30 @@ describe("getQuarterHourPosition", () => {
         };
 
         Object.entries(expectedPositions).forEach(([position, expectedClass]) => {
-            expect(getQuarterHourPosition(Number(position))).toBe(expectedClass);
+            expect(getQuarterHourPosition(Number(position) as QuarterHourPosition)).toBe(
+                expectedClass,
+            );
         });
     });
 
     it("returns empty string for invalid positions", () => {
-        [0.1, 1.0, 0, -0.25, null, undefined].forEach((invalidPosition) => {
-            expect(getQuarterHourPosition(invalidPosition)).toBe("");
+        [0.1, 1.0, 0, -0.25, null, undefined].forEach((invalidPosition: unknown) => {
+            expect(getQuarterHourPosition(invalidPosition as QuarterHourPosition)).toBe("");
         });
     });
 });
 
 describe("getGradientColor", () => {
-    let originalDate;
+    const originalDate = globalThis.Date;
 
     beforeEach(() => {
-        originalDate = globalThis.Date;
-        globalThis.Date = vi.fn(() => ({
-            getHours: () => 10, // Mock 10 AM
-        }));
-        globalThis.Date.now = originalDate.now;
+        const mockDate = vi.fn(() => ({
+            getHours: () => 10,
+        })) as unknown as DateConstructor;
+        mockDate.now = originalDate.now;
+        mockDate.parse = originalDate.parse;
+        mockDate.UTC = originalDate.UTC;
+        globalThis.Date = mockDate;
     });
 
     afterEach(() => {
@@ -159,7 +165,7 @@ describe("getGradientColor", () => {
 
     describe("for #tomorrow hash", () => {
         it("returns correct gradients based on task count thresholds", () => {
-            const testCases = [
+            const testCases: { tasks: number; expected: string | null }[] = [
                 { tasks: 21, expected: "bg-gradient-to-r from-red-900 to-red-700" },
                 { tasks: 25, expected: "bg-gradient-to-r from-red-900 to-red-700" },
                 { tasks: 20, expected: "bg-gradient-to-r from-orange-800 to-orange-600" },
@@ -184,15 +190,14 @@ describe("getGradientColor", () => {
 
     describe("for #today hash", () => {
         it("calculates threshold based on current hour and returns correct gradients", () => {
-            // With mocked hour of 10, hourAdjustment = 10 - 8 = 2, todayThreshold = 14 - 2 = 12
-            const testCases = [
-                { tasks: 9, expected: "bg-gradient-to-r from-blue-900 to-blue-700" }, // < threshold - 2
-                { tasks: 10, expected: "bg-gradient-to-r from-green-900 to-green-700" }, // === threshold - 2
-                { tasks: 11, expected: "bg-gradient-to-r from-emerald-900 to-emerald-700" }, // === threshold - 1
-                { tasks: 12, expected: null }, // === threshold
-                { tasks: 13, expected: "bg-gradient-to-r from-orange-800 to-orange-600" }, // === threshold + 1
-                { tasks: 14, expected: "bg-gradient-to-r from-red-900 to-red-700" }, // > threshold + 1
-                { tasks: 20, expected: "bg-gradient-to-r from-red-900 to-red-700" }, // > threshold + 1
+            const testCases: { tasks: number; expected: string | null }[] = [
+                { tasks: 9, expected: "bg-gradient-to-r from-blue-900 to-blue-700" },
+                { tasks: 10, expected: "bg-gradient-to-r from-green-900 to-green-700" },
+                { tasks: 11, expected: "bg-gradient-to-r from-emerald-900 to-emerald-700" },
+                { tasks: 12, expected: null },
+                { tasks: 13, expected: "bg-gradient-to-r from-orange-800 to-orange-600" },
+                { tasks: 14, expected: "bg-gradient-to-r from-red-900 to-red-700" },
+                { tasks: 20, expected: "bg-gradient-to-r from-red-900 to-red-700" },
             ];
 
             testCases.forEach(({ tasks, expected }) => {
@@ -201,18 +206,21 @@ describe("getGradientColor", () => {
         });
 
         it("handles early morning hours correctly", () => {
-            globalThis.Date = vi.fn(() => ({
-                getHours: () => 6, // Mock 6 AM
-            }));
+            const mockDate = vi.fn(() => ({
+                getHours: () => 6,
+            })) as unknown as DateConstructor;
+            mockDate.now = originalDate.now;
+            mockDate.parse = originalDate.parse;
+            mockDate.UTC = originalDate.UTC;
+            globalThis.Date = mockDate;
 
-            // With hour 6, hourAdjustment = 0, todayThreshold = 14
-            const testCases = [
-                { tasks: 11, expected: "bg-gradient-to-r from-blue-900 to-blue-700" }, // < threshold - 2
-                { tasks: 12, expected: "bg-gradient-to-r from-green-900 to-green-700" }, // === threshold - 2
-                { tasks: 13, expected: "bg-gradient-to-r from-emerald-900 to-emerald-700" }, // === threshold - 1
-                { tasks: 14, expected: null }, // === threshold
-                { tasks: 15, expected: "bg-gradient-to-r from-orange-800 to-orange-600" }, // === threshold + 1
-                { tasks: 16, expected: "bg-gradient-to-r from-red-900 to-red-700" }, // > threshold + 1
+            const testCases: { tasks: number; expected: string | null }[] = [
+                { tasks: 11, expected: "bg-gradient-to-r from-blue-900 to-blue-700" },
+                { tasks: 12, expected: "bg-gradient-to-r from-green-900 to-green-700" },
+                { tasks: 13, expected: "bg-gradient-to-r from-emerald-900 to-emerald-700" },
+                { tasks: 14, expected: null },
+                { tasks: 15, expected: "bg-gradient-to-r from-orange-800 to-orange-600" },
+                { tasks: 16, expected: "bg-gradient-to-r from-red-900 to-red-700" },
             ];
 
             testCases.forEach(({ tasks, expected }) => {
@@ -222,13 +230,13 @@ describe("getGradientColor", () => {
     });
 
     it("returns empty string for unknown hash values", () => {
-        ["#someday", "#next-week", "", "#unknown"].forEach((hash) => {
+        ["#someday", "#next-week", "", "#unknown"].forEach((hash: string) => {
             expect(getGradientColor(10, hash)).toBe("");
         });
     });
 
     it("handles edge cases", () => {
-        const edgeCases = [
+        const edgeCases: { tasks: number; hash: string; expected: string | null }[] = [
             { tasks: 0, hash: "#tomorrow", expected: "bg-gradient-to-r from-blue-900 to-blue-700" },
             { tasks: 0, hash: "#today", expected: "bg-gradient-to-r from-blue-900 to-blue-700" },
             { tasks: 100, hash: "#tomorrow", expected: "bg-gradient-to-r from-red-900 to-red-700" },
@@ -241,7 +249,6 @@ describe("getGradientColor", () => {
     });
 
     it("handles non-numeric task values", () => {
-        // Test the default case in #tomorrow switch statement
         expect(getGradientColor(NaN, "#tomorrow")).toBe(null);
         expect(getGradientColor(Infinity, "#tomorrow")).toBe(
             "bg-gradient-to-r from-red-900 to-red-700",
@@ -250,7 +257,6 @@ describe("getGradientColor", () => {
             "bg-gradient-to-r from-blue-900 to-blue-700",
         );
 
-        // Test the else case in #today logic
         expect(getGradientColor(NaN, "#today")).toBe("");
     });
 });
