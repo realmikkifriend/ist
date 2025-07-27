@@ -11,6 +11,7 @@ export default defineConfig({
         noExternal: ["@zerodevx/svelte-toast"],
     },
     test: {
+        globals: true,
         environment: "jsdom",
         setupFiles: ["./vitest-setup.js"],
         deps: {

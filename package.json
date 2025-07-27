@@ -28,6 +28,7 @@
         "@doist/todoist-api-typescript": "^5.0.2",
         "@fontsource/clear-sans": "^5.0.11",
         "@tailwindcss/typography": "^0.5.13",
+        "@vitest/eslint-plugin": "^1.3.4",
         "chrono-node": "^2.7.6",
         "luxon": "^3.4.4",
         "svelte-exmarkdown": "^3.0.5",

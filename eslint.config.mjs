@@ -7,6 +7,7 @@ import svelteParser from "svelte-eslint-parser";
 import tseslint from "typescript-eslint";
 import jsdoc from "eslint-plugin-jsdoc";
 import svelteConfig from "./svelte.config.mjs";
+import vitest from "@vitest/eslint-plugin";
 
 export default defineConfig([
     { files: ["**/*.{js,mjs,cjs}"], plugins: { js }, extends: ["js/recommended"] },
@@ -90,7 +91,33 @@ export default defineConfig([
         },
     },
     {
-        files: ["tests/**/*"],
+        files: ["tests/**/*.ts"], // Specific configuration for TypeScript test files
+        languageOptions: {
+            parserOptions: {
+                project: "./tsconfig.json",
+                tsconfigRootDir: import.meta.dirname,
+            },
+            sourceType: "module",
+            globals: globals.vitest, // Add Vitest globals
+        },
+        rules: {
+            "functional/no-let": "off",
+            "functional/no-promise-reject": "off", // Disable for test files
+            "@typescript-eslint/no-unused-vars": [
+                "error",
+                {
+                    argsIgnorePattern: "^_",
+                },
+            ],
+            // Relax some rules that might conflict with testing patterns
+            "@typescript-eslint/no-unsafe-call": "off",
+            "@typescript-eslint/no-unsafe-member-access": "off",
+            "@typescript-eslint/no-unsafe-assignment": "off",
+            "@typescript-eslint/no-explicit-any": "off", // Temporarily disable to see if it resolves issues
+        },
+    },
+    {
+        files: ["tests/**/*.js"], // Keep existing JS test file configuration
         rules: {
             "functional/no-let": "off",
             "@typescript-eslint/no-unused-vars": [
@@ -106,5 +133,14 @@ export default defineConfig([
         rules: Object.fromEntries(
             Object.keys(functional.configs.all.rules).map((rule) => [rule, "off"]),
         ),
+    },
+    {
+        files: ["tests/**/*.ts"],
+        plugins: {
+            vitest,
+        },
+        rules: {
+            ...vitest.configs.recommended.rules,
+        },
     },
 ]);

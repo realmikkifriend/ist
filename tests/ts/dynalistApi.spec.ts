@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import type { Mock } from "vitest";
-import { get, type Writable } from "svelte/store";
+import { get } from "svelte/store";
 import { dynalistAccessToken } from "../../src/js/stores";
 import {
     fetchDynalistDocument,
@@ -12,19 +12,20 @@ vi.mock("svelte/store", async (importOriginal) => {
     const mod = await importOriginal<typeof import("svelte/store")>();
     return {
         ...mod,
-        get: vi.fn<[Writable<string>], string>(),
+        get: vi.fn(),
     };
 });
 
 vi.mock("../../src/js/stores", async (importOriginal) => {
     const mod = await importOriginal<typeof import("../../src/js/stores")>();
-    const mockDynalistAccessToken: Writable<string> = {
+    const mockDynalistAccessToken = {
         subscribe: vi.fn((cb) => {
             cb("mock-access-token");
             return () => {};
         }),
         set: vi.fn(),
         update: vi.fn(),
+        get: vi.fn().mockReturnValue("mock-access-token"),
     };
     return {
         ...mod,
@@ -43,14 +44,6 @@ describe("dynalistApi", () => {
 
     beforeEach(() => {
         fetchSpy = vi.spyOn(globalThis, "fetch") as ReturnType<typeof vi.spyOn>;
-
-        (get as Mock<[Writable<string>], string>).mockImplementation((store: Writable<string>) => {
-            if (store === dynalistAccessToken) {
-                return "mock-access-token";
-            }
-
-            return store;
-        });
 
         vi.spyOn(console, "error").mockImplementation(() => {});
     });
@@ -161,7 +154,7 @@ describe("dynalistApi", () => {
                 ok: true,
                 json: () => Promise.resolve(mockResponseData),
             } as MockResponse);
-            (get as Mock<[Writable<string>], string>).mockReturnValue(mockAccessToken);
+            (get as Mock<typeof get>).mockReturnValue(mockAccessToken);
 
             const result = await updateDynalist(mockFileId, mockChanges);
 
@@ -184,7 +177,7 @@ describe("dynalistApi", () => {
                 ok: false,
                 json: () => Promise.resolve(mockErrorData),
             } as MockResponse);
-            (get as Mock<[Writable<string>], string>).mockReturnValue(mockAccessToken);
+            (get as Mock<typeof get>).mockReturnValue(mockAccessToken);
 
             const result = await updateDynalist(mockFileId, mockChanges);
 
@@ -193,7 +186,7 @@ describe("dynalistApi", () => {
 
         it("returns an error for network issues", async () => {
             fetchSpy.mockRejectedValueOnce(new Error("Update failed"));
-            (get as Mock<[Writable<string>], string>).mockReturnValue(mockAccessToken);
+            (get as Mock<typeof get>).mockReturnValue(mockAccessToken);
 
             const result = await updateDynalist(mockFileId, mockChanges);
 
