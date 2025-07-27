@@ -45,11 +45,13 @@
                                 ? button.time.slice(1)
                                 : button.time}</span
                         >
-                        <span
-                            class="badge badge-xs mt-0.5 w-fit overflow-hidden text-right font-bold {getPriorityClasses(
-                                button.priority ?? 1,
-                            )}">{button.count}</span
-                        >
+                        {#if button.count}
+                            <span
+                                class="badge badge-xs mt-0.5 w-fit overflow-hidden text-right font-bold {getPriorityClasses(
+                                    button.priority ?? 1,
+                                )}">{button.count}</span
+                            >
+                        {/if}
                     </div>
                 {/if}
             </div>
