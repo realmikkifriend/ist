@@ -45,7 +45,7 @@ vi.mock("@zerodevx/svelte-toast", () => ({
 vi.mock("../../src/js/toasts", async (importOriginal) => {
     const original = await importOriginal();
     return {
-        ...original,
+        ...(original as object),
         success: vi.fn(),
         newFirstTask: vi.fn(),
     };
