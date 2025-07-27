@@ -98,17 +98,18 @@ export const skipTask = (task: Task): void => {
  */
 export const updateFirstDueTask = async (): Promise<void> => {
     const $todoistData: TodoistData = get(todoistData);
-    if (!$todoistData?.dueTasks?.length) {
+    const prevTask: Task | null = get(previousFirstDueTask);
+
+    if (!$todoistData?.dueTasks?.length && !prevTask?.summoned) {
         setFirstDueTask(null);
         return;
     }
 
-    const selectedContextId: string | null = get(userSettings).selectedContext?.id ?? null;
-    const prevTask: Task | null = get(previousFirstDueTask);
-
     if (prevTask?.summoned) {
         return;
     }
+
+    const selectedContextId: string | null = get(userSettings).selectedContext?.id ?? null;
     const dueTasks: Task[] = updateDueTasks($todoistData.dueTasks, selectedContextId);
 
     const newTask: Task = dueTasks[0];
