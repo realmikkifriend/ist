@@ -124,3 +124,9 @@ export const mockContext: Context = {
     isFavorite: false,
     isFrozen: false,
 };
+
+export const testTasks: Task[] = [
+    makeTask({ id: "1", content: "Task 1", priority: 1 }),
+    makeTask({ id: "2", content: "Task 2", priority: 2 }),
+    makeTask({ id: "3", content: "Task 3", priority: 3 }),
+];

@@ -1,10 +1,18 @@
 import { vi } from "vitest";
-import { writable } from "svelte/store";
+import { writable, type Writable } from "svelte/store";
+import type { TodoistData, Task } from "../../types/todoist";
+import type { UserSettings } from "../../types/interface";
 
-export const userSettingsMockStore = writable({ selectedContext: null });
-export const previousFirstDueTaskMockStore = writable(null);
-export const todoistDataMockStore = writable({ dueTasks: [] });
-export const firstDueTaskMockStore = writable(null);
+export const userSettingsMockStore: Writable<UserSettings> = writable({ selectedContext: null });
+export const previousFirstDueTaskMockStore: Writable<Task | null> = writable(null);
+export const todoistDataMockStore: Writable<TodoistData> = writable({
+    dueTasks: [],
+    tasks: [],
+    contexts: [],
+    reverseTasks: { tomorrow: [], today: [] },
+});
+export const firstDueTaskMockStore: Writable<Task | null> = writable(null);
+export const todoistErrorMockStore: Writable<string | null> = writable(null);
 
 export const userSettingsUpdateSpy = vi.spyOn(userSettingsMockStore, "update");
 export const previousFirstDueTaskSetSpy = vi.spyOn(previousFirstDueTaskMockStore, "set");
@@ -15,6 +23,7 @@ vi.mock("../../src/js/stores", () => {
         previousFirstDueTask: previousFirstDueTaskMockStore,
         todoistData: todoistDataMockStore,
         firstDueTask: firstDueTaskMockStore,
+        todoistError: todoistErrorMockStore,
     };
 });
 
@@ -24,8 +33,14 @@ vi.mock("../../src/js/stores", () => {
 export function resetStoreMocks() {
     userSettingsMockStore.set({ selectedContext: null });
     previousFirstDueTaskMockStore.set(null);
-    todoistDataMockStore.set({ dueTasks: [] });
+    todoistDataMockStore.set({
+        dueTasks: [],
+        tasks: [],
+        contexts: [],
+        reverseTasks: { tomorrow: [], today: [] },
+    });
     firstDueTaskMockStore.set(null);
+    todoistErrorMockStore.set(null);
 
     userSettingsUpdateSpy.mockReset();
     previousFirstDueTaskSetSpy.mockReset();
