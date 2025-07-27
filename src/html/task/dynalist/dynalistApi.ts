@@ -51,10 +51,7 @@ export function fetchDynalistDocument(
                 typeof val === "object" && val !== null;
             if (!result.response.ok || (isObj(data) && data._code === "NotFound")) {
                 return {
-                    error:
-                        result.response.statusText ||
-                        (isObj(data) ? data._msg : undefined) ||
-                        "Dynalist document not found",
+                    error: result.response.statusText || (isObj(data) ? data._msg : undefined),
                     data: null,
                 };
             }
@@ -71,7 +68,7 @@ export function fetchDynalistDocument(
  * @param {unknown[]} changes - The list of changes to apply.
  * @returns {Promise<DynalistApiResultBase>} The result of the update operation.
  */
-export async function updateDynalist(
+export function updateDynalist(
     file_id: string,
     changes: unknown[],
 ): Promise<DynalistApiResultBase> {
@@ -81,20 +78,35 @@ export async function updateDynalist(
         changes,
     };
 
-    const response = await fetch("https://dynalist.io/api/v1/doc/edit", {
+    return fetch("https://dynalist.io/api/v1/doc/edit", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
         },
         body: JSON.stringify(payload),
-    });
+    })
+        .then((response) =>
+            response
+                .json()
+                .then((data: unknown) => ({ response, data, jsonError: false }))
+                .catch(() => ({ response, data: null, jsonError: true })),
+        )
+        .then((result) => {
+            if (result.jsonError) {
+                return { error: "Failed to parse Dynalist response as JSON" };
+            }
 
-    const data: unknown = await response.json();
-    if (response.ok) {
-        return { data };
-    } else {
-        return { error: "Network response was not ok", data };
-    }
+            const data = result.data;
+
+            if (result.response.ok) {
+                return { data };
+            } else {
+                return { error: "Network response was not ok", data };
+            }
+        })
+        .catch((error) => ({
+            error: (error as Error)?.message || "Network or other error during update",
+        }));
 }
 
 /**
