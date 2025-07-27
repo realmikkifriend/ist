@@ -173,7 +173,10 @@ export async function markTaskDone(
 
     return api
         .closeTask(taskID)
-        .then(() => undefined)
+        .then(() => {
+            success("Task marked as done!");
+            return undefined;
+        })
         .catch((error: unknown) => {
             if (error instanceof TodoistRequestError) {
                 return setErrorState(error);
