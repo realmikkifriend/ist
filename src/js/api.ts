@@ -73,11 +73,7 @@ export async function refreshData(): Promise<
         : [];
 
     const user =
-        userResponse &&
-        typeof userResponse === "object" &&
-        "id" in userResponse &&
-        "name" in userResponse &&
-        "email" in userResponse
+        userResponse && typeof userResponse === "object" && "tz_info" in userResponse
             ? (userResponse as User)
             : undefined;
 
@@ -90,6 +86,7 @@ export async function refreshData(): Promise<
     const todoistDataObj: TodoistData = {
         tasks: cleanedData.tasks ?? [],
         contexts: cleanedData.contexts ?? [],
+        user: cleanedData.user ?? undefined,
         dueTasks: [],
         reverseTasks: {
             tomorrow: [],

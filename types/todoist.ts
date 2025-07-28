@@ -14,6 +14,7 @@ export interface TodoistData {
     tasks: Task[];
     contexts: Context[];
     dueTasks: Task[];
+    user?: User;
     reverseTasks: {
         tomorrow: Task[];
         today: Task[];
@@ -104,7 +105,7 @@ interface Due {
 
 export interface User extends BaseUser {
     tz_info?: {
-        name?: string;
+        timezone?: string;
     };
 }
 

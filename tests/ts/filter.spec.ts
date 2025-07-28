@@ -44,7 +44,7 @@ describe("filter.ts", () => {
                     id: "",
                     name: "",
                     email: "",
-                    tz_info: { name: "UTC" },
+                    tz_info: { timezone: "UTC" },
                 },
             };
             const result = getDueTasks(data);
@@ -59,7 +59,7 @@ describe("filter.ts", () => {
                     id: "",
                     name: "",
                     email: "",
-                    tz_info: { name: "America/Chicago" },
+                    tz_info: { timezone: "America/Chicago" },
                 },
             };
 
@@ -83,7 +83,7 @@ describe("filter.ts", () => {
                     id: "",
                     name: "",
                     email: "",
-                    tz_info: { name: "UTC" },
+                    tz_info: { timezone: "UTC" },
                 },
             };
             const result = getReverseTasks(data);
@@ -98,7 +98,7 @@ describe("filter.ts", () => {
                     id: "",
                     name: "",
                     email: "",
-                    tz_info: { name: "America/Chicago" },
+                    tz_info: { timezone: "America/Chicago" },
                 },
             };
 

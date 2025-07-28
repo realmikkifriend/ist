@@ -9,7 +9,7 @@ import type { Task, Context, DueTasksData } from "../../types/todoist";
  */
 export function getDueTasks(data: DueTasksData): Task[] {
     const { tasks, contexts, user } = data;
-    const timeZone = user?.tz_info?.name || "local";
+    const timeZone = user?.tz_info?.timezone || "local";
 
     return filterAndSortTasks(tasks, contexts, { timeZone });
 }
@@ -21,7 +21,7 @@ export function getDueTasks(data: DueTasksData): Task[] {
  */
 export function getReverseTasks(data: DueTasksData): Task[] {
     const { tasks, contexts, user } = data;
-    const timeZone = user?.tz_info?.name || "local";
+    const timeZone = user?.tz_info?.timezone || "local";
 
     return filterAndSortTasks(tasks, contexts, { timeZone, reverse: true });
 }
@@ -43,7 +43,7 @@ export function filterAndSortTasks(
     const { timeZone, reverse = false } = options;
     const contextLookup = createContextLookup(contexts);
 
-    const date = new Date();
+    const date = reverse ? DateTime.now().plus({ days: 1 }).endOf("day").toJSDate() : new Date();
 
     const filteredTasks = timeZone ? filterDueTasks(tasks, timeZone, date) : tasks;
 
