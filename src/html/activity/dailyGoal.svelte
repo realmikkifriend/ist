@@ -4,7 +4,7 @@
     import { todoistData } from "./../../js/stores";
     import { getActivity } from "./activity";
     import { writable } from "svelte/store";
-    import { getProjectColors, getGridColsClass } from "../../js/classes";
+    import { getContextColors, getGridColsClass } from "../../js/classes";
     import type { TaskActivity } from "../../../types/todoist";
 
     const result = writable<TaskActivity[]>([]);
@@ -43,7 +43,7 @@
         )} items-start gap-0 overflow-hidden whitespace-nowrap p-0 outline-2"
     >
         {#if $result.length > 0 && $todoistData?.contexts}
-            {#each getProjectColors($result, $todoistData.contexts) as color, i (i)}
+            {#each getContextColors($result, $todoistData.contexts) as color, i (i)}
                 <div class="{color} h-full"></div>
             {/each}
         {/if}

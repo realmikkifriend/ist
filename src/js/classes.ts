@@ -183,13 +183,13 @@ export function getGradientColor(totalTasks: number, hash: string): string | nul
  * @param {Context[]} contexts - Contexts by which to retrieve styles.
  * @returns Tailwind classes to style task activity.
  */
-export function getProjectColors(activities: TaskActivity[], contexts: Context[]): string[] {
+export function getContextColors(activities: TaskActivity[], contexts: Context[]): string[] {
     if (!activities || !contexts) {
         return [];
     }
 
     return activities.map((activity) => {
-        const project = contexts.find((context) => context.id === activity.contextId);
-        return project ? colorClasses[project.color as ColorName] : "";
+        const context = contexts.find((context) => context.id === activity.contextId);
+        return context ? colorClasses[context.color as ColorName] : "";
     });
 }

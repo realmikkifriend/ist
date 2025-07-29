@@ -59,16 +59,19 @@ export async function refreshData(): Promise<
         return result;
     }
 
-    const [tasksResponse, projectsResponse, userResponse] = result;
+    const [tasksResponse, contextsResponse, userResponse] = result;
 
-    if (!tasksResponse || !projectsResponse || !userResponse) {
+    if (!tasksResponse || !contextsResponse || !userResponse) {
         return;
     }
 
-    const contexts = Array.isArray(projectsResponse.results)
-        ? projectsResponse.results.filter(
-              (proj: PersonalProject | WorkspaceProject): proj is Context =>
-                  proj && typeof proj === "object" && "inboxProject" in proj && "parentId" in proj,
+    const contexts = Array.isArray(contextsResponse.results)
+        ? contextsResponse.results.filter(
+              (context: PersonalProject | WorkspaceProject): context is Context =>
+                  context &&
+                  typeof context === "object" &&
+                  "inboxProject" in context &&
+                  "parentId" in context,
           )
         : [];
 
