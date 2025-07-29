@@ -10,6 +10,7 @@
     import { handleTaskDone, handleTaskDefer } from "../js/taskHandlers";
     import Sidebar from "./sidebar/Sidebar.svelte";
     import ContextBadge from "./sidebar/ContextBadge.svelte";
+    import DailyGoal from "./activity/dailyGoal.svelte";
     import NoTasks from "./NoTasks.svelte";
     import TaskDisplay from "./task/TaskDisplay.svelte";
     import Agenda from "./agenda/Agenda.svelte";
@@ -138,6 +139,12 @@
     {/if}
 {/if}
 
-<button class="fixed bottom-2 right-2 z-20 rounded-md bg-base-100 p-1" on:click={handleRefresh}>
-    <Icon src={ArrowPath} class="h-6 w-6 {$isSpinning ? 'animate-spin' : ''}" />
-</button>
+<div class="fixed bottom-2 left-2 z-10 flex w-32 flex-row items-center">
+    <DailyGoal />
+</div>
+
+<div class="fixed bottom-2 right-2 z-10">
+    <button class="rounded-md bg-base-100 p-1" on:click={handleRefresh}>
+        <Icon src={ArrowPath} class="h-6 w-6 {$isSpinning ? 'animate-spin' : ''}" />
+    </button>
+</div>

@@ -1,5 +1,6 @@
 import type { Priority, ColorName } from "../../types/todoist.js";
 import type { QuarterHourPosition, GradientType } from "../../types/agenda.js";
+import type { TaskActivity, Context } from "../../types/todoist.js";
 
 // This code may appear redundant, but ensures that Svelte exports all necessary classes.
 
@@ -15,6 +16,38 @@ export const getPriorityClasses = (priority: Priority): string =>
         3: "bg-priority-3 text-white",
         4: "bg-priority-4 text-white",
     })[priority] || "";
+
+/**
+ * Returns the 'grid-cols-' class for the provided number.
+ * @param {number} num - The number of columns.
+ * @returns The corresponding Tailwind CSS grid-cols class.
+ */
+export const getGridColsClass = (num: number): string => {
+    const classes: Record<number, string> = {
+        1: "grid-cols-1",
+        2: "grid-cols-2",
+        3: "grid-cols-3",
+        4: "grid-cols-4",
+        5: "grid-cols-5",
+        6: "grid-cols-6",
+        7: "grid-cols-7",
+        8: "grid-cols-8",
+        9: "grid-cols-9",
+        10: "grid-cols-10",
+        11: "grid-cols-11",
+        12: "grid-cols-12",
+        13: "grid-cols-[13]",
+        14: "grid-cols-[14]",
+        15: "grid-cols-[15]",
+        16: "grid-cols-[16]",
+        17: "grid-cols-[17]",
+        18: "grid-cols-[18]",
+        19: "grid-cols-[19]",
+        20: "grid-cols-[20]",
+    };
+
+    return classes[num] || "grid-cols-7";
+};
 
 /**
  * Returns the border color class for a given priority.
@@ -142,4 +175,21 @@ export function getGradientColor(totalTasks: number, hash: string): string | nul
     } else {
         return "";
     }
+}
+
+/**
+ * Retrieves styling for completed tasks.
+ * @param {TaskActivity[]} activities - Activity log to parse for styling.
+ * @param {Context[]} contexts - Contexts by which to retrieve styles.
+ * @returns Tailwind classes to style task activity.
+ */
+export function getProjectColors(activities: TaskActivity[], contexts: Context[]): string[] {
+    if (!activities || !contexts) {
+        return [];
+    }
+
+    return activities.map((activity) => {
+        const project = contexts.find((context) => context.id === activity.contextId);
+        return project ? colorClasses[project.color as ColorName] : "";
+    });
 }

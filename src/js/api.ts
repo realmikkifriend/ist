@@ -18,7 +18,7 @@ import type {
  * @returns {{ accessToken: string | null, api: TodoistApi | null }} - API ready for calls.
  */
 function initializeApi(): { accessToken: string | null; api: TodoistApi | null } {
-    const accessToken = get(todoistAccessToken) as string | null;
+    const accessToken = get(todoistAccessToken);
     const api = accessToken ? new TodoistApi(accessToken) : null;
     return { accessToken, api };
 }
@@ -40,7 +40,7 @@ export async function refreshData(): Promise<
     const result = await Promise.all([
         api.getTasks({ limit: 200 }),
         api.getProjects(),
-        getEndpoint("user", accessToken),
+        getEndpoint("user"),
     ]).catch((err: unknown) => {
         console.error("Error fetching data:", err);
         if (err instanceof TodoistRequestError) {
@@ -86,7 +86,7 @@ export async function refreshData(): Promise<
     const todoistDataObj: TodoistData = {
         tasks: cleanedData.tasks ?? [],
         contexts: cleanedData.contexts ?? [],
-        user: cleanedData.user ?? undefined,
+        user: cleanedData.user ?? ({} as User),
         dueTasks: [],
         reverseTasks: {
             tomorrow: [],
@@ -234,23 +234,27 @@ export async function deferTasks(
 /**
  * Calls a Todoist API endpoint.
  * @param {string} endpoint - The endpoint to call.
- * @param {string} accessToken - API access token.
  * @param {Record<string, string>} params - Additional parameters.
  * @returns {Promise<unknown>} - Result of API endpoint call.
  */
-async function getEndpoint(
+export async function getEndpoint(
     endpoint: string,
-    accessToken: string,
-    params: Record<string, string> = {},
+    params: Record<string, string | number> = {},
 ): Promise<unknown> {
+    const accessToken = get(todoistAccessToken);
     const CONTENT_TYPE = "application/x-www-form-urlencoded";
-    const response = await fetch(`https://api.todoist.com/api/v1/${endpoint}`, {
-        method: "POST",
+    const stringParams = Object.fromEntries(
+        Object.entries(params).map(([key, value]) => [key, String(value)]),
+    );
+    const queryString = new URLSearchParams(stringParams).toString();
+    const url = `https://api.todoist.com/api/v1/${endpoint}${queryString ? `?${queryString}` : ""}`;
+
+    const response = await fetch(url, {
+        method: "GET",
         headers: {
             Authorization: `Bearer ${accessToken}`,
             "Content-Type": CONTENT_TYPE,
         },
-        body: new URLSearchParams(params),
     });
 
     return response.ok ? response.json() : Promise.resolve({ error: `Error: ${response.status}` });

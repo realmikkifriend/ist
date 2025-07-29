@@ -14,7 +14,7 @@ export interface TodoistData {
     tasks: Task[];
     contexts: Context[];
     dueTasks: Task[];
-    user?: User;
+    user: User;
     reverseTasks: {
         tomorrow: Task[];
         today: Task[];
@@ -74,13 +74,6 @@ export type Task = Omit<
     | "dayOrder"
     | "projectId"
 > & {
-    userId?: string;
-    checked?: boolean;
-    description?: string;
-    isDeleted?: boolean;
-    noteCount?: number;
-    isCollapsed?: boolean;
-    dayOrder?: number;
     projectId?: string;
 
     contextId?: string;
@@ -107,6 +100,7 @@ export interface User extends BaseUser {
     tz_info?: {
         timezone?: string;
     };
+    daily_goal: number;
 }
 
 export interface DueTasksGroupedByContext {
@@ -123,3 +117,15 @@ export interface DueTasksData {
 }
 
 export type TaskUpdates = Array<[string, Date | DateTime | string]>;
+
+export interface TaskActivity {
+    date: DateTime;
+    taskId: string;
+    contextId: string;
+}
+
+export interface TodoistActivity {
+    event_date: string;
+    object_id: string;
+    parent_project_id: string;
+}

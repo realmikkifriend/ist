@@ -1,8 +1,9 @@
 import { writable } from "svelte/store";
 import { persisted } from "svelte-persisted-store";
 import { toast } from "@zerodevx/svelte-toast";
+import { DateTime } from "luxon";
 import type { Writable } from "svelte/store";
-import type { TodoistData, Task } from "../../types/todoist";
+import type { TodoistData, Task, TaskActivity, User } from "../../types/todoist";
 import type { UserSettings } from "../../types/interface";
 
 /**
@@ -23,6 +24,7 @@ export const todoistData = persisted<TodoistData>("todoist_data", {
     contexts: [],
     dueTasks: [],
     reverseTasks: { tomorrow: [], today: [] },
+    user: {} as User,
 });
 
 /**
@@ -48,6 +50,28 @@ export const firstDueTask = persisted<Task | null>("firstDueTask", null);
 export const previousFirstDueTask: Writable<Task | null> = writable(null);
 
 /**
+ * Stores task activity.
+ */
+export const taskActivity = persisted<TaskActivity[]>("task_activity", [], {
+    serializer: {
+        stringify: (value) =>
+            JSON.stringify(
+                value.map((activity) => ({
+                    ...activity,
+                    date: activity.date.toISO(),
+                })),
+            ),
+        parse: (text) =>
+            (JSON.parse(text) as (Omit<TaskActivity, "date"> & { date: string })[]).map(
+                (activity) => ({
+                    ...activity,
+                    date: DateTime.fromISO(activity.date),
+                }),
+            ),
+    },
+});
+
+/**
  * Logs the user out by clearing all relevant stores and showing a toast.
  * @returns {void}
  */
@@ -59,9 +83,11 @@ export function handleLogout(): void {
         contexts: [],
         dueTasks: [],
         reverseTasks: { tomorrow: [], today: [] },
+        user: {} as User,
     });
     todoistError.set(null);
     firstDueTask.set(null);
     userSettings.set({ selectedContext: null });
     dynalistAccessToken.set("");
+    taskActivity.set([]);
 }
