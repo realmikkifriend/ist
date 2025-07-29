@@ -103,7 +103,7 @@ export interface User extends BaseUser {
     daily_goal: number;
 }
 
-export interface DueTasksGroupedByContext {
+export interface TasksGroupedByContext {
     [contextId: string]: {
         total: number;
         priorities: { [priority: number]: number };

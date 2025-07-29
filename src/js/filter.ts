@@ -1,6 +1,8 @@
+import { get } from "svelte/store";
 import { DateTime } from "luxon";
+import { todoistData } from "./stores";
 import { getTaskTime } from "./time";
-import type { Task, Context, DueTasksData } from "../../types/todoist";
+import type { Task, Context, DueTasksData, TasksGroupedByContext } from "../../types/todoist";
 
 /**
  * Returns the list of due tasks, filtered and sorted.
@@ -143,4 +145,19 @@ export function compareTasks(
     }
 
     return 0;
+}
+
+/**
+ * Groups tasks by their context and counts priorities.
+ * @returns {TasksGroupedByContext} An object mapping context IDs to task counts and priority breakdowns.
+ */
+export function getTasksGroupedByContext(): TasksGroupedByContext {
+    const $todoistData = get(todoistData);
+    return ($todoistData?.dueTasks ?? []).reduce((acc: TasksGroupedByContext, task: Task) => {
+        const context = acc[task.contextId as string] ?? { total: 0, priorities: {} };
+        context.total++;
+        context.priorities[task.priority] = (context.priorities[task.priority] ?? 0) + 1;
+        acc[task.contextId as string] = context;
+        return acc;
+    }, {} as TasksGroupedByContext);
 }

@@ -3,6 +3,10 @@
     import { Icon, XCircle, Calendar } from "svelte-hero-icons";
     import { todoistData, userSettings, previousFirstDueTask } from "../../js/stores";
     import { getPriorityClasses } from "../../js/classes";
+    import { openAgenda } from "../agenda/agenda";
+    import { getTasksGroupedByContext } from "../../js/filter";
+    import type { Readable } from "svelte/motion";
+    import type { TasksGroupedByContext, Priority } from "../../../types/todoist";
 
     /**
      * Returns the CSS class for a given priority string.
@@ -14,17 +18,13 @@
         // Priority is a number enum, so coerce to number and cast to Priority
         return getPriorityClasses(+priorityStr as Priority);
     }
-    import { openAgenda } from "../agenda/agenda";
-    import { getDueTasksGroupedByContext } from "./sidebar";
-    import type { Readable } from "svelte/motion";
-    import type { DueTasksGroupedByContext, Priority } from "../../../types/todoist";
 
     /**
      * A derived store grouping due tasks by context.
      */
-    const dueTasksByContext: Readable<DueTasksGroupedByContext> = derived(
+    const dueTasksByContext: Readable<TasksGroupedByContext> = derived(
         todoistData,
-        ($todoistData) => ($todoistData ? getDueTasksGroupedByContext() : {}),
+        ($todoistData) => ($todoistData ? getTasksGroupedByContext() : {}),
     );
 
     /**

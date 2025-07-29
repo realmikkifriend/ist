@@ -1,22 +1,7 @@
 import { get } from "svelte/store";
 import { updateFirstDueTask } from "../../js/first";
 import { todoistData, userSettings, firstDueTask, previousFirstDueTask } from "../../js/stores";
-import type { Task, DueTasksGroupedByContext } from "../../../types/todoist";
-
-/**
- * Groups due tasks by their context and counts priorities.
- * @returns {DueTasksGroupedByContext} An object mapping context IDs to task counts and priority breakdowns.
- */
-export function getDueTasksGroupedByContext(): DueTasksGroupedByContext {
-    const $todoistData = get(todoistData);
-    return ($todoistData?.dueTasks ?? []).reduce((acc: DueTasksGroupedByContext, task: Task) => {
-        const context = acc[task.contextId as string] ?? { total: 0, priorities: {} };
-        context.total++;
-        context.priorities[task.priority] = (context.priorities[task.priority] ?? 0) + 1;
-        acc[task.contextId as string] = context;
-        return acc;
-    }, {} as DueTasksGroupedByContext);
-}
+import type { Task } from "../../../types/todoist";
 
 /**
  * Gets the count of due tasks for a specific context.
