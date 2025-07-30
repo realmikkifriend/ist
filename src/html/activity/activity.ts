@@ -164,6 +164,7 @@ const processActivityData = (newActivityData: { results: TodoistActivity[] }): T
         date: DateTime.fromISO(item.event_date),
         taskId: item.object_id,
         contextId: item.parent_project_id,
+        title: item.extra_data.content,
     }));
 };
 

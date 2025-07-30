@@ -122,10 +122,14 @@ export interface TaskActivity {
     date: DateTime;
     taskId: string;
     contextId: string;
+    title: string;
 }
 
 export interface TodoistActivity {
     event_date: string;
     object_id: string;
     parent_project_id: string;
+    extra_data: {
+        content: string;
+    };
 }

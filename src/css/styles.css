@@ -2,6 +2,30 @@
 @tailwind components;
 @tailwind utilities;
 
+@plugin "daisyui" {
+    themes:
+        dark --default,
+        dark --prefersDark,
+        light --prefersLight;
+    root: ":root";
+    include:;
+    exclude:;
+    prefix:;
+    logs: false;
+}
+
+@plugin "daisyui/theme" {
+    name: "dark";
+    default: true;
+
+    --color-primary: "#C23F31";
+    --color-secondary: "#737373";
+    --color-neutral: "#2D2D2D";
+    --color-accent: "#242424";
+    --color-base-100: "#1C1C1C";
+    --color-primary-content: "#e8e8e8";
+}
+
 body {
     font-family: "Clear Sans", sans-serif;
 }

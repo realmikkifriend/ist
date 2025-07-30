@@ -43,11 +43,28 @@
     }
 </script>
 
-<div class="relative w-fit">
+<div class="tooltip min-w-32">
+    <div class="tooltip-content ml-14 w-60 text-left">
+        {#if $result && $result.length > 0}
+            Tasks completed today...
+            <ul class="my-2 ml-5 list-disc">
+                {#each $result as r (r.date)}
+                    <li>{r.title}</li>
+                {/each}
+            </ul>
+        {:else}
+            <p>No tasks completed so far today...</p>
+        {/if}
+        <p>... out of your goal of {$todoistData.user.daily_goal}</p>
+        {#if $isLoading}
+            <hr class="my-1" />
+            <p class="text-xs">Checking for more...</p>
+        {/if}
+    </div>
     <div
-        class="badge badge-outline grid h-4 w-24 {getGridColsClass(
+        class="badge badge-outline grid h-4 w-32 {getGridColsClass(
             $todoistData.user.daily_goal,
-        )} items-start gap-0 overflow-hidden whitespace-nowrap p-0 outline-2"
+        )} items-start gap-0 overflow-hidden p-0 whitespace-nowrap outline-1"
     >
         {#if $result.length > 0 && $todoistData?.contexts}
             {#each getContextColors($result, $todoistData.contexts) as color, i (i)}
@@ -56,9 +73,9 @@
         {/if}
     </div>
 </div>
-<div class="flex w-fit flex-row text-nowrap px-1 pb-0.5 text-xs">
+<div class="flex w-fit flex-row px-1 pb-0.5 text-xs text-nowrap">
     {#if $isLoading}
-        <Icon src={ArrowPath} class="mr-0.5 mt-0.5 h-3.5 w-3.5 animate-spin" />
+        <Icon src={ArrowPath} class="mt-0.5 mr-0.5 h-3.5 w-3.5 animate-spin" />
     {/if}
     {$result.length}
     / {$todoistData.user.daily_goal}
