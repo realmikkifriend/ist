@@ -21,11 +21,11 @@
         const endOfToday = DateTime.now().endOf("day");
 
         const activity = getActivity([startOfToday, endOfToday]);
-        result.set(activity.data);
+        result.set(activity.data.sort((a, b) => a.contextId.localeCompare(b.contextId)));
 
         if (activity.promise) {
             const promisedActivity = await activity.promise;
-            result.set(promisedActivity);
+            result.set(promisedActivity.sort((a, b) => a.contextId.localeCompare(b.contextId)));
         }
 
         isLoading.set(false);
