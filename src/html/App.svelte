@@ -10,7 +10,6 @@
     import { handleTaskDone, handleTaskDefer } from "../js/taskHandlers";
     import Sidebar from "./sidebar/Sidebar.svelte";
     import ContextBadge from "./sidebar/ContextBadge.svelte";
-    import DailyGoal from "./activity/dailyGoal.svelte";
     import NoTasks from "./NoTasks.svelte";
     import TaskDisplay from "./task/TaskDisplay.svelte";
     import Agenda from "./agenda/Agenda.svelte";
@@ -135,10 +134,6 @@
         {showError($todoistError)}
     {/if}
 {/if}
-
-<div class="fixed bottom-2 left-2 z-10 flex w-32 flex-row items-center">
-    <DailyGoal />
-</div>
 
 <div class="fixed right-2 bottom-2 z-10">
     <button class="bg-base-100 rounded-md p-1" on:click={handleRefresh}>

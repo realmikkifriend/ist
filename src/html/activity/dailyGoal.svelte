@@ -70,9 +70,9 @@
     <div class="tooltip-content ml-24 w-80 text-left">
         {#if $sortedLists.byTime && $sortedLists.byTime.length > 0}
             {$sortedLists.byTime.length} tasks completed today...
-            <ul class="my-2 ml-20 space-y-1 -indent-20">
+            <div class="my-2 space-y-1">
                 {#each $sortedLists.byTime as r (r.date.startOf("day").toMillis() + r.taskId)}
-                    <li>
+                    <div class="ml-20 -indent-20">
                         <span class="font-mono tracking-tighter opacity-50"
                             >[{r.date.toFormat("hh:mm a")}]</span
                         >
@@ -80,9 +80,9 @@
                         {#if r.temporary}
                             <Icon src={ArrowPath} class="inline-block h-3 w-3 opacity-50" />
                         {/if}
-                    </li>
+                    </div>
                 {/each}
-            </ul>
+            </div>
         {:else}
             <p>No tasks completed so far today...</p>
         {/if}
@@ -93,7 +93,7 @@
         {/if}
     </div>
     <div
-        class="badge badge-outline grid h-4 w-32 {getGridColsClass(
+        class="badge badge-outline grid h-3 w-36 {getGridColsClass(
             $todoistData.user.daily_goal,
         )} items-start gap-0 overflow-hidden p-0 whitespace-nowrap outline-1"
     >
@@ -104,10 +104,10 @@
         {/if}
     </div>
 </div>
-<div class="flex w-fit flex-row px-1 pb-0.5 text-xs text-nowrap">
+<div class="ml-2 flex w-fit flex-row pb-0.5 text-xs text-nowrap">
     {#if $isLoading}
         <Icon src={ArrowPath} class="mt-0.5 mr-0.5 h-3.5 w-3.5 animate-spin" />
     {/if}
     {$sortedLists.byContext.length}
-    / {$todoistData.user.daily_goal}
+    / {$todoistData.user.daily_goal} tasks done
 </div>

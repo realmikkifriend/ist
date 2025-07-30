@@ -1,6 +1,7 @@
 <script lang="ts">
     import { Icon, Bars3, ArrowLeftOnRectangle } from "svelte-hero-icons";
     import Contexts from "./Contexts.svelte";
+    import DailyGoal from "../activity/dailyGoal.svelte";
     import Footer from "../Footer.svelte";
     import { todoistData, handleLogout } from "../../js/stores";
 
@@ -27,6 +28,9 @@
             {/if}
 
             <div class="mt-auto">
+                <div class="bg-neutral mb-4 flex w-full flex-row items-center rounded-sm p-2">
+                    <DailyGoal />
+                </div>
                 <Footer />
                 <button class="btn btn-secondary w-full" on:click={handleLogout}
                     ><Icon src={ArrowLeftOnRectangle} class="h-6 w-6" />Log Out</button
