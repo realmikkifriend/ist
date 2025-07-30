@@ -83,7 +83,7 @@
         <button
             class:opacity-25={$userSettings.selectedContext &&
                 $userSettings.selectedContext.id !== context.id}
-            class="mb-2 rounded-lg bg-secondary text-base-100"
+            class="bg-secondary text-base-100 mb-2 rounded-lg"
             on:click={() => handleContextClick(context.id)}
         >
             <div class="card-body gap-0 px-2 py-1">
@@ -93,7 +93,7 @@
                         <div class="flex flex-row items-start space-x-1 py-1">
                             {#each Array.from( { length: $dueTasksByContext[context.id].priorities[+priorityStr] }, ) as _, badgeIndex (badgeIndex)}
                                 <div
-                                    class="badge badge-xs h-1 w-2 border-none p-1 {getPriorityBadgeClass(
+                                    class="h-1 w-0.5 max-w-0.5 rounded-sm border-none p-1 {getPriorityBadgeClass(
                                         priorityStr,
                                     )}"
                                 ></div>

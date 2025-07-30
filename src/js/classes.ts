@@ -56,10 +56,10 @@ export const getGridColsClass = (num: number): string => {
  */
 export const getPriorityBorder = (priority: Priority): string =>
     ({
-        1: "border-b-priority-1",
-        2: "border-b-priority-2",
-        3: "border-b-priority-3",
-        4: "border-b-priority-4",
+        1: "border-b-priority-1/75",
+        2: "border-b-priority-2/75",
+        3: "border-b-priority-3/75",
+        4: "border-b-priority-4/75",
     })[priority] || "";
 
 export const colorClasses: Record<ColorName, string> = {
@@ -83,6 +83,29 @@ export const colorClasses: Record<ColorName, string> = {
     charcoal: "bg-gray-600",
     grey: "bg-gray-400",
     taupe: "bg-red-100",
+};
+
+export const colorClassesFaded: Record<ColorName, string> = {
+    berry_red: "bg-pink-600/50",
+    red: "bg-red-500/50",
+    orange: "bg-orange-500/50",
+    yellow: "bg-yellow-500/50",
+    olive_green: "bg-lime-700/50",
+    lime_green: "bg-lime-500/50",
+    green: "bg-green-600/50",
+    mint_green: "bg-emerald-400/50",
+    teal: "bg-teal-600/50",
+    sky_blue: "bg-sky-400/50",
+    light_blue: "bg-blue-300/50",
+    blue: "bg-blue-500/50",
+    grape: "bg-violet-500/50",
+    violet: "bg-fuchsia-600/50",
+    lavender: "bg-pink-300/50",
+    magenta: "bg-pink-500/50",
+    salmon: "bg-rose-400/50",
+    charcoal: "bg-gray-600/50",
+    grey: "bg-gray-400/50",
+    taupe: "bg-red-100/50",
 };
 
 export const borderClasses: Record<ColorName, string> = {
@@ -128,11 +151,11 @@ export const getQuarterHourPosition = (position: QuarterHourPosition): string =>
  */
 export function getGradientColor(totalTasks: number, hash: string): string | null {
     const gradients: Record<GradientType, string> = {
-        blue: "bg-gradient-to-r from-blue-900 to-blue-700",
-        green: "bg-gradient-to-r from-green-900 to-green-700",
-        darkGreen: "bg-gradient-to-r from-emerald-900 to-emerald-700",
-        orange: "bg-gradient-to-r from-orange-800 to-orange-600",
-        red: "bg-gradient-to-r from-red-900 to-red-700",
+        blue: "bg-linear-to-r from-blue-900 to-blue-700",
+        green: "bg-linear-to-r from-green-900 to-green-700",
+        darkGreen: "bg-linear-to-r from-emerald-900 to-emerald-700",
+        orange: "bg-linear-to-r from-orange-800 to-orange-600",
+        red: "bg-linear-to-r from-red-900 to-red-700",
     };
 
     if (hash === "#tomorrow") {

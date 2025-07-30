@@ -40,24 +40,24 @@
     }
 </script>
 
-<div class="dropdown dropdown-left absolute -right-7 -top-3">
+<div class="dropdown dropdown-left absolute -top-3 -right-7">
     <div
         tabindex="0"
         role="button"
-        class="btn m-0 h-2 min-h-8 gap-0 border-transparent bg-accent p-1 pb-3 pt-0 shadow-none hover:bg-primary"
+        class="btn bg-accent hover:bg-primary m-0 h-2 min-h-8 gap-0 border-transparent p-1 pt-0 pb-3 shadow-none"
     >
         <Logo type="dynalist" size={6} />
         <Icon src={ChevronDown} class="h-3 w-3" />
     </div>
-    <ul tabindex="-1" class="menu dropdown-content z-20 mr-[-4rem] w-fit rounded-lg bg-neutral p-1">
+    <ul tabindex="-1" class="menu dropdown-content bg-neutral z-20 -mr-16 w-fit rounded-lg p-1">
         {#each iconPairs as { icon, label, type }, index (index)}
             {#if index === 0}
-                <span class="cursor-default text-nowrap text-center text-xs"
+                <span class="cursor-default text-center text-xs text-nowrap"
                     >&mdash;read <a target="_blank" href={url}>original document</a>&mdash;</span
                 >
             {/if}
             {#if index === 3}
-                <span class="cursor-default text-nowrap text-center text-xs text-primary"
+                <span class="text-primary cursor-default text-center text-xs text-nowrap"
                     >&mdash;modify <a class="text-primary" target="_blank" href={url}
                         >original document</a
                     >&mdash;</span
@@ -65,10 +65,10 @@
             {/if}
             <button
                 on:click={() => handleSelectType(type)}
-                class="m-0 flex w-full flex-row items-center gap-1 rounded p-1 font-bold {selectedType ===
+                class="m-0 flex w-full flex-row items-center gap-1 rounded-sm p-1 font-bold {selectedType ===
                 type
-                    ? 'cursor-auto text-base-100'
-                    : 'cursor-pointer hover:bg-accent'}"
+                    ? 'text-base-100 cursor-auto'
+                    : 'hover:bg-accent cursor-pointer'}"
                 disabled={selectedType === type}
             >
                 <Icon src={icon} class="mr-1 h-6 w-6" />

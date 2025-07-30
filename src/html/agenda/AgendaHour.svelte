@@ -57,10 +57,10 @@
 
     <div
         class={`hour-container relative ${
-            tasks.length >= 4 ? "bg-gradient-to-b from-transparent via-red-950" : ""
+            tasks.length >= 4 ? "bg-linear-to-b from-transparent via-red-950" : ""
         } ${
             currentHour ? "z-20" : "z-10"
-        } h-24 w-[70%] flex-grow border-2 border-t-0 border-gray-700 group-first:border-t-2`}
+        } h-24 w-[70%] grow border-2 border-t-0 border-gray-700 group-first:border-t-2`}
     >
         {#each quarterHourPositions as position, index (index)}
             <div
@@ -69,12 +69,12 @@
         {/each}
         {#if currentHour}
             <div
-                class="absolute left-0 z-40 h-0.5 w-full rounded-badge bg-red-600"
+                class="rounded-badge absolute left-0 z-40 h-0.5 w-full bg-red-600"
                 style="top: {(now.minute / 60) * 100}%;"
                 id="today-marker"
             >
                 <div
-                    class="absolute -right-[0.3rem] -top-[0.2rem] h-2 w-2 rounded-full bg-red-600"
+                    class="absolute -top-[0.2rem] -right-[0.3rem] h-2 w-2 rounded-full bg-red-600"
                 ></div>
             </div>
         {/if}

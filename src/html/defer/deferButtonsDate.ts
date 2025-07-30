@@ -71,8 +71,7 @@ export function shouldHighlightTomorrow(
  */
 export function createTaskDots(tasks: Task[]): HTMLDivElement {
     const dotContainer = document.createElement("div");
-    dotContainer.className =
-        "dot-container flex space-x-0.5 justify-center items-center h-1 mt-[-0.5rem]";
+    dotContainer.className = "dot-container flex space-x-0.5 justify-center items-center h-1 -mt-2";
 
     const visibleTasks = tasks.slice(0, 3);
     const elements = visibleTasks.map((task) => {

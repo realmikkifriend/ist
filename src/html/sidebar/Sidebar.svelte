@@ -10,7 +10,10 @@
 <div class="drawer">
     <input id="my-drawer" type="checkbox" class="drawer-toggle" />
     <div class="drawer-content flex flex-row items-center">
-        <label for="my-drawer" class="btn drawer-button mt-0 bg-transparent hover:bg-primary">
+        <label
+            for="my-drawer"
+            class="btn drawer-button hover:bg-primary mt-0 bg-transparent shadow-none"
+        >
             {#if hash !== "#today" && hash !== "#tomorrow"}
                 <Icon src={Bars3} class="h-8 w-8" />
             {/if}
@@ -18,7 +21,7 @@
     </div>
     <div class="drawer-side z-30">
         <label for="my-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
-        <ul class="menu min-h-full w-80 bg-base-100 px-4 py-2 text-base-content">
+        <ul class="menu bg-base-100 text-base-content min-h-full w-80 px-4 py-2">
             {#if $todoistData.contexts}
                 <Contexts />
             {/if}

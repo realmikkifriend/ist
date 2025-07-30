@@ -1,7 +1,12 @@
 <script lang="ts">
     import { DateTime } from "luxon";
     import { Icon, InboxArrowDown, Inbox } from "svelte-hero-icons";
-    import { getPriorityClasses, colorClasses, borderClasses } from "../../js/classes";
+    import {
+        getPriorityClasses,
+        colorClasses,
+        colorClassesFaded,
+        borderClasses,
+    } from "../../js/classes";
     import { summonTask } from "./agenda";
     import type { Task, ColorName, Priority } from "../../../types/todoist";
 
@@ -14,17 +19,17 @@
 
 <div
     class={[
-        "agenda-task mx-1 flex w-full flex-row items-center overflow-hidden whitespace-nowrap rounded-md px-1 text-xs brightness-90",
-        colorClasses[color] || "bg-gray-600",
+        "agenda-task mx-1 flex  w-full flex-row items-center overflow-hidden rounded-md px-1 text-xs whitespace-nowrap brightness-90",
         task.priority < 3
-            ? `border bg-opacity-50 ${borderClasses[color] || "border-gray-600"}`
-            : "",
+            ? colorClassesFaded[color] || "bg-gray-600"
+            : colorClasses[color] || "bg-gray-600",
+        task.priority < 3 ? `border  ${borderClasses[color] || "border-gray-600"}` : "",
         task.firstDue ? firstDueClasses : "",
     ].join(" ")}
 >
     <button
         on:click={() => summonTask(task)}
-        class={`priority-element relative -left-1.5 mt-0 flex h-fit min-h-2.5 min-w-10 flex-shrink-0 flex-row items-center justify-center rounded-md pl-2 pr-1 text-xs font-bold ${getPriorityClasses(taskPriority)}`}
+        class={`priority-element relative -left-1.5 mt-0 flex h-fit min-h-2.5 min-w-10 shrink-0 flex-row items-center justify-center rounded-md pr-1 pl-2 text-xs font-bold ${getPriorityClasses(taskPriority)}`}
     >
         {#if task.due && task.due.date && task.due.date.includes("T")}
             {DateTime.fromISO(task.due.date).toFormat("h:mm")}

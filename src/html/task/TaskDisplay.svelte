@@ -53,16 +53,16 @@
 
 <div class="mx-auto mt-4 max-w-72 sm:mt-2 sm:max-w-sm">
     <div
-        class={`card mt-0 rounded-xl border-b-[0.75rem] border-opacity-50 bg-neutral text-primary-content ${priorityBorderClass}`}
+        class={`card bg-neutral text-primary-content mt-0 rounded-xl border-b-[0.75rem] ${priorityBorderClass}`}
     >
         <div class="card-body pb-7">
             {#if task.skip}
                 <button
-                    class="text-md btn btn-ghost btn-sm absolute right-0 top-0 h-8 min-h-8 content-center p-4"
+                    class="text-md btn btn-ghost btn-sm absolute top-0 right-0 h-8 min-h-8 content-center p-4"
                     title="skip task"
                     on:click={handleSkip}
                 >
-                    <Icon src={Forward} class="h-5 w-5 stroke-yellow-500 [&>path]:stroke-[3]" />
+                    <Icon src={Forward} class="h-5 w-5 stroke-yellow-500 [&>path]:stroke-3" />
                 </button>
             {/if}
             <h2 class="card-title text-center text-3xl">{task.content}</h2>
@@ -72,16 +72,16 @@
                     title={task.due?.string ? `repeats ${task.due.string}` : "one-time task"}
                     on:click={handleDone}
                 >
-                    <Icon src={Check} class="h-5 w-5 [&>path]:stroke-[3]" />
+                    <Icon src={Check} class="h-5 w-5 [&>path]:stroke-3" />
                 </button>
                 <button
                     class="text-md btn btn-secondary h-8 min-h-8 content-center p-4"
                     on:click={openModal}
                 >
                     {#if task.due?.allDay === 1}
-                        <Icon src={Calendar} class="h-5 w-5 [&>path]:stroke-[3]" />
+                        <Icon src={Calendar} class="h-5 w-5 [&>path]:stroke-3" />
                     {:else}
-                        <Icon src={Clock} class="h-5 w-5 [&>path]:stroke-[3]" />
+                        <Icon src={Clock} class="h-5 w-5 [&>path]:stroke-3" />
                     {/if}
                 </button>
             </div>

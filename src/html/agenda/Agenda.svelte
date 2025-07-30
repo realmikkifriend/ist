@@ -149,7 +149,7 @@
 </script>
 
 {#key $agendaStore.tasks}
-    <div class="mr-4 mt-[-2rem] max-w-lg sm:mx-auto sm:max-w-96" id="agenda">
+    <div class="-mt-8 mr-4 max-w-lg sm:mx-auto sm:max-w-96" id="agenda">
         <AgendaHeader
             agendaData={$agendaStore}
             displayData={{
@@ -159,7 +159,7 @@
         />
 
         {#if $agendaStore.tasksWithNoTime.length > 0}
-            <div class="mb-4 flex w-full flex-col items-center pl-[4.5rem] pr-2">
+            <div class="mb-4 flex w-full flex-col items-center pr-2 pl-18">
                 {#each $agendaStore.tasksWithNoTime as task (task.id)}
                     <AgendaTask {task} color={getTaskColor(task.contextId) ?? "berry_red"} />
                 {/each}

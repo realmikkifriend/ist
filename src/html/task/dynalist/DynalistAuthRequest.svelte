@@ -61,16 +61,11 @@
         </div>
     </div>
     <form class="flex gap-2" on:submit={handleToken}>
-        <input
-            type="text"
-            name="token"
-            placeholder="Enter your token"
-            class="input min-w-4 flex-grow"
-        />
+        <input type="text" name="token" placeholder="Enter your token" class="input min-w-4 grow" />
         <span class="submit-content" style="display:flex;">
             <button
                 type="submit"
-                class="btn flex-grow-0 bg-primary text-white hover:bg-primary hover:opacity-75"
+                class="btn bg-primary hover:bg-primary grow-0 text-white hover:opacity-75"
                 ><Icon src={Key} class="h-5 w-5" /></button
             >
         </span>

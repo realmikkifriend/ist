@@ -1,6 +1,4 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 @plugin "daisyui" {
     themes:
@@ -14,6 +12,14 @@
     logs: false;
 }
 
+@theme {
+    --color-primary-content: "#e8e8e8";
+    --color-priority-1: oklch(0.6368 0 0); /* grey */
+    --color-priority-2: oklch(0.681 0.1692 258.47); /* blue */
+    --color-priority-3: oklch(0.774 0.171 64.17); /* tangerine */
+    --color-priority-4: oklch(0.7172 0.1765 26.45); /* red */
+}
+
 @plugin "daisyui/theme" {
     name: "dark";
     default: true;
@@ -23,7 +29,6 @@
     --color-neutral: "#2D2D2D";
     --color-accent: "#242424";
     --color-base-100: "#1C1C1C";
-    --color-primary-content: "#e8e8e8";
 }
 
 body {
@@ -38,40 +43,42 @@ body {
 }
 
 ._toastContainer {
-    @apply relative right-2;
+    position: relative;
+    right: 0.5rem;
     top: unset !important;
 }
 
 /* DATE PICKER */
 
 :root {
-    --sdt-bg-main: theme("colors.base-100");
+    --sdt-bg-main: var(--color-base-100);
     --sdt-shadow-color: transparent;
-    --sdt-color: theme("colors.primary-content");
-    --sdt-header-color: theme("colors.primary-content");
-    --sdt-header-btn-bg-hover: theme("colors.neutral");
-    --sdt-table-disabled-date: theme("colors.neutral");
-    --sdt-table-data-bg-hover: theme("colors.neutral");
+    --sdt-color: var(--color-primary-content);
+    --sdt-header-color: var(--color-primary-content);
+    --sdt-header-btn-bg-hover: var(--color-neutral);
+    --sdt-table-disabled-date: var(--color-neutral);
+    --sdt-table-data-bg-hover: var(--color-neutral);
 }
 
 .std-calendar-wrap {
-    @apply min-w-72;
+    min-width: 18rem;
 }
 
 .sdt-cal-td > button {
-    @apply pb-1 pt-0;
+    padding-top: 0;
+    padding-bottom: 0.25rem;
 }
 
 .sdt-cal-td > button:disabled {
-    @apply pointer-events-none;
+    pointer-events: none;
 }
 
 .sdt-cal-td {
-    @apply cursor-not-allowed;
+    cursor: not-allowed;
 }
 
 .sdt-tomorrow {
-    @apply pt-[0.1rem];
+    padding-top: 0.1rem;
 }
 
 .sdt-tomorrow > button {
@@ -81,7 +88,7 @@ body {
 
 .sdt-today::before,
 .modal-box * .btn:empty {
-    @apply hidden;
+    display: none;
 }
 
 /* GENERATED ELEMENTS */
@@ -89,18 +96,28 @@ body {
 .prose ul,
 .prose li,
 .prose p {
-    @apply mb-0 mt-0;
+    margin-top: 0;
+    margin-bottom: 0;
 }
 
 /* AGENDA */
 
 #agenda h1,
 #agenda h2 {
-    @apply text-center font-bold;
+    text-align: center;
+    font-weight: 700;
 }
 #agenda h1 {
-    @apply text-2xl;
+    font-size: 1.5rem;
+    line-height: 2rem;
 }
 #agenda h2 {
-    @apply mb-1 text-base leading-none;
+    margin-bottom: 0.25rem;
+    font-size: 1rem;
+    line-height: 1;
+}
+
+/* BUTTONS */
+.btn {
+    box-shadow: none;
 }

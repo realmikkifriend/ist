@@ -75,12 +75,12 @@
 
 {#if checklistItems.length > 0}
     <div class="mt-2">
-        <em class="absolute -top-3.5 left-0 text-nowrap text-xs opacity-25">
+        <em class="absolute -top-3.5 left-0 text-xs text-nowrap opacity-25">
             <span>{checklistItems.length} remaining</span>
         </em>
         <button
             use:buttonAction
-            class="float-left mr-2 mt-0.5 inline-block h-5 w-5 cursor-pointer rounded bg-primary p-1 pb-5 pr-5"
+            class="bg-primary float-left mt-0.5 mr-2 inline-block h-5 w-5 cursor-pointer rounded-sm p-1 pr-5 pb-5"
             ><Icon src={Backspace} class="h-4 w-4" /></button
         >
         {#key checklistItems}

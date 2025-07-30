@@ -114,7 +114,7 @@
 {#if hasItems}
     <div class="mt-2">
         <button
-            class="float-left mr-2 mt-0.5 inline-block h-5 w-5 cursor-pointer rounded bg-primary p-1 pb-5 pr-5 {$isLoading
+            class="bg-primary float-left mt-0.5 mr-2 inline-block h-5 w-5 cursor-pointer rounded-sm p-1 pr-5 pb-5 {$isLoading
                 ? 'animate-ping'
                 : ''}"
             on:click={showNextItem}
@@ -124,7 +124,7 @@
         </button>
 
         {#key $rotationIndex}
-            <em class="absolute -top-3.5 left-0 text-nowrap text-xs opacity-25">
+            <em class="absolute -top-3.5 left-0 text-xs text-nowrap opacity-25">
                 <span class="mr-0.5 inline-block w-7">&infin;{checklistItems.length}</span>
                 {#if currentItem?.note && isMonthYearFormat(currentItem.note)}
                     <span>last completed {currentItem.note}</span>

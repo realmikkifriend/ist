@@ -80,7 +80,7 @@
 <div class="modal-box flex min-h-[65%] w-fit flex-col justify-center">
     {#key task}
         <div class="flex justify-center">
-            <div role="tablist" class="tabs-boxed tabs w-2/3 bg-neutral">
+            <div role="tablist" class="tabs-boxed tabs bg-neutral w-2/3">
                 {#each ["time", "calendar"] as tab (tab)}
                     <button
                         role="tab"
@@ -92,7 +92,7 @@
                     >
                         <Icon
                             src={tab === "time" ? Clock : Calendar}
-                            class="h-5 w-5 [&>path]:stroke-[3]"
+                            class="h-5 w-5 [&>path]:stroke-3"
                         />
                     </button>
                 {/each}
