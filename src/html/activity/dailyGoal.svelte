@@ -7,7 +7,10 @@
     import { getContextColors, getGridColsClass } from "../../js/classes";
     import type { TaskActivity } from "../../../types/todoist";
 
-    const result = writable<TaskActivity[]>([]);
+    const sortedLists = writable<{ byContext: TaskActivity[]; byTime: TaskActivity[] }>({
+        byContext: [],
+        byTime: [],
+    });
     const isLoading = writable<boolean>(true);
 
     const debounceState: { timeoutId: ReturnType<typeof setTimeout> | null } = { timeoutId: null };
@@ -21,11 +24,21 @@
         const endOfToday = DateTime.now().endOf("day");
 
         const activity = getActivity([startOfToday, endOfToday]);
-        result.set(activity.data.sort((a, b) => a.contextId.localeCompare(b.contextId)));
+
+        const byContext = [...activity.data].sort((a, b) => a.contextId.localeCompare(b.contextId));
+        const byTime = [...activity.data].sort((a, b) => a.date.toMillis() - b.date.toMillis());
+
+        sortedLists.set({ byContext, byTime });
 
         if (activity.promise) {
             const promisedActivity = await activity.promise;
-            result.set(promisedActivity.sort((a, b) => a.contextId.localeCompare(b.contextId)));
+            const promisedByContext = [...promisedActivity].sort((a, b) =>
+                a.contextId.localeCompare(b.contextId),
+            );
+            const promisedByTime = [...promisedActivity].sort(
+                (a, b) => a.date.toMillis() - b.date.toMillis(),
+            );
+            sortedLists.set({ byContext: promisedByContext, byTime: promisedByTime });
         }
 
         isLoading.set(false);
@@ -44,12 +57,17 @@
 </script>
 
 <div class="tooltip min-w-32">
-    <div class="tooltip-content ml-14 w-60 text-left">
-        {#if $result && $result.length > 0}
-            Tasks completed today...
-            <ul class="my-2 ml-5 list-disc">
-                {#each $result as r (r.date)}
-                    <li>{r.title}</li>
+    <div class="tooltip-content ml-24 w-80 text-left">
+        {#if $sortedLists.byTime && $sortedLists.byTime.length > 0}
+            {$sortedLists.byTime.length} tasks completed today...
+            <ul class="my-2 ml-20 space-y-1 -indent-20">
+                {#each $sortedLists.byTime as r (r.date)}
+                    <li>
+                        <span class="font-mono tracking-tighter opacity-50"
+                            >[{r.date.toFormat("hh:mm a")}]</span
+                        >
+                        {r.title}
+                    </li>
                 {/each}
             </ul>
         {:else}
@@ -66,8 +84,8 @@
             $todoistData.user.daily_goal,
         )} items-start gap-0 overflow-hidden p-0 whitespace-nowrap outline-1"
     >
-        {#if $result.length > 0 && $todoistData?.contexts}
-            {#each getContextColors($result, $todoistData.contexts) as color, i (i)}
+        {#if $sortedLists.byContext.length > 0 && $todoistData?.contexts}
+            {#each getContextColors($sortedLists.byContext, $todoistData.contexts) as color, i (i)}
                 <div class="{color} h-full"></div>
             {/each}
         {/if}
@@ -77,6 +95,6 @@
     {#if $isLoading}
         <Icon src={ArrowPath} class="mt-0.5 mr-0.5 h-3.5 w-3.5 animate-spin" />
     {/if}
-    {$result.length}
+    {$sortedLists.byContext.length}
     / {$todoistData.user.daily_goal}
 </div>
