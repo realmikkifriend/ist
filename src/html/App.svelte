@@ -142,6 +142,6 @@
 
 <div class="fixed right-2 bottom-2 z-10">
     <button class="bg-base-100 rounded-md p-1" on:click={handleRefresh}>
-        <Icon src={ArrowPath} class="h-6 w-6 {$isSpinning ? 'animate-spin' : ''}" />
+        <Icon src={ArrowPath} class="h-6 w-6 {$isSpinning ? 'animate-spin cursor-wait' : ''}" />
     </button>
 </div>

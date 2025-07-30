@@ -55,7 +55,7 @@
     >
         <Icon src={BarsArrowUp} class="h-5 w-6" />
     </button>
-    <div class="flex grow flex-col items-center">
+    <div class="mr-6 flex grow cursor-default flex-col items-center">
         <h1 class="flex-1 text-center">{title}</h1>
         <h2 class="rounded-lg px-3 py-0.5 text-center {headerGradientColor}">
             {#if todayTasks.length > 0 && window.location.hash === "#tomorrow"}

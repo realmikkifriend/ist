@@ -118,6 +118,8 @@ body {
 }
 
 /* BUTTONS */
+button,
 .btn {
     box-shadow: none;
+    cursor: pointer;
 }

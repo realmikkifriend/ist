@@ -66,7 +66,7 @@
     }
 </script>
 
-<div class="tooltip min-w-32">
+<div class="tooltip min-w-32" class:cursor-progress={$isLoading}>
     <div class="tooltip-content ml-24 w-80 text-left">
         {#if $sortedLists.byTime && $sortedLists.byTime.length > 0}
             {$sortedLists.byTime.length} tasks completed today...
