@@ -123,6 +123,7 @@ export interface TaskActivity {
     taskId: string;
     contextId: string;
     title: string;
+    temporary: boolean | null;
 }
 
 export interface TodoistActivity {

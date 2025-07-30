@@ -165,6 +165,7 @@ const processActivityData = (newActivityData: { results: TodoistActivity[] }): T
         taskId: item.object_id,
         contextId: item.parent_project_id,
         title: item.extra_data.content,
+        temporary: null,
     }));
 };
 
@@ -172,10 +173,34 @@ const mergeActivity = (
     baseActivity: TaskActivity[],
     newActivityData: TaskActivity[],
 ): TaskActivity[] => {
-    const existingTimestamps = new Set(baseActivity.map((activity) => activity.date.valueOf()));
-    const filteredNewActivityData = newActivityData.filter(
-        (activity) => !existingTimestamps.has(activity.date.valueOf()),
-    );
+    const merged = [...baseActivity];
 
-    return [...baseActivity, ...filteredNewActivityData];
+    newActivityData.forEach((newActivity) => {
+        const existingIndex = merged.findIndex(
+            (activity) =>
+                activity.taskId === newActivity.taskId &&
+                activity.date.hasSame(newActivity.date, "day"),
+        );
+
+        if (existingIndex !== -1) {
+            if (!newActivity.temporary && merged[existingIndex].temporary === true) {
+                merged[existingIndex] = newActivity;
+            } else if (!merged[existingIndex].temporary) {
+                if (
+                    newActivity.temporary === false &&
+                    !merged.some(
+                        (activity) =>
+                            activity.taskId === newActivity.taskId &&
+                            activity.date.valueOf() === newActivity.date.valueOf(),
+                    )
+                ) {
+                    merged.push(newActivity);
+                }
+            }
+        } else {
+            merged.push(newActivity);
+        }
+    });
+
+    return merged;
 };

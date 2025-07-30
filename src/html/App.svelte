@@ -58,13 +58,10 @@
      * @param event - Event containing the task id in detail.
      * @param event.detail - Contains the event information.
      * @param event.detail.task - The task being affected.
-     * @param event.detail.task.id - The ID of the task being marked done.
      */
-    const handleDone = (event: { detail: { task: { id: string } } }): void => {
-        const {
-            task: { id: taskID },
-        } = event.detail;
-        void handleTaskDone(taskID);
+    const handleDone = (event: { detail: { task: Task } }): void => {
+        const { task } = event.detail;
+        void handleTaskDone(task);
     };
 
     /**
@@ -143,8 +140,8 @@
     <DailyGoal />
 </div>
 
-<div class="fixed bottom-2 right-2 z-10">
-    <button class="rounded-md bg-base-100 p-1" on:click={handleRefresh}>
+<div class="fixed right-2 bottom-2 z-10">
+    <button class="bg-base-100 rounded-md p-1" on:click={handleRefresh}>
         <Icon src={ArrowPath} class="h-6 w-6 {$isSpinning ? 'animate-spin' : ''}" />
     </button>
 </div>

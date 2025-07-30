@@ -32,10 +32,20 @@
 
         if (activity.promise) {
             const promisedActivity = await activity.promise;
-            const promisedByContext = [...promisedActivity].sort((a, b) =>
+            const combinedActivity = [...activity.data, ...promisedActivity];
+            const uniqueActivity = Array.from(
+                new Map(
+                    combinedActivity.map((item) => [
+                        item.date.startOf("day").toMillis() + item.taskId,
+                        item,
+                    ]),
+                ).values(),
+            );
+
+            const promisedByContext = [...uniqueActivity].sort((a, b) =>
                 a.contextId.localeCompare(b.contextId),
             );
-            const promisedByTime = [...promisedActivity].sort(
+            const promisedByTime = [...uniqueActivity].sort(
                 (a, b) => a.date.toMillis() - b.date.toMillis(),
             );
             sortedLists.set({ byContext: promisedByContext, byTime: promisedByTime });
@@ -61,12 +71,15 @@
         {#if $sortedLists.byTime && $sortedLists.byTime.length > 0}
             {$sortedLists.byTime.length} tasks completed today...
             <ul class="my-2 ml-20 space-y-1 -indent-20">
-                {#each $sortedLists.byTime as r (r.date)}
+                {#each $sortedLists.byTime as r (r.date.startOf("day").toMillis() + r.taskId)}
                     <li>
                         <span class="font-mono tracking-tighter opacity-50"
                             >[{r.date.toFormat("hh:mm a")}]</span
                         >
                         {r.title}
+                        {#if r.temporary}
+                            <Icon src={ArrowPath} class="inline-block h-3 w-3 opacity-50" />
+                        {/if}
                     </li>
                 {/each}
             </ul>

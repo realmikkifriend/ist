@@ -1,10 +1,10 @@
-import { todoistData, todoistError, previousFirstDueTask } from "./stores";
+import { todoistData, todoistError, previousFirstDueTask, taskActivity } from "./stores";
 import { markTaskDone, deferTasks, refreshData } from "./api";
 import { updateFirstDueTask } from "./first";
 import { get } from "svelte/store";
 import { DateTime } from "luxon";
 import { TodoistRequestError } from "@doist/todoist-api-typescript";
-import type { Task, TodoistData, TaskUpdates } from "../../types/todoist";
+import type { Task, TodoistData, TaskUpdates, TaskActivity } from "../../types/todoist";
 
 /**
  * Updates the dueTasks resource in the todoistData store based on the provided task updates.
@@ -56,17 +56,26 @@ export function updateTaskResources(taskUpdates: TaskUpdates): void {
 
 /**
  * Marks a task as done and updates the resources accordingly.
- * @param {string} taskID - The ID of the task to mark as done.
+ * @param {Task} task - The task to mark as done.
  * @returns Promise&lt;void>
  */
-export async function handleTaskDone(taskID: string): Promise<void> {
+export async function handleTaskDone(task: Task): Promise<void> {
     previousFirstDueTask.set(null);
 
     const fiveMinutesFromNow = DateTime.now().plus({ minutes: 5 });
 
-    updateTaskResources([[taskID, fiveMinutesFromNow]]);
+    const newActivityEntry: TaskActivity = {
+        date: DateTime.now(),
+        taskId: task.id,
+        contextId: task.contextId || "inbox",
+        title: task.content,
+        temporary: true,
+    };
+    taskActivity.update((activities) => [...activities, newActivityEntry]);
 
-    const result = await markTaskDone(taskID).catch((error: unknown) => {
+    updateTaskResources([[task.id, fiveMinutesFromNow]]);
+
+    const result = await markTaskDone(task.id).catch((error: unknown) => {
         const message = error instanceof TodoistRequestError ? error.message : "Unknown error";
         todoistError.set(`Failed to mark task done: ${message}`);
         return null;
