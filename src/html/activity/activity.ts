@@ -8,9 +8,15 @@ import type { Task, TaskActivity, TodoistActivity } from "../../../types/todoist
  * Checks stores for task activity and gets more from the API.
  * @param {DateTime[]} timeframe - Timeframe (start and end) to filter activity by.
  * @param {Task | null} task - Optional task to filter activity by.
- * @returns Retrieved activity records.
+ * @returns Retrieved activity records from the store and a promise of more if retrieved.
  */
-export async function getActivity(timeframe: DateTime[], task: Task | null = null) {
+export function getActivity(
+    timeframe: DateTime[],
+    task: Task | null = null,
+): {
+    data: TaskActivity[];
+    promise: Promise<TaskActivity[]> | null;
+} {
     const storedActivityData = get(taskActivity).filter(
         (activity) => !task?.id || activity.taskId === task.id,
     );
@@ -22,28 +28,32 @@ export async function getActivity(timeframe: DateTime[], task: Task | null = nul
     const [startCovered, endCovered] = checkCoverage(relevantActivity, startDate, endDate);
 
     if (!startDate.hasSame(DateTime.now(), "day") && startCovered && endCovered) {
-        return relevantActivity;
+        return { data: relevantActivity, promise: null };
     }
 
-    const allNewActivityData = await getAllActivityData(
-        startDate,
-        endDate,
-        relevantActivity,
-        null,
-        task,
-    );
+    const promise = (async () => {
+        const allUpdatedActivityData = await getAllActivityData(
+            startDate,
+            endDate,
+            relevantActivity,
+            null,
+            task,
+        );
 
-    const relevantNewActivityData = filterActivityByTimeframe(
-        allNewActivityData,
-        startDate,
-        endDate,
-    );
+        const relevantUpdatedActivity = filterActivityByTimeframe(
+            allUpdatedActivityData,
+            startDate,
+            endDate,
+        );
 
-    const mergedActivityData = mergeActivity(get(taskActivity), allNewActivityData);
+        const mergedActivityData = mergeActivity(get(taskActivity), allUpdatedActivityData);
 
-    taskActivity.set(mergedActivityData);
+        taskActivity.set(mergedActivityData);
 
-    return relevantNewActivityData;
+        return relevantUpdatedActivity;
+    })();
+
+    return { data: relevantActivity, promise };
 }
 
 /**

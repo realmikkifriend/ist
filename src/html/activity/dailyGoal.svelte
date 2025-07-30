@@ -8,7 +8,7 @@
     import type { TaskActivity } from "../../../types/todoist";
 
     const result = writable<TaskActivity[]>([]);
-    const isLoading = writable<boolean>(false);
+    const isLoading = writable<boolean>(true);
 
     const debounceState: { timeoutId: ReturnType<typeof setTimeout> | null } = { timeoutId: null };
 
@@ -20,8 +20,14 @@
         const startOfToday = DateTime.now().startOf("day");
         const endOfToday = DateTime.now().endOf("day");
 
-        const activityData = await getActivity([startOfToday, endOfToday]);
-        result.set(activityData);
+        const activity = getActivity([startOfToday, endOfToday]);
+        result.set(activity.data);
+
+        if (activity.promise) {
+            const promisedActivity = await activity.promise;
+            result.set(promisedActivity);
+        }
+
         isLoading.set(false);
     }
 
@@ -29,16 +35,17 @@
         if (debounceState.timeoutId) {
             clearTimeout(debounceState.timeoutId);
         }
-        isLoading.set(true);
+
         debounceState.timeoutId = setTimeout(() => {
+            isLoading.set(true);
             void fetchDailyActivity();
         }, 2000);
     }
 </script>
 
-<div class="relative w-full">
+<div class="relative w-fit">
     <div
-        class="badge badge-outline grid h-4 w-full {getGridColsClass(
+        class="badge badge-outline grid h-4 w-24 {getGridColsClass(
             $todoistData.user.daily_goal,
         )} items-start gap-0 overflow-hidden whitespace-nowrap p-0 outline-2"
     >
@@ -52,8 +59,7 @@
 <div class="flex w-fit flex-row text-nowrap px-1 pb-0.5 text-xs">
     {#if $isLoading}
         <Icon src={ArrowPath} class="mr-0.5 mt-0.5 h-3.5 w-3.5 animate-spin" />
-    {:else}
-        {$result.length}
     {/if}
+    {$result.length}
     / {$todoistData.user.daily_goal}
 </div>
