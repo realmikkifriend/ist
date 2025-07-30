@@ -11,12 +11,12 @@
     /**
      * Returns the CSS class for a given priority string.
      * This moves the type assertion logic out of the template and into the script section.
-     * @param priorityStr - The given priority.
+     * @param priorityNum - The given priority.
      * @returns The Tailwind classes that correspond to the priority.
      */
-    function getPriorityBadgeClass(priorityStr: string): string {
-        // Priority is a number enum, so coerce to number and cast to Priority
-        return getPriorityClasses(+priorityStr as Priority);
+    function getPriorityBadgeClass(priorityNum: number): string {
+        // Priority is a number enum, so coerce to Priority
+        return getPriorityClasses(priorityNum as Priority);
     }
 
     /**
@@ -83,10 +83,26 @@
         <button
             class:opacity-25={$userSettings.selectedContext &&
                 $userSettings.selectedContext.id !== context.id}
-            class="bg-secondary text-base-100 mb-2 rounded-lg"
+            class="bg-secondary text-base-100 tooltip sm:tooltip-right tooltip-bottom mb-2 rounded-lg"
             on:click={() => handleContextClick(context.id)}
         >
-            <div class="card-body gap-0 px-2 py-1">
+            <div class="tooltip-content w-70 text-left">
+                {$dueTasksByContext[context.id].total} tasks due in this context:
+                <div class="my-2 space-y-1">
+                    {#each $dueTasksByContext[context.id].tasks as task (task.id)}
+                        <span class="flex flex-row">
+                            <div
+                                class="mt-1.5 mr-1 h-1 w-0.5 max-w-0.5 rounded-sm border-none p-1 {getPriorityBadgeClass(
+                                    task.priority,
+                                )}"
+                            ></div>
+                            {task.content}
+                        </span>
+                    {/each}
+                </div>
+            </div>
+
+            <div class="gap-0 px-2 py-1">
                 <p class="cursor-pointer text-left text-lg font-bold">{context.name}</p>
                 <div class="flex flex-row items-start space-x-2">
                     {#each Object.keys($dueTasksByContext[context.id].priorities).sort((a, b) => +b - +a) as priorityStr, index (index)}
@@ -94,7 +110,7 @@
                             {#each Array.from( { length: $dueTasksByContext[context.id].priorities[+priorityStr] }, ) as _, badgeIndex (badgeIndex)}
                                 <div
                                     class="h-1 w-0.5 max-w-0.5 rounded-sm border-none p-1 {getPriorityBadgeClass(
-                                        priorityStr,
+                                        +priorityStr,
                                     )}"
                                 ></div>
                             {/each}

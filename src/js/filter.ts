@@ -154,9 +154,10 @@ export function compareTasks(
 export function getTasksGroupedByContext(): TasksGroupedByContext {
     const $todoistData = get(todoistData);
     return ($todoistData?.dueTasks ?? []).reduce((acc: TasksGroupedByContext, task: Task) => {
-        const context = acc[task.contextId as string] ?? { total: 0, priorities: {} };
+        const context = acc[task.contextId as string] ?? { total: 0, priorities: {}, tasks: [] };
         context.total++;
         context.priorities[task.priority] = (context.priorities[task.priority] ?? 0) + 1;
+        context.tasks.push(task); // Add the task object
         acc[task.contextId as string] = context;
         return acc;
     }, {} as TasksGroupedByContext);

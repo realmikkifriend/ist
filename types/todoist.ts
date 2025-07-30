@@ -107,6 +107,7 @@ export interface TasksGroupedByContext {
     [contextId: string]: {
         total: number;
         priorities: { [priority: number]: number };
+        tasks: Task[];
     };
 }
 
