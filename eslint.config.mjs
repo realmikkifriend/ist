@@ -55,13 +55,13 @@ export default defineConfig([
     // `     eslint-plugin-svelte
     ...svelte.configs.recommended,
     {
-        files: ["**/*.svelte", "**/*.svelte.ts"],
+        files: ["**/*.svelte"],
         languageOptions: {
             parser: svelteParser,
             parserOptions: {
                 project: "./tsconfig.json",
                 tsconfigRootDir: import.meta.dirname,
-                extraFileExtensions: [".svelte", ".svelte.ts"],
+                extraFileExtensions: [".svelte"],
                 parser: "@typescript-eslint/parser",
                 svelteFeatures: {
                     experimentalGenerics: true,
@@ -88,6 +88,12 @@ export default defineConfig([
                     argsIgnorePattern: "^_",
                 },
             ],
+        },
+    },
+    {
+        files: ["src/**/*.ts", "src/**/*.svelte"],
+        rules: {
+            complexity: ["error", { max: 10 }],
         },
     },
     {
