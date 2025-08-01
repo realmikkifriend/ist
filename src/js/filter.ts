@@ -99,6 +99,60 @@ export function processDueProperties(task: Task, timeZone: string, date: Date): 
 }
 
 /**
+ * Compares two tasks by priority.
+ * @param {Task} a - The first task.
+ * @param {Task} b - The second task.
+ * @returns {number} The comparison result.
+ */
+function compareByPriority(a: Task, b: Task): number {
+    return b.priority - a.priority;
+}
+
+/**
+ * Compares two tasks by context.
+ * @param {Task} a - The first task.
+ * @param {Task} b - The second task.
+ * @param {Record<string, number>} contextLookup - The context lookup object.
+ * @returns {number} The comparison result.
+ */
+function compareByContext(a: Task, b: Task, contextLookup: Record<string, number>): number {
+    const aHasContext = Boolean(a.contextId);
+    const bHasContext = Boolean(b.contextId);
+
+    if (aHasContext !== bHasContext) {
+        return aHasContext ? 1 : -1;
+    }
+
+    if (aHasContext && bHasContext) {
+        const orderA = contextLookup[a.contextId!];
+        const orderB = contextLookup[b.contextId!];
+        if (orderA !== orderB) {
+            return orderA - orderB;
+        }
+    }
+
+    return 0;
+}
+
+/**
+ * Compares two tasks by due date.
+ * @param {Task} a - The first task.
+ * @param {Task} b - The second task.
+ * @param {string} timeZone - The time zone to use for date comparisons.
+ * @returns {number} The comparison result.
+ */
+function compareByDueDate(a: Task, b: Task, timeZone: string): number {
+    if (!a.due || !b.due) {
+        return 0;
+    }
+
+    const dateA = DateTime.fromISO(a.due.datetime || a.due.date, { zone: timeZone });
+    const dateB = DateTime.fromISO(b.due.datetime || b.due.date, { zone: timeZone });
+
+    return dateA.toMillis() - dateB.toMillis();
+}
+
+/**
  * Compares two tasks for sorting.
  * @param {Task} a - The first task.
  * @param {Task} b - The second task.
@@ -116,35 +170,15 @@ export function compareTasks(
 ): number {
     const applyReverse = (val: number) => (reverse ? -val : val);
 
-    if (a.priority !== b.priority) {
-        return applyReverse(b.priority - a.priority);
-    }
+    const comparisons = [
+        () => compareByPriority(a, b),
+        () => compareByContext(a, b, contextLookup),
+        () => (timeZone ? compareByDueDate(a, b, timeZone) : 0),
+    ];
 
-    const aHasContext = Boolean(a.contextId);
-    const bHasContext = Boolean(b.contextId);
+    const result = comparisons.reduce((acc, comparison) => acc || comparison(), 0);
 
-    if (aHasContext !== bHasContext) {
-        return applyReverse(aHasContext ? 1 : -1);
-    }
-
-    if (aHasContext && bHasContext) {
-        const orderA = contextLookup[a.contextId!];
-        const orderB = contextLookup[b.contextId!];
-        if (orderA !== orderB) {
-            return applyReverse(orderA - orderB);
-        }
-    }
-
-    if (!timeZone || !a.due || !b.due) return 0;
-
-    const dateA = DateTime.fromISO(a.due.datetime || a.due.date, { zone: timeZone }).toJSDate();
-    const dateB = DateTime.fromISO(b.due.datetime || b.due.date, { zone: timeZone }).toJSDate();
-
-    if (dateA.getTime() !== dateB.getTime()) {
-        return applyReverse(dateA.getTime() - dateB.getTime());
-    }
-
-    return 0;
+    return applyReverse(result);
 }
 
 /**

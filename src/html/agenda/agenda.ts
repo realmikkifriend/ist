@@ -90,6 +90,24 @@ export function markTasks(tasks: Task[]): (Task & { firstDue?: boolean; closeTim
     });
 }
 
+const getPositionForFirstTask = (taskDateTime: DateTime): number => {
+    const minutes = taskDateTime.minute;
+    return (minutes > 45 ? 46 : minutes) * 0.1;
+};
+
+const getPositionForSubsequentTask = (taskDateTime: DateTime, previousTaskDue: Task): number => {
+    const timeDifference = taskDateTime.diff(
+        DateTime.fromISO(previousTaskDue.due!.date),
+        "minutes",
+    ).minutes;
+
+    if (taskDateTime.minute > 45 && timeDifference < 20) {
+        return 0;
+    }
+
+    return Math.pow(timeDifference + 1, 2) * 0.0009;
+};
+
 /**
  * Calculate the position of a task in the agenda.
  * @param {Task & { closeTiming?: boolean }} task - The current task.
@@ -102,22 +120,15 @@ export const calculateTaskPosition = (
 ): number => {
     if (task.closeTiming) {
         return 0;
-    } else {
-        const taskDateTime = DateTime.fromISO(task.due?.date ?? "");
-
-        const timeDifference =
-            previousTaskDue && previousTaskDue.due?.date
-                ? taskDateTime.diff(DateTime.fromISO(previousTaskDue.due.date), "minutes").minutes
-                : taskDateTime.diff(taskDateTime.startOf("hour"), "minutes").minutes;
-
-        if (!previousTaskDue) {
-            return (taskDateTime.minute > 45 ? 46 : timeDifference) * 0.1;
-        } else if (taskDateTime.minute > 45 && timeDifference < 20) {
-            return 0;
-        } else {
-            return Math.pow(timeDifference + 1, 2) * 0.0009;
-        }
     }
+
+    const taskDateTime = DateTime.fromISO(task.due?.date ?? "");
+
+    if (!previousTaskDue) {
+        return getPositionForFirstTask(taskDateTime);
+    }
+
+    return getPositionForSubsequentTask(taskDateTime, previousTaskDue);
 };
 
 /**

@@ -93,6 +93,38 @@ export const skipTask = (task: Task): void => {
 };
 
 /**
+ * Determines whether to show a toast notification for a new task.
+ * @param {Task} newTask - The new first-due task.
+ * @param {Task | null} prevTask - The previous task.
+ * @param {string | null} selectedContextId - The currently selected context ID.
+ * @returns True if a toast should be shown, false otherwise.
+ */
+const shouldShowNewTaskToast = (
+    newTask: Task,
+    prevTask: Task | null,
+    selectedContextId: string | null,
+): boolean => {
+    return (
+        prevTask !== null &&
+        newTask.id !== prevTask.id &&
+        (!selectedContextId || prevTask.contextId === selectedContextId) &&
+        window.location.hash !== "#today" &&
+        window.location.hash !== "#tomorrow"
+    );
+};
+
+/**
+ * Loads comments for a given task and attaches them.
+ * @param {Task} task - The task to load comments for.
+ * @returns The task with comments.
+ */
+const loadCommentsForTask = async (task: Task): Promise<Task> => {
+    const comments = await getTaskComments(task.id);
+    (task as Task & { comments: Comment[] }).comments = comments;
+    return task;
+};
+
+/**
  * Update the first due task, loading comments and handling context changes.
  * @returns {Promise<void>}
  */
@@ -100,35 +132,26 @@ export const updateFirstDueTask = async (): Promise<void> => {
     const $todoistData: TodoistData = get(todoistData);
     const prevTask: Task | null = get(previousFirstDueTask);
 
-    if (!$todoistData?.dueTasks?.length && !prevTask?.summoned) {
-        setFirstDueTask(null);
+    if (prevTask?.summoned) {
         return;
     }
 
-    if (prevTask?.summoned) {
+    if (!$todoistData?.dueTasks?.length) {
+        setFirstDueTask(null);
         return;
     }
 
     const selectedContextId: string | null = get(userSettings).selectedContext?.id ?? null;
     const dueTasks: Task[] = updateDueTasks($todoistData.dueTasks, selectedContextId);
 
-    const newTask: Task = dueTasks[0];
+    const newTaskWithComments = await loadCommentsForTask(dueTasks[0]);
 
-    const comments = await getTaskComments(newTask.id);
-    (newTask as Task & { comments: Comment[] }).comments = comments;
-
-    if (
-        prevTask &&
-        newTask.id !== prevTask.id &&
-        (!selectedContextId || prevTask.contextId === selectedContextId) &&
-        window.location.hash !== "#today" &&
-        window.location.hash !== "#tomorrow"
-    ) {
+    if (shouldShowNewTaskToast(newTaskWithComments, prevTask, selectedContextId)) {
         newFirstTask(FirstDueTaskToast as unknown as typeof SvelteComponent, () =>
-            setFirstDueTask(newTask),
+            setFirstDueTask(newTaskWithComments),
         );
     } else {
         toast.pop({ target: "wait" });
-        setFirstDueTask(newTask);
+        setFirstDueTask(newTaskWithComments);
     }
 };

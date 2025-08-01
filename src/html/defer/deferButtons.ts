@@ -53,6 +53,81 @@ function calculateAdjustedTime(
 }
 
 /**
+ * Rounds the future time for a button based on its index.
+ * @param {Date} futureTime - The future time to round.
+ * @param {number} index - The index of the button.
+ */
+function roundFutureTime(futureTime: Date, index: number): void {
+    if (index > 2) {
+        const roundingFactor = index >= 3 && index <= 7 ? 5 : 15;
+        const roundedMinutes =
+            Math.round(futureTime.getMinutes() / roundingFactor) * roundingFactor;
+        futureTime.setMinutes(roundedMinutes);
+    }
+}
+
+/**
+ * Handles the processing for a button that crosses into the next day.
+ * @param {TimeButtonConfig} button - The button to process.
+ * @param {Date} futureTime - The original future time.
+ * @param {Date} now - The current Date.
+ * @param {Date} nextMorning - The Date for the next morning.
+ * @param {number} index - The button processing index.
+ * @param {(TimeButtonConfig | null)[]} processedButtons - Previously processed buttons.
+ * @returns The processed button configuration.
+ */
+function handleNextDayButton(
+    button: TimeButtonConfig,
+    futureTime: Date,
+    now: Date,
+    nextMorning: Date,
+    index: number,
+    processedButtons: (TimeButtonConfig | null)[],
+): TimeButtonConfig {
+    const adjustedFutureTime = calculateAdjustedTime(
+        futureTime,
+        nextMorning,
+        index,
+        processedButtons,
+    );
+
+    const hoursInFuture = Math.floor(
+        (adjustedFutureTime.getTime() - now.getTime()) / (1000 * 60 * 60),
+    );
+
+    return {
+        ...button,
+        ms: adjustedFutureTime.getTime() - now.getTime(),
+        text: `${hoursInFuture} hrs`,
+        styling: button.styling ?? "",
+        stylingButton: (button.stylingButton ?? "") + " bg-blue-900",
+    };
+}
+
+/**
+ * Handles the processing for a button that does not cross into the next day.
+ * @param {TimeButtonConfig} button - The button to process.
+ * @param {Date} futureTime - The button deferral time.
+ * @param {Date} now - The current date.
+ * @returns The processed button configuration.
+ */
+function handleSameDayButton(
+    button: TimeButtonConfig,
+    futureTime: Date,
+    now: Date,
+): TimeButtonConfig {
+    const stylingButton =
+        (button.stylingButton ?? "") + (button.text !== "tomorrow" ? " bg-neutral" : "");
+    return {
+        ...button,
+        ms: futureTime.getTime() - now.getTime(),
+        text: button.text ?? "",
+        styling: button.styling ?? "",
+        stylingButton,
+    };
+}
+
+/**
  * Processes a button to calculate its ms and styling based on its position and time.
  * @param {TimeButtonConfig} button - The button to process.
  * @param {number} index - The index of the button in the array.
@@ -69,50 +144,13 @@ function processButton(
     nextMorning: Date,
 ): TimeButtonConfig {
     const futureTime = new Date(now.getTime() + (button.ms ?? 0));
-
-    if (index > 2) {
-        const roundingFactor = index >= 3 && index <= 7 ? 5 : 15;
-        const roundedMinutes =
-            Math.round(futureTime.getMinutes() / roundingFactor) * roundingFactor;
-        futureTime.setMinutes(roundedMinutes);
-    }
+    roundFutureTime(futureTime, index);
 
     if (futureTime.getDate() !== now.getDate()) {
-        const adjustedFutureTime = calculateAdjustedTime(
-            futureTime,
-            nextMorning,
-            index,
-            processedButtons,
-        );
-
-        const hoursInFuture = Math.floor(
-            (adjustedFutureTime.getTime() - now.getTime()) / (1000 * 60 * 60),
-        );
-
-        return {
-            ...button,
-            ms: adjustedFutureTime.getTime() - now.getTime(),
-            text: `${hoursInFuture} hrs`,
-            styling: button.styling ?? "",
-            stylingButton: (button.stylingButton ?? "") + " bg-blue-900",
-        };
-    } else if (button.text !== "tomorrow") {
-        return {
-            ...button,
-            ms: futureTime.getTime() - now.getTime(),
-            text: button.text ?? "",
-            styling: button.styling ?? "",
-            stylingButton: (button.stylingButton ?? "") + " bg-neutral",
-        };
+        return handleNextDayButton(button, futureTime, now, nextMorning, index, processedButtons);
     }
 
-    return {
-        ...button,
-        ms: futureTime.getTime() - now.getTime(),
-        text: button.text ?? "",
-        styling: button.styling ?? "",
-        stylingButton: button.stylingButton ?? "",
-    };
+    return handleSameDayButton(button, futureTime, now);
 }
 
 /**

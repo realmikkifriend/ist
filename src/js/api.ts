@@ -8,9 +8,9 @@ import { cleanTodoistData } from "./process";
 import type { Task, Comment, TodoistData, Context, User } from "../../types/todoist";
 import type { DateTime } from "luxon";
 import type {
+    GetProjectsResponse,
+    GetTasksResponse,
     UpdateTaskArgs,
-    PersonalProject,
-    WorkspaceProject,
 } from "@doist/todoist-api-typescript";
 
 /**
@@ -23,57 +23,32 @@ function initializeApi(): { accessToken: string | null; api: TodoistApi | null }
     return { accessToken, api };
 }
 
-/**
- * Refreshes Todoist data and updates the store.
- * @returns {Promise<{ status: "success"; error: null } | { status: "error"; error: TodoistRequestError | string } | void>} - Results of API refresh.
- */
-export async function refreshData(): Promise<
-    | { status: "success"; error: null }
-    | { status: "error"; error: TodoistRequestError | string }
-    | void
-> {
-    const { accessToken, api } = initializeApi();
-    if (!accessToken || !api) {
-        return setErrorState(new TodoistRequestError("No access token found."));
+function handleApiError(err: unknown): TodoistRequestError {
+    console.error("Error during API operation:", err);
+    if (err instanceof TodoistRequestError) {
+        return err;
     }
-
-    const result = await Promise.all([
-        api.getTasks({ limit: 200 }),
-        api.getProjects(),
-        getEndpoint("user"),
-    ]).catch((err: unknown) => {
-        console.error("Error fetching data:", err);
-        if (err instanceof TodoistRequestError) {
-            return setErrorState(err);
-        }
-        if (err instanceof Error) {
-            return setErrorState(new TodoistRequestError(err.message));
-        }
-        if (typeof err === "string") {
-            return setErrorState(new TodoistRequestError(err));
-        }
-        return setErrorState(new TodoistRequestError("Unknown error"));
-    });
-
-    if (!Array.isArray(result)) {
-        return result;
+    if (err instanceof Error) {
+        return new TodoistRequestError(err.message);
     }
-
-    const [tasksResponse, contextsResponse, userResponse] = result;
-
-    if (!tasksResponse || !contextsResponse || !userResponse) {
-        return;
+    if (typeof err === "string") {
+        return new TodoistRequestError(err);
     }
+    return new TodoistRequestError("An unknown error occurred");
+}
 
-    const contexts = Array.isArray(contextsResponse.results)
-        ? contextsResponse.results.filter(
-              (context: PersonalProject | WorkspaceProject): context is Context =>
-                  context &&
-                  typeof context === "object" &&
-                  "inboxProject" in context &&
-                  "parentId" in context,
-          )
-        : [];
+function processApiResponse(
+    tasks: GetTasksResponse,
+    projects: GetProjectsResponse,
+    userResponse: unknown,
+): TodoistData {
+    const contexts = (projects.results || []).filter(
+        (context): context is Context =>
+            !!context &&
+            typeof context === "object" &&
+            "inboxProject" in context &&
+            "parentId" in context,
+    );
 
     const user =
         userResponse && typeof userResponse === "object" && "tz_info" in userResponse
@@ -81,7 +56,7 @@ export async function refreshData(): Promise<
             : undefined;
 
     const cleanedData = cleanTodoistData({
-        tasks: tasksResponse.results,
+        tasks: tasks.results || [],
         contexts,
         user,
     }) as { tasks: Task[]; contexts: Context[]; user?: User };
@@ -109,11 +84,45 @@ export async function refreshData(): Promise<
         today: reverseTasksToday,
     };
 
-    todoistData.set(todoistDataObj);
+    return todoistDataObj;
+}
 
-    success("Todoist data updated!");
+/**
+ * Refreshes Todoist data and updates the store.
+ * @returns {Promise<{ status: "success"; error: null } | { status: "error"; error: TodoistRequestError | string } | void>} - Results of API refresh.
+ */
+export function refreshData(): Promise<
+    | { status: "success"; error: null }
+    | { status: "error"; error: TodoistRequestError | string }
+    | void
+> {
+    const { accessToken, api } = initializeApi();
+    if (!accessToken || !api) {
+        return Promise.resolve(setErrorState(new TodoistRequestError("No access token found.")));
+    }
 
-    return { status: "success", error: null };
+    return Promise.all([api.getTasks({ limit: 200 }), api.getProjects(), getEndpoint("user")])
+        .then((apiResult) => {
+            const [tasks, projects, userResponse] = apiResult;
+
+            if (!tasks || !projects || !userResponse) {
+                return;
+            }
+
+            const todoistDataObj = processApiResponse(tasks, projects, userResponse);
+
+            todoistData.set(todoistDataObj);
+            success("Todoist data updated!");
+            const successResult: { status: "success"; error: null } = {
+                status: "success",
+                error: null,
+            };
+            return successResult;
+        })
+        .catch((err) => {
+            const error = handleApiError(err);
+            return setErrorState(error);
+        });
 }
 
 /**
@@ -134,11 +143,11 @@ function setErrorState(error: TodoistRequestError): {
  * @param {string} taskId - The ID of the task for which comments will be retrieved.
  * @returns {Promise<Comment[]>} - Results of comment retrieval, or empty array if error.
  */
-export async function getTaskComments(taskId: string): Promise<Comment[]> {
+export function getTaskComments(taskId: string): Promise<Comment[]> {
     const { accessToken, api } = initializeApi();
     if (!accessToken || !api) {
         toast.push("Failed to load comments: No access token found.");
-        return [];
+        return Promise.resolve([]);
     }
 
     return api
@@ -163,12 +172,12 @@ export async function getTaskComments(taskId: string): Promise<Comment[]> {
  * @param {string} taskID - The ID of the task to mark done.
  * @returns {Promise<void | { status: "error"; error: TodoistRequestError | string }>} - Result of API call to mark task done.
  */
-export async function markTaskDone(
+export function markTaskDone(
     taskID: string,
 ): Promise<void | { status: "error"; error: TodoistRequestError | string }> {
     const { accessToken, api } = initializeApi();
     if (!accessToken || !api) {
-        return setErrorState(new TodoistRequestError("No access token found."));
+        return Promise.resolve(setErrorState(new TodoistRequestError("No access token found.")));
     }
 
     return api
@@ -196,12 +205,12 @@ export async function markTaskDone(
  * @param {[Task, DateTime][]} taskTimePairs - Array of [Task, DateTime] pairs.
  * @returns {Promise<any[]>} - Results of task-defer API calls.
  */
-export async function deferTasks(
+export function deferTasks(
     taskTimePairs: [Task, DateTime][],
 ): Promise<(void | { status: "error"; error: TodoistRequestError | string })[]> {
     const { accessToken, api } = initializeApi();
     if (!accessToken || !api) {
-        return [setErrorState(new TodoistRequestError("No access token found."))];
+        return Promise.resolve([setErrorState(new TodoistRequestError("No access token found."))]);
     }
 
     const updatePromises = taskTimePairs.map(([task, time]) => {
@@ -240,7 +249,7 @@ export async function deferTasks(
  * @param {Record<string, string>} params - Additional parameters.
  * @returns {Promise<unknown>} - Result of API endpoint call.
  */
-export async function getEndpoint(
+export function getEndpoint(
     endpoint: string,
     params: Record<string, string | number> = {},
 ): Promise<unknown> {
@@ -252,15 +261,15 @@ export async function getEndpoint(
     const queryString = new URLSearchParams(stringParams).toString();
     const url = `https://api.todoist.com/api/v1/${endpoint}${queryString ? `?${queryString}` : ""}`;
 
-    const response = await fetch(url, {
+    return fetch(url, {
         method: "GET",
         headers: {
             Authorization: `Bearer ${accessToken}`,
             "Content-Type": CONTENT_TYPE,
         },
-    });
-
-    return response.ok ? response.json() : Promise.resolve({ error: `Error: ${response.status}` });
+    }).then((response) =>
+        response.ok ? response.json() : Promise.resolve({ error: `Error: ${response.status}` }),
+    );
 }
 
 /**

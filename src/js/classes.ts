@@ -111,6 +111,44 @@ export const getQuarterHourPosition = (position: QuarterHourPosition): string =>
         0.75: "top-[75%]",
     })[position] || "";
 
+function getTomorrowGradient(
+    totalTasks: number,
+    gradients: Record<GradientType, string>,
+): string | null {
+    const thresholds = [
+        { limit: 21, color: gradients.red },
+        { limit: 19, color: gradients.orange },
+        { limit: 17, color: null },
+        { limit: 15, color: gradients.darkGreen },
+        { limit: 12, color: gradients.green },
+    ];
+
+    const found = thresholds.find(({ limit }) => totalTasks >= limit);
+    return found ? found.color : gradients.blue;
+}
+
+function getTodayGradient(
+    totalTasks: number,
+    gradients: Record<GradientType, string>,
+): string | null {
+    const currentHour = new Date().getHours();
+    const hourAdjustment = Math.max(0, currentHour - 8);
+    const todayThreshold = 14 - hourAdjustment;
+    const diff = totalTasks - todayThreshold;
+
+    if (diff < -2) return gradients.blue;
+    if (diff > 1) return gradients.red;
+
+    const diffMap: Map<number, string | null> = new Map([
+        [-2, gradients.green],
+        [-1, gradients.darkGreen],
+        [0, null],
+        [1, gradients.orange],
+    ]);
+
+    return diffMap.get(diff) ?? "";
+}
+
 /**
  * Determines a gradient background class based on the total number of tasks and a hash string.
  * @param {number} totalTasks - The total number of tasks.
@@ -126,46 +164,13 @@ export function getGradientColor(totalTasks: number, hash: string): string | nul
         red: "bg-linear-to-r from-red-900 to-red-700",
     };
 
-    if (hash === "#tomorrow") {
-        switch (true) {
-            case totalTasks > 20:
-                return gradients.red;
-            case totalTasks >= 19:
-                return gradients.orange;
-            case totalTasks >= 17:
-                return null;
-            case totalTasks >= 15:
-                return gradients.darkGreen;
-            case totalTasks >= 12:
-                return gradients.green;
-            case totalTasks < 12:
-                return gradients.blue;
-            default:
-                return null;
-        }
-    } else if (hash === "#today") {
-        const currentHour: number = new Date().getHours();
-        const hourAdjustment: number = currentHour > 8 ? currentHour - 8 : 0;
-        const todayThreshold: number = 14 - hourAdjustment;
+    const gradientStrategies: Record<string, () => string | null> = {
+        "#tomorrow": () => getTomorrowGradient(totalTasks, gradients),
+        "#today": () => getTodayGradient(totalTasks, gradients),
+    };
 
-        if (totalTasks < todayThreshold - 2) {
-            return gradients.blue;
-        } else if (totalTasks === todayThreshold - 2) {
-            return gradients.green;
-        } else if (totalTasks === todayThreshold - 1) {
-            return gradients.darkGreen;
-        } else if (totalTasks === todayThreshold) {
-            return null;
-        } else if (totalTasks === todayThreshold + 1) {
-            return gradients.orange;
-        } else if (totalTasks > todayThreshold + 1) {
-            return gradients.red;
-        } else {
-            return "";
-        }
-    } else {
-        return "";
-    }
+    const strategy = gradientStrategies[hash];
+    return strategy ? strategy() : "";
 }
 
 /**
@@ -179,8 +184,10 @@ export function getContextColors(activities: TaskActivity[], contexts: Context[]
         return [];
     }
 
+    const contextMap = new Map(contexts.map((context) => [context.id, context]));
+
     return activities.map((activity) => {
-        const context = contexts.find((context) => context.id === activity.contextId);
+        const context = contextMap.get(activity.contextId);
         return context ? colorClasses[context.color as ColorName] : "";
     });
 }

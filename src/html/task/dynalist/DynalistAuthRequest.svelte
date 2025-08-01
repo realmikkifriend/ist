@@ -16,36 +16,47 @@
 
         const form = event.target as HTMLFormElement;
         const tokenElement = form.elements.namedItem("token");
-        let tempToken = "";
-        if (tokenElement instanceof HTMLInputElement) {
-            tempToken = tokenElement.value;
-        }
-
         const submitBtn = form.querySelector("button[type='submit']");
-        if (submitBtn instanceof HTMLButtonElement) submitBtn.disabled = true;
-
         const spinner = form.querySelector(".spinner");
-        if (spinner instanceof HTMLElement) spinner.style.display = "inline-block";
-
         const submitContent = form.querySelector(".submit-content");
-        if (submitContent instanceof HTMLElement) submitContent.style.display = "none";
+        const invalidTokenMsg = form.parentElement?.querySelector(".invalid-token");
 
-        const invalidToken = form.parentElement?.querySelector(
-            ".invalid-token",
-        ) as HTMLParagraphElement | null;
-        if (invalidToken) invalidToken.style.display = "none";
+        const setLoadingState = (loading: boolean) => {
+            if (submitBtn instanceof HTMLButtonElement) {
+                submitBtn.disabled = loading;
+            }
+            if (spinner instanceof HTMLElement) {
+                spinner.style.display = loading ? "inline-block" : "none";
+            }
+            if (submitContent instanceof HTMLElement) {
+                submitContent.style.display = loading ? "none" : "flex";
+            }
+        };
 
-        const result: ValidateDynalistTokenResult = await validateDynalistToken(tempToken);
+        const showInvalidTokenMessage = (show: boolean) => {
+            if (invalidTokenMsg instanceof HTMLParagraphElement) {
+                invalidTokenMsg.style.display = show ? "block" : "none";
+            }
+        };
+
+        const token = tokenElement instanceof HTMLInputElement ? tokenElement.value : "";
+
+        setLoadingState(true);
+        showInvalidTokenMessage(false);
+
+        const result: ValidateDynalistTokenResult = await validateDynalistToken(token);
+
         if (result.success) {
             success("Dynalist access token set!");
-            dynalistAccessToken.set(tempToken);
+            dynalistAccessToken.set(token);
+            if (tokenElement instanceof HTMLInputElement) {
+                tokenElement.value = "";
+            }
         } else {
-            if (invalidToken) invalidToken.style.display = "block";
+            showInvalidTokenMessage(true);
         }
 
-        if (submitBtn instanceof HTMLButtonElement) submitBtn.disabled = false;
-        if (spinner instanceof HTMLElement) spinner.style.display = "none";
-        if (submitContent instanceof HTMLElement) submitContent.style.display = "flex";
+        setLoadingState(false);
     }
 </script>
 
