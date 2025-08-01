@@ -114,6 +114,11 @@
                 {#each getContextColors($sortedLists.byContext.slice(0, dailyGoal), $todoistData.contexts) as color, i (i)}
                     <div class="{color} h-full grow"></div>
                 {/each}
+                {#if $sortedLists.byContext.length < dailyGoal}
+                    {#each Array(dailyGoal - $sortedLists.byContext.length) as _, i (i)}
+                        <div class="h-full grow"></div>
+                    {/each}
+                {/if}
             {/if}
         </div>
         {#if $sortedLists.byContext.length > dailyGoal && $todoistData?.contexts}
