@@ -4,8 +4,8 @@
     import { todoistData } from "./../../js/stores";
     import { getActivity } from "./activity";
     import { writable } from "svelte/store";
-    import { getContextColors, getGridColsClass } from "../../js/classes";
-    import type { TaskActivity } from "../../../types/todoist";
+    import { getContextColors, getGridColsClass, colorClasses } from "../../js/classes";
+    import type { TaskActivity, ColorName } from "../../../types/todoist";
 
     const sortedLists = writable<{ byContext: TaskActivity[]; byTime: TaskActivity[] }>({
         byContext: [],
@@ -25,7 +25,18 @@
 
         const activity = getActivity([startOfToday, endOfToday]);
 
-        const byContext = [...activity.data].sort((a, b) => a.contextId.localeCompare(b.contextId));
+        const sortActivitiesByColor = (activities: TaskActivity[]) => {
+            const colorOrder = Object.keys(colorClasses);
+            return [...activities].sort((a, b) => {
+                const aContext = $todoistData.contexts.find((c) => c.id === a.contextId);
+                const bContext = $todoistData.contexts.find((c) => c.id === b.contextId);
+                const aColorIndex = aContext ? colorOrder.indexOf(aContext.color as ColorName) : -1;
+                const bColorIndex = bContext ? colorOrder.indexOf(bContext.color as ColorName) : -1;
+                return aColorIndex - bColorIndex;
+            });
+        };
+
+        const byContext = sortActivitiesByColor(activity.data);
         const byTime = [...activity.data].sort((a, b) => a.date.toMillis() - b.date.toMillis());
 
         sortedLists.set({ byContext, byTime });
@@ -42,9 +53,7 @@
                 ).values(),
             );
 
-            const promisedByContext = [...uniqueActivity].sort((a, b) =>
-                a.contextId.localeCompare(b.contextId),
-            );
+            const promisedByContext = sortActivitiesByColor(uniqueActivity);
             const promisedByTime = [...uniqueActivity].sort(
                 (a, b) => a.date.toMillis() - b.date.toMillis(),
             );
