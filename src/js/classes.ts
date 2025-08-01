@@ -18,48 +18,6 @@ export const getPriorityClasses = (priority: Priority): string =>
     })[priority] || "";
 
 /**
- * Returns the 'grid-cols-' class for the provided number.
- * @param {number} num - The number of columns.
- * @returns The corresponding Tailwind CSS grid-cols class.
- */
-export const getGridColsClass = (num: number): string => {
-    const classes: Record<number, string> = {
-        1: "grid-cols-1",
-        2: "grid-cols-2",
-        3: "grid-cols-3",
-        4: "grid-cols-4",
-        5: "grid-cols-5",
-        6: "grid-cols-6",
-        7: "grid-cols-7",
-        8: "grid-cols-8",
-        9: "grid-cols-9",
-        10: "grid-cols-10",
-        11: "grid-cols-11",
-        12: "grid-cols-12",
-        13: "grid-cols-[13]",
-        14: "grid-cols-[14]",
-        15: "grid-cols-[15]",
-        16: "grid-cols-[16]",
-        17: "grid-cols-[17]",
-        18: "grid-cols-[18]",
-        19: "grid-cols-[19]",
-        20: "grid-cols-[20]",
-        21: "grid-cols-[21]",
-        22: "grid-cols-[22]",
-        23: "grid-cols-[23]",
-        24: "grid-cols-[24]",
-        25: "grid-cols-[25]",
-        26: "grid-cols-[26]",
-        27: "grid-cols-[27]",
-        28: "grid-cols-[28]",
-        29: "grid-cols-[29]",
-        30: "grid-cols-[30]",
-    };
-
-    return classes[num] || "grid-cols-7";
-};
-
-/**
  * Returns the border color class for a given priority.
  * @param {Priority} priority - The priority level (1 to 4).
  * @returns The corresponding Tailwind CSS border class for the priority.
