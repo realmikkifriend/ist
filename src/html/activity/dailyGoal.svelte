@@ -4,7 +4,7 @@
     import { todoistData } from "./../../js/stores";
     import { getActivity } from "./activity";
     import { writable } from "svelte/store";
-    import { getContextColors, getGridColsClass, colorClasses } from "../../js/classes";
+    import { getContextColors, colorClasses } from "../../js/classes";
     import type { TaskActivity, ColorName } from "../../../types/todoist";
 
     const sortedLists = writable<{ byContext: TaskActivity[]; byTime: TaskActivity[] }>({
@@ -14,6 +14,8 @@
     const isLoading = writable<boolean>(true);
 
     const debounceState: { timeoutId: ReturnType<typeof setTimeout> | null } = { timeoutId: null };
+
+    $: dailyGoal = $todoistData.user.daily_goal;
 
     /**
      * Creates dataset for display.
@@ -101,15 +103,28 @@
             <p class="text-xs">Checking for more...</p>
         {/if}
     </div>
-    <div
-        class="badge badge-outline grid h-3 w-36 {getGridColsClass(
-            $todoistData.user.daily_goal,
-        )} items-start gap-0 overflow-hidden p-0 whitespace-nowrap outline-1"
-    >
-        {#if $sortedLists.byContext.length > 0 && $todoistData?.contexts}
-            {#each getContextColors($sortedLists.byContext, $todoistData.contexts) as color, i (i)}
-                <div class="{color} h-full"></div>
-            {/each}
+    <div class="flex w-full min-w-36 flex-row items-center">
+        <div
+            class="badge badge-outline outline-secondary flex h-3 items-start gap-0 overflow-hidden rounded-full border-0 p-0 whitespace-nowrap outline-1"
+            class:w-full={$sortedLists.byContext.length === 0}
+            class:rounded-r-none={$sortedLists.byContext.length > dailyGoal}
+            style="flex-grow: {dailyGoal};"
+        >
+            {#if $sortedLists.byContext.length > 0 && $todoistData?.contexts}
+                {#each getContextColors($sortedLists.byContext.slice(0, dailyGoal), $todoistData.contexts) as color, i (i)}
+                    <div class="{color} h-full grow"></div>
+                {/each}
+            {/if}
+        </div>
+        {#if $sortedLists.byContext.length > dailyGoal && $todoistData?.contexts}
+            <div
+                class="flex h-4 flex-row items-start gap-0 overflow-hidden rounded-r-full border-2 border-l-0 border-lime-500 p-0 whitespace-nowrap"
+                style="flex-grow: {$sortedLists.byContext.slice(dailyGoal).length};"
+            >
+                {#each getContextColors($sortedLists.byContext.slice(dailyGoal), $todoistData.contexts) as color, i (i)}
+                    <div class="{color} h-full grow"></div>
+                {/each}
+            </div>
         {/if}
     </div>
 </div>
@@ -117,6 +132,8 @@
     {#if $isLoading}
         <Icon src={ArrowPath} class="mt-0.5 mr-0.5 h-3.5 w-3.5 animate-spin" />
     {/if}
-    {$sortedLists.byContext.length}
-    / {$todoistData.user.daily_goal} tasks done
+    <span class="mr-1" class:text-lime-500={$sortedLists.byContext.length > dailyGoal}>
+        {$sortedLists.byContext.length}
+    </span>
+    / {dailyGoal} tasks done
 </div>
