@@ -1,5 +1,4 @@
-import { buttonConfig } from "./deferButtonsTime";
-import type { TimeButtonConfig } from "../../types/defer";
+import type { TimeButtonConfig } from "../types/defer";
 
 /**
  * Calculates the adjusted time for a button that crosses into the next day.
@@ -9,7 +8,7 @@ import type { TimeButtonConfig } from "../../types/defer";
  * @param {(TimeButtonConfig | null)[]} processedButtons - The array of already processed buttons.
  * @returns The adjusted Date object.
  */
-function calculateAdjustedTime(
+export function calculateAdjustedTime(
     futureTime: Date,
     nextMorning: Date,
     index: number,
@@ -57,7 +56,7 @@ function calculateAdjustedTime(
  * @param {Date} futureTime - The future time to round.
  * @param {number} index - The index of the button.
  */
-function roundFutureTime(futureTime: Date, index: number): void {
+export function roundFutureTime(futureTime: Date, index: number): void {
     if (index > 2) {
         const roundingFactor = index >= 3 && index <= 7 ? 5 : 15;
         const roundedMinutes =
@@ -76,7 +75,7 @@ function roundFutureTime(futureTime: Date, index: number): void {
  * @param {(TimeButtonConfig | null)[]} processedButtons - Previously processed buttons.
  * @returns The processed button configuration.
  */
-function handleNextDayButton(
+export function handleNextDayButton(
     button: TimeButtonConfig,
     futureTime: Date,
     now: Date,
@@ -111,7 +110,7 @@ function handleNextDayButton(
  * @param {Date} now - The current date.
  * @returns The processed button configuration.
  */
-function handleSameDayButton(
+export function handleSameDayButton(
     button: TimeButtonConfig,
     futureTime: Date,
     now: Date,
@@ -136,7 +135,7 @@ function handleSameDayButton(
  * @param {Date} nextMorning - The Date representing the next morning (6am).
  * @returns The processed button.
  */
-function processButton(
+export function processButton(
     button: TimeButtonConfig,
     index: number,
     processedButtons: (TimeButtonConfig | null)[],
@@ -152,66 +151,3 @@ function processButton(
 
     return handleSameDayButton(button, futureTime, now);
 }
-
-/**
- * Creates an array of processed defer buttons with calculated times and styling.
- * @returns An array of processed buttons.
- */
-const createButtons = (): TimeButtonConfig[] => {
-    const buttons: TimeButtonConfig[] = [];
-
-    buttons.push(buttonConfig.tomorrow);
-
-    buttonConfig.minutes.forEach(({ value, height }) => {
-        buttons.push({
-            text: `${value} minute${value && value > 1 ? "s" : ""}`,
-            ms: (value ?? 0) * 60 * 1000,
-            styling: "basis-[48.5%]",
-            stylingButton: height ?? "",
-            value,
-            height,
-        });
-    });
-
-    buttonConfig.hours.forEach(({ value, text, height, styling }) => {
-        const displayText = text || `${value} hrs`;
-        const buttonStyling = styling || "basis-[22.75%]";
-
-        buttons.push({
-            text: displayText,
-            ms: (value ?? 0) * 60 * 60 * 1000,
-            styling: buttonStyling,
-            stylingButton: height ?? "",
-            value,
-            height,
-        });
-    });
-
-    const now = new Date();
-    const nextMorning = new Date(now);
-    nextMorning.setDate(now.getDate() + 1);
-    nextMorning.setHours(6, 0, 0, 0);
-
-    return buttons.map((button, index, array) => {
-        const processedButtons = array.slice(0, index).map((btn, i) =>
-            i < index
-                ? processButton(
-                      btn,
-                      i,
-                      array
-                          .slice(0, i)
-                          .map((b, j) =>
-                              j < i
-                                  ? processButton(b, j, array.slice(0, j), now, nextMorning)
-                                  : null,
-                          ),
-                      now,
-                      nextMorning,
-                  )
-                : null,
-        );
-        return processButton(button, index, processedButtons, now, nextMorning);
-    });
-};
-
-export default createButtons;

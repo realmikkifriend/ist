@@ -2,7 +2,7 @@
     import { afterUpdate, createEventDispatcher } from "svelte";
     import { DateTime } from "luxon";
     import SveltyPicker from "svelty-picker";
-    import { updateCalendarCells } from "./deferButtonsDate";
+    import { updateCalendarCells } from "../../services/deferService";
     import type { Task } from "../../types/todoist";
 
     export let taskToDefer: Task;

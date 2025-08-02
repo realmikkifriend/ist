@@ -1,6 +1,6 @@
 import { DateTime } from "luxon";
-import { getPriorityClasses } from "../../utils/styleUtils";
-import type { Task, Priority } from "../../types/todoist";
+import { getPriorityClasses } from "../utils/styleUtils";
+import type { Task, Priority } from "../types/todoist";
 
 /**
  * Returns the start and end DateTime for a given month/year string.
@@ -128,43 +128,4 @@ export function processCalendarCell(
         const dotContainer = createTaskDots(tasksForDate);
         cell.appendChild(dotContainer);
     }
-}
-
-/**
- * Updates all calendar cells in the given calendar element with task dots and highlights.
- * @param {HTMLElement} calendarElement - The calendar DOM element.
- * @param {string} tz - Timezone string.
- * @param {Task[]} tasks - Array of all tasks.
- * @param {Task} taskToDefer - The task being deferred (for contextId).
- */
-export function updateCalendarCells(
-    calendarElement: HTMLElement,
-    tz: string,
-    tasks: Task[],
-    taskToDefer: Task,
-): void {
-    if (!calendarElement) return;
-
-    const header = calendarElement.querySelector(".std-btn-header.sdt-toggle-btn");
-    if (!(header instanceof HTMLElement)) return;
-    const monthYear = header.innerText;
-    const now = DateTime.local().setZone(tz);
-    const { start, end } = getCalendarDateRange(monthYear, now);
-    const soonTasks = getTasksForMonth(tasks, start, end, tz, taskToDefer.contextId ?? "");
-    const calendarCells = calendarElement.querySelectorAll("td.sdt-cal-td.svelte-hexbpx");
-
-    calendarCells.forEach((cell) => {
-        const cellText = cell.textContent?.trim() ?? "";
-        const cellDate = parseInt(cellText);
-        if (!isNaN(cellDate)) {
-            processCalendarCell(
-                cell as HTMLTableCellElement,
-                cellDate,
-                monthYear,
-                now,
-                soonTasks,
-                tz,
-            );
-        }
-    });
 }
