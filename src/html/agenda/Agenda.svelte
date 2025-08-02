@@ -10,8 +10,8 @@
     import AgendaHour from "./AgendaHour.svelte";
     import AgendaTask from "./AgendaTask.svelte";
     import type { Writable } from "svelte/store";
-    import type { AgendaData } from "../../../types/agenda";
-    import type { Task, Context, ColorName } from "../../../types/todoist";
+    import type { AgendaData } from "../../types/agenda";
+    import type { Task, Context, ColorName } from "../../types/todoist";
 
     const agendaStore: Writable<AgendaData> = writable({
         tasks: [],

@@ -1,6 +1,6 @@
 import { success } from "../../../services/toastService";
 import { updateDynalist } from "./dynalistApi";
-import type { DynalistCountData, DynalistContent } from "../../../../types/dynalist";
+import type { DynalistCountData, DynalistContent } from "../../../types/dynalist";
 
 /**
  * Parses count data from a Dynalist note string.

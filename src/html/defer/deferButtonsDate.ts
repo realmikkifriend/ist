@@ -1,6 +1,6 @@
 import { DateTime } from "luxon";
 import { getPriorityClasses } from "../../utils/styleUtils";
-import type { Task, Priority } from "../../../types/todoist";
+import type { Task, Priority } from "../../types/todoist";
 
 /**
  * Returns the start and end DateTime for a given month/year string.

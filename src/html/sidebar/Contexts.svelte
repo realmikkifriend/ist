@@ -6,7 +6,7 @@
     import { openAgenda } from "../agenda/agenda";
     import { getTasksGroupedByContext } from "../../js/filter";
     import type { Readable } from "svelte/motion";
-    import type { TasksGroupedByContext, Priority } from "../../../types/todoist";
+    import type { TasksGroupedByContext, Priority } from "../../types/todoist";
 
     /**
      * Returns the CSS class for a given priority string.

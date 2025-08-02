@@ -3,7 +3,7 @@
     import DynalistComment from "./dynalist/DynalistComment.svelte";
     import DynalistAuthRequest from "./dynalist/DynalistAuthRequest.svelte";
     import { dynalistAccessToken } from "../../stores/stores";
-    import type { Comment } from "../../../types/todoist";
+    import type { Comment } from "../../types/todoist";
 
     export let comments: Comment[];
 

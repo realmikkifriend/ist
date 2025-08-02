@@ -5,7 +5,7 @@ import type {
     FetchDynalistDocumentResult,
     DynalistDocumentData,
     DynalistNode,
-} from "../../../../types/dynalist";
+} from "../../../types/dynalist";
 
 /**
  * Recursively processes a Dynalist node, filtering out checked nodes and processing children.

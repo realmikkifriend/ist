@@ -1,5 +1,5 @@
 import { buttonConfig } from "./deferButtonsTime";
-import type { TimeButtonConfig } from "../../../types/defer";
+import type { TimeButtonConfig } from "../../types/defer";
 
 /**
  * Calculates the adjusted time for a button that crosses into the next day.

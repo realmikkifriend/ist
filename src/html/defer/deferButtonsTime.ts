@@ -1,4 +1,4 @@
-import type { TimeButtonConfig, DeferButtonConfig } from "../../../types/defer";
+import type { TimeButtonConfig, DeferButtonConfig } from "../../types/defer";
 
 /**
  * Button configuration for defer buttons (time-based).

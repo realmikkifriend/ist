@@ -4,7 +4,7 @@
     // import { filterAndSortTasks } from "../../js/filter";
     import { todoistData } from "../../stores/stores";
     // import type { Task } from "../../../types/todoist";
-    import type { AgendaData, DisplayData } from "../../../types/agenda";
+    import type { AgendaData, DisplayData } from "../../types/agenda";
     // import type { GradientType } from "../../../types/agenda";
 
     export let agendaData: AgendaData;

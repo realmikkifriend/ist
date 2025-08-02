@@ -6,7 +6,7 @@
     import { getPriorityBorder } from "../../utils/styleUtils";
     import { skipTask } from "../../js/first";
     import { DateTime } from "luxon";
-    import type { Task, Priority } from "../../../types/todoist";
+    import type { Task, Priority } from "../../types/todoist";
 
     export let task: Task;
 

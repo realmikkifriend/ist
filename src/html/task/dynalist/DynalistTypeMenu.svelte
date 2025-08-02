@@ -10,7 +10,7 @@
         Inbox,
     } from "svelte-hero-icons";
     import Logo from "../../Logo.svelte";
-    import type { DynalistTaskType } from "../../../../types/dynalist";
+    import type { DynalistTaskType } from "../../../types/dynalist";
 
     export let selectedType: DynalistTaskType;
     export let url: string;

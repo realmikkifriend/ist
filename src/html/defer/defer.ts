@@ -1,8 +1,8 @@
 import { DateTime } from "luxon";
 import { createDateWithTime } from "../../js/time";
 import createButtons from "./deferButtons";
-import type { Task, Priority } from "../../../types/todoist";
-import type { DateButtonConfig } from "../../../types/defer";
+import type { Task, Priority } from "../../types/todoist";
+import type { DateButtonConfig } from "../../types/defer";
 
 /**
  * Sets up the "tomorrow" button with the correct text and milliseconds.

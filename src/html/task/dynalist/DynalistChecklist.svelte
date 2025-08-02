@@ -3,7 +3,7 @@
     import { Icon, Backward } from "svelte-hero-icons";
     import { writable } from "svelte/store";
     import { hasError } from "./dynalist";
-    import type { DynalistContent, DynalistNode } from "../../../../types/dynalist";
+    import type { DynalistContent, DynalistNode } from "../../../types/dynalist";
 
     export let content: DynalistContent | undefined;
 
@@ -41,14 +41,14 @@
 </script>
 
 {#if errorMessage}
-    <div class="italic text-error">{errorMessage}</div>
+    <div class="text-error italic">{errorMessage}</div>
 {:else if checklistItems && $currentIndex < checklistItems.length}
     <div class="mt-2">
-        <em class="absolute -left-0.5 -top-3.5 text-nowrap text-xs opacity-25">
+        <em class="absolute -top-3.5 -left-0.5 text-xs text-nowrap opacity-25">
             <span class="mr-0.5 inline-block w-7">{$currentIndex + 1}/{checklistItems.length}</span>
         </em>
         <button
-            class="float-left mr-2 mt-1 inline-block h-5 w-5 cursor-pointer border-2 border-primary-content transition-colors"
+            class="border-primary-content float-left mt-1 mr-2 inline-block h-5 w-5 cursor-pointer border-2 transition-colors"
             on:click={showNextItem}
         />
         <Markdown md={checklistItems[$currentIndex]?.content ?? ""} />
@@ -58,9 +58,9 @@
 {/if}
 
 {#if $currentIndex > 0}
-    <div class="absolute -right-7 top-6">
+    <div class="absolute top-6 -right-7">
         <button
-            class="btn m-0 h-2 min-h-8 gap-0 border-transparent p-1 pb-2.5 pt-1 text-primary-content shadow-none hover:bg-primary hover:text-white"
+            class="btn text-primary-content hover:bg-primary m-0 h-2 min-h-8 gap-0 border-transparent p-1 pt-1 pb-2.5 shadow-none hover:text-white"
             class:bg-accent={$currentIndex < checklistItems.length - 1}
             class:bg-primary={$currentIndex === checklistItems.length - 1}
             on:click={() => currentIndex.set(0)}

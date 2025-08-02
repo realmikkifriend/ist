@@ -8,7 +8,7 @@
     import DatePicker from "./DatePicker.svelte";
     import TimePicker from "./TimePicker.svelte";
     import type { Writable, Readable } from "svelte/store";
-    import type { Task } from "../../../types/todoist";
+    import type { Task } from "../../types/todoist";
 
     export let task: Task;
 

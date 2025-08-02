@@ -14,7 +14,7 @@
         DynalistContent,
         DynalistTaskType,
         DynalistStoreState,
-    } from "../../../../types/dynalist";
+    } from "../../../types/dynalist";
 
     export let url: string;
 

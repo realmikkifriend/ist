@@ -2,7 +2,7 @@
     import { writable } from "svelte/store";
     import { parseCountData, handleCount, calculateLabel } from "./dynalistCount";
     import type { Writable } from "svelte/store";
-    import type { DynalistNode, DynalistCountData, LabelInfo } from "../../../../types/dynalist";
+    import type { DynalistNode, DynalistCountData, LabelInfo } from "../../../types/dynalist";
 
     export let content: DynalistNode;
 
@@ -34,7 +34,7 @@
     <span class="flex w-full items-center text-xl">
         {content.content}
         <span
-            class="badge badge-xs ml-1 w-fit overflow-hidden whitespace-nowrap p-2 px-3 pt-[0.45rem] text-[0.6rem] font-bold uppercase {labelInfo.classes}"
+            class="badge badge-xs ml-1 w-fit overflow-hidden p-2 px-3 pt-[0.45rem] text-[0.6rem] font-bold whitespace-nowrap uppercase {labelInfo.classes}"
         >
             {labelInfo.label}
         </span>
@@ -45,7 +45,7 @@
             <span class="text-2xl {$countData.current >= $countData.total ? 'text-blue-500' : ''}"
                 >{$countData.current}</span
             >
-            <span class="ml-2 mr-3 text-base text-secondary">
+            <span class="text-secondary mr-3 ml-2 text-base">
                 <span class="text-lg">&#8725;</span>{$countData.total}
             </span>
             <small class={$countData.current >= $countData.total ? "text-blue-500" : ""}>
@@ -55,7 +55,7 @@
         <span class="flex flex-nowrap items-end">
             {#each options as option, index (index)}
                 <button
-                    class="btn ml-1 h-8 min-h-8 px-1 pb-1 pt-0 text-primary-content hover:bg-base-100 active:bg-primary {$countData.current >=
+                    class="btn text-primary-content hover:bg-base-100 active:bg-primary ml-1 h-8 min-h-8 px-1 pt-0 pb-1 {$countData.current >=
                     $countData.total
                         ? 'bg-neutral'
                         : 'bg-primary'}"

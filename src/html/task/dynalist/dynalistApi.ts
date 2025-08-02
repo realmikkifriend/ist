@@ -5,7 +5,7 @@ import type {
     DynalistApiResultBase,
     FetchDynalistDocumentResult,
     ValidateDynalistTokenResult,
-} from "../../../../types/dynalist";
+} from "../../../types/dynalist";
 
 /**
  * Fetches a Dynalist document by URL and access token.

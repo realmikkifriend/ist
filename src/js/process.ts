@@ -1,7 +1,7 @@
 import { createDateWithTime } from "./time";
 import { handleTaskDefer } from "./taskHandlers";
 import { DateTime } from "luxon";
-import type { Task, Context, User, CleanableTodoistData } from "../../types/todoist";
+import type { Task, Context, User, CleanableTodoistData } from "../types/todoist";
 
 /**
  * Handles overdue tasks by deferring them to today.

@@ -3,7 +3,7 @@
     import { DateTime } from "luxon";
     import SveltyPicker from "svelty-picker";
     import { updateCalendarCells } from "./deferButtonsDate";
-    import type { Task } from "../../../types/todoist";
+    import type { Task } from "../../types/todoist";
 
     export let taskToDefer: Task;
     export let tz: string;

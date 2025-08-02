@@ -1,6 +1,6 @@
 import { DateTime } from "luxon";
 import { toastMessages } from "../stores/stores";
-import type { ToastMessage } from "../../types/interface";
+import type { ToastMessage } from "../types/interface";
 
 /**
  * Adds a toast message to the store.

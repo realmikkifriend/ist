@@ -4,8 +4,8 @@ import { todoistData, userSettings, firstDueTask, previousFirstDueTask } from ".
 import { getTaskComments } from "./api";
 import { summonTask } from "../html/agenda/agenda";
 import { handleBadgeClick } from "../services/sidebarService";
-import type { Task, Comment, TodoistData } from "../../types/todoist";
-import type { UserSettings } from "../../types/interface";
+import type { Task, Comment, TodoistData } from "../types/todoist";
+import type { UserSettings } from "../types/interface";
 
 /**
  * Get the name of the current context, either from user settings or from the first due task's context.

@@ -4,8 +4,8 @@
     import { getQuarterHourPosition } from "../../utils/styleUtils";
     import { markTasks, calculateTaskPosition, calculateTaskStyle } from "./agenda";
     import AgendaTask from "./AgendaTask.svelte";
-    import type { Task, Context, ColorName } from "../../../types/todoist";
-    import type { QuarterHourPosition } from "../../../types/agenda";
+    import type { Task, Context, ColorName } from "../../types/todoist";
+    import type { QuarterHourPosition } from "../../types/agenda";
 
     export let tasks: Task[];
     export let hour: number;

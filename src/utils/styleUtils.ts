@@ -1,6 +1,6 @@
-import type { Priority, ColorName } from "../../types/todoist.js";
-import type { QuarterHourPosition, GradientType } from "../../types/agenda.js";
-import type { TaskActivity, Context } from "../../types/todoist.js";
+import type { Priority, ColorName } from "../types/todoist.js";
+import type { QuarterHourPosition, GradientType } from "../types/agenda.js";
+import type { TaskActivity, Context } from "../types/todoist.js";
 
 // This code may appear redundant, but ensures that Svelte exports all necessary classes.
 

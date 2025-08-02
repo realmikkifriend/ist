@@ -6,7 +6,7 @@
     import { updateDynalist } from "./dynalistApi";
     import { success } from "../../../services/toastService";
     import type { Writable } from "svelte/store";
-    import type { DynalistContent, DynalistNode } from "../../../../types/dynalist";
+    import type { DynalistContent, DynalistNode } from "../../../types/dynalist";
 
     export let content: DynalistContent;
 

@@ -8,7 +8,7 @@
         borderClasses,
     } from "../../utils/styleUtils";
     import { summonTask } from "./agenda";
-    import type { Task, ColorName, Priority } from "../../../types/todoist";
+    import type { Task, ColorName, Priority } from "../../types/todoist";
 
     export let task: Task;
     export let color: ColorName;

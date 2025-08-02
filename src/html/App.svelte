@@ -15,7 +15,7 @@
     import Agenda from "./agenda/Agenda.svelte";
     import Toasts from "./Toasts.svelte";
     import type { Writable } from "svelte/store";
-    import type { Task } from "../../types/todoist";
+    import type { Task } from "../types/todoist";
 
     const isSpinning: Writable<boolean> = writable(false);
     const hash: Writable<string> = writable(window.location.hash);

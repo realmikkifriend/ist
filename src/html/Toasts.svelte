@@ -1,7 +1,7 @@
 <script lang="ts">
     import { toastMessages } from "../stores/stores";
     import { fly } from "svelte/transition";
-    import type { ToastMessage } from "../../types/interface";
+    import type { ToastMessage } from "../types/interface";
     import { removeToast } from "../services/toastService";
 
     const alertClasses: Record<ToastMessage["type"], string> = {

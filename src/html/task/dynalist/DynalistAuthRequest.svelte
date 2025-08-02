@@ -4,7 +4,7 @@
     import { success } from "../../../services/toastService";
     import Logo from "../../Logo.svelte";
     import { validateDynalistToken } from "./dynalistApi";
-    import type { ValidateDynalistTokenResult } from "../../../../types/dynalist";
+    import type { ValidateDynalistTokenResult } from "../../../types/dynalist";
 
     /**
      * Handles the submission of the Dynalist access token form.

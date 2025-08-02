@@ -4,7 +4,7 @@ import { todoistAccessToken, todoistData, todoistError } from "../stores/stores"
 import { getDueTasks, getReverseTasks } from "./filter";
 import { error, success } from "../services/toastService";
 import { cleanTodoistData } from "./process";
-import type { Task, Comment, TodoistData, Context, User } from "../../types/todoist";
+import type { Task, Comment, TodoistData, Context, User } from "../types/todoist";
 import type { DateTime } from "luxon";
 import type {
     GetProjectsResponse,
