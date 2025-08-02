@@ -1,5 +1,5 @@
 import { get } from "svelte/store";
-import { dynalistAccessToken } from "../../../js/stores";
+import { dynalistAccessToken } from "../../../stores/stores";
 import { fetchDynalistDocument } from "./dynalistApi";
 import type {
     FetchDynalistDocumentResult,

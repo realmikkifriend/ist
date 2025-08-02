@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { todoistAccessToken } from "../js/stores";
+    import { todoistAccessToken } from "../stores/stores";
     import "@fontsource/clear-sans/400.css";
     import "@fontsource/clear-sans/700.css";
     import App from "./App.svelte";

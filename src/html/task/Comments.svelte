@@ -2,7 +2,7 @@
     import Markdown from "svelte-exmarkdown";
     import DynalistComment from "./dynalist/DynalistComment.svelte";
     import DynalistAuthRequest from "./dynalist/DynalistAuthRequest.svelte";
-    import { dynalistAccessToken } from "../../js/stores";
+    import { dynalistAccessToken } from "../../stores/stores";
     import type { Comment } from "../../../types/todoist";
 
     export let comments: Comment[];
@@ -20,7 +20,7 @@
     );
 </script>
 
-<div class="prose mx-auto w-11/12 rounded-b-xl bg-accent p-4 text-primary-content">
+<div class="prose bg-accent text-primary-content mx-auto w-11/12 rounded-b-xl p-4">
     {#if requiresAuthRequest && !$dynalistAccessToken}
         <DynalistAuthRequest />
         <div class="divider my-1" />

@@ -1,6 +1,6 @@
 import { get } from "svelte/store";
 import { DateTime } from "luxon";
-import { todoistData } from "./stores";
+import { todoistData } from "../stores/stores";
 import { getTaskTime } from "./time";
 import type { Task, Context, DueTasksData, TasksGroupedByContext } from "../../types/todoist";
 

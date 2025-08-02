@@ -1,7 +1,7 @@
 <script lang="ts">
     import { derived } from "svelte/store";
     import { Icon, XCircle, Calendar } from "svelte-hero-icons";
-    import { todoistData, userSettings, previousFirstDueTask } from "../../js/stores";
+    import { todoistData, userSettings, previousFirstDueTask } from "../../stores/stores";
     import { getPriorityClasses } from "../../js/classes";
     import { openAgenda } from "../agenda/agenda";
     import { getTasksGroupedByContext } from "../../js/filter";

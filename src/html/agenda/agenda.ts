@@ -1,5 +1,5 @@
 import { get } from "svelte/store";
-import { firstDueTask, previousFirstDueTask } from "../../js/stores";
+import { firstDueTask, previousFirstDueTask } from "../../stores/stores";
 import { setFirstDueTask } from "../../js/first";
 import { DateTime } from "luxon";
 import type { Task, TodoistData } from "../../../types/todoist";

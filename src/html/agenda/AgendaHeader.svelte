@@ -2,7 +2,7 @@
     import { Icon, XCircle, Calendar, BarsArrowUp } from "svelte-hero-icons";
     import { summonTask } from "./agenda";
     // import { filterAndSortTasks } from "../../js/filter";
-    import { todoistData } from "../../js/stores";
+    import { todoistData } from "../../stores/stores";
     // import type { Task } from "../../../types/todoist";
     import type { AgendaData, DisplayData } from "../../../types/agenda";
     // import type { GradientType } from "../../../types/agenda";

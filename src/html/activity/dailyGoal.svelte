@@ -1,7 +1,7 @@
 <script lang="ts">
     import { DateTime } from "luxon";
     import { Icon, ArrowPath } from "svelte-hero-icons";
-    import { todoistData } from "./../../js/stores";
+    import { todoistData } from "../../stores/stores";
     import { getActivity } from "./activity";
     import { writable } from "svelte/store";
     import { getContextColors, colorClasses } from "../../js/classes";

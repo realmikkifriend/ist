@@ -1,5 +1,5 @@
 import { DateTime } from "luxon";
-import { toastMessages } from "../js/stores";
+import { toastMessages } from "../stores/stores";
 import type { ToastMessage } from "../../types/interface";
 
 /**

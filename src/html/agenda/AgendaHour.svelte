@@ -1,6 +1,6 @@
 <script lang="ts">
     import { DateTime } from "luxon";
-    import { todoistData } from "../../js/stores";
+    import { todoistData } from "../../stores/stores";
     import { getQuarterHourPosition } from "../../js/classes";
     import { markTasks, calculateTaskPosition, calculateTaskStyle } from "./agenda";
     import AgendaTask from "./AgendaTask.svelte";

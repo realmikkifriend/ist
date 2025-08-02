@@ -3,7 +3,7 @@
     import { writable } from "svelte/store";
     import { DateTime } from "luxon";
     import { Icon, ArrowPath } from "svelte-hero-icons";
-    import { todoistData, todoistError, userSettings, firstDueTask } from "../js/stores";
+    import { todoistData, todoistError, userSettings, firstDueTask } from "../stores/stores";
     import { updateFirstDueTask } from "../js/first";
     import { refreshData } from "../js/api";
     import { error as showError } from "../services/toastService";

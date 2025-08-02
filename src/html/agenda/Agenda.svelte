@@ -2,7 +2,7 @@
     import { onMount, onDestroy } from "svelte";
     import { writable } from "svelte/store";
     import { DateTime } from "luxon";
-    import { todoistData } from "../../js/stores";
+    import { todoistData } from "../../stores/stores";
     import { getGradientColor } from "../../js/classes";
     import { filterAndSortTasks } from "../../js/filter";
     import { getTasksForDate, sortAgendaTasks } from "./agenda";

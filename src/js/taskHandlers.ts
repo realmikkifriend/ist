@@ -1,4 +1,4 @@
-import { todoistData, todoistError, previousFirstDueTask, taskActivity } from "./stores";
+import { todoistData, todoistError, previousFirstDueTask, taskActivity } from "../stores/stores";
 import { markTaskDone, deferTasks, refreshData } from "./api";
 import { updateFirstDueTask } from "./first";
 import { get } from "svelte/store";
