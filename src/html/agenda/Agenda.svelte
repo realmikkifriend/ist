@@ -4,7 +4,7 @@
     import { DateTime } from "luxon";
     import { todoistData } from "../../stores/stores";
     import { getGradientColor } from "../../utils/styleUtils";
-    import { filterAndSortTasks } from "../../js/filter";
+    import { filterAndSortTasks } from "../../utils/filterUtils";
     import { getTasksForDate, sortAgendaTasks } from "../../utils/agendaUtils";
     import AgendaHeader from "./AgendaHeader.svelte";
     import AgendaHour from "./AgendaHour.svelte";

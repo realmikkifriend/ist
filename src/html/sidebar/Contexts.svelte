@@ -4,7 +4,7 @@
     import { todoistData, userSettings, previousFirstDueTask } from "../../stores/stores";
     import { getPriorityClasses } from "../../utils/styleUtils";
     import { openAgenda } from "../../services/agendaService";
-    import { getTasksGroupedByContext } from "../../js/filter";
+    import { getTasksGroupedByContext } from "../../utils/filterUtils";
     import type { Readable } from "svelte/motion";
     import type { TasksGroupedByContext, Priority } from "../../types/todoist";
 
@@ -24,7 +24,7 @@
      */
     const dueTasksByContext: Readable<TasksGroupedByContext> = derived(
         todoistData,
-        ($todoistData) => ($todoistData ? getTasksGroupedByContext() : {}),
+        ($todoistData) => getTasksGroupedByContext($todoistData.dueTasks),
     );
 
     /**
