@@ -3,7 +3,8 @@ import { TodoistApi, TodoistRequestError } from "@doist/todoist-api-typescript";
 import { todoistAccessToken, todoistData, todoistError } from "../stores/stores";
 import { getDueTasks, getReverseTasks } from "../utils/filterUtils";
 import { error, success } from "../services/toastService";
-import { cleanTodoistData } from "./process";
+import { cleanTodoistData } from "../utils/processUtils";
+import { handleOverdueTasks } from "../services/deferService";
 import type { Task, Comment, TodoistData, Context, User } from "../types/todoist";
 import type { DateTime } from "luxon";
 import type {
@@ -108,6 +109,7 @@ export function refreshData(): Promise<
                 return;
             }
 
+            handleOverdueTasks(tasks.results || []);
             const todoistDataObj = processApiResponse(tasks, projects, userResponse);
 
             todoistData.set(todoistDataObj);

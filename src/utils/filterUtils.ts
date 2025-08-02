@@ -15,6 +15,23 @@ export function getDueTasks(data: DueTasksData): Task[] {
 }
 
 /**
+ * Filters tasks that are due soon (within 25 hours and have a time).
+ * @param {Task[]} tasks - Array of tasks.
+ * @returns {Task[]} - Filtered array of soon tasks.
+ */
+export function getSoonTasks(tasks: Task[]): Task[] {
+    return tasks.filter((task) => {
+        if (!task.due || !task.due.date) return false;
+        const dueDateTime = DateTime.fromISO(task.due.date);
+        return (
+            dueDateTime.isValid &&
+            task.due.date.includes("T") &&
+            dueDateTime.diffNow("hours").hours <= 25
+        );
+    });
+}
+
+/**
  * Returns the list of reverse tasks, filtered and sorted in reverse order.
  * @param {DueTasksData} data - The data object containing tasks, contexts, and user.
  * @returns {Task[]} The filtered and reverse-sorted tasks.

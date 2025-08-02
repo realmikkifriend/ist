@@ -1,7 +1,7 @@
 <script lang="ts">
     import { createEventDispatcher, onDestroy } from "svelte";
     import { getPriorityClasses } from "../../utils/styleUtils";
-    import { updateMilliseconds } from "../../services/deferService";
+    import { updateMilliseconds } from "../../services/deferModalService";
     import type { Task } from "../../types/todoist";
 
     export let task: Task;

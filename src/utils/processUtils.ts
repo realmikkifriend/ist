@@ -1,31 +1,4 @@
-import { DateTime } from "luxon";
-import { createDateWithTime } from "../utils/timeUtils";
-import { handleTaskDefer } from "./taskHandlers";
-import type { Task, Context, User, CleanableTodoistData } from "../types/todoist";
-
-/**
- * Handles overdue tasks by deferring them to today.
- * @param {Task[]} tasks - Array of Task objects to check for overdue status.
- * @returns {void}
- */
-function handleOverdueTasks(tasks: Task[]): void {
-    const today = DateTime.now().startOf("day");
-    const overdueTasks =
-        tasks.filter((task) => {
-            const dueDate = task.due?.date && DateTime.fromISO(task.due.date).startOf("day");
-            return dueDate && dueDate < today;
-        }) || [];
-
-    if (overdueTasks.length > 0) {
-        const taskUpdates: [Task, DateTime][] = overdueTasks.map((task) => {
-            const extracted = task.due?.string ? createDateWithTime(task.due.string, today) : null;
-            const time: DateTime = extracted?.newDate ?? today;
-            return [task, time];
-        });
-
-        void handleTaskDefer(taskUpdates);
-    }
-}
+import type { Context, User, CleanableTodoistData, Task } from "../types/todoist";
 
 /**
  * Removes specified properties from each object in the array and optionally renames properties.
@@ -63,7 +36,6 @@ function cleanDataArray<T extends object>(
  */
 export function cleanTodoistData(data: CleanableTodoistData): CleanableTodoistData {
     if (data.tasks) {
-        handleOverdueTasks(data.tasks);
         const taskPropsToRemove = [
             "userId",
             "sectionId",
