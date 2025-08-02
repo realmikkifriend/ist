@@ -3,7 +3,7 @@
     import { Icon, XCircle, Calendar } from "svelte-hero-icons";
     import { todoistData, userSettings, previousFirstDueTask } from "../../stores/stores";
     import { getPriorityClasses } from "../../utils/styleUtils";
-    import { openAgenda } from "../agenda/agenda";
+    import { openAgenda } from "../../services/agendaService";
     import { getTasksGroupedByContext } from "../../js/filter";
     import type { Readable } from "svelte/motion";
     import type { TasksGroupedByContext, Priority } from "../../types/todoist";

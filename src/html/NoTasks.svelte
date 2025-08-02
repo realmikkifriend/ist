@@ -1,6 +1,6 @@
 <script lang="ts">
     import { Icon, Calendar } from "svelte-hero-icons";
-    import { openAgenda } from "./agenda/agenda";
+    import { openAgenda } from "../services/agendaService";
 
     const buttonClasses: string =
         "border-2 space-x-1 border-white rounded-md p-2 flex flex-row items-center";

@@ -2,7 +2,8 @@
     import { DateTime } from "luxon";
     import { todoistData } from "../../stores/stores";
     import { getQuarterHourPosition } from "../../utils/styleUtils";
-    import { markTasks, calculateTaskPosition, calculateTaskStyle } from "./agenda";
+    import { calculateTaskPosition, calculateTaskStyle } from "./../../utils/agendaUtils";
+    import { markTasks } from "../../services/agendaService";
     import AgendaTask from "./AgendaTask.svelte";
     import type { Task, Context, ColorName } from "../../types/todoist";
     import type { QuarterHourPosition } from "../../types/agenda";

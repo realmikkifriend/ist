@@ -1,6 +1,6 @@
 <script lang="ts">
     import { Icon, XCircle, Calendar, BarsArrowUp } from "svelte-hero-icons";
-    import { summonTask } from "./agenda";
+    import { summonTask } from "../../services/agendaService";
     // import { filterAndSortTasks } from "../../js/filter";
     import { todoistData } from "../../stores/stores";
     // import type { Task } from "../../../types/todoist";
