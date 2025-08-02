@@ -3,7 +3,7 @@
     import { writable } from "svelte/store";
     import { DateTime } from "luxon";
     import { todoistData } from "../../stores/stores";
-    import { getGradientColor } from "../../js/classes";
+    import { getGradientColor } from "../../utils/styleUtils";
     import { filterAndSortTasks } from "../../js/filter";
     import { getTasksForDate, sortAgendaTasks } from "./agenda";
     import AgendaHeader from "./AgendaHeader.svelte";

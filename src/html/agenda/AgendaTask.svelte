@@ -6,7 +6,7 @@
         colorClasses,
         colorClassesFaded,
         borderClasses,
-    } from "../../js/classes";
+    } from "../../utils/styleUtils";
     import { summonTask } from "./agenda";
     import type { Task, ColorName, Priority } from "../../../types/todoist";
 

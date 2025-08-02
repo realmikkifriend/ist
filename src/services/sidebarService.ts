@@ -1,7 +1,7 @@
 import { get } from "svelte/store";
-import { updateFirstDueTask } from "../../js/first";
-import { todoistData, userSettings, firstDueTask, previousFirstDueTask } from "../../stores/stores";
-import type { Task } from "../../../types/todoist";
+import { updateFirstDueTask } from "../js/first";
+import { todoistData, userSettings, firstDueTask, previousFirstDueTask } from "../stores/stores";
+import type { Task } from "../../types/todoist";
 
 /**
  * Gets the count of due tasks for a specific context.

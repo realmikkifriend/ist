@@ -1,6 +1,6 @@
 <script lang="ts">
     import { createEventDispatcher, onDestroy } from "svelte";
-    import { getPriorityClasses } from "../../js/classes";
+    import { getPriorityClasses } from "../../utils/styleUtils";
     import { updateMilliseconds } from "./defer";
     import type { Task } from "../../../types/todoist";
     // import type { TimeButtonConfig } from "../../../types/defer";
@@ -30,7 +30,7 @@
         {#if button.ms !== undefined}
             <div class={button.styling}>
                 <button
-                    class={"btn min-h-4 w-full rounded-md px-1 hover:bg-secondary " +
+                    class={"btn hover:bg-secondary min-h-4 w-full rounded-md px-1 " +
                         button.stylingButton}
                     on:click={() => handleDefer(Number(button.ms))}>{button.text}</button
                 >
@@ -39,7 +39,7 @@
                         class="flex max-h-4 w-full justify-between overflow-hidden text-xs opacity-65"
                     >
                         <span
-                            class="w-fit overflow-hidden text-left text-secondary"
+                            class="text-secondary w-fit overflow-hidden text-left"
                             class:italic={button.time && button.time.startsWith("*")}
                             >{button.time && button.time.startsWith("*")
                                 ? button.time.slice(1)

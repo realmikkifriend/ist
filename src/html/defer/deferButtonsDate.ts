@@ -1,5 +1,5 @@
 import { DateTime } from "luxon";
-import { getPriorityClasses } from "../../js/classes";
+import { getPriorityClasses } from "../../utils/styleUtils";
 import type { Task, Priority } from "../../../types/todoist";
 
 /**

@@ -6,7 +6,7 @@ import type { TaskActivity, Context } from "../../types/todoist.js";
 
 /**
  * Returns background and text color classes for a given priority.
- * @param {Priority} priority - The priority level (1 to 4).
+ * @param {Priority} priority - The priority to style.
  * @returns The corresponding Tailwind CSS classes for the priority.
  */
 export const getPriorityClasses = (priority: Priority): string =>

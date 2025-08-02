@@ -3,7 +3,7 @@
     import { Icon, Check, Calendar, Clock, Forward } from "svelte-hero-icons";
     import DeferModal from "../defer/DeferModal.svelte";
     import Comments from "./Comments.svelte";
-    import { getPriorityBorder } from "../../js/classes";
+    import { getPriorityBorder } from "../../utils/styleUtils";
     import { skipTask } from "../../js/first";
     import { DateTime } from "luxon";
     import type { Task, Priority } from "../../../types/todoist";
