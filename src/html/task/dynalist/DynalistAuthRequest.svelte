@@ -61,7 +61,7 @@
 </script>
 
 <div class="dynalistPrompt w-full">
-    <div class="flex h-auto items-center space-x-1">
+    <div class="mb-1 flex items-center space-x-1">
         <Logo type="dynalist" size={8} />
         <div class="overflow-x-hidden text-nowrap">
             Provide <a

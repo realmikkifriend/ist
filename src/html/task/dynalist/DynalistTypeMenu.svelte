@@ -44,7 +44,7 @@
     <div
         tabindex="0"
         role="button"
-        class="btn bg-accent hover:bg-primary m-0 h-2 min-h-8 gap-0 border-transparent p-1 pt-0 pb-3 shadow-none"
+        class="btn bg-accent hover:bg-primary m-0 flex h-2 min-h-8 flex-row content-center gap-0 border-transparent px-1 py-0 shadow-none"
     >
         <Logo type="dynalist" size={6} />
         <Icon src={ChevronDown} class="h-3 w-3" />
