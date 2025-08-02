@@ -1,7 +1,7 @@
 import { get } from "svelte/store";
 import { success, newFirstTask } from "../services/toastService";
 import { todoistData, userSettings, firstDueTask, previousFirstDueTask } from "../stores/stores";
-import { getTaskComments } from "./api";
+import { getTaskComments } from "../services/apiService";
 import { summonTask } from "../services/agendaService";
 import { handleBadgeClick } from "../services/sidebarService";
 import type { Task, Comment, TodoistData } from "../types/todoist";

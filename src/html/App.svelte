@@ -5,7 +5,7 @@
     import { Icon, ArrowPath } from "svelte-hero-icons";
     import { todoistData, todoistError, userSettings, firstDueTask } from "../stores/stores";
     import { updateFirstDueTask } from "../js/first";
-    import { refreshData } from "../js/api";
+    import { refreshData } from "../services/apiService";
     import { error as showError } from "../services/toastService";
     import { handleTaskDone, handleTaskDefer } from "../js/taskHandlers";
     import Sidebar from "./sidebar/Sidebar.svelte";

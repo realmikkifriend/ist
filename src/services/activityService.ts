@@ -1,6 +1,6 @@
 import { get } from "svelte/store";
 import { DateTime } from "luxon";
-import { getEndpoint } from "../js/api";
+import { getEndpoint } from "../utils/apiUtils";
 import { taskActivity } from "../stores/stores";
 import type { Task, TaskActivity, TodoistActivity } from "../types/todoist";
 import {
