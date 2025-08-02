@@ -2,7 +2,7 @@
     import Markdown from "svelte-exmarkdown";
     import { Icon, Backward } from "svelte-hero-icons";
     import { writable } from "svelte/store";
-    import { hasError } from "./dynalist";
+    import { hasError } from "../../../utils/dynalistUtils";
     import type { DynalistContent, DynalistNode } from "../../../types/dynalist";
 
     export let content: DynalistContent | undefined;

@@ -1,11 +1,16 @@
 import { get } from "svelte/store";
-import { dynalistAccessToken } from "../../../stores/stores";
+import { dynalistAccessToken } from "../stores/stores";
 import type {
+    FetchDynalistDocumentResult,
+    DynalistDocumentData,
+    DynalistNode,
     DynalistContent,
     DynalistApiResultBase,
-    FetchDynalistDocumentResult,
     ValidateDynalistTokenResult,
-} from "../../../types/dynalist";
+    DynalistCountData,
+} from "../types/dynalist";
+import { success } from "./toastService";
+import { processNode, getDynalistType } from "../utils/dynalistUtils";
 
 /**
  * Fetches a Dynalist document by URL and access token.
@@ -138,4 +143,82 @@ export async function validateDynalistToken(token: string): Promise<ValidateDyna
             console.error("Network or other error:", error);
             return { success: false, error: "Network or other error" };
         });
+}
+
+/**
+ * Loads and processes a Dynalist comment from a document URL.
+ * @param {string} url - The Dynalist document URL.
+ * @returns {Promise<{ dynalistObject?: DynalistNode; selectedType?: string; error?: unknown }>} The processed comment and type, or error.
+ */
+export async function loadDynalistComment(
+    url: string,
+): Promise<{ dynalistObject?: DynalistNode; selectedType?: string; error?: unknown }> {
+    const accessToken = get(dynalistAccessToken);
+    const {
+        data,
+        dynalistSubItem,
+        error: fetchError,
+    }: FetchDynalistDocumentResult = await fetchDynalistDocument(url, accessToken);
+    if (fetchError) {
+        return { error: fetchError };
+    }
+    if (!data || !("nodes" in data)) {
+        return { error: new Error("Invalid Dynalist data structure.") };
+    }
+    (data as unknown as DynalistDocumentData).nodes.forEach((node) => {
+        if (node.content) node.content = node.content.replace(/__(.*?)__/g, "_$1_");
+    });
+
+    const rootNode = (data as unknown as DynalistDocumentData).nodes.find(
+        (node) => node.id === (dynalistSubItem || "root"),
+    );
+
+    if (!rootNode) {
+        return { error: new Error("Specified node not in document.") };
+    }
+
+    const dynalistObject = processNode(rootNode, data as unknown as DynalistDocumentData);
+    if (!dynalistObject) {
+        return { error: new Error("Processed Dynalist node is null.") };
+    }
+
+    const dynalistObjectWithFileId = {
+        ...dynalistObject,
+        file_id: (data as unknown as DynalistDocumentData).file_id,
+    };
+    const selectedType = getDynalistType(dynalistObject.note);
+    return { dynalistObject: dynalistObjectWithFileId, selectedType };
+}
+
+/**
+ * Handles updating the count for a Dynalist node.
+ * @param {string} option - The option string (e.g., "+1", "-1").
+ * @param {DynalistCountData} countData - The current count data.
+ * @param {DynalistContent} content - The Dynalist node content.
+ * @returns {Promise<DynalistCountData>} The updated count data.
+ */
+export async function handleCount(
+    option: string,
+    countData: DynalistCountData,
+    content: DynalistContent,
+): Promise<DynalistCountData> {
+    const todayFormatted = new Date().toLocaleDateString("en-CA");
+    const increment = +option.slice(1);
+    const updatedData: DynalistCountData = {
+        ...countData,
+        current: countData.current + increment,
+    };
+    const changes = [
+        {
+            action: "edit",
+            node_id: content.id,
+            note: `count ${updatedData.total}/${updatedData.current} ${todayFormatted}`,
+        },
+    ];
+
+    await updateDynalist(content.file_id, changes);
+
+    success("Updated count!");
+
+    return updatedData;
 }

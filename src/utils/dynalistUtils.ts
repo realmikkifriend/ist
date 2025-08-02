@@ -1,6 +1,101 @@
-import { success } from "../../../services/toastService";
-import { updateDynalist } from "./dynalistApi";
-import type { DynalistCountData, DynalistContent } from "../../../types/dynalist";
+import type { DynalistNode, DynalistDocumentData, DynalistCountData } from "../types/dynalist";
+
+/**
+ * Recursively processes a Dynalist node, filtering out checked nodes and processing children.
+ * @param {DynalistNode} node - The node to process.
+ * @param {DynalistDocumentData} data - The document data containing all nodes.
+ * @returns {DynalistNode | null} The processed node or null if checked.
+ */
+export function processNode(node: DynalistNode, data: DynalistDocumentData): DynalistNode | null {
+    if (node.checked) return null;
+
+    const { children, ...rest } = node;
+    const processedNode: DynalistNode = {
+        ...rest,
+        note: node.note,
+        content: node.content,
+        checked: node.checked,
+        children: undefined,
+    };
+
+    if (children && children.length > 0) {
+        processedNode.children = children
+            .map((childId) => {
+                const child = data.nodes.find((n) => n.id === childId);
+                return child ? processNode(child, data) : null;
+            })
+            .filter((child): child is DynalistNode => child !== null);
+    }
+
+    return processedNode;
+}
+
+/**
+ * Determines the Dynalist type from a note string.
+ * @param {string | undefined} note - The note to analyze.
+ * @returns {string} The determined type.
+ */
+export function getDynalistType(note: string | undefined): string {
+    const validTypes = ["read", "checklist", "rotating", "crossoff"];
+    const firstWordMatch = note && note.match(/^count \d+(\/|$)[\s\S]*$/);
+
+    if (note && (validTypes.includes(note) || firstWordMatch)) {
+        return firstWordMatch ? "count" : note;
+    }
+    return "read";
+}
+
+/**
+ * Generates a markdown comment from a Dynalist node and its children.
+ * @param {DynalistNode} node - The root node.
+ * @param {number} indent - The indentation level.
+ * @returns {string} The generated markdown comment.
+ */
+export function generateDynalistComment(node: DynalistNode, indent: number = 0): string {
+    if (!node || !Array.isArray(node.children)) return "";
+
+    const processNodeContent = (child: DynalistNode | string, level: number): string => {
+        if (typeof child === "string") {
+            return `${"  ".repeat(level)}- ${child}\n`;
+        } else {
+            const markdown =
+                `${"  ".repeat(level)}- ${child.content}\n` +
+                (Array.isArray(child.children)
+                    ? child.children
+                          .map((subChild) => processNodeContent(subChild, level + 1))
+                          .join("")
+                    : "");
+            return markdown;
+        }
+    };
+
+    return node.children.map((child) => processNodeContent(child, indent)).join("");
+}
+
+/**
+ * Parses a markdown list into an array of strings, preserving indentation.
+ * @param {string} content - The markdown list content.
+ * @returns {string[]} The parsed list items.
+ */
+export function parseList(content: string): string[] {
+    return content.split("\n").reduce<string[]>((result, line) => {
+        if (line.startsWith("  ") && result.length > 0) {
+            result[result.length - 1] += "\n" + line;
+        } else {
+            result.push(line.substring(2).trim());
+        }
+        return result;
+    }, []);
+}
+
+/**
+ * Returns whether the provided object has an error property.
+ * @param {unknown} obj - The object to check for an error property.
+ * @returns True if the object has an error property, false otherwise.
+ */
+export function hasError(obj: unknown): obj is { error: { message?: string } } {
+    return typeof obj === "object" && obj !== null && "error" in obj;
+}
 
 /**
  * Parses count data from a Dynalist note string.
@@ -21,39 +116,6 @@ export const parseCountData = (note: string): DynalistCountData => {
         ...(date ? { date } : {}),
     };
 };
-
-/**
- * Handles updating the count for a Dynalist node.
- * @param {string} option - The option string (e.g., "+1", "-1").
- * @param {DynalistCountData} countData - The current count data.
- * @param {DynalistContent} content - The Dynalist node content.
- * @returns {Promise<DynalistCountData>} The updated count data.
- */
-export async function handleCount(
-    option: string,
-    countData: DynalistCountData,
-    content: DynalistContent,
-): Promise<DynalistCountData> {
-    const todayFormatted = new Date().toLocaleDateString("en-CA");
-    const increment = +option.slice(1);
-    const updatedData: DynalistCountData = {
-        ...countData,
-        current: countData.current + increment,
-    };
-    const changes = [
-        {
-            action: "edit",
-            node_id: content.id,
-            note: `count ${updatedData.total}/${updatedData.current} ${todayFormatted}`,
-        },
-    ];
-
-    await updateDynalist(content.file_id, changes);
-
-    success("Updated count!");
-
-    return updatedData;
-}
 
 /**
  * Calculates the label and classes for the current count state.

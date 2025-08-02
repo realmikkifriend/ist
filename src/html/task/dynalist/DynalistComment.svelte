@@ -7,7 +7,8 @@
     import DynalistRotating from "./DynalistRotating.svelte";
     import DynalistCrossOff from "./DynalistCrossOff.svelte";
     import DynalistTypeMenu from "./DynalistTypeMenu.svelte";
-    import { loadDynalistComment, generateDynalistComment, hasError } from "./dynalist";
+    import { loadDynalistComment } from "../../../services/dynalistService";
+    import { generateDynalistComment, hasError } from "../../../utils/dynalistUtils";
     import { error as showError } from "../../../services/toastService";
     import type { Writable } from "svelte/store";
     import type {

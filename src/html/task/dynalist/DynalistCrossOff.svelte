@@ -2,8 +2,8 @@
     import { writable } from "svelte/store";
     import { Icon, Backspace } from "svelte-hero-icons";
     import Markdown from "svelte-exmarkdown";
-    import { generateDynalistComment } from "./dynalist";
-    import { updateDynalist } from "./dynalistApi";
+    import { generateDynalistComment } from "../../../utils/dynalistUtils";
+    import { updateDynalist } from "../../../services/dynalistService";
     import { success } from "../../../services/toastService";
     import type { Writable } from "svelte/store";
     import type { DynalistContent, DynalistNode } from "../../../types/dynalist";

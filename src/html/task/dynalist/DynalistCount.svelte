@@ -1,6 +1,7 @@
 <script lang="ts">
     import { writable } from "svelte/store";
-    import { parseCountData, handleCount, calculateLabel } from "./dynalistCount";
+    import { handleCount } from "../../../services/dynalistService";
+    import { parseCountData, calculateLabel } from "../../../utils/dynalistUtils";
     import type { Writable } from "svelte/store";
     import type { DynalistNode, DynalistCountData, LabelInfo } from "../../../types/dynalist";
 
