@@ -2,7 +2,7 @@
     import { DateTime } from "luxon";
     import { Icon, ArrowPath } from "svelte-hero-icons";
     import { todoistData } from "../../stores/stores";
-    import { getActivity } from "./activity";
+    import { getActivity } from "../../services/activityService";
     import { writable } from "svelte/store";
     import { getContextColors, colorClasses } from "../../utils/styleUtils";
     import type { TaskActivity, ColorName } from "../../types/todoist";
