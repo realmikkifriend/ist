@@ -4,7 +4,7 @@
     import Markdown from "svelte-exmarkdown";
     import { generateDynalistComment } from "./dynalist";
     import { updateDynalist } from "./dynalistApi";
-    import { success } from "../../../js/toasts";
+    import { success } from "../../../services/toastService";
     import type { Writable } from "svelte/store";
     import type { DynalistContent, DynalistNode } from "../../../../types/dynalist";
 

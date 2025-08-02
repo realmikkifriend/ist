@@ -8,7 +8,7 @@
     import DynalistCrossOff from "./DynalistCrossOff.svelte";
     import DynalistTypeMenu from "./DynalistTypeMenu.svelte";
     import { loadDynalistComment, generateDynalistComment, hasError } from "./dynalist";
-    import { error as showError } from "../../../js/toasts";
+    import { error as showError } from "../../../services/toastService";
     import type { Writable } from "svelte/store";
     import type {
         DynalistContent,

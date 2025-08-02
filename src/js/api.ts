@@ -2,8 +2,7 @@ import { get } from "svelte/store";
 import { TodoistApi, TodoistRequestError } from "@doist/todoist-api-typescript";
 import { todoistAccessToken, todoistData, todoistError } from "./stores";
 import { getDueTasks, getReverseTasks } from "./filter";
-import { success } from "./toasts";
-import { toast } from "@zerodevx/svelte-toast";
+import { error, success } from "../services/toastService";
 import { cleanTodoistData } from "./process";
 import type { Task, Comment, TodoistData, Context, User } from "../../types/todoist";
 import type { DateTime } from "luxon";
@@ -146,23 +145,22 @@ function setErrorState(error: TodoistRequestError): {
 export function getTaskComments(taskId: string): Promise<Comment[]> {
     const { accessToken, api } = initializeApi();
     if (!accessToken || !api) {
-        toast.push("Failed to load comments: No access token found.");
         return Promise.resolve([]);
     }
 
     return api
         .getComments({ taskId })
         .then((response) => response.results)
-        .catch((error: unknown) => {
+        .catch((err: unknown) => {
             const message =
-                error instanceof TodoistRequestError
-                    ? error.message
-                    : error instanceof Error
-                      ? error.message
-                      : typeof error === "string"
-                        ? error
+                err instanceof TodoistRequestError
+                    ? err.message
+                    : err instanceof Error
+                      ? err.message
+                      : typeof err === "string"
+                        ? err
                         : "Unknown error";
-            toast.push(`Failed to load comments: ${message}`);
+            error(`Failed to load comments: ${message}`);
             return [];
         });
 }

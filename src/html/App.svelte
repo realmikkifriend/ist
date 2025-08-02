@@ -6,13 +6,14 @@
     import { todoistData, todoistError, userSettings, firstDueTask } from "../js/stores";
     import { updateFirstDueTask } from "../js/first";
     import { refreshData } from "../js/api";
-    import { error as showError } from "../js/toasts";
+    import { error as showError } from "../services/toastService";
     import { handleTaskDone, handleTaskDefer } from "../js/taskHandlers";
     import Sidebar from "./sidebar/Sidebar.svelte";
     import ContextBadge from "./sidebar/ContextBadge.svelte";
     import NoTasks from "./NoTasks.svelte";
     import TaskDisplay from "./task/TaskDisplay.svelte";
     import Agenda from "./agenda/Agenda.svelte";
+    import Toasts from "./Toasts.svelte";
     import type { Writable } from "svelte/store";
     import type { Task } from "../../types/todoist";
 
@@ -140,3 +141,5 @@
         <Icon src={ArrowPath} class="h-6 w-6 {$isSpinning ? 'animate-spin cursor-wait' : ''}" />
     </button>
 </div>
+
+<Toasts />

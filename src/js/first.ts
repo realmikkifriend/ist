@@ -1,12 +1,9 @@
 import { get } from "svelte/store";
-import { toast } from "@zerodevx/svelte-toast";
-import { success, newFirstTask } from "./toasts";
+import { success, newFirstTask } from "../services/toastService";
 import { todoistData, userSettings, firstDueTask, previousFirstDueTask } from "./stores";
 import { getTaskComments } from "./api";
-import FirstDueTaskToast from "../html/FirstDueTaskToast.svelte";
 import { summonTask } from "../html/agenda/agenda";
 import { handleBadgeClick } from "../html/sidebar/sidebar";
-import type { SvelteComponent } from "svelte";
 import type { Task, Comment, TodoistData } from "../../types/todoist";
 import type { UserSettings } from "../../types/interface";
 
@@ -147,11 +144,8 @@ export const updateFirstDueTask = async (): Promise<void> => {
     const newTaskWithComments = await loadCommentsForTask(dueTasks[0]);
 
     if (shouldShowNewTaskToast(newTaskWithComments, prevTask, selectedContextId)) {
-        newFirstTask(FirstDueTaskToast as unknown as typeof SvelteComponent, () =>
-            setFirstDueTask(newTaskWithComments),
-        );
+        newFirstTask(() => setFirstDueTask(newTaskWithComments));
     } else {
-        toast.pop({ target: "wait" });
         setFirstDueTask(newTaskWithComments);
     }
 };

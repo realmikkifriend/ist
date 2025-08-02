@@ -1,5 +1,4 @@
 import { get } from "svelte/store";
-import { toast } from "@zerodevx/svelte-toast";
 import { firstDueTask, previousFirstDueTask } from "../../js/stores";
 import { setFirstDueTask } from "../../js/first";
 import { DateTime } from "luxon";
@@ -185,7 +184,6 @@ export function summonTask(
  * @returns {void}
  */
 export function openAgenda(agendaType: string = "today"): void {
-    toast.pop({ target: "wait" });
     window.location.hash = agendaType;
 
     const drawerCheckbox = document.getElementById("my-drawer") as HTMLInputElement | null;

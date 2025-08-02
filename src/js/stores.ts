@@ -1,10 +1,9 @@
 import { writable } from "svelte/store";
 import { persisted } from "svelte-persisted-store";
-import { toast } from "@zerodevx/svelte-toast";
 import { DateTime } from "luxon";
 import type { Writable } from "svelte/store";
 import type { TodoistData, Task, TaskActivity, User } from "../../types/todoist";
-import type { UserSettings } from "../../types/interface";
+import type { UserSettings, ToastMessage } from "../../types/interface";
 
 /**
  * Stores the Todoist access token.
@@ -72,11 +71,16 @@ export const taskActivity = persisted<TaskActivity[]>("task_activity", [], {
 });
 
 /**
+ * Stores toast messages.
+ */
+export const toastMessages = writable<ToastMessage[]>([]);
+
+/**
  * Logs the user out by clearing all relevant stores and showing a toast.
  * @returns {void}
  */
 export function handleLogout(): void {
-    toast.pop(0);
+    toastMessages.set([]);
     todoistAccessToken.set("");
     todoistData.set({
         tasks: [],

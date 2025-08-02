@@ -1,4 +1,4 @@
-import { success } from "../../../js/toasts";
+import { success } from "../../../services/toastService";
 import { updateDynalist } from "./dynalistApi";
 import type { DynalistCountData, DynalistContent } from "../../../../types/dynalist";
 
