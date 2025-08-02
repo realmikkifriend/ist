@@ -173,34 +173,46 @@ const mergeActivity = (
     baseActivity: TaskActivity[],
     newActivityData: TaskActivity[],
 ): TaskActivity[] => {
-    const merged = [...baseActivity];
+    return newActivityData.reduce(
+        (accumulated, newActivity) => {
+            const comparisonUnit = (activity: TaskActivity) =>
+                activity.temporary || newActivity.temporary ? "minute" : "millisecond";
 
-    newActivityData.forEach((newActivity) => {
-        const existingIndex = merged.findIndex(
-            (activity) =>
-                activity.taskId === newActivity.taskId &&
-                activity.date.hasSame(newActivity.date, "day"),
-        );
+            const duplicateIndex = accumulated.findIndex(
+                (activity) =>
+                    activity.taskId === newActivity.taskId &&
+                    activity.date.hasSame(newActivity.date, comparisonUnit(activity)),
+            );
 
-        if (existingIndex !== -1) {
-            if (!newActivity.temporary && merged[existingIndex].temporary === true) {
-                merged[existingIndex] = newActivity;
-            } else if (!merged[existingIndex].temporary) {
-                if (
-                    newActivity.temporary === false &&
-                    !merged.some(
-                        (activity) =>
-                            activity.taskId === newActivity.taskId &&
-                            activity.date.valueOf() === newActivity.date.valueOf(),
-                    )
-                ) {
-                    merged.push(newActivity);
-                }
+            if (duplicateIndex === -1) {
+                return [...accumulated, newActivity];
             }
-        } else {
-            merged.push(newActivity);
-        }
-    });
 
-    return merged;
+            const existingActivity = accumulated[duplicateIndex];
+
+            const shouldReplace = !newActivity.temporary && existingActivity.temporary === true;
+
+            const shouldAddNew =
+                !existingActivity.temporary &&
+                newActivity.temporary === false &&
+                !accumulated.some(
+                    (activity) =>
+                        activity.taskId === newActivity.taskId &&
+                        activity.date.valueOf() === newActivity.date.valueOf(),
+                );
+
+            if (shouldReplace) {
+                const updatedAccumulated = [...accumulated];
+                updatedAccumulated[duplicateIndex] = newActivity;
+                return updatedAccumulated;
+            }
+
+            if (shouldAddNew) {
+                return [...accumulated, newActivity];
+            }
+
+            return accumulated;
+        },
+        [...baseActivity],
+    );
 };

@@ -49,7 +49,7 @@
             const uniqueActivity = Array.from(
                 new Map(
                     combinedActivity.map((item) => [
-                        item.date.startOf("day").toMillis() + item.taskId,
+                        `${item.taskId}:${item.date.toMillis()}`,
                         item,
                     ]),
                 ).values(),
@@ -82,7 +82,7 @@
         {#if $sortedLists.byTime && $sortedLists.byTime.length > 0}
             {$sortedLists.byTime.length} tasks completed today...
             <div class="my-2 space-y-1">
-                {#each $sortedLists.byTime as r (r.date.startOf("day").toMillis() + r.taskId)}
+                {#each $sortedLists.byTime as r (`${r.taskId}:${r.date.toMillis()}`)}
                     <div class="ml-20 -indent-20">
                         <span class="font-mono tracking-tighter opacity-50"
                             >[{r.date.toFormat("hh:mm a")}]</span
