@@ -4,7 +4,7 @@
     import { Icon, Calendar, Clock } from "svelte-hero-icons";
     import { DateTime } from "luxon";
     import { todoistData } from "../../stores/stores";
-    import { createDateWithTime } from "../../js/time";
+    import { createDateWithTime } from "../../utils/timeUtils";
     import DatePicker from "./DatePicker.svelte";
     import TimePicker from "./TimePicker.svelte";
     import type { Writable, Readable } from "svelte/store";
