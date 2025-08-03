@@ -2,7 +2,6 @@ import { get } from "svelte/store";
 import { success, newFirstTask } from "../services/toastService";
 import { todoistData, userSettings, firstDueTask, previousFirstDueTask } from "../stores/stores";
 import { getTaskComments } from "../services/apiService";
-import { summonTask } from "../services/agendaService";
 import type { Task, Comment, TodoistData } from "../types/todoist";
 import type { UserSettings } from "../types/interface";
 import { filterTasksByContext, shouldShowNewTaskToast } from "../utils/firstTaskUtils";
@@ -119,6 +118,31 @@ export const updateFirstDueTask = async (): Promise<void> => {
         setFirstDueTask(newTaskWithComments);
     }
 };
+
+/**
+ * Summon a task as the first due task.
+ * @param {Task & { firstDue?: boolean; skip?: boolean; summoned?: string | boolean }} task - The task to summon.
+ * @param {boolean} enableSkip - Whether to enable skip. Defaults to false.
+ * @returns {void}
+ */
+export function summonTask(
+    task: Task & { firstDue?: boolean; skip?: boolean; summoned?: string | boolean },
+    enableSkip: boolean = false,
+): void {
+    if (!task.firstDue || enableSkip) {
+        if (enableSkip) {
+            task.skip = true;
+        }
+        const currentFirstDueSummoned = get(firstDueTask)?.summoned;
+
+        task.summoned = currentFirstDueSummoned || window.location.hash;
+
+        setFirstDueTask(task);
+        previousFirstDueTask.set(get(firstDueTask) || null);
+    }
+
+    window.location.hash = "";
+}
 
 /**
  * Handles the click event on the badge, updating navigation and state as needed.

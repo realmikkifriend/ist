@@ -7,7 +7,7 @@
         colorClassesFaded,
         borderClasses,
     } from "../../utils/styleUtils";
-    import { summonTask } from "../../services/agendaService";
+    import { summonTask } from "../../services/firstTaskService";
     import type { Task, ColorName, Priority } from "../../types/todoist";
 
     export let task: Task;

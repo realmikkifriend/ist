@@ -1,6 +1,5 @@
 import { get } from "svelte/store";
-import { firstDueTask, previousFirstDueTask } from "../stores/stores";
-import { setFirstDueTask } from "../services/firstTaskService";
+import { firstDueTask } from "../stores/stores";
 import { DateTime } from "luxon";
 import type { Task } from "../types/todoist";
 
@@ -37,31 +36,6 @@ export function markTasks(tasks: Task[]): (Task & { firstDue?: boolean; closeTim
         }
         return markedTask;
     });
-}
-
-/**
- * Summon a task as the first due task.
- * @param {Task & { firstDue?: boolean; skip?: boolean; summoned?: string | boolean }} task - The task to summon.
- * @param {boolean} enableSkip - Whether to enable skip. Defaults to false.
- * @returns {void}
- */
-export function summonTask(
-    task: Task & { firstDue?: boolean; skip?: boolean; summoned?: string | boolean },
-    enableSkip: boolean = false,
-): void {
-    if (!task.firstDue || enableSkip) {
-        if (enableSkip) {
-            task.skip = true;
-        }
-        const currentFirstDueSummoned = get(firstDueTask)?.summoned;
-
-        task.summoned = currentFirstDueSummoned || window.location.hash;
-
-        setFirstDueTask(task);
-        previousFirstDueTask.set(get(firstDueTask) || null);
-    }
-
-    window.location.hash = "";
 }
 
 /**
