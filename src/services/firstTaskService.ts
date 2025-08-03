@@ -1,7 +1,13 @@
 import { get } from "svelte/store";
 import { success, newFirstTask } from "../services/toastService";
-import { todoistData, userSettings, firstDueTask, previousFirstDueTask } from "../stores/stores";
-import { getTaskComments } from "../services/apiService";
+import {
+    todoistAccessToken,
+    todoistData,
+    userSettings,
+    firstDueTask,
+    previousFirstDueTask,
+} from "../stores/stores";
+import { getTaskComments } from "../utils/apiUtils";
 import type { Task, Comment, TodoistData } from "../types/todoist";
 import type { UserSettings } from "../types/interface";
 import { filterTasksByContext, shouldShowNewTaskToast } from "../utils/firstTaskUtils";
@@ -85,7 +91,7 @@ export const skipTask = (task: Task): void => {
  * @returns The task with comments.
  */
 const loadCommentsForTask = async (task: Task): Promise<Task> => {
-    const comments = await getTaskComments(task.id);
+    const comments = await getTaskComments(get(todoistAccessToken), task.id);
     (task as Task & { comments: Comment[] }).comments = comments;
     return task;
 };

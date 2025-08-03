@@ -1,13 +1,13 @@
 import { get } from "svelte/store";
 import { TodoistRequestError } from "@doist/todoist-api-typescript";
 import { todoistAccessToken, todoistData, todoistError } from "../stores/stores";
-import { error, success } from "../services/toastService";
+import { success } from "../services/toastService";
 import { handleOverdueTasks } from "../services/deferService";
 import { formatTaskDate } from "../utils/timeUtils";
 import { initializeApi, handleApiError, processApiResponse, getEndpoint } from "../utils/apiUtils";
 import type { DateTime } from "luxon";
 import type { UpdateTaskArgs } from "@doist/todoist-api-typescript";
-import type { Task, Comment } from "../types/todoist";
+import type { Task } from "../types/todoist";
 
 /**
  * Refreshes Todoist data and updates the store.
@@ -49,34 +49,6 @@ export function refreshData(): Promise<
         .catch((err) => {
             const error = handleApiError(err);
             return setErrorState(error);
-        });
-}
-
-/**
- * Gets comments for a specific task.
- * @param {string} taskId - The ID of the task for which comments will be retrieved.
- * @returns {Promise<Comment[]>} - Results of comment retrieval, or empty array if error.
- */
-export function getTaskComments(taskId: string): Promise<Comment[]> {
-    const api = initializeApi(get(todoistAccessToken));
-    if (!api) {
-        return Promise.resolve([]);
-    }
-
-    return api
-        .getComments({ taskId })
-        .then((response) => response.results)
-        .catch((err: unknown) => {
-            const message =
-                err instanceof TodoistRequestError
-                    ? err.message
-                    : err instanceof Error
-                      ? err.message
-                      : typeof err === "string"
-                        ? err
-                        : "Unknown error";
-            error(`Failed to load comments: ${message}`);
-            return [];
         });
 }
 

@@ -2,7 +2,7 @@ import { TodoistApi, TodoistRequestError } from "@doist/todoist-api-typescript";
 import { getDueTasks, getReverseTasks } from "../utils/filterUtils";
 import { cleanTodoistData } from "../utils/processUtils";
 import type { GetProjectsResponse, GetTasksResponse } from "@doist/todoist-api-typescript";
-import type { Task, TodoistData, Context, User } from "../types/todoist";
+import type { Task, TodoistData, Context, User, Comment } from "../types/todoist";
 
 /**
  * Initializes the Todoist API with the current access token.
@@ -118,4 +118,39 @@ export function getEndpoint(
     }).then((response) =>
         response.ok ? response.json() : Promise.resolve({ error: `Error: ${response.status}` }),
     );
+}
+
+/**
+ * Gets comments for a specific task.
+ * @param {string} accessToken - The access token for the Todoist API.
+ * @param {string} taskId - The ID of the task for which comments will be retrieved.
+ * @returns {Promise<Comment[]>} - Results of comment retrieval, or empty array if error.
+ */
+export function getTaskComments(accessToken: string, taskId: string): Promise<Comment[]> {
+    const api = initializeApi(accessToken);
+    if (!api) {
+        return Promise.resolve([]);
+    }
+
+    return api
+        .getComments({ taskId })
+        .then((response) => response.results)
+        .catch((err: unknown) => {
+            const message =
+                err instanceof TodoistRequestError
+                    ? err.message
+                    : err instanceof Error
+                      ? err.message
+                      : typeof err === "string"
+                        ? err
+                        : "Unknown error";
+            return [
+                {
+                    content: `Failed to load comments: ${message}`,
+                    postedAt: new Date().toISOString(),
+                    id: "error-comment",
+                    taskId: taskId,
+                } as Comment,
+            ];
+        });
 }
