@@ -3,7 +3,6 @@ import { success, newFirstTask } from "../services/toastService";
 import { todoistData, userSettings, firstDueTask, previousFirstDueTask } from "../stores/stores";
 import { getTaskComments } from "../services/apiService";
 import { summonTask } from "../services/agendaService";
-import { handleBadgeClick } from "../services/sidebarService";
 import type { Task, Comment, TodoistData } from "../types/todoist";
 import type { UserSettings } from "../types/interface";
 import { filterTasksByContext, shouldShowNewTaskToast } from "../utils/firstTaskUtils";
@@ -77,7 +76,7 @@ export const skipTask = (task: Task): void => {
     if (nextIndex < reverseTasks.length) {
         summonTask(reverseTasks[nextIndex], true);
     } else {
-        handleBadgeClick();
+        clearSelectedTask();
     }
 };
 
@@ -120,3 +119,34 @@ export const updateFirstDueTask = async (): Promise<void> => {
         setFirstDueTask(newTaskWithComments);
     }
 };
+
+/**
+ * Handles the click event on the badge, updating navigation and state as needed.
+ * @returns {void}
+ */
+export function clearSelectedTask(): void {
+    const $firstDueTask = get(firstDueTask);
+    const selectedContext = get(userSettings).selectedContext;
+
+    if ($firstDueTask?.summoned) {
+        window.location.hash = $firstDueTask.summoned as string;
+
+        $firstDueTask.summoned = false;
+        if ($firstDueTask.skip) {
+            delete $firstDueTask.skip;
+        }
+
+        void updateFirstDueTask();
+    } else if (selectedContext) {
+        clearSelectedContext();
+    }
+}
+
+/**
+ * Clears the selected context and previous first due task.
+ * @returns {void}
+ */
+function clearSelectedContext(): void {
+    previousFirstDueTask.set(null);
+    userSettings.update((settings) => ({ ...settings, selectedContext: null }));
+}

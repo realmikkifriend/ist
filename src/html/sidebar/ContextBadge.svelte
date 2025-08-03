@@ -1,7 +1,8 @@
 <script lang="ts">
     import { Icon, XMark } from "svelte-hero-icons";
     import { userSettings, firstDueTask } from "../../stores/stores";
-    import { handleBadgeClick, getDueTaskCountByContext } from "../../services/sidebarService";
+    import { getDueTaskCountByContext } from "../../services/sidebarService";
+    import { clearSelectedTask } from "../../services/firstTaskService";
     import { getContextName } from "../../services/firstTaskService";
 </script>
 
@@ -16,7 +17,7 @@
            {$userSettings.selectedContext ? 'text-primary' : ''}
            {$firstDueTask?.summoned ? 'border-purple-400 text-purple-400' : ''}
            {$firstDueTask?.skip ? 'border-yellow-500 text-yellow-500' : ''}"
-    on:click={handleBadgeClick}
+    on:click={clearSelectedTask}
 >
     {#if $firstDueTask?.skip}
         low priority, defer?

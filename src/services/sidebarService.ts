@@ -1,6 +1,5 @@
 import { get } from "svelte/store";
-import { updateFirstDueTask } from "../services/firstTaskService";
-import { todoistData, userSettings, firstDueTask, previousFirstDueTask } from "../stores/stores";
+import { todoistData } from "../stores/stores";
 import type { Task } from "../types/todoist";
 
 /**
@@ -14,35 +13,4 @@ export function getDueTaskCountByContext(contextId: string): number {
         return $todoistData.dueTasks.filter((task: Task) => task.contextId === contextId).length;
     }
     return 0;
-}
-
-/**
- * Clears the selected context and previous first due task.
- * @returns {void}
- */
-function clearSelectedContext(): void {
-    previousFirstDueTask.set(null);
-    userSettings.update((settings) => ({ ...settings, selectedContext: null }));
-}
-
-/**
- * Handles the click event on the badge, updating navigation and state as needed.
- * @returns {void}
- */
-export function handleBadgeClick(): void {
-    const $firstDueTask = get(firstDueTask);
-    const selectedContext = get(userSettings).selectedContext;
-
-    if ($firstDueTask?.summoned) {
-        window.location.hash = $firstDueTask.summoned as string;
-
-        $firstDueTask.summoned = false;
-        if ($firstDueTask.skip) {
-            delete $firstDueTask.skip;
-        }
-
-        void updateFirstDueTask();
-    } else if (selectedContext) {
-        clearSelectedContext();
-    }
 }
