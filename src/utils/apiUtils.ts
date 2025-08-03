@@ -1,20 +1,17 @@
-import { get } from "svelte/store";
 import { TodoistApi, TodoistRequestError } from "@doist/todoist-api-typescript";
-import { todoistAccessToken, todoistError } from "../stores/stores";
 import { getDueTasks, getReverseTasks } from "../utils/filterUtils";
 import { cleanTodoistData } from "../utils/processUtils";
-import type { Task, TodoistData, Context, User } from "../types/todoist";
-import type { DateTime } from "luxon";
 import type { GetProjectsResponse, GetTasksResponse } from "@doist/todoist-api-typescript";
+import type { Task, TodoistData, Context, User } from "../types/todoist";
 
 /**
  * Initializes the Todoist API with the current access token.
- * @returns {{ accessToken: string | null, api: TodoistApi | null }} - API ready for calls.
+ * @param {string} accessToken - The access token for the Todoist API.
+ * @returns {TodoistApi | null} - API ready for calls.
  */
-export function initializeApi(): { accessToken: string | null; api: TodoistApi | null } {
-    const accessToken = get(todoistAccessToken);
+export function initializeApi(accessToken: string): TodoistApi | null {
     const api = accessToken ? new TodoistApi(accessToken) : null;
-    return { accessToken, api };
+    return api;
 }
 
 /**
@@ -94,29 +91,17 @@ export function processApiResponse(
 }
 
 /**
- * Sets the error state in the store.
- * @param {TodoistRequestError | string} error - The error object or message.
- * @returns {{ status: "error"; error: TodoistRequestError | string }} - Results of error function.
- */
-export function setErrorState(error: TodoistRequestError): {
-    status: "error";
-    error: TodoistRequestError;
-} {
-    todoistError.set(error.message);
-    return { status: "error", error };
-}
-
-/**
  * Calls a Todoist API endpoint.
+ * @param {string} accessToken - The access token for the Todoist API.
  * @param {string} endpoint - The endpoint to call.
  * @param {Record<string, string>} params - Additional parameters.
  * @returns {Promise<unknown>} - Result of API endpoint call.
  */
 export function getEndpoint(
+    accessToken: string,
     endpoint: string,
     params: Record<string, string | number> = {},
 ): Promise<unknown> {
-    const accessToken = get(todoistAccessToken);
     const CONTENT_TYPE = "application/x-www-form-urlencoded";
     const stringParams = Object.fromEntries(
         Object.entries(params).map(([key, value]) => [key, String(value)]),
@@ -133,15 +118,4 @@ export function getEndpoint(
     }).then((response) =>
         response.ok ? response.json() : Promise.resolve({ error: `Error: ${response.status}` }),
     );
-}
-
-/**
- * Formats a DateTime object for a Todoist task.
- * @param {DateTime} time - The time to format.
- * @returns {string} - Formatted time string.
- */
-export function formatTaskDate(time: DateTime): string {
-    return time.hour === 0 && time.minute === 0 && time.second === 0 && time.millisecond === 0
-        ? time.toFormat("yyyy-MM-dd")
-        : time.toFormat("yyyy-MM-dd'T'HH:mm:ss");
 }

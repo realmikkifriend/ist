@@ -39,3 +39,14 @@ export const createDateWithTime = (
 
     return { extractedTime: formattedTime, newDate };
 };
+
+/**
+ * Formats a DateTime object for a Todoist task.
+ * @param {DateTime} time - The time to format.
+ * @returns {string} - Formatted time string.
+ */
+export function formatTaskDate(time: DateTime): string {
+    return time.hour === 0 && time.minute === 0 && time.second === 0 && time.millisecond === 0
+        ? time.toFormat("yyyy-MM-dd")
+        : time.toFormat("yyyy-MM-dd'T'HH:mm:ss");
+}

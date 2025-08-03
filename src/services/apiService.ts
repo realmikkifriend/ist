@@ -1,15 +1,10 @@
+import { get } from "svelte/store";
 import { TodoistRequestError } from "@doist/todoist-api-typescript";
-import { todoistData } from "../stores/stores";
+import { todoistAccessToken, todoistData, todoistError } from "../stores/stores";
 import { error, success } from "../services/toastService";
 import { handleOverdueTasks } from "../services/deferService";
-import {
-    initializeApi,
-    handleApiError,
-    processApiResponse,
-    setErrorState,
-    formatTaskDate,
-    getEndpoint,
-} from "../utils/apiUtils";
+import { formatTaskDate } from "../utils/timeUtils";
+import { initializeApi, handleApiError, processApiResponse, getEndpoint } from "../utils/apiUtils";
 import type { DateTime } from "luxon";
 import type { UpdateTaskArgs } from "@doist/todoist-api-typescript";
 import type { Task, Comment } from "../types/todoist";
@@ -23,12 +18,16 @@ export function refreshData(): Promise<
     | { status: "error"; error: TodoistRequestError | string }
     | void
 > {
-    const { accessToken, api } = initializeApi();
-    if (!accessToken || !api) {
+    const api = initializeApi(get(todoistAccessToken));
+    if (!todoistAccessToken || !api) {
         return Promise.resolve(setErrorState(new TodoistRequestError("No access token found.")));
     }
 
-    return Promise.all([api.getTasks({ limit: 200 }), api.getProjects(), getEndpoint("user")])
+    return Promise.all([
+        api.getTasks({ limit: 200 }),
+        api.getProjects(),
+        getEndpoint(get(todoistAccessToken), "user"),
+    ])
         .then((apiResult) => {
             const [tasks, projects, userResponse] = apiResult;
 
@@ -59,8 +58,8 @@ export function refreshData(): Promise<
  * @returns {Promise<Comment[]>} - Results of comment retrieval, or empty array if error.
  */
 export function getTaskComments(taskId: string): Promise<Comment[]> {
-    const { accessToken, api } = initializeApi();
-    if (!accessToken || !api) {
+    const api = initializeApi(get(todoistAccessToken));
+    if (!api) {
         return Promise.resolve([]);
     }
 
@@ -89,8 +88,8 @@ export function getTaskComments(taskId: string): Promise<Comment[]> {
 export function markTaskDone(
     taskID: string,
 ): Promise<void | { status: "error"; error: TodoistRequestError | string }> {
-    const { accessToken, api } = initializeApi();
-    if (!accessToken || !api) {
+    const api = initializeApi(get(todoistAccessToken));
+    if (!api) {
         return Promise.resolve(setErrorState(new TodoistRequestError("No access token found.")));
     }
 
@@ -122,8 +121,8 @@ export function markTaskDone(
 export function deferTasks(
     taskTimePairs: [Task, DateTime][],
 ): Promise<(void | { status: "error"; error: TodoistRequestError | string })[]> {
-    const { accessToken, api } = initializeApi();
-    if (!accessToken || !api) {
+    const api = initializeApi(get(todoistAccessToken));
+    if (!api) {
         return Promise.resolve([setErrorState(new TodoistRequestError("No access token found."))]);
     }
 
@@ -155,4 +154,17 @@ export function deferTasks(
     });
 
     return Promise.all(updatePromises);
+}
+
+/**
+ * Sets the error state in the store.
+ * @param {TodoistRequestError | string} error - The error object or message.
+ * @returns {{ status: "error"; error: TodoistRequestError | string }} - Results of error function.
+ */
+export function setErrorState(error: TodoistRequestError): {
+    status: "error";
+    error: TodoistRequestError;
+} {
+    todoistError.set(error.message);
+    return { status: "error", error };
 }

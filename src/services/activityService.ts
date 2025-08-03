@@ -1,7 +1,7 @@
 import { get } from "svelte/store";
 import { DateTime } from "luxon";
 import { getEndpoint } from "../utils/apiUtils";
-import { taskActivity } from "../stores/stores";
+import { todoistAccessToken, taskActivity } from "../stores/stores";
 import type { Task, TaskActivity, TodoistActivity } from "../types/todoist";
 import {
     checkCoverage,
@@ -120,7 +120,7 @@ export async function getNewActivity(task: Task | null = null, cursor: string | 
         params.cursor = cursor;
     }
 
-    const endpointData = await getEndpoint("activities", params);
+    const endpointData = await getEndpoint(get(todoistAccessToken), "activities", params);
 
     return endpointData;
 }
