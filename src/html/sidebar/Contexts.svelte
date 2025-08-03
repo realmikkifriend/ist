@@ -9,8 +9,8 @@
     import type { TasksGroupedByContext, Priority } from "../../types/todoist";
 
     /**
-     * Returns the CSS class for a given priority string.
-     * This moves the type assertion logic out of the template and into the script section.
+     * Returns the CSS class for a given priority.
+     * Necessary because Svelte 4 templates can't include type assertions.
      * @param priorityNum - The given priority.
      * @returns The Tailwind classes that correspond to the priority.
      */
