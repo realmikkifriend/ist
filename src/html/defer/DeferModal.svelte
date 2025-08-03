@@ -77,15 +77,15 @@
     }
 </script>
 
-<div class="modal-box flex min-h-[65%] w-fit flex-col justify-start">
+<div class="modal-box flex min-h-[60%] w-fit flex-col justify-start">
     {#key task}
         <div class="flex justify-center">
-            <div role="tablist" class="tabs-box tabs bg-neutral w-3/5 justify-center gap-7">
+            <div role="tablist" class="tabs-box tabs bg-neutral h-10 w-2/3 justify-center">
                 {#each ["time", "calendar"] as tab (tab)}
                     <button
                         role="tab"
                         tabindex="0"
-                        class={`tab w-2/5  ${
+                        class={`tab h-8 w-1/2 ${
                             tab === ($isTimeTabActive ? "time" : "calendar")
                                 ? "tab-active"
                                 : "bg-neutral"
