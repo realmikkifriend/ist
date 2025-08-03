@@ -1,8 +1,8 @@
 <script lang="ts">
     import { Icon, XMark } from "svelte-hero-icons";
-    import { handleBadgeClick, getDueTaskCountByContext } from "../../services/sidebarService";
     import { userSettings, firstDueTask } from "../../stores/stores";
-    import { getContextName } from "../../js/first";
+    import { handleBadgeClick, getDueTaskCountByContext } from "../../services/sidebarService";
+    import { getContextName } from "../../services/firstTaskService";
 </script>
 
 <button

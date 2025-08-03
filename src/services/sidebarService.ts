@@ -1,5 +1,5 @@
 import { get } from "svelte/store";
-import { updateFirstDueTask } from "../js/first";
+import { updateFirstDueTask } from "../services/firstTaskService";
 import { todoistData, userSettings, firstDueTask, previousFirstDueTask } from "../stores/stores";
 import type { Task } from "../types/todoist";
 

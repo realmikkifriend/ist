@@ -4,7 +4,7 @@
     import DeferModal from "../defer/DeferModal.svelte";
     import Comments from "./Comments.svelte";
     import { getPriorityBorder } from "../../utils/styleUtils";
-    import { skipTask } from "../../js/first";
+    import { skipTask } from "../../services/firstTaskService";
     import { DateTime } from "luxon";
     import type { Task, Priority } from "../../types/todoist";
 

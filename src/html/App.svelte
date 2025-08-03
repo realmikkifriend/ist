@@ -4,7 +4,7 @@
     import { DateTime } from "luxon";
     import { Icon, ArrowPath } from "svelte-hero-icons";
     import { todoistData, todoistError, userSettings, firstDueTask } from "../stores/stores";
-    import { updateFirstDueTask } from "../js/first";
+    import { updateFirstDueTask } from "../services/firstTaskService";
     import { refreshData } from "../services/apiService";
     import { error as showError } from "../services/toastService";
     import { handleTaskDone, handleTaskDefer } from "../js/taskHandlers";

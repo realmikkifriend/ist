@@ -1,6 +1,6 @@
 import { get } from "svelte/store";
 import { firstDueTask, previousFirstDueTask } from "../stores/stores";
-import { setFirstDueTask } from "../js/first";
+import { setFirstDueTask } from "../services/firstTaskService";
 import { DateTime } from "luxon";
 import type { Task } from "../types/todoist";
 

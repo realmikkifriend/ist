@@ -6,6 +6,7 @@ import { summonTask } from "../services/agendaService";
 import { handleBadgeClick } from "../services/sidebarService";
 import type { Task, Comment, TodoistData } from "../types/todoist";
 import type { UserSettings } from "../types/interface";
+import { filterTasksByContext, shouldShowNewTaskToast } from "../utils/firstTaskUtils";
 
 /**
  * Get the name of the current context, either from user settings or from the first due task's context.
@@ -35,15 +36,6 @@ export const setFirstDueTask = (task: Task | null): void => {
     firstDueTask.set(task);
     previousFirstDueTask.set(task);
 };
-
-/**
- * Filter task list by context.
- * @param {Task[]} tasks - The list of tasks to filter.
- * @param {string} contextId - The context ID to filter by.
- * @returns {Task[]} The filtered list of tasks.
- */
-const filterTasksByContext = (tasks: Task[], contextId: string): Task[] =>
-    tasks.filter((task) => task.contextId === contextId);
 
 /**
  * Update due tasks based on the selected context ID.
@@ -87,27 +79,6 @@ export const skipTask = (task: Task): void => {
     } else {
         handleBadgeClick();
     }
-};
-
-/**
- * Determines whether to show a toast notification for a new task.
- * @param {Task} newTask - The new first-due task.
- * @param {Task | null} prevTask - The previous task.
- * @param {string | null} selectedContextId - The currently selected context ID.
- * @returns True if a toast should be shown, false otherwise.
- */
-const shouldShowNewTaskToast = (
-    newTask: Task,
-    prevTask: Task | null,
-    selectedContextId: string | null,
-): boolean => {
-    return (
-        prevTask !== null &&
-        newTask.id !== prevTask.id &&
-        (!selectedContextId || prevTask.contextId === selectedContextId) &&
-        window.location.hash !== "#today" &&
-        window.location.hash !== "#tomorrow"
-    );
 };
 
 /**

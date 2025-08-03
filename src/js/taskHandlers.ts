@@ -1,6 +1,6 @@
 import { todoistData, todoistError, previousFirstDueTask, taskActivity } from "../stores/stores";
 import { markTaskDone, deferTasks, refreshData } from "../services/apiService";
-import { updateFirstDueTask } from "./first";
+import { updateFirstDueTask } from "../services/firstTaskService";
 import { get } from "svelte/store";
 import { DateTime } from "luxon";
 import { TodoistRequestError } from "@doist/todoist-api-typescript";
