@@ -31,11 +31,9 @@
         buttonElement.classList.add("bg-secondary", "border-secondary");
 
         setTimeout(() => {
-            if ($currentIndex < checklistItems.length - 1) {
-                currentIndex.update((n) => n + 1);
-                buttonElement.parentElement?.classList.remove("line-through", "text-secondary");
-                buttonElement.classList.remove("bg-secondary", "border-secondary");
-            }
+            currentIndex.update((n) => n + 1);
+            buttonElement.parentElement?.classList.remove("line-through", "text-secondary");
+            buttonElement.classList.remove("bg-secondary", "border-secondary");
         }, 200);
     }
 </script>
