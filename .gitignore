@@ -6,3 +6,4 @@
 env.js
 node_modules
 *speclinter*
+dependencies.*

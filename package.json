@@ -9,7 +9,8 @@
         "test:coverage": "svelte-check && vitest run --coverage",
         "test:watch": "vitest",
         "test:coverage:watch": "vitest --coverage",
-        "lint": "eslint 'src/**/*.{svelte,ts}'"
+        "lint": "eslint 'src/**/*.{svelte,ts}'",
+        "depcruise": "depcruise src --include-only '^src' --output-type x-dot-webpage -f dependencies.htm"
     },
     "repository": {
         "type": "git",

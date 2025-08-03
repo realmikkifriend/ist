@@ -4,9 +4,7 @@ module.exports = {
         {
             name: "no-circular",
             severity: "warn",
-            comment:
-                "This dependency is part of a circular relationship. You might want to revise " +
-                "your solution (i.e. use dependency inversion, make sure the modules have a single responsibility) ",
+            comment: "Circular dependency!",
             from: {},
             to: {
                 circular: true,
@@ -14,12 +12,7 @@ module.exports = {
         },
         {
             name: "no-orphans",
-            comment:
-                "This is an orphan module - it's likely not used (anymore?). Either use it or " +
-                "remove it. If it's logical this module is an orphan (i.e. it's a config file), " +
-                "add an exception for it in your dependency-cruiser configuration. By default " +
-                "this rule does not scrutinize dot-files (e.g. .eslintrc.js), TypeScript declaration " +
-                "files (.d.ts), tsconfig.json and some of the babel and webpack configs.",
+            comment: "Orphaned module!",
             severity: "warn",
             from: {
                 orphan: true,
@@ -35,8 +28,7 @@ module.exports = {
         {
             name: "no-deprecated-core",
             comment:
-                "A module depends on a node core module that has been deprecated. Find an alternative - these are " +
-                "bound to exist - node doesn't deprecate lightly.",
+                "A module depends on a node core module that has been deprecated. Find an alternative.",
             severity: "warn",
             from: {},
             to: {
@@ -115,6 +107,50 @@ module.exports = {
                 // types for this rule
                 dependencyTypesNot: ["type-only"],
             },
+        },
+
+        /* architectural layer boundaries */
+        {
+            name: "no-non-view-to-view",
+            comment: "Only .svelte files can import other .svelte files",
+            severity: "error",
+            from: { pathNot: ["\\.svelte$", "src/js/index.ts"] },
+            to: { path: "\\.svelte$" },
+        },
+        {
+            name: "utils-to-only-utils-or-types",
+            comment: "Utilities can only import from other utilities or types",
+            severity: "error",
+            from: { path: "^src/utils" },
+            to: {
+                pathNot: ["^src/utils", "^src/types"],
+            },
+        },
+        {
+            name: "stores-to-only-stores-or-types",
+            comment: "Stores can only import from other stores or types",
+            severity: "error",
+            from: { path: "^src/stores" },
+            to: {
+                pathNot: ["^src/stores", "^src/types"],
+            },
+        },
+        {
+            name: "types-to-only-types",
+            comment: "Types can only import from other types",
+            severity: "error",
+            from: { path: "^types" },
+            to: {
+                pathNot: ["^src/types"],
+            },
+        },
+        {
+            name: "svelte-to-no-js",
+            comment:
+                "Svelte components in html can't import from js in html or from the src/js folder",
+            severity: "error",
+            from: { path: "^src/html/.*\\.svelte$" },
+            to: { path: ["^src/html/.*\\.(js|ts)$", "^src/js"] },
         },
 
         /* rules you might want to tweak for your specific situation: */
