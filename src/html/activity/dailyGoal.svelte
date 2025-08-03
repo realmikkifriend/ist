@@ -102,11 +102,15 @@
     </div>
 </div>
 <div class="ml-2 flex w-fit flex-row pb-0.5 text-xs text-nowrap">
-    {#if $isLoading}
+    {#if $isLoading || !dailyGoal}
         <Icon src={ArrowPath} class="mt-0.5 mr-0.5 h-3.5 w-3.5 animate-spin" />
     {/if}
-    <span class="mr-1" class:text-lime-500={$sortedLists.byContext.length > dailyGoal}>
-        {$sortedLists.byContext.length}
-    </span>
-    / {dailyGoal} tasks done
+    {#if dailyGoal}
+        <span class="mr-1" class:text-lime-500={$sortedLists.byContext.length > dailyGoal}>
+            {$sortedLists.byContext.length}
+        </span>
+        / {dailyGoal} tasks done
+    {:else}
+        loading goal...
+    {/if}
 </div>
