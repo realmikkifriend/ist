@@ -1,5 +1,5 @@
 import { DateTime } from "luxon";
-import { handleTaskDefer } from "../js/taskHandlers";
+import { handleTaskDefer } from "./taskHandlerService";
 import { createDateWithTime } from "../utils/timeUtils";
 import type { Task } from "../types/todoist";
 

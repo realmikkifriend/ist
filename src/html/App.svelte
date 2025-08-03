@@ -7,7 +7,7 @@
     import { updateFirstDueTask } from "../services/firstTaskService";
     import { refreshData } from "../services/apiService";
     import { error as showError } from "../services/toastService";
-    import { handleTaskDone, handleTaskDefer } from "../js/taskHandlers";
+    import { handleTaskDone, handleTaskDefer } from "../services/taskHandlerService";
     import Sidebar from "./sidebar/Sidebar.svelte";
     import ContextBadge from "./sidebar/ContextBadge.svelte";
     import NoTasks from "./NoTasks.svelte";
