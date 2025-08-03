@@ -1,5 +1,5 @@
 import { todoistData, todoistError, previousFirstDueTask, taskActivity } from "../stores/stores";
-import { markTaskDone, deferTasks, refreshData } from "../services/apiService";
+import { markTaskDone, deferTasks } from "../services/apiService";
 import { updateFirstDueTask } from "../services/firstTaskService";
 import { get } from "svelte/store";
 import { DateTime } from "luxon";
@@ -81,8 +81,6 @@ export async function handleTaskDone(task: Task): Promise<void> {
         return null;
     });
     if (!result) return;
-
-    void refreshData();
 }
 
 /**
@@ -105,6 +103,4 @@ export async function handleTaskDefer(taskUpdates: Array<[Task, DateTime]>): Pro
         return null;
     });
     if (!result) return;
-
-    void refreshData();
 }

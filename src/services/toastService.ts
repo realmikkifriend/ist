@@ -1,6 +1,20 @@
 import { DateTime } from "luxon";
-import { toastMessages } from "../stores/stores";
+import { TodoistRequestError } from "@doist/todoist-api-typescript";
+import { toastMessages, todoistError } from "../stores/stores";
 import type { ToastMessage } from "../types/interface";
+
+/**
+ * Sets the error state in the store.
+ * @param {TodoistRequestError | string} error - The error object or message.
+ * @returns {{ status: "error"; error: TodoistRequestError | string }} - Results of error function.
+ */
+export function setErrorState(error: TodoistRequestError): {
+    status: "error";
+    error: TodoistRequestError;
+} {
+    todoistError.set(error.message);
+    return { status: "error", error };
+}
 
 /**
  * Adds a toast message to the store.

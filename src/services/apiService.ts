@@ -1,56 +1,12 @@
 import { get } from "svelte/store";
 import { TodoistRequestError } from "@doist/todoist-api-typescript";
-import { todoistAccessToken, todoistData, todoistError } from "../stores/stores";
-import { success } from "../services/toastService";
-import { handleOverdueTasks } from "../services/deferService";
+import { todoistAccessToken } from "../stores/stores";
+import { success, setErrorState } from "../services/toastService";
 import { formatTaskDate } from "../utils/timeUtils";
-import { initializeApi, handleApiError, processApiResponse, getEndpoint } from "../utils/apiUtils";
+import { initializeApi } from "../utils/apiUtils";
 import type { DateTime } from "luxon";
 import type { UpdateTaskArgs } from "@doist/todoist-api-typescript";
 import type { Task } from "../types/todoist";
-
-/**
- * Refreshes Todoist data and updates the store.
- * @returns {Promise<{ status: "success"; error: null } | { status: "error"; error: TodoistRequestError | string } | void>} - Results of API refresh.
- */
-export function refreshData(): Promise<
-    | { status: "success"; error: null }
-    | { status: "error"; error: TodoistRequestError | string }
-    | void
-> {
-    const api = initializeApi(get(todoistAccessToken));
-    if (!todoistAccessToken || !api) {
-        return Promise.resolve(setErrorState(new TodoistRequestError("No access token found.")));
-    }
-
-    return Promise.all([
-        api.getTasks({ limit: 200 }),
-        api.getProjects(),
-        getEndpoint(get(todoistAccessToken), "user"),
-    ])
-        .then((apiResult) => {
-            const [tasks, projects, userResponse] = apiResult;
-
-            if (!tasks || !projects || !userResponse) {
-                return;
-            }
-
-            handleOverdueTasks(tasks.results || []);
-            const todoistDataObj = processApiResponse(tasks, projects, userResponse);
-
-            todoistData.set(todoistDataObj);
-            success("Todoist data updated!");
-            const successResult: { status: "success"; error: null } = {
-                status: "success",
-                error: null,
-            };
-            return successResult;
-        })
-        .catch((err) => {
-            const error = handleApiError(err);
-            return setErrorState(error);
-        });
-}
 
 /**
  * Marks a task as done.
@@ -126,17 +82,4 @@ export function deferTasks(
     });
 
     return Promise.all(updatePromises);
-}
-
-/**
- * Sets the error state in the store.
- * @param {TodoistRequestError | string} error - The error object or message.
- * @returns {{ status: "error"; error: TodoistRequestError | string }} - Results of error function.
- */
-export function setErrorState(error: TodoistRequestError): {
-    status: "error";
-    error: TodoistRequestError;
-} {
-    todoistError.set(error.message);
-    return { status: "error", error };
 }

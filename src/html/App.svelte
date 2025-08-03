@@ -5,7 +5,7 @@
     import { Icon, ArrowPath } from "svelte-hero-icons";
     import { todoistData, todoistError, userSettings, firstDueTask } from "../stores/stores";
     import { updateFirstDueTask } from "../services/firstTaskService";
-    import { refreshData } from "../services/apiService";
+    import { refreshData } from "../services/updateService";
     import { error as showError } from "../services/toastService";
     import { handleTaskDone, handleTaskDefer } from "../services/taskHandlerService";
     import Sidebar from "./sidebar/Sidebar.svelte";
@@ -59,9 +59,10 @@
      * @param event.detail - Contains the event information.
      * @param event.detail.task - The task being affected.
      */
-    const handleDone = (event: { detail: { task: Task } }): void => {
+    const handleDone = async (event: { detail: { task: Task } }): Promise<void> => {
         const { task } = event.detail;
-        void handleTaskDone(task);
+        await handleTaskDone(task);
+        void refreshData();
     };
 
     /**
@@ -71,11 +72,12 @@
      * @param event.detail.task - The task being affected.
      * @param event.detail.time - The time the task will be deferred to.
      */
-    const handleDefer = (event: CustomEvent<{ task: Task; time: string }>): void => {
+    const handleDefer = async (event: CustomEvent<{ task: Task; time: string }>): Promise<void> => {
         const { task, time } = event.detail;
         const dateTime = DateTime.fromISO(time);
         if (dateTime.isValid) {
-            void handleTaskDefer([[task, dateTime]]);
+            await handleTaskDefer([[task, dateTime]]);
+            void refreshData();
         } else {
             showError("Received unexpected type of date...");
         }
