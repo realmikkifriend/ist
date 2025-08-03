@@ -191,3 +191,15 @@ export function getContextColors(activities: TaskActivity[], contexts: Context[]
         return context ? colorClasses[context.color as ColorName] : "";
     });
 }
+
+/**
+ * Gets the color for a given context ID.
+ * @param {string} id - ID of given context.
+ * @param {Context[]} contexts - List of contexts from which to retrieve color.
+ * @returns ColorName corresponding to given context, or undefined.
+ */
+export function getTaskColor(id: string, contexts: Context[]): ColorName | undefined {
+    if (!id) return undefined;
+    const context: Context | undefined = contexts.find((context) => context.id === id);
+    return context?.color as ColorName | undefined;
+}
