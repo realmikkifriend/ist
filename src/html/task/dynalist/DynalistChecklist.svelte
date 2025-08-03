@@ -2,15 +2,20 @@
     import Markdown from "svelte-exmarkdown";
     import { Icon, Backward } from "svelte-hero-icons";
     import { writable } from "svelte/store";
-    import { hasError } from "../../../utils/dynalistUtils";
-    import type { DynalistContent, DynalistNode } from "../../../types/dynalist";
+    import { parseList, hasError } from "../../../utils/dynalistUtils";
+    import type { DynalistNode } from "../../../types/dynalist";
 
-    export let content: DynalistContent | undefined;
+    export let content: DynalistNode | undefined;
 
     const currentIndex = writable(0);
 
-    $: checklistItems =
-        content && Array.isArray(content?.children) ? (content.children as DynalistNode[]) : [];
+    $: checklistItems = (() => {
+        if (!content || hasError(content)) {
+            return [];
+        }
+        const result = parseList(typeof content === "string" ? content : "");
+        return result instanceof Error ? [] : result;
+    })();
 
     $: errorMessage = !content
         ? "No checklist content provided."
@@ -40,16 +45,18 @@
 
 {#if errorMessage}
     <div class="text-error italic">{errorMessage}</div>
-{:else if checklistItems && $currentIndex < checklistItems.length}
+{:else if checklistItems && $currentIndex < checklistItems.length - 1}
     <div class="mt-2">
         <em class="absolute -top-3.5 -left-0.5 text-xs text-nowrap opacity-25">
-            <span class="mr-0.5 inline-block w-7">{$currentIndex + 1}/{checklistItems.length}</span>
+            <span class="mr-0.5 inline-block w-7"
+                >{$currentIndex + 1}/{checklistItems.length - 1}</span
+            >
         </em>
         <button
             class="border-primary-content float-left mt-1 mr-2 inline-block h-5 w-5 cursor-pointer border-2 transition-colors"
             on:click={showNextItem}
         />
-        <Markdown md={checklistItems[$currentIndex]?.content ?? ""} />
+        <Markdown md={checklistItems[$currentIndex] ?? ""} />
     </div>
 {:else}
     <span class="italic">End of list!</span>

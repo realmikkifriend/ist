@@ -11,6 +11,7 @@ export interface DynalistContent {
 }
 
 export interface DynalistNode extends DynalistContent {
+    level?: number;
     checked?: boolean;
     children?: DynalistNode[] | string[];
     note?: string;

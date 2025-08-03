@@ -100,7 +100,7 @@
                         "Unsupported format, but stay tuned."}
                 />
             {:else if $dynalistStore.selectedType === "checklist"}
-                <DynalistChecklist content={result.dynalistObject} />
+                <DynalistChecklist content={generateDynalistComment(result.dynalistObject)} />
             {:else if $dynalistStore.selectedType === "count"}
                 <DynalistCount content={result.dynalistObject} />
             {:else if $dynalistStore.selectedType === "rotating"}
