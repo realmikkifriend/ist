@@ -211,3 +211,24 @@ export function getTasksGroupedByContext(tasks: Task[]): TasksGroupedByContext {
         return acc;
     }, {} as TasksGroupedByContext);
 }
+
+/**
+ * Filters tasks that are due within a specific time range.
+ * @param {Task[]} tasks - Array of tasks.
+ * @param {DateTime} currentTime - Start of the time range.
+ * @param {DateTime | null} nextTime - End of the time range.
+ * @returns {Task[]} - Filtered array of tasks in the time range.
+ */
+export function getTasksInTimeRange(
+    tasks: Task[],
+    currentTime: DateTime,
+    nextTime: DateTime | null,
+): Task[] {
+    return tasks.filter((task) => {
+        if (!task.due || !task.due.date) return false;
+        const dueDateTime = DateTime.fromISO(task.due.date);
+        const isAfterCurrent = dueDateTime.toMillis() >= currentTime.toMillis();
+        const isBeforeNext = nextTime ? dueDateTime.toMillis() < nextTime.toMillis() : true;
+        return isAfterCurrent && isBeforeNext;
+    });
+}

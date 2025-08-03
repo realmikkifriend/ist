@@ -50,3 +50,17 @@ export function formatTaskDate(time: DateTime): string {
         ? time.toFormat("yyyy-MM-dd")
         : time.toFormat("yyyy-MM-dd'T'HH:mm:ss");
 }
+
+/**
+ * Rounds the future time for a button based on its index.
+ * @param {Date} futureTime - The future time to round.
+ * @param {number} index - The index of the button.
+ */
+export function roundFutureTime(futureTime: Date, index: number): void {
+    if (index > 2) {
+        const roundingFactor = index >= 3 && index <= 7 ? 5 : 15;
+        const roundedMinutes =
+            Math.round(futureTime.getMinutes() / roundingFactor) * roundingFactor;
+        futureTime.setMinutes(roundedMinutes);
+    }
+}
