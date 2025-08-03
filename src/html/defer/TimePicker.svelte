@@ -46,7 +46,7 @@
                         >
                         {#if button.count}
                             <span
-                                class="badge badge-xs mt-0.5 w-fit overflow-hidden text-right font-bold {getPriorityClasses(
+                                class="badge badge-xs mt-0 w-fit overflow-hidden px-1 text-right text-xs font-bold {getPriorityClasses(
                                     button.priority ?? 1,
                                 )}">{button.count}</span
                             >
