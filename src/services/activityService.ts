@@ -1,14 +1,69 @@
 import { get } from "svelte/store";
 import { DateTime } from "luxon";
-import { getEndpoint } from "../utils/apiUtils";
-import { todoistAccessToken, taskActivity } from "../stores/stores";
-import type { Task, TaskActivity, TodoistActivity } from "../types/todoist";
 import {
     checkCoverage,
     filterActivityByTimeframe,
     mergeActivity,
     processActivityData,
 } from "../utils/activityUtils";
+import { getEndpoint } from "../utils/apiUtils";
+import { colorClasses } from "../utils/styleUtils";
+import { todoistData, todoistAccessToken, taskActivity } from "../stores/stores";
+import type { Task, TaskActivity, TodoistActivity, ColorName } from "../types/todoist";
+
+/**
+ * Creates dataset for display.
+ * @returns Task activity data for today.
+ */
+export function fetchDailyActivity(): {
+    preliminary: { byContext: TaskActivity[]; byTime: TaskActivity[] };
+    promise: Promise<{ byContext: TaskActivity[]; byTime: TaskActivity[] }> | null;
+} {
+    const startOfToday = DateTime.now().startOf("day");
+    const endOfToday = DateTime.now().endOf("day");
+
+    const currentData = get(todoistData);
+    const activity = getActivity([startOfToday, endOfToday]);
+
+    const sortActivitiesByColor = (activities: TaskActivity[]) => {
+        const colorOrder = Object.keys(colorClasses);
+        return [...activities].sort((a, b) => {
+            const aContext = currentData.contexts.find((c) => c.id === a.contextId);
+            const bContext = currentData.contexts.find((c) => c.id === b.contextId);
+            const aColorIndex = aContext ? colorOrder.indexOf(aContext.color as ColorName) : -1;
+            const bColorIndex = bContext ? colorOrder.indexOf(bContext.color as ColorName) : -1;
+            return aColorIndex - bColorIndex;
+        });
+    };
+
+    const byContext = sortActivitiesByColor(activity.data);
+    const byTime = [...activity.data].sort((a, b) => a.date.toMillis() - b.date.toMillis());
+
+    const preliminary = { byContext, byTime };
+
+    if (activity.promise) {
+        const promise = activity.promise.then((promisedActivity) => {
+            const combinedActivity = [...activity.data, ...promisedActivity];
+            const uniqueActivity = Array.from(
+                new Map(
+                    combinedActivity.map((item) => [
+                        `${item.taskId}:${item.date.toMillis()}`,
+                        item,
+                    ]),
+                ).values(),
+            );
+
+            const promisedByContext = sortActivitiesByColor(uniqueActivity);
+            const promisedByTime = [...uniqueActivity].sort(
+                (a, b) => a.date.toMillis() - b.date.toMillis(),
+            );
+            return { byContext: promisedByContext, byTime: promisedByTime };
+        });
+        return { preliminary, promise };
+    }
+
+    return { preliminary, promise: null };
+}
 
 /**
  * Checks stores for task activity and gets more from the API.

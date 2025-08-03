@@ -1,11 +1,10 @@
 <script lang="ts">
-    import { DateTime } from "luxon";
     import { Icon, ArrowPath } from "svelte-hero-icons";
     import { todoistData } from "../../stores/stores";
-    import { getActivity } from "../../services/activityService";
+    import { fetchDailyActivity } from "../../services/activityService";
     import { writable } from "svelte/store";
-    import { getContextColors, colorClasses } from "../../utils/styleUtils";
-    import type { TaskActivity, ColorName } from "../../types/todoist";
+    import { getContextColors } from "../../utils/styleUtils";
+    import type { TaskActivity } from "../../types/todoist";
 
     const sortedLists = writable<{ byContext: TaskActivity[]; byTime: TaskActivity[] }>({
         byContext: [],
@@ -17,62 +16,31 @@
 
     $: dailyGoal = $todoistData.user.daily_goal;
 
-    /**
-     * Creates dataset for display.
-     * @returns Task activity data for today.
-     */
-    async function fetchDailyActivity() {
-        const startOfToday = DateTime.now().startOf("day");
-        const endOfToday = DateTime.now().endOf("day");
-
-        const activity = getActivity([startOfToday, endOfToday]);
-
-        const sortActivitiesByColor = (activities: TaskActivity[]) => {
-            const colorOrder = Object.keys(colorClasses);
-            return [...activities].sort((a, b) => {
-                const aContext = $todoistData.contexts.find((c) => c.id === a.contextId);
-                const bContext = $todoistData.contexts.find((c) => c.id === b.contextId);
-                const aColorIndex = aContext ? colorOrder.indexOf(aContext.color as ColorName) : -1;
-                const bColorIndex = bContext ? colorOrder.indexOf(bContext.color as ColorName) : -1;
-                return aColorIndex - bColorIndex;
-            });
-        };
-
-        const byContext = sortActivitiesByColor(activity.data);
-        const byTime = [...activity.data].sort((a, b) => a.date.toMillis() - b.date.toMillis());
-
-        sortedLists.set({ byContext, byTime });
-
-        if (activity.promise) {
-            const promisedActivity = await activity.promise;
-            const combinedActivity = [...activity.data, ...promisedActivity];
-            const uniqueActivity = Array.from(
-                new Map(
-                    combinedActivity.map((item) => [
-                        `${item.taskId}:${item.date.toMillis()}`,
-                        item,
-                    ]),
-                ).values(),
-            );
-
-            const promisedByContext = sortActivitiesByColor(uniqueActivity);
-            const promisedByTime = [...uniqueActivity].sort(
-                (a, b) => a.date.toMillis() - b.date.toMillis(),
-            );
-            sortedLists.set({ byContext: promisedByContext, byTime: promisedByTime });
-        }
-
-        isLoading.set(false);
-    }
-
     $: if ($todoistData.tasks) {
         if (debounceState.timeoutId) {
             clearTimeout(debounceState.timeoutId);
         }
 
         debounceState.timeoutId = setTimeout(() => {
-            isLoading.set(true);
-            void fetchDailyActivity();
+            const activity = fetchDailyActivity();
+            sortedLists.set(
+                activity.preliminary as { byContext: TaskActivity[]; byTime: TaskActivity[] },
+            );
+
+            if (activity.promise) {
+                isLoading.set(true);
+                void (
+                    activity.promise as Promise<{
+                        byContext: TaskActivity[];
+                        byTime: TaskActivity[];
+                    }>
+                ).then((promisedActivity) => {
+                    sortedLists.set(promisedActivity);
+                    isLoading.set(false);
+                });
+            } else {
+                isLoading.set(false);
+            }
         }, 2000);
     }
 </script>
