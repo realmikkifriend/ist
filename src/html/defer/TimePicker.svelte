@@ -1,7 +1,8 @@
 <script lang="ts">
     import { createEventDispatcher, onDestroy } from "svelte";
-    import { getPriorityClasses } from "../../utils/styleUtils";
     import { updateMilliseconds } from "../../services/deferModalService";
+    import { getPriorityClasses } from "../../utils/styleUtils";
+    import ListTask from "../task/ListTask.svelte";
     import type { Task } from "../../types/todoist";
 
     export let task: Task;
@@ -34,22 +35,27 @@
                     on:click={() => handleDefer(Number(button.ms))}>{button.text}</button
                 >
                 {#if button.time}
-                    <div
-                        class="flex max-h-4 w-full justify-between overflow-hidden text-xs opacity-65"
-                    >
+                    <div class="flex max-h-4 w-full justify-between text-xs">
                         <span
-                            class="text-secondary w-fit overflow-hidden text-left"
+                            class="text-secondary w-fit overflow-hidden text-left opacity-65"
                             class:italic={button.time && button.time.startsWith("*")}
                             >{button.time && button.time.startsWith("*")
                                 ? button.time.slice(1)
                                 : button.time}</span
                         >
-                        {#if button.count}
-                            <span
-                                class="badge badge-xs mt-0 w-fit overflow-hidden px-1 text-right text-xs font-bold {getPriorityClasses(
-                                    button.priority ?? 1,
-                                )}">{button.count}</span
-                            >
+                        {#if button.tasks && button.tasks.length > 0}
+                            <div class="tooltip tooltip-top w-fit cursor-default">
+                                <div class="tooltip-content w-40 text-left">
+                                    {#each button.tasks as task (task.id)}
+                                        <ListTask {task} />
+                                    {/each}
+                                </div>
+                                <span
+                                    class="badge badge-xs mt-0 w-fit overflow-hidden px-1 text-right text-xs font-bold {getPriorityClasses(
+                                        button.priority ?? 1,
+                                    )}">{button.tasks.length}</span
+                                >
+                            </div>
                         {/if}
                     </div>
                 {/if}

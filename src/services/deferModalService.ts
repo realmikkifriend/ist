@@ -15,7 +15,7 @@ import type { DateButtonConfig } from "../types/defer";
  * @param {Task[]} matchedTasks - Array of matched tasks.
  */
 function updateButtonWithTasks(button: DateButtonConfig, matchedTasks: Task[]): void {
-    button.count = matchedTasks.length > 0 ? matchedTasks.length : "";
+    button.tasks = matchedTasks.sort((a, b) => (b.priority ?? 1) - (a.priority ?? 1));
     button.priority =
         matchedTasks.length > 0
             ? (Math.max(...matchedTasks.map((task) => task.priority ?? 1)) as Priority)

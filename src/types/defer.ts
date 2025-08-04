@@ -1,4 +1,4 @@
-import type { Priority } from "./todoist";
+import type { Priority, Task } from "./todoist";
 
 export interface ButtonConfig {
     value?: number;
@@ -12,9 +12,9 @@ export interface ButtonConfig {
 export type TimeButtonConfig = ButtonConfig;
 
 export interface DateButtonConfig extends ButtonConfig {
-    count?: number | string;
     priority?: Priority;
     time?: string;
+    tasks?: Task[];
 }
 
 export interface DeferButtonConfig {
