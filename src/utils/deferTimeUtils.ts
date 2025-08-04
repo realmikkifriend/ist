@@ -97,7 +97,7 @@ export function calculateAdjustedTime(
         adjustedTime.setHours(adjustedTime.getHours() + hoursUntilMorning);
     }
 
-    return adjustedTime;
+    return roundFutureTime(adjustedTime, index);
 }
 
 /**
