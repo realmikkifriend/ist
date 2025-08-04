@@ -7,6 +7,8 @@
 
     export let comments: Comment[];
 
+    console.log(comments);
+
     /**
      * Whether any comment requires a Dynalist auth request.
      */
@@ -20,25 +22,27 @@
     );
 </script>
 
-<div class="prose bg-accent text-primary-content mx-auto w-11/12 rounded-b-xl p-4">
-    {#if requiresAuthRequest && !$dynalistAccessToken}
-        <DynalistAuthRequest />
-        <div class="divider my-1" />
-    {/if}
+{#if comments && comments.length > 0}
+    <div class="prose bg-accent text-primary-content mx-auto w-11/12 rounded-b-xl p-4">
+        {#if requiresAuthRequest && !$dynalistAccessToken}
+            <DynalistAuthRequest />
+            <div class="divider my-1" />
+        {/if}
 
-    {#each comments as comment, index (index)}
-        {#if comment.content.startsWith("https://dynalist.io/d/")}
-            {#if $dynalistAccessToken}
-                <DynalistComment url={comment.content} />
+        {#each comments as comment, index (index)}
+            {#if comment.content.startsWith("https://dynalist.io/d/")}
+                {#if $dynalistAccessToken}
+                    <DynalistComment url={comment.content} />
+                {:else}
+                    Dynalist URL detected but no access code stored.
+                {/if}
             {:else}
-                Dynalist URL detected but no access code stored.
+                <Markdown md={comment.content} />
             {/if}
-        {:else}
-            <Markdown md={comment.content} />
-        {/if}
 
-        {#if index < comments.length - 1}
-            <div class="divider relative z-10 my-1" />
-        {/if}
-    {/each}
-</div>
+            {#if index < comments.length - 1}
+                <div class="divider relative z-10 my-1" />
+            {/if}
+        {/each}
+    </div>
+{/if}
