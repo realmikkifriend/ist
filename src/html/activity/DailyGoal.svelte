@@ -4,6 +4,7 @@
     import { fetchDailyActivity } from "../../services/activityService";
     import { writable } from "svelte/store";
     import { getContextColors } from "../../utils/styleUtils";
+    import DailyGoalTooltip from "./DailyGoalTooltip.svelte";
     import type { TaskActivity } from "../../types/activity";
 
     const sortedLists = writable<{ byContext: TaskActivity[]; byTime: TaskActivity[] }>({
@@ -46,31 +47,7 @@
 </script>
 
 <div class="tooltip min-w-32" class:cursor-progress={$isLoading}>
-    <div class="tooltip-content ml-24 w-80 text-left">
-        {#if $sortedLists.byTime && $sortedLists.byTime.length > 0}
-            {$sortedLists.byTime.length} tasks completed today...
-            <div class="my-2 space-y-1">
-                {#each $sortedLists.byTime as r (`${r.taskId}:${r.date.toMillis()}`)}
-                    <div class="ml-20 -indent-20">
-                        <span class="font-mono tracking-tighter opacity-50"
-                            >[{r.date.toFormat("hh:mm a")}]</span
-                        >
-                        {r.title}
-                        {#if r.temporary}
-                            <Icon src={ArrowPath} class="inline-block h-3 w-3 opacity-50" />
-                        {/if}
-                    </div>
-                {/each}
-            </div>
-        {:else}
-            <p>No tasks completed so far today...</p>
-        {/if}
-        <p>... out of your goal of {$todoistData.user.daily_goal}</p>
-        {#if $isLoading}
-            <hr class="my-1" />
-            <p class="text-xs">Checking for more...</p>
-        {/if}
-    </div>
+    <DailyGoalTooltip {dailyGoal} sortedByTime={$sortedLists.byTime} isLoading={$isLoading} />
     <div class="flex w-full min-w-36 flex-row items-center">
         <div
             class="badge badge-outline outline-secondary flex h-3 items-start gap-0 overflow-hidden rounded-full border-0 p-0 whitespace-nowrap outline-1"

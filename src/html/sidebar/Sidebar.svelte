@@ -1,7 +1,7 @@
 <script lang="ts">
     import { Icon, Bars3, ArrowLeftOnRectangle } from "svelte-hero-icons";
     import Contexts from "./Contexts.svelte";
-    import DailyGoal from "../activity/dailyGoal.svelte";
+    import DailyGoal from "../activity/DailyGoal.svelte";
     import Footer from "../Footer.svelte";
     import { todoistData, handleLogout } from "../../stores/stores";
 
