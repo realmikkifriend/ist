@@ -5,49 +5,6 @@ import type { Task } from "../types/todoist";
 import type { TimeButtonConfig, DateButtonConfig, TimeButtonContext } from "../types/defer";
 
 /**
- * Calculates the adjusted time for a button that crosses into the next day.
- * @param {Date} futureTime - The original future time for the button.
- * @param {TimeButtonContext} context - Object containing now, nextMorning, index, and processedButtons.
- * @returns The adjusted Date object.
- */
-export function calculateAdjustedTime(futureTime: Date, context: TimeButtonContext): Date {
-    const adjustedTime = new Date(futureTime);
-
-    const lastCrossedButton = context.processedButtons
-        .slice(0, context.index)
-        .reverse()
-        .find(
-            (btn) =>
-                btn &&
-                btn.ms !== undefined &&
-                new Date(context.now.getTime() + btn.ms).getDate() !== context.now.getDate(),
-        );
-
-    if (context.index > 0 && lastCrossedButton && lastCrossedButton.ms !== undefined) {
-        const hoursToAdd = context.processedButtons
-            .slice(0, context.index)
-            .filter(
-                (btn) =>
-                    btn &&
-                    btn.ms !== undefined &&
-                    new Date(context.now.getTime() + btn.ms).getDate() !== context.now.getDate(),
-            ).length;
-
-        const lastCrossedTime = new Date(context.now.getTime() + lastCrossedButton.ms);
-        adjustedTime.setTime(lastCrossedTime.getTime() + hoursToAdd * 60 * 60 * 1000);
-    }
-
-    if (adjustedTime < context.nextMorning) {
-        const hoursUntilMorning = Math.ceil(
-            (context.nextMorning.getTime() - adjustedTime.getTime()) / (1000 * 60 * 60),
-        );
-        adjustedTime.setHours(adjustedTime.getHours() + hoursUntilMorning);
-    }
-
-    return roundFutureTime(adjustedTime, context.index);
-}
-
-/**
  * Processes a button to calculate its ms and styling based on its position and time.
  * @param {TimeButtonConfig} button - The button to process.
  * @param {TimeButtonContext} context - Object containing futureTime, now, nextMorning, index, and processedButtons.
@@ -57,15 +14,13 @@ function processButton(button: TimeButtonConfig, context: TimeButtonContext): Ti
     const futureTime = new Date(context.now.getTime() + (button.ms ?? 0));
     const roundedFutureTime = roundFutureTime(futureTime, context.index);
 
-    const adjustedFutureTime = calculateAdjustedTime(roundedFutureTime, context);
-
     const newContext: TimeButtonContext = {
         ...context,
         futureTime: roundedFutureTime,
     };
 
     if (roundedFutureTime.getDate() !== context.now.getDate()) {
-        return handleNextDayButton(button, newContext, adjustedFutureTime);
+        return handleNextDayButton(button, newContext, roundedFutureTime);
     }
 
     return handleSameDayButton(button, roundedFutureTime, context.now);
@@ -77,6 +32,11 @@ function processButton(button: TimeButtonConfig, context: TimeButtonContext): Ti
  */
 export const createButtons = (): TimeButtonConfig[] => {
     const buttons: TimeButtonConfig[] = [];
+
+    const now = new Date();
+    const nextMorning = new Date(now);
+    nextMorning.setDate(now.getDate() + 1);
+    nextMorning.setHours(6, 0, 0, 0);
 
     buttons.push(buttonConfig.tomorrow);
 
@@ -91,24 +51,53 @@ export const createButtons = (): TimeButtonConfig[] => {
         });
     });
 
-    buttonConfig.hours.forEach(({ value, text, height, styling }) => {
-        const displayText = text || `${value} hrs`;
-        const buttonStyling = styling || "basis-[22.75%]";
+    const processedHours = buttonConfig.hours
+        .reduce(
+            (acc, item) => {
+                const baseMs = (item.value ?? 0) * 60 * 60 * 1000;
+                const futureTimeCandidate = new Date(now.getTime() + baseMs);
 
-        buttons.push({
-            text: displayText,
-            ms: (value ?? 0) * 60 * 60 * 1000,
-            styling: buttonStyling,
-            stylingButton: height ?? "",
-            value,
-            height,
+                const isNextDayAdjustmentNeeded = futureTimeCandidate.getDate() !== now.getDate();
+
+                const nextDayHourButtonCount = acc.filter(
+                    (btn) =>
+                        (btn as TimeButtonConfig & { isAdjustedForNextDay?: boolean })
+                            .isAdjustedForNextDay,
+                ).length;
+
+                const actualMs = isNextDayAdjustmentNeeded
+                    ? (() => {
+                          const targetHour = 6 + nextDayHourButtonCount;
+                          const targetDate = new Date(now);
+                          targetDate.setDate(now.getDate() + 1);
+                          targetDate.setHours(targetHour, 0, 0, 0);
+                          return targetDate.getTime() - now.getTime();
+                      })()
+                    : baseMs;
+
+                const displayText = isNextDayAdjustmentNeeded
+                    ? `${6 + nextDayHourButtonCount} AM`
+                    : item.text || `${item.value} hrs`;
+
+                acc.push({
+                    text: displayText,
+                    ms: actualMs,
+                    styling: item.styling || "basis-[22.75%]",
+                    stylingButton: item.height ?? "",
+                    value: item.value,
+                    height: item.height,
+                    isAdjustedForNextDay: isNextDayAdjustmentNeeded,
+                });
+                return acc;
+            },
+            [] as (TimeButtonConfig & { isAdjustedForNextDay?: boolean })[],
+        )
+        .map((button) => {
+            const { ...rest } = button;
+            return rest;
         });
-    });
 
-    const now = new Date();
-    const nextMorning = new Date(now);
-    nextMorning.setDate(now.getDate() + 1);
-    nextMorning.setHours(6, 0, 0, 0);
+    buttons.push(...processedHours);
 
     return buttons.map((button, index, array) => {
         const context: TimeButtonContext = {

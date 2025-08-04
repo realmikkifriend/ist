@@ -58,14 +58,10 @@ export function handleNextDayButton(
     context: TimeButtonContext,
     adjustedFutureTime: Date,
 ): TimeButtonConfig {
-    const hoursInFuture = Math.floor(
-        (adjustedFutureTime.getTime() - context.now.getTime()) / (1000 * 60 * 60),
-    );
-
     return {
         ...button,
         ms: adjustedFutureTime.getTime() - context.now.getTime(),
-        text: `${hoursInFuture} hrs`,
+        text: button.text ?? "",
         styling: button.styling ?? "",
         stylingButton: (button.stylingButton ?? "") + " bg-blue-900",
     };
