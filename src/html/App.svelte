@@ -108,7 +108,12 @@
      * Returns a promise for refreshing data, for use in Svelte's {#await}.
      * @returns Promise for refreshing data.
      */
-    const dataPromise = (): Promise<void> => handleRefresh();
+    const dataPromise = (): Promise<void> => {
+        if ($firstDueTask?.summoned) {
+            return Promise.resolve();
+        }
+        return handleRefresh();
+    };
 </script>
 
 <div class="flex w-fit items-center">

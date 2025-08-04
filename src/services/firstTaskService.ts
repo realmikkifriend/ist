@@ -89,15 +89,17 @@ export const updateFirstDueTask = async (task: Task | null = null): Promise<void
         return;
     }
 
+    if (debounceState.timeoutId) {
+        return;
+    }
+
     const selectedContextId: string | null = get(userSettings).selectedContext?.id ?? null;
     const dueTasks: Task[] = updateDueTasks($todoistData.dueTasks, selectedContextId);
 
-    if (debounceState.timeoutId) {
-        clearTimeout(debounceState.timeoutId);
-    }
+    void processDueTaskUpdate(dueTasks, prevTask, selectedContextId);
 
     debounceState.timeoutId = setTimeout(() => {
-        void processDueTaskUpdate(dueTasks, prevTask, selectedContextId);
+        debounceState.timeoutId = null;
     }, 2000);
 };
 
@@ -164,6 +166,9 @@ const processDueTaskUpdate = async (
     prevTask: Task | null,
     selectedContextId: string | null,
 ): Promise<void> => {
+    if (!dueTasks.length) {
+        return;
+    }
     const newTaskWithComments = await loadCommentsForTask(dueTasks[0]);
 
     if (shouldShowNewTaskToast(newTaskWithComments, prevTask, selectedContextId)) {
@@ -191,10 +196,13 @@ export function summonTask(
 
         task.summoned = currentFirstDueSummoned || window.location.hash;
 
-        void updateFirstDueTask(task);
+        void (async () => {
+            await updateFirstDueTask(task);
+            window.location.hash = "";
+        })();
+    } else {
+        window.location.hash = "";
     }
-
-    window.location.hash = "";
 }
 
 /**
