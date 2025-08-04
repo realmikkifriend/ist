@@ -55,12 +55,14 @@ export function formatTaskDate(time: DateTime): string {
  * Rounds the future time for a button based on its index.
  * @param {Date} futureTime - The future time to round.
  * @param {number} index - The index of the button.
+ * @returns {Date} The rounded future time.
  */
-export function roundFutureTime(futureTime: Date, index: number): void {
+export function roundFutureTime(futureTime: Date, index: number): Date {
     if (index > 2) {
         const roundingFactor = index >= 3 && index <= 7 ? 5 : 15;
         const roundedMinutes =
             Math.round(futureTime.getMinutes() / roundingFactor) * roundingFactor;
         futureTime.setMinutes(roundedMinutes);
     }
+    return futureTime;
 }

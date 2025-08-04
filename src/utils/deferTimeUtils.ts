@@ -178,13 +178,20 @@ function processButton(
     nextMorning: Date,
 ): TimeButtonConfig {
     const futureTime = new Date(now.getTime() + (button.ms ?? 0));
-    roundFutureTime(futureTime, index);
+    const roundedFutureTime = roundFutureTime(futureTime, index);
 
-    if (futureTime.getDate() !== now.getDate()) {
-        return handleNextDayButton(button, futureTime, now, nextMorning, index, processedButtons);
+    if (roundedFutureTime.getDate() !== now.getDate()) {
+        return handleNextDayButton(
+            button,
+            roundedFutureTime,
+            now,
+            nextMorning,
+            index,
+            processedButtons,
+        );
     }
 
-    return handleSameDayButton(button, futureTime, now);
+    return handleSameDayButton(button, roundedFutureTime, now);
 }
 
 /**
