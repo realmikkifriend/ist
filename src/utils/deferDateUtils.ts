@@ -1,6 +1,7 @@
 import { DateTime } from "luxon";
 import { getPriorityClasses } from "../utils/styleUtils";
 import type { Task, Priority } from "../types/todoist";
+import type { CalendarContext } from "../types/defer";
 
 /**
  * Returns the start and end DateTime for a given month/year string.
@@ -24,23 +25,25 @@ export function getCalendarDateRange(
 /**
  * Filters tasks for those due within the given date range and context.
  * @param {Task[]} tasks - Array of tasks.
- * @param {DateTime} start - Start of the date range.
- * @param {DateTime} end - End of the date range.
- * @param {string} tz - Timezone string.
- * @param {string} contextId - Context ID to filter by.
+ * @param {object} dateRange - Start and end DateTimes.
+ * @param {DateTime} dateRange.start - Start of the date range to retrieve tasks for.
+ * @param {DateTime} dateRange.end - End of the date range to retrieve tasks for.
+ * @param {CalendarContext} context - Object containing timezone and context ID.
  * @returns {Task[]} - An array of tasks with the given parameters.
  */
 export function getTasksForMonth(
     tasks: Task[],
-    start: DateTime,
-    end: DateTime,
-    tz: string,
-    contextId: string,
+    dateRange: { start: DateTime; end: DateTime },
+    context: CalendarContext,
 ): Task[] {
     return tasks.filter((task) => {
         if (!task.due) return false;
-        const dueDate = DateTime.fromISO(task.due.date).setZone(tz);
-        return dueDate >= start && dueDate <= end && task.contextId === contextId;
+        const dueDate = DateTime.fromISO(task.due.date).setZone(context.tz);
+        return (
+            dueDate >= dateRange.start &&
+            dueDate <= dateRange.end &&
+            task.contextId === context.contextId
+        );
     });
 }
 
@@ -95,18 +98,12 @@ export function createTaskDots(tasks: Task[]): HTMLDivElement {
  * Processes a calendar cell, updating its highlight and task dots.
  * @param {HTMLTableCellElement} cell - The calendar cell element.
  * @param {number} cellDate - The day number for the cell.
- * @param {string} monthYear - Month and year in "MMMM yyyy" format.
- * @param {DateTime} now - The current DateTime.
- * @param {Task[]} soonTasks - Array of tasks for the month.
- * @param {string} tz - Timezone string.
+ * @param {CalendarContext} context - Object containing monthYear, now, soonTasks, and tz.
  */
 export function processCalendarCell(
     cell: HTMLTableCellElement,
     cellDate: number,
-    monthYear: string,
-    now: DateTime,
-    soonTasks: Task[],
-    tz: string,
+    context: CalendarContext,
 ): void {
     cell.querySelector(".dot-container")?.remove();
     cell.classList.remove("sdt-tomorrow");
@@ -114,14 +111,14 @@ export function processCalendarCell(
     if (cell.querySelector("button[disabled]")) return;
 
     const grayedOut = cell.querySelector("button.not-current");
-    if (!grayedOut && shouldHighlightTomorrow(cellDate, monthYear, now)) {
+    if (!grayedOut && shouldHighlightTomorrow(cellDate, context.monthYear, context.now)) {
         cell.classList.add("sdt-tomorrow");
     }
 
     if (grayedOut) return;
 
-    const tasksForDate = soonTasks
-        .filter(({ due }) => due && DateTime.fromISO(due.date).setZone(tz).day === cellDate)
+    const tasksForDate = context.soonTasks
+        .filter(({ due }) => due && DateTime.fromISO(due.date).setZone(context.tz).day === cellDate)
         .sort((a, b) => b.priority - a.priority);
 
     if (tasksForDate.length > 0) {

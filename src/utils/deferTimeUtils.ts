@@ -1,7 +1,12 @@
 import { DateTime } from "luxon";
 import { roundFutureTime, createDateWithTime } from "./timeUtils";
 import type { Task } from "../types/todoist";
-import type { DeferButtonConfig, TimeButtonConfig, DateButtonConfig } from "../types/defer";
+import type {
+    DeferButtonConfig,
+    TimeButtonConfig,
+    DateButtonConfig,
+    TimeButtonContext,
+} from "../types/defer";
 
 /**
  * Button configuration for defer buttons (time-based).
@@ -52,86 +57,65 @@ export const buttonConfig: DeferButtonConfig = {
 /**
  * Calculates the adjusted time for a button that crosses into the next day.
  * @param {Date} futureTime - The original future time for the button.
- * @param {Date} nextMorning - The Date representing the next morning (6am).
- * @param {number} index - The index of the button in the array.
- * @param {(TimeButtonConfig | null)[]} processedButtons - The array of already processed buttons.
+ * @param {TimeButtonContext} context - Object containing now, nextMorning, index, and processedButtons.
  * @returns The adjusted Date object.
  */
-export function calculateAdjustedTime(
-    futureTime: Date,
-    nextMorning: Date,
-    index: number,
-    processedButtons: (TimeButtonConfig | null)[],
-): Date {
-    const now = new Date();
+export function calculateAdjustedTime(futureTime: Date, context: TimeButtonContext): Date {
     const adjustedTime = new Date(futureTime);
 
-    const lastCrossedButton = processedButtons
-        .slice(0, index)
+    const lastCrossedButton = context.processedButtons
+        .slice(0, context.index)
         .reverse()
         .find(
             (btn) =>
                 btn &&
                 btn.ms !== undefined &&
-                new Date(now.getTime() + btn.ms).getDate() !== now.getDate(),
+                new Date(context.now.getTime() + btn.ms).getDate() !== context.now.getDate(),
         );
 
-    if (index > 0 && lastCrossedButton && lastCrossedButton.ms !== undefined) {
-        const hoursToAdd = processedButtons
-            .slice(0, index)
+    if (context.index > 0 && lastCrossedButton && lastCrossedButton.ms !== undefined) {
+        const hoursToAdd = context.processedButtons
+            .slice(0, context.index)
             .filter(
                 (btn) =>
                     btn &&
                     btn.ms !== undefined &&
-                    new Date(now.getTime() + btn.ms).getDate() !== now.getDate(),
+                    new Date(context.now.getTime() + btn.ms).getDate() !== context.now.getDate(),
             ).length;
 
-        const lastCrossedTime = new Date(now.getTime() + lastCrossedButton.ms);
+        const lastCrossedTime = new Date(context.now.getTime() + lastCrossedButton.ms);
         adjustedTime.setTime(lastCrossedTime.getTime() + hoursToAdd * 60 * 60 * 1000);
     }
 
-    if (adjustedTime < nextMorning) {
+    if (adjustedTime < context.nextMorning) {
         const hoursUntilMorning = Math.ceil(
-            (nextMorning.getTime() - adjustedTime.getTime()) / (1000 * 60 * 60),
+            (context.nextMorning.getTime() - adjustedTime.getTime()) / (1000 * 60 * 60),
         );
         adjustedTime.setHours(adjustedTime.getHours() + hoursUntilMorning);
     }
 
-    return roundFutureTime(adjustedTime, index);
+    return roundFutureTime(adjustedTime, context.index);
 }
 
 /**
  * Handles the processing for a button that crosses into the next day.
  * @param {TimeButtonConfig} button - The button to process.
- * @param {Date} futureTime - The original future time.
- * @param {Date} now - The current Date.
- * @param {Date} nextMorning - The Date for the next morning.
- * @param {number} index - The button processing index.
- * @param {(TimeButtonConfig | null)[]} processedButtons - Previously processed buttons.
+ * @param {TimeButtonContext} context - Object containing futureTime, now, nextMorning, index, and processedButtons.
  * @returns The processed button configuration.
  */
 function handleNextDayButton(
     button: TimeButtonConfig,
-    futureTime: Date,
-    now: Date,
-    nextMorning: Date,
-    index: number,
-    processedButtons: (TimeButtonConfig | null)[],
+    context: TimeButtonContext,
 ): TimeButtonConfig {
-    const adjustedFutureTime = calculateAdjustedTime(
-        futureTime,
-        nextMorning,
-        index,
-        processedButtons,
-    );
+    const adjustedFutureTime = calculateAdjustedTime(context.futureTime, context);
 
     const hoursInFuture = Math.floor(
-        (adjustedFutureTime.getTime() - now.getTime()) / (1000 * 60 * 60),
+        (adjustedFutureTime.getTime() - context.now.getTime()) / (1000 * 60 * 60),
     );
 
     return {
         ...button,
-        ms: adjustedFutureTime.getTime() - now.getTime(),
+        ms: adjustedFutureTime.getTime() - context.now.getTime(),
         text: `${hoursInFuture} hrs`,
         styling: button.styling ?? "",
         stylingButton: (button.stylingButton ?? "") + " bg-blue-900",
@@ -164,34 +148,23 @@ function handleSameDayButton(
 /**
  * Processes a button to calculate its ms and styling based on its position and time.
  * @param {TimeButtonConfig} button - The button to process.
- * @param {number} index - The index of the button in the array.
- * @param {(TimeButtonConfig | null)[]} processedButtons - The array of already processed buttons.
- * @param {Date} now - The current Date.
- * @param {Date} nextMorning - The Date representing the next morning (6am).
+ * @param {TimeButtonContext} context - Object containing futureTime, now, nextMorning, index, and processedButtons.
  * @returns The processed button.
  */
-function processButton(
-    button: TimeButtonConfig,
-    index: number,
-    processedButtons: (TimeButtonConfig | null)[],
-    now: Date,
-    nextMorning: Date,
-): TimeButtonConfig {
-    const futureTime = new Date(now.getTime() + (button.ms ?? 0));
-    const roundedFutureTime = roundFutureTime(futureTime, index);
+function processButton(button: TimeButtonConfig, context: TimeButtonContext): TimeButtonConfig {
+    const futureTime = new Date(context.now.getTime() + (button.ms ?? 0));
+    const roundedFutureTime = roundFutureTime(futureTime, context.index);
 
-    if (roundedFutureTime.getDate() !== now.getDate()) {
-        return handleNextDayButton(
-            button,
-            roundedFutureTime,
-            now,
-            nextMorning,
-            index,
-            processedButtons,
-        );
+    const newContext: TimeButtonContext = {
+        ...context,
+        futureTime: roundedFutureTime,
+    };
+
+    if (roundedFutureTime.getDate() !== context.now.getDate()) {
+        return handleNextDayButton(button, newContext);
     }
 
-    return handleSameDayButton(button, roundedFutureTime, now);
+    return handleSameDayButton(button, roundedFutureTime, context.now);
 }
 
 /**
@@ -234,24 +207,14 @@ export const createButtons = (): TimeButtonConfig[] => {
     nextMorning.setHours(6, 0, 0, 0);
 
     return buttons.map((button, index, array) => {
-        const processedButtons = array.slice(0, index).map((btn, i) =>
-            i < index
-                ? processButton(
-                      btn,
-                      i,
-                      array
-                          .slice(0, i)
-                          .map((b, j) =>
-                              j < i
-                                  ? processButton(b, j, array.slice(0, j), now, nextMorning)
-                                  : null,
-                          ),
-                      now,
-                      nextMorning,
-                  )
-                : null,
-        );
-        return processButton(button, index, processedButtons, now, nextMorning);
+        const context: TimeButtonContext = {
+            futureTime: new Date(),
+            now,
+            nextMorning,
+            index,
+            processedButtons: array.slice(0, index),
+        };
+        return processButton(button, context);
     });
 };
 

@@ -72,24 +72,22 @@ export function updateCalendarCells(
 
     const header = calendarElement.querySelector(".std-btn-header.sdt-toggle-btn");
     if (!(header instanceof HTMLElement)) return;
+
     const monthYear = header.innerText;
     const now = DateTime.local().setZone(tz);
-    const { start, end } = getCalendarDateRange(monthYear, now);
-    const soonTasks = getTasksForMonth(tasks, start, end, tz, taskToDefer.contextId ?? "");
+    const dateRange = getCalendarDateRange(monthYear, now);
+    const contextId = taskToDefer.contextId ?? "";
+    const calendarContext = { monthYear, now, soonTasks: [] as Task[], tz, contextId };
+
+    calendarContext.soonTasks = getTasksForMonth(tasks, dateRange, calendarContext);
+
     const calendarCells = calendarElement.querySelectorAll("td.sdt-cal-td.svelte-hexbpx");
 
     calendarCells.forEach((cell) => {
         const cellText = cell.textContent?.trim() ?? "";
         const cellDate = parseInt(cellText);
         if (!isNaN(cellDate)) {
-            processCalendarCell(
-                cell as HTMLTableCellElement,
-                cellDate,
-                monthYear,
-                now,
-                soonTasks,
-                tz,
-            );
+            processCalendarCell(cell as HTMLTableCellElement, cellDate, calendarContext);
         }
     });
 }

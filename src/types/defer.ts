@@ -1,4 +1,5 @@
 import type { Priority, Task } from "./todoist";
+import type { DateTime } from "luxon";
 
 export interface ButtonConfig {
     value?: number;
@@ -21,4 +22,20 @@ export interface DeferButtonConfig {
     tomorrow: TimeButtonConfig;
     minutes: TimeButtonConfig[];
     hours: TimeButtonConfig[];
+}
+
+export interface CalendarContext {
+    monthYear: string;
+    now: DateTime;
+    soonTasks: Task[];
+    tz: string;
+    contextId: string;
+}
+
+export interface TimeButtonContext {
+    futureTime: Date;
+    now: Date;
+    nextMorning: Date;
+    index: number;
+    processedButtons: (TimeButtonConfig | null)[];
 }
