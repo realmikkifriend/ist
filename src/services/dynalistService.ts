@@ -1,6 +1,7 @@
 import { get } from "svelte/store";
 import { dynalistAccessToken } from "../stores/stores";
-import { updateDynalist, loadDynalistComment } from "../utils/dynalistApiUtils";
+import { loadDynalistComment } from "../utils/dynalistApiGetUtils";
+import { updateDynalist } from "../utils/dynalistApiPostUtils";
 import { success, error as showError } from "./toastService";
 import { hasError } from "../utils/dynalistUtils";
 import type { Writable } from "svelte/store";
