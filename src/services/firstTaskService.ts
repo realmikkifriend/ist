@@ -15,6 +15,16 @@ import { filterTasksByContext, shouldShowNewTaskToast } from "../utils/firstTask
 const debounceState: { timeoutId: ReturnType<typeof setTimeout> | null } = { timeoutId: null };
 
 /**
+ * Sets the firstDueTask and previousFirstDueTask stores.
+ * @param {Task | null} task - The task to set in the stores.
+ * @returns {void}
+ */
+const setDueTaskStores = (task: Task | null): void => {
+    firstDueTask.set(task);
+    previousFirstDueTask.set(task);
+};
+
+/**
  * Get the name of the current context, either from user settings or from the first due task's context.
  * @returns - The context name, or an empty string if not found.
  */
@@ -32,38 +42,6 @@ export function getContextName(): string {
     }
     return "";
 }
-
-/**
- * Set the first due task in the store.
- * @param {Task | null} task - The task to set as the first due task.
- * @returns {void}
- */
-export const setFirstDueTask = (task: Task | null): void => {
-    firstDueTask.set(task);
-    previousFirstDueTask.set(task);
-};
-
-/**
- * Update due tasks based on the selected context ID.
- * @param {Task[]} dueTasks - The list of due tasks.
- * @param {string | null} contextId - The selected context ID from settings.
- * @returns {Task[]} The updated list of due tasks.
- */
-const updateDueTasks = (dueTasks: Task[], contextId: string | null): Task[] => {
-    if (contextId) {
-        const filteredDueTasks = filterTasksByContext(dueTasks, contextId);
-        if (!filteredDueTasks.length) {
-            userSettings.update((settings: UserSettings) => ({
-                ...settings,
-                selectedContext: null,
-            }));
-            success("No more tasks in context! Showing all due tasks...");
-            return dueTasks;
-        }
-        return filteredDueTasks;
-    }
-    return dueTasks;
-};
 
 /**
  * Skip the current task and summon the next one.
@@ -100,19 +78,15 @@ const loadCommentsForTask = async (task: Task): Promise<Task> => {
 
 /**
  * Update the first due task, loading comments and handling context changes.
+ * @param {Task | null} task - Optional task to set as the first due task.
  * @returns {Promise<void>}
  */
-export const updateFirstDueTask = async (): Promise<void> => {
+export const updateFirstDueTask = async (task: Task | null = null): Promise<void> => {
     const $todoistData: TodoistData = get(todoistData);
     const prevTask: Task | null = get(previousFirstDueTask);
 
-    if (prevTask?.summoned) {
-        return Promise.resolve();
-    }
-
-    if (!$todoistData?.dueTasks?.length) {
-        setFirstDueTask(null);
-        return Promise.resolve();
+    if (await handleInitialChecks(task, $todoistData, prevTask)) {
+        return;
     }
 
     const selectedContextId: string | null = get(userSettings).selectedContext?.id ?? null;
@@ -123,18 +97,80 @@ export const updateFirstDueTask = async (): Promise<void> => {
     }
 
     debounceState.timeoutId = setTimeout(() => {
-        void (async () => {
-            const newTaskWithComments = await loadCommentsForTask(dueTasks[0]);
-
-            if (shouldShowNewTaskToast(newTaskWithComments, prevTask, selectedContextId)) {
-                newFirstTask(() => setFirstDueTask(newTaskWithComments));
-            } else {
-                setFirstDueTask(newTaskWithComments);
-            }
-        })();
+        void processDueTaskUpdate(dueTasks, prevTask, selectedContextId);
     }, 2000);
+};
 
-    return Promise.resolve();
+/**
+ * Handles initial checks and early exits for updateFirstDueTask.
+ * @param {Task | null} task - Optional task to set as the first due task.
+ * @param {TodoistData} $todoistData - The current Todoist data.
+ * @param {Task | null} prevTask - The previously set first due task.
+ * @returns {Promise<boolean>} True if the function should exit early, false otherwise.
+ */
+const handleInitialChecks = async (
+    task: Task | null,
+    $todoistData: TodoistData,
+    prevTask: Task | null,
+): Promise<boolean> => {
+    if (task) {
+        const taskWithComments = await loadCommentsForTask(task);
+        setDueTaskStores(taskWithComments);
+        return true; // Exit early
+    }
+
+    if (prevTask?.summoned) {
+        return true; // Exit early
+    }
+
+    if (!$todoistData?.dueTasks?.length) {
+        setDueTaskStores(null);
+        return true; // Exit early
+    }
+    return false; // Continue processing
+};
+
+/**
+ * Update due tasks based on the selected context ID.
+ * @param {Task[]} dueTasks - The list of due tasks.
+ * @param {string | null} contextId - The selected context ID from settings.
+ * @returns {Task[]} The updated list of due tasks.
+ */
+const updateDueTasks = (dueTasks: Task[], contextId: string | null): Task[] => {
+    if (contextId) {
+        const filteredDueTasks = filterTasksByContext(dueTasks, contextId);
+        if (!filteredDueTasks.length) {
+            userSettings.update((settings: UserSettings) => ({
+                ...settings,
+                selectedContext: null,
+            }));
+            success("No more tasks in context! Showing all due tasks...");
+            return dueTasks;
+        }
+        return filteredDueTasks;
+    }
+    return dueTasks;
+};
+
+/**
+ * Processes the update for the first due task, including loading comments and handling toast notifications.
+ * @param {Task[]} dueTasks - The list of due tasks.
+ * @param {Task | null} prevTask - The previously set first due task.
+ * @param {string | null} selectedContextId - The ID of the currently selected context.
+ * @returns {Promise<void>}
+ */
+const processDueTaskUpdate = async (
+    dueTasks: Task[],
+    prevTask: Task | null,
+    selectedContextId: string | null,
+): Promise<void> => {
+    const newTaskWithComments = await loadCommentsForTask(dueTasks[0]);
+
+    if (shouldShowNewTaskToast(newTaskWithComments, prevTask, selectedContextId)) {
+        newFirstTask(() => setDueTaskStores(newTaskWithComments));
+    } else {
+        setDueTaskStores(newTaskWithComments);
+    }
 };
 
 /**
@@ -155,8 +191,7 @@ export function summonTask(
 
         task.summoned = currentFirstDueSummoned || window.location.hash;
 
-        setFirstDueTask(task);
-        previousFirstDueTask.set(get(firstDueTask) || null);
+        void updateFirstDueTask(task);
     }
 
     window.location.hash = "";
