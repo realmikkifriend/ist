@@ -7,8 +7,6 @@
 
     export let comments: Comment[];
 
-    console.log(comments);
-
     /**
      * Whether any comment requires a Dynalist auth request.
      */
