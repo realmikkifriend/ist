@@ -77,7 +77,7 @@
     }
 </script>
 
-<div class="modal-box flex min-h-[60%] w-fit flex-col justify-start overflow-hidden">
+<div class="modal-box flex min-h-[64%] w-fit flex-col justify-start overflow-hidden">
     {#key task}
         <div class="flex justify-center">
             <div role="tablist" class="tabs-box tabs bg-neutral h-10 w-2/3 justify-center">

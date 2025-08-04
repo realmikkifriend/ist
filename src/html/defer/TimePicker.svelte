@@ -38,7 +38,7 @@
                     <div class="flex max-h-4 w-full justify-between text-xs">
                         <span
                             class="text-secondary w-fit overflow-hidden text-left opacity-65"
-                            class:italic={button.time && button.time.startsWith("*")}
+                            class:invisible={button.time && button.time.startsWith("*")}
                             >{button.time && button.time.startsWith("*")
                                 ? button.time.slice(1)
                                 : button.time}</span
