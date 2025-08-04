@@ -84,6 +84,9 @@ export default defineConfig([
                 svelteConfig,
             },
         },
+        rules: {
+            "max-lines": ["error", { max: 90, skipComments: true, skipBlankLines: true }],
+        },
     },
 
     // -----------------------------------
