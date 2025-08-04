@@ -44,18 +44,10 @@ export function fetchDailyActivity(): {
 
     if (activity.promise) {
         const promise = activity.promise.then((promisedActivity) => {
-            const combinedActivity = [...activity.data, ...promisedActivity];
-            const uniqueActivity = Array.from(
-                new Map(
-                    combinedActivity.map((item) => [
-                        `${item.taskId}:${item.date.toMillis()}`,
-                        item,
-                    ]),
-                ).values(),
-            );
+            const combinedActivity = mergeActivity(activity.data, promisedActivity);
 
-            const promisedByContext = sortActivitiesByColor(uniqueActivity);
-            const promisedByTime = [...uniqueActivity].sort(
+            const promisedByContext = sortActivitiesByColor(combinedActivity);
+            const promisedByTime = [...combinedActivity].sort(
                 (a, b) => a.date.toMillis() - b.date.toMillis(),
             );
             return { byContext: promisedByContext, byTime: promisedByTime };
