@@ -40,11 +40,9 @@ export function updateTaskResources(taskUpdates: TaskUpdates): void {
                     const insertIndex = $resources.dueTasks.findIndex(
                         (t) => t.due && new Date(t.due.date) > newDueDate,
                     );
-                    if (insertIndex === -1) {
-                        $resources.dueTasks.push(task);
-                    } else {
-                        $resources.dueTasks.splice(insertIndex, 0, task);
-                    }
+                    const actualInsertIndex =
+                        insertIndex === -1 ? $resources.dueTasks.length : insertIndex;
+                    $resources.dueTasks.splice(actualInsertIndex, 0, task);
                 }
             }
         });
