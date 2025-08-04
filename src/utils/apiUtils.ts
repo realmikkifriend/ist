@@ -95,13 +95,13 @@ export function processApiResponse(
  * @param {string} accessToken - The access token for the Todoist API.
  * @param {string} endpoint - The endpoint to call.
  * @param {Record<string, string>} params - Additional parameters.
- * @returns {Promise<unknown>} - Result of API endpoint call.
+ * @returns {Promise<T>} - Result of API endpoint call.
  */
-export function getEndpoint(
+export function getEndpoint<T>(
     accessToken: string,
     endpoint: string,
     params: Record<string, string | number> = {},
-): Promise<unknown> {
+): Promise<T> {
     const CONTENT_TYPE = "application/x-www-form-urlencoded";
     const stringParams = Object.fromEntries(
         Object.entries(params).map(([key, value]) => [key, String(value)]),
