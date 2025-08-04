@@ -64,3 +64,11 @@ export interface DynalistStoreState {
     selectedType: DynalistTaskType | "";
     error?: string;
 }
+
+export interface DetermineLabelAndClassesParams {
+    percentageComplete: number;
+    currentHour: number;
+    endHour: number;
+    current: number;
+    goalCount: number;
+}

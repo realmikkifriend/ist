@@ -1,4 +1,9 @@
-import type { DynalistNode, DynalistDocumentData, DynalistCountData } from "../types/dynalist";
+import type {
+    DynalistNode,
+    DynalistDocumentData,
+    DynalistCountData,
+    DetermineLabelAndClassesParams,
+} from "../types/dynalist";
 
 /**
  * Recursively processes a Dynalist node, filtering out checked nodes and processing children.
@@ -155,20 +160,13 @@ export function calculateLabel(countData: DynalistCountData): { label: string; c
 
     /**
      * Determines the label and classes based on progress.
-     * @param {number} percentageComplete - Completion based on tasks done.
-     * @param {number} currentHour - Hour extracted from current time.
-     * @param {number} endHour - Hour designated as end of productive day.
-     * @param {number} current - Hour designated as end of productive day.
-     * @param {number} goalCount - Number of tasks to complete in a day.
+     * @param {DetermineLabelAndClassesParams} params - Object containing all necessary parameters.
      * @returns {{ label: string; classes: string }} - Paired button label and classes.
      */
     const determineLabelAndClasses = (
-        percentageComplete: number,
-        currentHour: number,
-        endHour: number,
-        current: number,
-        goalCount: number,
+        params: DetermineLabelAndClassesParams,
     ): { label: string; classes: string } => {
+        const { percentageComplete, currentHour, endHour, current, goalCount } = params;
         if (percentageComplete >= 100) {
             return { label: "complete", classes: "bg-blue-500 text-blue-100" };
         } else if (currentHour > endHour && percentageComplete < 100) {
@@ -186,5 +184,11 @@ export function calculateLabel(countData: DynalistCountData): { label: string; c
         }
     };
 
-    return determineLabelAndClasses(percentageComplete, currentHour, endHour, current, goalCount);
+    return determineLabelAndClasses({
+        percentageComplete,
+        currentHour,
+        endHour,
+        current,
+        goalCount,
+    });
 }
