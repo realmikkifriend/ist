@@ -4,7 +4,7 @@
     import { DateTime } from "luxon";
     import { Icon, ArrowPath } from "svelte-hero-icons";
     import { todoistData, todoistError, userSettings, firstDueTask } from "../stores/stores";
-    import { updateFirstDueTask } from "../services/firstTaskService";
+    import { updateFirstDueTask, skipTask } from "../services/firstTaskService";
     import { refreshData } from "../services/updateService";
     import { error as showError } from "../services/toastService";
     import { handleTaskDone, handleTaskDefer } from "../services/taskHandlerService";
@@ -61,6 +61,7 @@
      */
     const handleDone = async (event: { detail: { task: Task } }): Promise<void> => {
         const { task } = event.detail;
+        if (task.summoned) window.location.hash = String(task.summoned);
         await handleTaskDone(task);
         void refreshData();
     };
@@ -77,9 +78,17 @@
         const dateTime = DateTime.fromISO(time);
         if (dateTime.isValid) {
             await handleTaskDefer([[task, dateTime]]);
-            void refreshData();
         } else {
             showError("Received unexpected type of date...");
+        }
+
+        if (task.skip) {
+            void skipTask(task);
+        } else {
+            if (event.detail.task.summoned) {
+                window.location.hash = String(event.detail.task.summoned);
+            }
+            void refreshData();
         }
     };
 

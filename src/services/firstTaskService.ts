@@ -116,18 +116,18 @@ const handleInitialChecks = async (
     if (task) {
         const taskWithComments = await loadCommentsForTask(task);
         setDueTaskStores(taskWithComments);
-        return true; // Exit early
+        return true;
     }
 
     if (prevTask?.summoned) {
-        return true; // Exit early
+        return true;
     }
 
     if (!$todoistData?.dueTasks?.length) {
         setDueTaskStores(null);
-        return true; // Exit early
+        return true;
     }
-    return false; // Continue processing
+    return false;
 };
 
 /**

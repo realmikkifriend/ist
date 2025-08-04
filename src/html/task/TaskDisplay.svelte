@@ -21,7 +21,6 @@
      * Handles marking the task as done and dispatches a "done" event.
      */
     const handleDone = (): void => {
-        if (task.summoned) window.location.hash = String(task.summoned);
         dispatch("done", { task });
     };
 
@@ -31,7 +30,6 @@
      */
     const handleDefer = (event: CustomEvent<{ task: Task; time: DateTime }>): void => {
         (document.getElementById("defer_modal") as HTMLDialogElement | null)?.close();
-        if (event.detail.task.summoned) window.location.hash = String(event.detail.task.summoned);
         // Convert DateTime to ISO string before dispatching
         dispatch("defer", { task: event.detail.task, time: event.detail.time.toISO() ?? "" });
     };
