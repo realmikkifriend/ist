@@ -68,7 +68,7 @@
             <h2 class="card-title text-center text-3xl">{task.content}</h2>
             <div class="card-actions justify-center">
                 <button
-                    class="text-md btn btn-primary h-8 min-h-8 content-center p-4"
+                    class="text-md btn btn-primary focus:btn-soft h-8 min-h-8 content-center p-4 focus:cursor-progress"
                     title={task.due?.string ? `repeats ${task.due.string}` : "one-time task"}
                     on:click={handleDone}
                 >
