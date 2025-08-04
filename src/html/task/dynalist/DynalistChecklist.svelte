@@ -3,9 +3,8 @@
     import { Icon, Backward } from "svelte-hero-icons";
     import { writable } from "svelte/store";
     import { parseList, hasError } from "../../../utils/dynalistUtils";
-    import type { DynalistNode } from "../../../types/dynalist";
 
-    export let content: DynalistNode | undefined;
+    export let content: string | undefined;
 
     const currentIndex = writable(0);
 
