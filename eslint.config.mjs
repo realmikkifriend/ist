@@ -101,6 +101,23 @@ export default defineConfig([
             ],
         },
     },
+    {
+        files: ["**/*.ts", "**/*.tsx"],
+        ignores: ["src/types/**/*.ts", "src/types/**/*.tsx"],
+        rules: {
+            "no-restricted-syntax": [
+                "error",
+                {
+                    selector: "TSTypeAliasDeclaration",
+                    message: "Types are only allowed in src/types. Please import them.",
+                },
+                {
+                    selector: "TSInterfaceDeclaration",
+                    message: "Interfaces are only allowed in src/types. Please import them.",
+                },
+            ],
+        },
+    },
     // -----------------------------------
     // `     Svelte Configuration
     ...svelte.configs.recommended,
