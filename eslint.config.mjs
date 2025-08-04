@@ -10,6 +10,13 @@ import svelteConfig from "./svelte.config.mjs";
 import vitest from "@vitest/eslint-plugin";
 
 export default defineConfig([
+    {
+        files: ["**/*"],
+        rules: {
+            "no-console": ["warn", { allow: ["error"] }],
+            "max-params": ["error", 4],
+        },
+    },
     // -----------------------------------
     // `     General JavaScript Configuration
     {
