@@ -12,6 +12,8 @@ import type { Task, Comment, TodoistData } from "../types/todoist";
 import type { UserSettings } from "../types/interface";
 import { filterTasksByContext, shouldShowNewTaskToast } from "../utils/firstTaskUtils";
 
+const debounceState: { timeoutId: ReturnType<typeof setTimeout> | null } = { timeoutId: null };
+
 /**
  * Get the name of the current context, either from user settings or from the first due task's context.
  * @returns - The context name, or an empty string if not found.
@@ -105,24 +107,34 @@ export const updateFirstDueTask = async (): Promise<void> => {
     const prevTask: Task | null = get(previousFirstDueTask);
 
     if (prevTask?.summoned) {
-        return;
+        return Promise.resolve();
     }
 
     if (!$todoistData?.dueTasks?.length) {
         setFirstDueTask(null);
-        return;
+        return Promise.resolve();
     }
 
     const selectedContextId: string | null = get(userSettings).selectedContext?.id ?? null;
     const dueTasks: Task[] = updateDueTasks($todoistData.dueTasks, selectedContextId);
 
-    const newTaskWithComments = await loadCommentsForTask(dueTasks[0]);
-
-    if (shouldShowNewTaskToast(newTaskWithComments, prevTask, selectedContextId)) {
-        newFirstTask(() => setFirstDueTask(newTaskWithComments));
-    } else {
-        setFirstDueTask(newTaskWithComments);
+    if (debounceState.timeoutId) {
+        clearTimeout(debounceState.timeoutId);
     }
+
+    debounceState.timeoutId = setTimeout(() => {
+        void (async () => {
+            const newTaskWithComments = await loadCommentsForTask(dueTasks[0]);
+
+            if (shouldShowNewTaskToast(newTaskWithComments, prevTask, selectedContextId)) {
+                newFirstTask(() => setFirstDueTask(newTaskWithComments));
+            } else {
+                setFirstDueTask(newTaskWithComments);
+            }
+        })();
+    }, 2000);
+
+    return Promise.resolve();
 };
 
 /**
