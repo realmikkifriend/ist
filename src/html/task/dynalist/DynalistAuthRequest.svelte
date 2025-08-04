@@ -1,6 +1,6 @@
 <script lang="ts">
     import { Icon, ArrowPath, Key } from "svelte-hero-icons";
-    import { dynalistAccessToken } from "../../../stores/stores";
+    import { dynalistAccessToken } from "../../../stores/secret";
     import { success } from "../../../services/toastService";
     import Logo from "../../Logo.svelte";
     import { validateDynalistToken } from "../../../utils/dynalistApiGetUtils";

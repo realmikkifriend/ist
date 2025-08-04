@@ -2,7 +2,8 @@
     import { onMount } from "svelte";
     import { writable } from "svelte/store";
     import { DateTime } from "luxon";
-    import { todoistData, todoistError, userSettings, firstDueTask } from "../stores/stores";
+    import { todoistData, todoistError, firstDueTask } from "../stores/stores";
+    import { userSettings } from "../stores/interface";
     import { updateFirstDueTask, skipTask } from "../services/firstTaskService";
     import { refreshData } from "../services/updateService";
     import { error as showError } from "../services/toastService";

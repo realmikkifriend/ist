@@ -8,7 +8,8 @@ import {
 } from "../utils/activityUtils";
 import { getEndpoint } from "../utils/apiUtils";
 import { colorClasses } from "../utils/styleUtils";
-import { todoistData, todoistAccessToken, taskActivity } from "../stores/stores";
+import { todoistData, taskActivity } from "../stores/stores";
+import { todoistAccessToken } from "../stores/secret";
 import type { Task, ColorName } from "../types/todoist";
 import type { TaskActivity, TodoistActivity } from "../types/activity";
 

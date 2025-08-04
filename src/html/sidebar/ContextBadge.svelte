@@ -1,6 +1,7 @@
 <script lang="ts">
     import { Icon, XMark } from "svelte-hero-icons";
-    import { todoistData, userSettings, firstDueTask } from "../../stores/stores";
+    import { todoistData, firstDueTask } from "../../stores/stores";
+    import { userSettings } from "../../stores/interface";
     import { getDueTaskCountByContext } from "../../services/sidebarService";
     import { clearSelectedTask } from "../../services/firstTaskService";
     import { getSelectedContextName } from "../../utils/firstTaskUtils";

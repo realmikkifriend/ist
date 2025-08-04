@@ -1,5 +1,5 @@
 import { get } from "svelte/store";
-import { dynalistAccessToken } from "../stores/stores";
+import { dynalistAccessToken } from "../stores/secret";
 import { loadDynalistComment } from "../utils/dynalistApiGetUtils";
 import { updateDynalist } from "../utils/dynalistApiPostUtils";
 import { success, error as showError } from "./toastService";

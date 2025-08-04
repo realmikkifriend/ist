@@ -1,6 +1,6 @@
 <script lang="ts">
     import { onMount } from "svelte";
-    import { todoistAccessToken } from "../stores/stores";
+    import { todoistAccessToken } from "../stores/secret";
 
     const TODOIST_CLIENT_ID: string | undefined = process.env.TODOIST_CLIENT_ID;
     const TODOIST_CLIENT_SECRET: string | undefined = process.env.TODOIST_CLIENT_SECRET;

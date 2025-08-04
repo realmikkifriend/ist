@@ -1,12 +1,12 @@
 <script lang="ts">
-    import ListTask from "../task/ListTask.svelte";
-
     import { derived } from "svelte/store";
     import { Icon, XCircle, Calendar } from "svelte-hero-icons";
-    import { todoistData, userSettings, previousFirstDueTask } from "../../stores/stores";
+    import { todoistData, previousFirstDueTask } from "../../stores/stores";
+    import { userSettings } from "../../stores/interface";
     import { getPriorityClasses } from "../../utils/styleUtils";
     import { openAgenda } from "../../services/agendaService";
     import { getTasksGroupedByContext } from "../../utils/filterUtils";
+    import ListTask from "../task/ListTask.svelte";
     import type { Readable } from "svelte/motion";
     import type { TasksGroupedByContext, Priority } from "../../types/todoist";
 

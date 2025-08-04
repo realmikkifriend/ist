@@ -3,7 +3,8 @@
     import Contexts from "./Contexts.svelte";
     import DailyGoal from "../activity/DailyGoal.svelte";
     import Footer from "../Footer.svelte";
-    import { todoistData, handleLogout } from "../../stores/stores";
+    import { todoistData } from "../../stores/stores";
+    import { handleLogout } from "../../services/updateService";
 
     export let hash: string;
 </script>

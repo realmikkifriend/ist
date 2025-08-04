@@ -1,6 +1,7 @@
 import { DateTime } from "luxon";
 import { TodoistRequestError } from "@doist/todoist-api-typescript";
-import { toastMessages, todoistError } from "../stores/stores";
+import { todoistError } from "../stores/stores";
+import { toastMessages } from "../stores/interface";
 import type { ToastMessage } from "../types/interface";
 
 /**

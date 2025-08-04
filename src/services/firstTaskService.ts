@@ -1,11 +1,7 @@
 import { get } from "svelte/store";
-import {
-    todoistAccessToken,
-    todoistData,
-    userSettings,
-    firstDueTask,
-    previousFirstDueTask,
-} from "../stores/stores";
+import { todoistData, firstDueTask, previousFirstDueTask } from "../stores/stores";
+import { userSettings } from "../stores/interface";
+import { todoistAccessToken } from "../stores/secret";
 import { newFirstTask } from "../services/toastService";
 import { clearSelectedContext, updateDueTasks } from "../services/sidebarService";
 import { shouldShowNewTaskToast, loadCommentsForTask } from "../utils/firstTaskUtils";

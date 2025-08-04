@@ -1,5 +1,6 @@
 import { get } from "svelte/store";
-import { todoistData, previousFirstDueTask, userSettings } from "../stores/stores";
+import { todoistData, previousFirstDueTask } from "../stores/stores";
+import { userSettings } from "../stores/interface";
 import { success } from "../services/toastService";
 import { filterTasksByContext } from "../utils/firstTaskUtils";
 import type { Task } from "../types/todoist";

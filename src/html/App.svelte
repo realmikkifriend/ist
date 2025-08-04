@@ -2,7 +2,8 @@
     import { onMount } from "svelte";
     import { writable } from "svelte/store";
     import { Icon, ArrowPath } from "svelte-hero-icons";
-    import { todoistData, userSettings, firstDueTask } from "../stores/stores";
+    import { todoistData, firstDueTask } from "../stores/stores";
+    import { userSettings } from "../stores/interface";
     import { updateFirstDueTask } from "../services/firstTaskService";
     import { refreshData } from "../services/updateService";
     import AppView from "./AppView.svelte";

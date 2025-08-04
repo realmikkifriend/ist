@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { toastMessages } from "../stores/stores";
+    import { toastMessages } from "../stores/interface";
     import { fly } from "svelte/transition";
     import type { ToastMessage } from "../types/interface";
     import { removeToast } from "../services/toastService";
