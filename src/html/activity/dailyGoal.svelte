@@ -4,7 +4,7 @@
     import { fetchDailyActivity } from "../../services/activityService";
     import { writable } from "svelte/store";
     import { getContextColors } from "../../utils/styleUtils";
-    import type { TaskActivity } from "../../types/todoist";
+    import type { TaskActivity } from "../../types/activity";
 
     const sortedLists = writable<{ byContext: TaskActivity[]; byTime: TaskActivity[] }>({
         byContext: [],

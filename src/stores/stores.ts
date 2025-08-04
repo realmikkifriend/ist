@@ -2,8 +2,9 @@ import { writable } from "svelte/store";
 import { persisted } from "svelte-persisted-store";
 import { DateTime } from "luxon";
 import type { Writable } from "svelte/store";
-import type { TodoistData, Task, TaskActivity, User } from "../types/todoist";
+import type { TodoistData, Task, User } from "../types/todoist";
 import type { UserSettings, ToastMessage } from "../types/interface";
+import type { TaskActivity } from "../types/activity";
 
 /**
  * Stores the Todoist access token.

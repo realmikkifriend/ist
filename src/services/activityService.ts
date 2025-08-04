@@ -9,7 +9,8 @@ import {
 import { getEndpoint } from "../utils/apiUtils";
 import { colorClasses } from "../utils/styleUtils";
 import { todoistData, todoistAccessToken, taskActivity } from "../stores/stores";
-import type { Task, TaskActivity, TodoistActivity, ColorName } from "../types/todoist";
+import type { Task, ColorName } from "../types/todoist";
+import type { TaskActivity, TodoistActivity } from "../types/activity";
 
 /**
  * Creates dataset for display.

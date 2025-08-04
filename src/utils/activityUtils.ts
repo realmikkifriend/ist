@@ -1,5 +1,5 @@
 import { DateTime } from "luxon";
-import type { TaskActivity, TodoistActivity } from "../types/todoist";
+import type { TaskActivity, TodoistActivity } from "../types/activity";
 
 /**
  * Filters activity logs by timeframe.
