@@ -1,11 +1,11 @@
 <script lang="ts">
     import { createEventDispatcher } from "svelte";
-    import { Icon, Check, Calendar, Clock, Forward } from "svelte-hero-icons";
-    import DeferModal from "../defer/DeferModal.svelte";
-    import Comments from "./Comments.svelte";
-    import { getPriorityBorder } from "../../utils/styleUtils";
-    import { skipTask } from "../../services/firstTaskService";
     import { DateTime } from "luxon";
+    import { Icon, Check, Calendar, Clock, Forward } from "svelte-hero-icons";
+    import { skipTask } from "../../services/firstTaskService";
+    import { getPriorityBorder } from "../../utils/styleUtils";
+    import Comments from "./Comments.svelte";
+    import DeferModal from "../defer/DeferModal.svelte";
     import type { Task, Priority } from "../../types/todoist";
 
     export let task: Task;
