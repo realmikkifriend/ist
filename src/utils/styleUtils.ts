@@ -31,50 +31,27 @@ export const getPriorityBorder = (priority: Priority): string =>
         4: "border-b-priority-4/75",
     })[priority] || "";
 
-export const colorClasses: Record<ColorName, string> = {
-    berry_red: "bg-red-500",
-    red: "bg-red-700",
-    orange: "bg-orange-500",
-    yellow: "bg-yellow-500",
-    olive_green: "bg-lime-700",
-    lime_green: "bg-lime-500",
-    green: "bg-green-600",
-    mint_green: "bg-emerald-400",
-    teal: "bg-teal-600",
-    sky_blue: "bg-sky-400",
-    light_blue: "bg-blue-300",
-    blue: "bg-blue-500",
-    grape: "bg-purple-500",
-    violet: "bg-violet-600",
-    lavender: "bg-purple-300",
-    magenta: "bg-pink-600",
-    salmon: "bg-rose-400",
-    charcoal: "bg-slate-600",
-    grey: "bg-gray-400",
-    taupe: "bg-red-100",
-};
-
-export const colorClassesFaded: Record<ColorName, string> = {
-    berry_red: "bg-red-500/50",
-    red: "bg-red-700/50",
-    orange: "bg-orange-500/50",
-    yellow: "bg-yellow-500/50",
-    olive_green: "bg-lime-700/50",
-    lime_green: "bg-lime-500/50",
-    green: "bg-green-600/50",
-    mint_green: "bg-emerald-400/50",
-    teal: "bg-teal-600/50",
-    sky_blue: "bg-sky-400/50",
-    light_blue: "bg-blue-300/50",
-    blue: "bg-blue-500/50",
-    grape: "bg-purple-500/50",
-    violet: "bg-violet-600/50",
-    lavender: "bg-purple-300/50",
-    magenta: "bg-pink-600/50",
-    salmon: "bg-rose-400/50",
-    charcoal: "bg-slate-600/50",
-    grey: "bg-gray-400/50",
-    taupe: "bg-red-100/50",
+export const colorClasses: Record<ColorName, { default: string; faded: string }> = {
+    berry_red: { default: "bg-red-500", faded: "bg-red-500/50" },
+    red: { default: "bg-red-700", faded: "bg-red-700/50" },
+    orange: { default: "bg-orange-500", faded: "bg-orange-500/50" },
+    yellow: { default: "bg-yellow-500", faded: "bg-yellow-500/50" },
+    olive_green: { default: "bg-lime-700", faded: "bg-lime-700/50" },
+    lime_green: { default: "bg-lime-500", faded: "bg-lime-500/50" },
+    green: { default: "bg-green-600", faded: "bg-green-600/50" },
+    mint_green: { default: "bg-emerald-400", faded: "bg-emerald-400/50" },
+    teal: { default: "bg-teal-600", faded: "bg-teal-600/50" },
+    sky_blue: { default: "bg-sky-400", faded: "bg-sky-400/50" },
+    light_blue: { default: "bg-blue-300", faded: "bg-blue-300/50" },
+    blue: { default: "bg-blue-500", faded: "bg-blue-500/50" },
+    grape: { default: "bg-purple-500", faded: "bg-purple-500/50" },
+    violet: { default: "bg-violet-600", faded: "bg-violet-600/50" },
+    lavender: { default: "bg-purple-300", faded: "bg-purple-300/50" },
+    magenta: { default: "bg-pink-600", faded: "bg-pink-600/50" },
+    salmon: { default: "bg-rose-400", faded: "bg-rose-400/50" },
+    charcoal: { default: "bg-slate-600", faded: "bg-slate-600/50" },
+    grey: { default: "bg-gray-400", faded: "bg-gray-400/50" },
+    taupe: { default: "bg-red-100", faded: "bg-red-100/50" },
 };
 
 export const borderClasses: Record<ColorName, string> = {
@@ -193,7 +170,7 @@ export function getContextColors(activities: TaskActivity[], contexts: Context[]
 
     return activities.map((activity) => {
         const context = contextMap.get(activity.contextId);
-        return context ? colorClasses[context.color as ColorName] : "";
+        return context ? colorClasses[context.color as ColorName].default : "";
     });
 }
 

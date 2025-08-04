@@ -1,12 +1,7 @@
 <script lang="ts">
     import { DateTime } from "luxon";
     import { Icon, InboxArrowDown, Inbox } from "svelte-hero-icons";
-    import {
-        getPriorityClasses,
-        colorClasses,
-        colorClassesFaded,
-        borderClasses,
-    } from "../../utils/styleUtils";
+    import { getPriorityClasses, colorClasses, borderClasses } from "../../utils/styleUtils";
     import { summonTask } from "../../services/firstTaskService";
     import type { Task, ColorName, Priority } from "../../types/todoist";
 
@@ -21,8 +16,8 @@
     class={[
         "agenda-task mx-1 flex  w-full flex-row items-center overflow-hidden rounded-md px-1 text-xs whitespace-nowrap brightness-90",
         task.priority < 3
-            ? colorClassesFaded[color] || "bg-gray-600"
-            : colorClasses[color] || "bg-gray-600",
+            ? colorClasses[color].faded || "bg-gray-600"
+            : colorClasses[color].default || "bg-gray-600",
         task.priority < 3 ? `border  ${borderClasses[color] || "border-gray-600"}` : "",
         task.firstDue ? firstDueClasses : "",
     ].join(" ")}
