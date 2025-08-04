@@ -19,9 +19,16 @@ const debounceState: { timeoutId: ReturnType<typeof setTimeout> | null } = { tim
  * @param {Task | null} task - The task to set in the stores.
  * @returns {void}
  */
-const setDueTaskStores = (task: Task | null): void => {
-    firstDueTask.set(task);
-    previousFirstDueTask.set(task);
+const setDueTaskStores = (task: Task | null | Promise<Task>): void => {
+    if (task instanceof Promise) {
+        void task.then((resolvedTask) => {
+            firstDueTask.set(resolvedTask);
+            previousFirstDueTask.set(resolvedTask);
+        });
+    } else {
+        firstDueTask.set(task);
+        previousFirstDueTask.set(task);
+    }
 };
 
 /**
@@ -68,24 +75,23 @@ export const skipTask = (task: Task): void => {
 /**
  * Loads comments for a given task and attaches them.
  * @param {Task} task - The task to load comments for.
- * @returns The task with comments.
+ * @returns The task with a promise for the comments.
  */
-const loadCommentsForTask = async (task: Task): Promise<Task> => {
-    const comments = await getTaskComments(get(todoistAccessToken), task.id);
-    (task as Task & { comments: Comment[] }).comments = comments;
+const loadCommentsForTask = (task: Task): Task => {
+    const commentsPromise = getTaskComments(get(todoistAccessToken), task.id);
+    (task as Task & { comments: Promise<Comment[]> }).comments = commentsPromise;
     return task;
 };
 
 /**
  * Update the first due task, loading comments and handling context changes.
  * @param {Task | null} task - Optional task to set as the first due task.
- * @returns {Promise<void>}
  */
-export const updateFirstDueTask = async (task: Task | null = null): Promise<void> => {
+export const updateFirstDueTask = (task: Task | null = null): void => {
     const $todoistData: TodoistData = get(todoistData);
     const prevTask: Task | null = get(previousFirstDueTask);
 
-    if (await handleInitialChecks(task, $todoistData, prevTask)) {
+    if (handleInitialChecks(task, $todoistData, prevTask)) {
         return;
     }
 
@@ -110,18 +116,18 @@ export const updateFirstDueTask = async (task: Task | null = null): Promise<void
  * @param {Task | null} prevTask - The previously set first due task.
  * @returns {Promise<boolean>} True if the function should exit early, false otherwise.
  */
-const handleInitialChecks = async (
+const handleInitialChecks = (
     task: Task | null,
     $todoistData: TodoistData,
     prevTask: Task | null,
-): Promise<boolean> => {
+): boolean => {
     if (task) {
-        const taskWithComments = await loadCommentsForTask(task);
+        const taskWithComments = loadCommentsForTask(task);
         setDueTaskStores(taskWithComments);
         return true;
     }
 
-    if (prevTask?.summoned) {
+    if (prevTask?.summoned && !task) {
         return true;
     }
 
@@ -159,17 +165,16 @@ const updateDueTasks = (dueTasks: Task[], contextId: string | null): Task[] => {
  * @param {Task[]} dueTasks - The list of due tasks.
  * @param {Task | null} prevTask - The previously set first due task.
  * @param {string | null} selectedContextId - The ID of the currently selected context.
- * @returns {Promise<void>}
  */
-const processDueTaskUpdate = async (
+const processDueTaskUpdate = (
     dueTasks: Task[],
     prevTask: Task | null,
     selectedContextId: string | null,
-): Promise<void> => {
+): void => {
     if (!dueTasks.length) {
         return;
     }
-    const newTaskWithComments = await loadCommentsForTask(dueTasks[0]);
+    const newTaskWithComments = loadCommentsForTask(dueTasks[0]);
 
     if (shouldShowNewTaskToast(newTaskWithComments, prevTask, selectedContextId)) {
         newFirstTask(() => setDueTaskStores(newTaskWithComments));
@@ -196,8 +201,8 @@ export function summonTask(
 
         task.summoned = currentFirstDueSummoned || window.location.hash;
 
-        void (async () => {
-            await updateFirstDueTask(task);
+        void (() => {
+            updateFirstDueTask(task);
             window.location.hash = "";
         })();
     } else {

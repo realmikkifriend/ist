@@ -1,7 +1,7 @@
 <script lang="ts">
     import { createEventDispatcher } from "svelte";
     import { DateTime } from "luxon";
-    import { Icon, Check, Calendar, Clock, Forward } from "svelte-hero-icons";
+    import { Icon, Check, Calendar, Clock, Forward, ArrowPath } from "svelte-hero-icons";
     import { skipTask } from "../../services/firstTaskService";
     import { getPriorityBorder } from "../../utils/styleUtils";
     import Comments from "./Comments.svelte";
@@ -86,7 +86,20 @@
         </div>
     </div>
     {#if task.comments}
-        <Comments comments={task.comments} />
+        {#await task.comments}
+            <div
+                class="prose bg-accent text-primary-content mx-auto flex w-11/12 flex-row items-center rounded-b-xl p-4 opacity-25"
+            >
+                <Icon src={ArrowPath} class="mr-2 h-4 w-4 animate-spin" />
+                <p>Loading comments...</p>
+            </div>
+        {:then comments}
+            <Comments {comments} />
+        {:catch error}
+            <div class="prose bg-accent text-primary-content mx-auto w-11/12 rounded-b-xl p-4">
+                <p>Error loading comments: {error.message}</p>
+            </div>
+        {/await}
     {/if}
 </div>
 

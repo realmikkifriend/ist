@@ -80,7 +80,7 @@ export type Task = Omit<
     summoned?: string | boolean;
     skip?: boolean;
     firstDue?: boolean;
-    comments?: Comment[];
+    comments?: Comment[] | Promise<Comment[]>;
 
     due: Due | null;
 };
