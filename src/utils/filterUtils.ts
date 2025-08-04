@@ -185,9 +185,13 @@ export function compareTasks(
 ): number {
     const applyReverse = (val: number) => (reverse ? -val : val);
 
+    const priorityComparison = () => compareByPriority(a, b);
+    const contextComparison = () => compareByContext(a, b, contextLookup);
+
     const comparisons = [
-        () => compareByPriority(a, b),
-        () => compareByContext(a, b, contextLookup),
+        ...(reverse
+            ? [priorityComparison, contextComparison]
+            : [contextComparison, priorityComparison]),
         () => (timeZone ? compareByDueDate(a, b, timeZone) : 0),
     ];
 
