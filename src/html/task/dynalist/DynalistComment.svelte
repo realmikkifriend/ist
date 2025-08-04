@@ -1,14 +1,9 @@
 <script lang="ts">
     import { writable } from "svelte/store";
-    import Markdown from "svelte-exmarkdown";
     import { Icon, ArrowPath } from "svelte-hero-icons";
-    import DynalistChecklist from "./DynalistChecklist.svelte";
-    import DynalistCount from "./DynalistCount.svelte";
-    import DynalistRotating from "./DynalistRotating.svelte";
-    import DynalistCrossOff from "./DynalistCrossOff.svelte";
-    import DynalistTypeMenu from "./DynalistTypeMenu.svelte";
     import { loadDynalistComment } from "../../../services/dynalistService";
-    import { generateDynalistComment, hasError } from "../../../utils/dynalistUtils";
+    import { hasError } from "../../../utils/dynalistUtils";
+    import DynalistContentComponent from "./DynalistContent.svelte";
     import { error as showError } from "../../../services/toastService";
     import type { Writable } from "svelte/store";
     import type {
@@ -93,32 +88,12 @@
     </span>
 {:then result}
     {#if result.dynalistObject}
-        <div class="relative">
-            {#if $dynalistStore.selectedType === "read"}
-                <Markdown
-                    md={generateDynalistComment(result.dynalistObject) ||
-                        "Unsupported format, but stay tuned."}
-                />
-            {:else if $dynalistStore.selectedType === "checklist"}
-                <DynalistChecklist content={generateDynalistComment(result.dynalistObject)} />
-            {:else if $dynalistStore.selectedType === "count"}
-                <DynalistCount content={result.dynalistObject} />
-            {:else if $dynalistStore.selectedType === "rotating"}
-                <DynalistRotating content={result.dynalistObject} />
-            {:else if $dynalistStore.selectedType === "crossoff"}
-                <DynalistCrossOff content={result.dynalistObject} />
-            {/if}
-
-            {#key $dynalistStore.selectedType}
-                <DynalistTypeMenu
-                    selectedType={$dynalistStore.selectedType === ""
-                        ? "read"
-                        : $dynalistStore.selectedType}
-                    {url}
-                    on:selectType={handleTypeSelection}
-                />
-            {/key}
-        </div>
+        <DynalistContentComponent
+            dynalistObject={result.dynalistObject}
+            selectedType={$dynalistStore.selectedType}
+            {url}
+            on:selectType={handleTypeSelection}
+        />
     {:else}
         <span class="flex items-center text-red-600"> Error loading Dynalist document. </span>
     {/if}

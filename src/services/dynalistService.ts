@@ -8,9 +8,12 @@ import type {
     DynalistApiResultBase,
     ValidateDynalistTokenResult,
     DynalistCountData,
+    DynalistStoreState,
+    DynalistTaskType,
 } from "../types/dynalist";
-import { success } from "./toastService";
-import { processNode, getDynalistType } from "../utils/dynalistUtils";
+import { success, error as showError } from "./toastService";
+import { processNode, getDynalistType, hasError } from "../utils/dynalistUtils";
+import type { Writable } from "svelte/store";
 
 /**
  * Fetches a Dynalist document by URL and access token.
@@ -147,6 +150,58 @@ export async function validateDynalistToken(token: string): Promise<ValidateDyna
 
 /**
  * Loads and processes a Dynalist comment from a document URL.
+ * @param {string} url - The Dynalist document URL.
+ * @param {Writable<DynalistStoreState>} dynalistStore - The Svelte store for Dynalist contents.
+ * @returns {Promise<{ dynalistObject?: DynalistNode; selectedType?: string; error?: unknown }>} The processed comment and type, or error.
+ */
+export async function initializeDynalistComment(
+    url: string,
+    dynalistStore: Writable<DynalistStoreState>,
+): Promise<DynalistStoreState> {
+    const result = await loadDynalistComment(url);
+    const { dynalistObject, selectedType, error } = result;
+
+    if (error) {
+        const errorMsg =
+            hasError(error) && typeof error.error.message === "string"
+                ? `Dynalist retrieval/processing error: ${error.error.message}`
+                : `Dynalist retrieval/processing error`;
+
+        showError(errorMsg);
+        console.error(errorMsg);
+
+        return {
+            dynalistObject: undefined,
+            selectedType: "",
+            error: errorMsg,
+        };
+    }
+
+    const validTypes: (DynalistTaskType | "")[] = [
+        "read",
+        "checklist",
+        "count",
+        "rotating",
+        "crossoff",
+        "",
+    ];
+    const safeSelectedType =
+        selectedType && validTypes.includes(selectedType as DynalistTaskType | "")
+            ? (selectedType as DynalistTaskType | "")
+            : "";
+
+    const newState: DynalistStoreState = {
+        dynalistObject,
+        selectedType: safeSelectedType,
+        error: undefined,
+    };
+
+    dynalistStore.set(newState);
+    return newState;
+}
+
+/**
+ * Loads a Dynalist comment from a document URL.
  * @param {string} url - The Dynalist document URL.
  * @returns {Promise<{ dynalistObject?: DynalistNode; selectedType?: string; error?: unknown }>} The processed comment and type, or error.
  */
