@@ -95,8 +95,7 @@ export function getActivity(
 
     const promise = (async () => {
         const allUpdatedActivityData = await getAllActivityData(
-            startDate,
-            endDate,
+            timeframe,
             relevantActivity,
             null,
             task,
@@ -121,20 +120,19 @@ export function getActivity(
 /**
  * Retrieves all activity data within the specified timeframe.
  * Uses recursion to handle pagination.
- * @param {DateTime} startDate - Start of date range to filter by.
- * @param {DateTime} endDate - End of date range to filter by.
+ * @param {DateTime[]} timeframe - Timeframe (start and end) to filter activity by.
  * @param {TaskActivity[]} accumulatedData - Accumulated activity log data.
  * @param {string | null} cursor - The cursor for pagination.
  * @param {Task | null} task - Optional task to filter activity by.
  * @returns {Promise<TaskActivity[]>} - A promise that resolves to an array of TaskActivity objects.
  */
 const getAllActivityData = async (
-    startDate: DateTime,
-    endDate: DateTime,
+    timeframe: DateTime[],
     accumulatedData: TaskActivity[] = [],
     cursor: string | null = null,
     task: Task | null,
 ): Promise<TaskActivity[]> => {
+    const [startDate, endDate] = timeframe;
     const newActivityData = (await getNewActivity(task, cursor)) as {
         next_cursor: string | null;
         results: TodoistActivity[];
@@ -149,7 +147,7 @@ const getAllActivityData = async (
     const done = startCovered && (endCovered || startIsToday);
 
     if (newActivityData.next_cursor && !done) {
-        return getAllActivityData(startDate, endDate, allData, newActivityData.next_cursor, task);
+        return getAllActivityData(timeframe, allData, newActivityData.next_cursor, task);
     }
 
     return allData;
