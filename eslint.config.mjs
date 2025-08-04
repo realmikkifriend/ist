@@ -10,16 +10,22 @@ import svelteConfig from "./svelte.config.mjs";
 import vitest from "@vitest/eslint-plugin";
 
 export default defineConfig([
-    { files: ["**/*.{js,mjs,cjs}"], plugins: { js }, extends: ["js/recommended"] },
-    { files: ["**/*.js"], languageOptions: { sourceType: "module" } },
-    { files: ["**/*.{js,mjs,cjs}"], languageOptions: { globals: globals.browser } },
     // -----------------------------------
-    // `     TypeScript
+    // `     General JavaScript Configuration
+    {
+        files: ["**/*.{js,mjs,cjs}"],
+        extends: [js.configs.recommended],
+        languageOptions: {
+            sourceType: "module",
+            globals: globals.browser,
+        },
+    },
+
+    // -----------------------------------
+    // `     TypeScript Configuration
     ...tseslint.configs.recommendedTypeChecked,
     {
         files: ["**/*.ts", "**/*.tsx"],
-        plugins: { js },
-        extends: ["js/recommended"],
         languageOptions: {
             parserOptions: {
                 projectService: true,
@@ -28,8 +34,9 @@ export default defineConfig([
             globals: globals.browser,
         },
     },
+
     // -----------------------------------
-    // `     JSDoc
+    // `     JSDoc Configuration (for TypeScript files)
     jsdoc.configs["flat/recommended-typescript"],
     jsdoc.configs["flat/contents-typescript"],
     {
@@ -51,8 +58,9 @@ export default defineConfig([
             "jsdoc/require-param-type": "error",
         },
     },
+
     // -----------------------------------
-    // `     eslint-plugin-svelte
+    // `     Svelte Configuration
     ...svelte.configs.recommended,
     {
         files: ["**/*.svelte"],
@@ -70,14 +78,17 @@ export default defineConfig([
             },
         },
     },
+
     // -----------------------------------
-    // `     eslint-plugin-functional
-    // functional.configs.externalVanillaRecommended,
-    // functional.configs.recommended,
-    // functional.configs.strict,
-    // functional.configs.stylistic,
+    // `     eslint-plugin-functional Configuration
     functional.configs.all,
     functional.configs.disableTypeChecked,
+    {
+        files: ["src/**/*.ts", "src/**/*.svelte"],
+        rules: {
+            complexity: ["error", { max: 10 }],
+        },
+    },
     {
         files: ["**/*.svelte"],
         rules: {
@@ -91,13 +102,19 @@ export default defineConfig([
         },
     },
     {
-        files: ["src/**/*.ts", "src/**/*.svelte"],
-        rules: {
-            complexity: ["error", { max: 10 }],
-        },
+        files: ["**/*.spec.js"],
+        rules: Object.fromEntries(
+            Object.keys(functional.configs.all.rules).map((rule) => [rule, "off"]),
+        ),
     },
+
+    // -----------------------------------
+    // `     Vitest Configuration (for test files)
     {
-        files: ["tests/**/*.ts"], // Specific configuration for TypeScript test files
+        files: ["tests/**/*.ts"],
+        plugins: {
+            vitest,
+        },
         languageOptions: {
             parserOptions: {
                 project: "./tsconfig.json",
@@ -107,6 +124,7 @@ export default defineConfig([
             globals: globals.vitest, // Add Vitest globals
         },
         rules: {
+            ...vitest.configs.recommended.rules,
             "functional/no-let": "off",
             "functional/no-promise-reject": "off", // Disable for test files
             "@typescript-eslint/no-unused-vars": [
@@ -132,21 +150,6 @@ export default defineConfig([
                     argsIgnorePattern: "^_",
                 },
             ],
-        },
-    },
-    {
-        files: ["**/*.spec.js"],
-        rules: Object.fromEntries(
-            Object.keys(functional.configs.all.rules).map((rule) => [rule, "off"]),
-        ),
-    },
-    {
-        files: ["tests/**/*.ts"],
-        plugins: {
-            vitest,
-        },
-        rules: {
-            ...vitest.configs.recommended.rules,
         },
     },
 ]);
