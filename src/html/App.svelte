@@ -74,6 +74,10 @@
      * @param event.detail.time - The time the task will be deferred to.
      */
     const handleDefer = async (event: CustomEvent<{ task: Task; time: string }>): Promise<void> => {
+        if (event.detail.task.summoned && !event.detail.task.skip) {
+            window.location.hash = String(event.detail.task.summoned);
+        }
+
         const { task, time } = event.detail;
         const dateTime = DateTime.fromISO(time);
         if (dateTime.isValid) {
@@ -85,9 +89,6 @@
         if (task.skip) {
             void skipTask(task);
         } else {
-            if (event.detail.task.summoned) {
-                window.location.hash = String(event.detail.task.summoned);
-            }
             void refreshData();
         }
     };

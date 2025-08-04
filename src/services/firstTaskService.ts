@@ -216,10 +216,7 @@ export function clearSelectedTask(): void {
     if ($firstDueTask?.summoned) {
         window.location.hash = $firstDueTask.summoned as string;
 
-        $firstDueTask.summoned = false;
-        if ($firstDueTask.skip) {
-            delete $firstDueTask.skip;
-        }
+        firstDueTask.set(null);
 
         void updateFirstDueTask();
     } else if (selectedContext) {

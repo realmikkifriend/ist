@@ -1,10 +1,4 @@
-import {
-    todoistData,
-    todoistError,
-    previousFirstDueTask,
-    taskActivity,
-    firstDueTask,
-} from "../stores/stores";
+import { todoistData, todoistError, previousFirstDueTask, taskActivity } from "../stores/stores";
 import { markTaskDone, deferTasks } from "../services/apiService";
 import { updateFirstDueTask } from "../services/firstTaskService";
 import { get } from "svelte/store";
@@ -95,10 +89,7 @@ export async function handleTaskDone(task: Task): Promise<void> {
  * @returns Promise&lt;void>
  */
 export async function handleTaskDefer(taskUpdates: Array<[Task, DateTime]>): Promise<void> {
-    const $firstDueTask = get(firstDueTask);
-    if (!$firstDueTask?.summoned) {
-        previousFirstDueTask.set(null);
-    }
+    previousFirstDueTask.set(null);
 
     const updatedTaskResources: Array<[string, DateTime]> = taskUpdates.map(([task, dateTime]) => [
         task.id,
