@@ -1,4 +1,6 @@
 <script lang="ts">
+    import ListTask from "../task/ListTask.svelte";
+
     import { derived } from "svelte/store";
     import { Icon, XCircle, Calendar } from "svelte-hero-icons";
     import { todoistData, userSettings, previousFirstDueTask } from "../../stores/stores";
@@ -90,14 +92,7 @@
                 {$dueTasksByContext[context.id].total} tasks due in this context:
                 <div class="my-2 space-y-1">
                     {#each $dueTasksByContext[context.id].tasks as task (task.id)}
-                        <span class="flex flex-row">
-                            <div
-                                class="mt-1.5 mr-1 h-1 w-0.5 max-w-0.5 rounded-sm border-none p-1 {getPriorityBadgeClass(
-                                    task.priority,
-                                )}"
-                            ></div>
-                            {task.content}
-                        </span>
+                        <ListTask {task} />
                     {/each}
                 </div>
             </div>
