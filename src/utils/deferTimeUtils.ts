@@ -57,13 +57,15 @@ function processButton(button: TimeButtonConfig, context: TimeButtonContext): Ti
     const futureTime = new Date(context.now.getTime() + (button.ms ?? 0));
     const roundedFutureTime = roundFutureTime(futureTime, context.index);
 
+    const adjustedFutureTime = calculateAdjustedTime(roundedFutureTime, context);
+
     const newContext: TimeButtonContext = {
         ...context,
         futureTime: roundedFutureTime,
     };
 
     if (roundedFutureTime.getDate() !== context.now.getDate()) {
-        return handleNextDayButton(button, newContext);
+        return handleNextDayButton(button, newContext, adjustedFutureTime);
     }
 
     return handleSameDayButton(button, roundedFutureTime, context.now);

@@ -1,4 +1,3 @@
-import { calculateAdjustedTime } from "./deferTimeUtils";
 import type { DeferButtonConfig, TimeButtonConfig, TimeButtonContext } from "../types/defer";
 
 /**
@@ -51,14 +50,14 @@ export const buttonConfig: DeferButtonConfig = {
  * Handles the processing for a button that crosses into the next day.
  * @param {TimeButtonConfig} button - The button to process.
  * @param {TimeButtonContext} context - Object containing futureTime, now, nextMorning, index, and processedButtons.
+ * @param {Date} adjustedFutureTime - Time to add to button.
  * @returns The processed button configuration.
  */
 export function handleNextDayButton(
     button: TimeButtonConfig,
     context: TimeButtonContext,
+    adjustedFutureTime: Date,
 ): TimeButtonConfig {
-    const adjustedFutureTime = calculateAdjustedTime(context.futureTime, context);
-
     const hoursInFuture = Math.floor(
         (adjustedFutureTime.getTime() - context.now.getTime()) / (1000 * 60 * 60),
     );
