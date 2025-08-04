@@ -1,5 +1,4 @@
 import { get } from "svelte/store";
-import { success, newFirstTask } from "../services/toastService";
 import {
     todoistAccessToken,
     todoistData,
@@ -7,10 +6,10 @@ import {
     firstDueTask,
     previousFirstDueTask,
 } from "../stores/stores";
-import { getTaskComments } from "../utils/apiUtils";
-import type { Task, Comment, TodoistData } from "../types/todoist";
-import type { UserSettings } from "../types/interface";
-import { filterTasksByContext, shouldShowNewTaskToast } from "../utils/firstTaskUtils";
+import { newFirstTask } from "../services/toastService";
+import { clearSelectedContext, updateDueTasks } from "../services/sidebarService";
+import { shouldShowNewTaskToast, loadCommentsForTask } from "../utils/firstTaskUtils";
+import type { Task, TodoistData } from "../types/todoist";
 
 const debounceState: { timeoutId: ReturnType<typeof setTimeout> | null } = { timeoutId: null };
 
@@ -32,25 +31,6 @@ const setDueTaskStores = (task: Task | null | Promise<Task>): void => {
 };
 
 /**
- * Get the name of the current context, either from user settings or from the first due task's context.
- * @returns - The context name, or an empty string if not found.
- */
-export function getContextName(): string {
-    const $userSettings = get(userSettings);
-    const $todoistData = get(todoistData);
-    const $firstDueTask = get(firstDueTask);
-
-    if ($userSettings?.selectedContext?.name) {
-        return $userSettings.selectedContext.name;
-    }
-    if ($todoistData?.contexts) {
-        const context = $todoistData.contexts.find((c) => c.id === $firstDueTask?.contextId);
-        if (context && typeof context.name === "string") return context.name;
-    }
-    return "";
-}
-
-/**
  * Skip the current task and summon the next one.
  * @param {Task} task - The task to skip.
  * @returns {void}
@@ -70,17 +50,6 @@ export const skipTask = (task: Task): void => {
     } else {
         clearSelectedTask();
     }
-};
-
-/**
- * Loads comments for a given task and attaches them.
- * @param {Task} task - The task to load comments for.
- * @returns The task with a promise for the comments.
- */
-const loadCommentsForTask = (task: Task): Task => {
-    const commentsPromise = getTaskComments(get(todoistAccessToken), task.id);
-    (task as Task & { comments: Promise<Comment[]> }).comments = commentsPromise;
-    return task;
 };
 
 /**
@@ -122,7 +91,7 @@ const handleInitialChecks = (
     prevTask: Task | null,
 ): boolean => {
     if (task) {
-        const taskWithComments = loadCommentsForTask(task);
+        const taskWithComments = loadCommentsForTask(task, get(todoistAccessToken));
         setDueTaskStores(taskWithComments);
         return true;
     }
@@ -139,28 +108,6 @@ const handleInitialChecks = (
 };
 
 /**
- * Update due tasks based on the selected context ID.
- * @param {Task[]} dueTasks - The list of due tasks.
- * @param {string | null} contextId - The selected context ID from settings.
- * @returns {Task[]} The updated list of due tasks.
- */
-const updateDueTasks = (dueTasks: Task[], contextId: string | null): Task[] => {
-    if (contextId) {
-        const filteredDueTasks = filterTasksByContext(dueTasks, contextId);
-        if (!filteredDueTasks.length) {
-            userSettings.update((settings: UserSettings) => ({
-                ...settings,
-                selectedContext: null,
-            }));
-            success("No more tasks in context! Showing all due tasks...");
-            return dueTasks;
-        }
-        return filteredDueTasks;
-    }
-    return dueTasks;
-};
-
-/**
  * Processes the update for the first due task, including loading comments and handling toast notifications.
  * @param {Task[]} dueTasks - The list of due tasks.
  * @param {Task | null} prevTask - The previously set first due task.
@@ -174,7 +121,7 @@ const processDueTaskUpdate = (
     if (!dueTasks.length) {
         return;
     }
-    const newTaskWithComments = loadCommentsForTask(dueTasks[0]);
+    const newTaskWithComments = loadCommentsForTask(dueTasks[0], get(todoistAccessToken));
 
     if (shouldShowNewTaskToast(newTaskWithComments, prevTask, selectedContextId)) {
         newFirstTask(() => setDueTaskStores(newTaskWithComments));
@@ -227,13 +174,4 @@ export function clearSelectedTask(): void {
     } else if (selectedContext) {
         clearSelectedContext();
     }
-}
-
-/**
- * Clears the selected context and previous first due task.
- * @returns {void}
- */
-function clearSelectedContext(): void {
-    previousFirstDueTask.set(null);
-    userSettings.update((settings) => ({ ...settings, selectedContext: null }));
 }

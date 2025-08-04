@@ -1,9 +1,9 @@
 <script lang="ts">
     import { Icon, XMark } from "svelte-hero-icons";
-    import { userSettings, firstDueTask } from "../../stores/stores";
+    import { todoistData, userSettings, firstDueTask } from "../../stores/stores";
     import { getDueTaskCountByContext } from "../../services/sidebarService";
     import { clearSelectedTask } from "../../services/firstTaskService";
-    import { getContextName } from "../../services/firstTaskService";
+    import { getSelectedContextName } from "../../utils/firstTaskUtils";
 </script>
 
 <button
@@ -24,7 +24,11 @@
     {:else if $firstDueTask?.summoned}
         summoned task
     {:else}
-        {getDueTaskCountByContext($firstDueTask?.contextId ?? "")} left in {getContextName()}
+        {getDueTaskCountByContext($firstDueTask?.contextId ?? "")} left in {getSelectedContextName(
+            $todoistData,
+            $userSettings,
+            $firstDueTask,
+        )}
     {/if}
     {#if $userSettings.selectedContext || $firstDueTask?.summoned}
         <p class="ml-1 block sm:hidden sm:group-hover:block">

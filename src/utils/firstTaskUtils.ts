@@ -1,4 +1,6 @@
-import type { Task } from "../types/todoist";
+import { getTaskComments } from "./apiUtils";
+import type { Task, Comment, TodoistData } from "../types/todoist";
+import type { UserSettings } from "../types/interface";
 
 /**
  * Filter task list by context.
@@ -28,4 +30,40 @@ export const shouldShowNewTaskToast = (
         window.location.hash !== "#today" &&
         window.location.hash !== "#tomorrow"
     );
+};
+
+/**
+ * Get the name of the current context, either from user settings or from the first due task's context.
+ * @param {TodoistData | null | undefined} todoistDataValue - The value of the todoistData store.
+ * @param {UserSettings | null | undefined} userSettingsValue - The value of the userSettings store.
+ * @param {Task | null} firstDueTaskValue - The value of the firstDueTask store.
+ * @returns - The context name, or an empty string if not found.
+ */
+export function getSelectedContextName(
+    todoistDataValue: TodoistData | null | undefined,
+    userSettingsValue: UserSettings | null | undefined,
+    firstDueTaskValue: Task | null,
+): string {
+    if (userSettingsValue?.selectedContext?.name) {
+        return userSettingsValue.selectedContext.name;
+    }
+    if (todoistDataValue?.contexts) {
+        const context = todoistDataValue.contexts.find(
+            (c) => c.id === firstDueTaskValue?.contextId,
+        );
+        if (context && typeof context.name === "string") return context.name;
+    }
+    return "";
+}
+
+/**
+ * Loads comments for a given task and attaches them.
+ * @param {Task} task - The task to load comments for.
+ * @param {string} todoistAccessTokenValue - The value of the todoistAccessToken store.
+ * @returns The task with a promise for the comments.
+ */
+export const loadCommentsForTask = (task: Task, todoistAccessTokenValue: string): Task => {
+    const commentsPromise = getTaskComments(todoistAccessTokenValue, task.id);
+    (task as Task & { comments: Promise<Comment[]> }).comments = commentsPromise;
+    return task;
 };
