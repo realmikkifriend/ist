@@ -40,6 +40,9 @@ export default defineConfig([
             },
             globals: globals.browser,
         },
+        rules: {
+            "max-lines": ["error", { max: 140, skipComments: true, skipBlankLines: true }],
+        },
     },
 
     // -----------------------------------
@@ -65,7 +68,16 @@ export default defineConfig([
             "jsdoc/require-param-type": "error",
         },
     },
-
+    // -----------------------------------
+    // `     eslint-plugin-functional Configuration
+    functional.configs.all,
+    functional.configs.disableTypeChecked,
+    {
+        files: ["src/**/*.ts", "src/**/*.svelte"],
+        rules: {
+            complexity: ["error", { max: 10 }],
+        },
+    },
     // -----------------------------------
     // `     Svelte Configuration
     ...svelte.configs.recommended,
@@ -86,22 +98,6 @@ export default defineConfig([
         },
         rules: {
             "max-lines": ["error", { max: 90, skipComments: true, skipBlankLines: true }],
-        },
-    },
-
-    // -----------------------------------
-    // `     eslint-plugin-functional Configuration
-    functional.configs.all,
-    functional.configs.disableTypeChecked,
-    {
-        files: ["src/**/*.ts", "src/**/*.svelte"],
-        rules: {
-            complexity: ["error", { max: 10 }],
-        },
-    },
-    {
-        files: ["**/*.svelte"],
-        rules: {
             "functional/no-let": "off",
             "@typescript-eslint/no-unused-vars": [
                 "error",
@@ -111,13 +107,6 @@ export default defineConfig([
             ],
         },
     },
-    {
-        files: ["**/*.spec.js"],
-        rules: Object.fromEntries(
-            Object.keys(functional.configs.all.rules).map((rule) => [rule, "off"]),
-        ),
-    },
-
     // -----------------------------------
     // `     Vitest Configuration (for test files)
     {
@@ -143,23 +132,10 @@ export default defineConfig([
                     argsIgnorePattern: "^_",
                 },
             ],
-            // Relax some rules that might conflict with testing patterns
             "@typescript-eslint/no-unsafe-call": "off",
             "@typescript-eslint/no-unsafe-member-access": "off",
             "@typescript-eslint/no-unsafe-assignment": "off",
-            "@typescript-eslint/no-explicit-any": "off", // Temporarily disable to see if it resolves issues
-        },
-    },
-    {
-        files: ["tests/**/*.js"], // Keep existing JS test file configuration
-        rules: {
-            "functional/no-let": "off",
-            "@typescript-eslint/no-unused-vars": [
-                "error",
-                {
-                    argsIgnorePattern: "^_",
-                },
-            ],
+            "@typescript-eslint/no-explicit-any": "off",
         },
     },
 ]);
