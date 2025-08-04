@@ -5,7 +5,7 @@
     import Markdown from "svelte-exmarkdown";
     import { isMonthYearFormat } from "../../../utils/timeUtils";
     import { generateDynalistComment } from "../../../utils/dynalistUtils";
-    import { updateDynalist } from "../../../services/dynalistService";
+    import { updateDynalistWithToken } from "../../../services/dynalistService";
     import { success } from "../../../services/toastService";
     import type { Writable } from "svelte/store";
     import type { DynalistContent, DynalistNode, DynalistChange } from "../../../types/dynalist";
@@ -72,7 +72,7 @@
 
         const changes = createUpdateChanges(currentItem);
 
-        return updateDynalist(content.file_id, changes).then(
+        return updateDynalistWithToken(content.file_id, changes).then(
             () => {
                 success("Sent to bottom of list in Dynalist!");
                 isLoading.set(false);

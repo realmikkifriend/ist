@@ -3,7 +3,7 @@
     import { dynalistAccessToken } from "../../../stores/stores";
     import { success } from "../../../services/toastService";
     import Logo from "../../Logo.svelte";
-    import { validateDynalistToken } from "../../../services/dynalistService";
+    import { validateDynalistToken } from "../../../utils/dynalistApiUtils";
     import type { ValidateDynalistTokenResult } from "../../../types/dynalist";
 
     /**

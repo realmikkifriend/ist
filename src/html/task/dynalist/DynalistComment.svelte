@@ -1,7 +1,7 @@
 <script lang="ts">
     import { writable } from "svelte/store";
     import { Icon, ArrowPath } from "svelte-hero-icons";
-    import { loadDynalistComment } from "../../../services/dynalistService";
+    import { loadDynalistCommentWithToken } from "../../../services/dynalistService";
     import { hasError } from "../../../utils/dynalistUtils";
     import DynalistContentComponent from "./DynalistContent.svelte";
     import { error as showError } from "../../../services/toastService";
@@ -20,7 +20,7 @@
         error: undefined,
     });
 
-    const loadPromise: Promise<DynalistStoreState> = loadDynalistComment(url).then(
+    const loadPromise: Promise<DynalistStoreState> = loadDynalistCommentWithToken(url).then(
         (value: { dynalistObject?: DynalistContent; selectedType?: string; error?: unknown }) => {
             const { dynalistObject, selectedType, error } = value;
             if (error) {

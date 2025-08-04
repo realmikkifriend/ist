@@ -3,7 +3,7 @@
     import { Icon, Backspace } from "svelte-hero-icons";
     import Markdown from "svelte-exmarkdown";
     import { generateDynalistComment } from "../../../utils/dynalistUtils";
-    import { updateDynalist } from "../../../services/dynalistService";
+    import { updateDynalistWithToken } from "../../../services/dynalistService";
     import { success } from "../../../services/toastService";
     import type { Writable } from "svelte/store";
     import type { DynalistContent, DynalistNode } from "../../../types/dynalist";
@@ -38,7 +38,7 @@
                 },
             ];
 
-            await updateDynalist(content.file_id, changes)
+            await updateDynalistWithToken(content.file_id, changes)
                 .then(() => {
                     removedItemIds.update((ids) => new Set([...ids, itemToRemove.id]));
                     success("Removed from list in Dynalist!");
