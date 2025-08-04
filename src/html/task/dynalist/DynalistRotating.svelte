@@ -3,6 +3,7 @@
     import { Icon, ArrowUturnDown } from "svelte-hero-icons";
     import { DateTime } from "luxon";
     import Markdown from "svelte-exmarkdown";
+    import { isMonthYearFormat } from "../../../utils/timeUtils";
     import { generateDynalistComment } from "../../../utils/dynalistUtils";
     import { updateDynalist } from "../../../services/dynalistService";
     import { success } from "../../../services/toastService";
@@ -29,18 +30,6 @@
         if (!arr || arr.length === 0) return [];
         const normalizedIndex = index % arr.length;
         return [...arr.slice(normalizedIndex), ...arr.slice(0, normalizedIndex)];
-    }
-
-    /**
-     * Checks if a date string is in "Month Year" format.
-     * @param dateString - The date string to check.
-     * @returns True if the string is in "Month Year" format, false otherwise.
-     */
-    function isMonthYearFormat(dateString?: string): boolean {
-        const trimmed = dateString?.trim() || "";
-        const fullMonthFormat = DateTime.fromFormat(trimmed, "LLLL yyyy");
-        const shortMonthFormat = DateTime.fromFormat(trimmed, "LLL yyyy");
-        return fullMonthFormat.isValid || shortMonthFormat.isValid;
     }
 
     /**
@@ -72,27 +61,6 @@
     }
 
     /**
-     * Handles a successful update to Dynalist.
-     * @returns True if the update was successful.
-     */
-    function handleUpdateSuccess(): boolean {
-        success("Sent to bottom of list in Dynalist!");
-        isLoading.set(false);
-        return true;
-    }
-
-    /**
-     * Handles an error during update to Dynalist.
-     * @param error - The error object.
-     * @returns False to indicate failure.
-     */
-    function handleUpdateError(error: unknown): boolean {
-        console.error("Failed to update Dynalist:", error);
-        isLoading.set(false);
-        return false;
-    }
-
-    /**
      * Rotates to the next item in the checklist and updates Dynalist.
      * @returns A promise resolving to true if successful, false otherwise.
      */
@@ -105,8 +73,16 @@
         const changes = createUpdateChanges(currentItem);
 
         return updateDynalist(content.file_id, changes).then(
-            handleUpdateSuccess,
-            handleUpdateError,
+            () => {
+                success("Sent to bottom of list in Dynalist!");
+                isLoading.set(false);
+                return true;
+            },
+            (error: unknown) => {
+                console.error("Failed to update Dynalist:", error);
+                isLoading.set(false);
+                return false;
+            },
         );
     }
 </script>
