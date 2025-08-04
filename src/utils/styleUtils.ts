@@ -156,6 +156,10 @@ function getTodayGradient(
  * @returns The gradient CSS class string, null, or an empty string depending on conditions.
  */
 export function getGradientColor(totalTasks: number, hash: string): string | null {
+    if (totalTasks === 0) {
+        return null;
+    }
+
     const gradients: Record<GradientType, string> = {
         blue: "bg-linear-to-r from-blue-900 to-blue-700",
         green: "bg-linear-to-r from-green-900 to-green-700",
