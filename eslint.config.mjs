@@ -42,6 +42,7 @@ export default defineConfig([
         },
         rules: {
             "max-lines": ["error", { max: 140, skipComments: true, skipBlankLines: true }],
+            "max-depth": ["error", 2],
         },
     },
 
@@ -98,6 +99,7 @@ export default defineConfig([
         },
         rules: {
             "max-lines": ["error", { max: 90, skipComments: true, skipBlankLines: true }],
+            "max-depth": ["error", 2],
             "functional/no-let": "off",
             "@typescript-eslint/no-unused-vars": [
                 "error",
