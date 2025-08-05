@@ -2,7 +2,7 @@
     import { Icon, ArrowPath, Key } from "svelte-hero-icons";
     import { dynalistAccessToken } from "../../../stores/secret";
     import { success } from "../../../services/toastService";
-    import Logo from "../../Logo.svelte";
+    import Logo from "../../interface/Logo.svelte";
     import { validateDynalistToken } from "../../../utils/dynalistApiGetUtils";
     import type { ValidateDynalistTokenResult } from "../../../types/dynalist";
 

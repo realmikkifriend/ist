@@ -10,7 +10,7 @@
     import Sidebar from "./sidebar/Sidebar.svelte";
     import ContextBadge from "./sidebar/ContextBadge.svelte";
     import Agenda from "./agenda/Agenda.svelte";
-    import Toasts from "./Toasts.svelte";
+    import Toasts from "./interface/Toasts.svelte";
     import type { Writable } from "svelte/store";
 
     const isSpinning: Writable<boolean> = writable(false);

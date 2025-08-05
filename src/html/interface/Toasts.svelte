@@ -1,8 +1,8 @@
 <script lang="ts">
-    import { toastMessages } from "../stores/interface";
+    import { toastMessages } from "../../stores/interface";
     import { fly } from "svelte/transition";
-    import type { ToastMessage } from "../types/interface";
-    import { removeToast } from "../services/toastService";
+    import type { ToastMessage } from "../../types/interface";
+    import { removeToast } from "../../services/toastService";
 
     const alertClasses: Record<ToastMessage["type"], string> = {
         info: "alert-info",

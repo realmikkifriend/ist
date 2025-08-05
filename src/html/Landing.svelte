@@ -1,7 +1,7 @@
 <script lang="ts">
     import { getAuthStateParameter, getAuthorizationUrl } from "@doist/todoist-api-typescript";
-    import Logo from "./Logo.svelte";
-    import Footer from "./Footer.svelte";
+    import Logo from "./interface/Logo.svelte";
+    import Footer from "./interface/Footer.svelte";
 
     const TODOIST_CLIENT_ID: string | undefined = process.env.TODOIST_CLIENT_ID;
 

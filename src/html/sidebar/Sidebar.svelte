@@ -2,7 +2,7 @@
     import { Icon, Bars3, ArrowLeftOnRectangle } from "svelte-hero-icons";
     import Contexts from "./Contexts.svelte";
     import DailyGoal from "../activity/DailyGoal.svelte";
-    import Footer from "../Footer.svelte";
+    import Footer from "../interface/Footer.svelte";
     import { todoistData } from "../../stores/stores";
     import { handleLogout } from "../../services/updateService";
 

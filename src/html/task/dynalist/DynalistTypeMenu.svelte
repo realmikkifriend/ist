@@ -9,7 +9,7 @@
         ArrowPathRoundedSquare,
         Inbox,
     } from "svelte-hero-icons";
-    import Logo from "../../Logo.svelte";
+    import Logo from "../../interface/Logo.svelte";
     import type { DynalistTaskType } from "../../../types/dynalist";
 
     export let selectedType: DynalistTaskType;
