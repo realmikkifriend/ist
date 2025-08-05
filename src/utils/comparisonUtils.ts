@@ -7,7 +7,7 @@ import type { Task } from "../types/todoist";
  * @param {Task} b - The second task.
  * @returns {number} The comparison result.
  */
-function compareByPriority(a: Task, b: Task): number {
+export function compareByPriority(a: Task, b: Task): number {
     return b.priority - a.priority;
 }
 

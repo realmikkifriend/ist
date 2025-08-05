@@ -1,19 +1,32 @@
 <script lang="ts">
     import { DateTime } from "luxon";
+    import ListTask from "../task/ListTask.svelte";
+    import type { Task } from "../../types/todoist";
 
     export let day: DateTime;
     export let dots: { color: string }[];
+    export let tooltip: Task[] | undefined = undefined;
 
     const today = DateTime.now().startOf("day");
     const tomorrow = today.plus({ days: 1 });
 </script>
 
 <div
-    class="relative flex h-9 w-full flex-col items-center justify-center rounded-sm"
+    class="tooltip tooltip-top relative flex h-9 w-full flex-col items-center justify-center rounded-sm"
     class:bg-red-950={day.hasSame(today, "day")}
     class:bg-red-800={day.hasSame(tomorrow, "day")}
 >
-    <span>{day.day}</span>
+    {#if tooltip}
+        <div class="tooltip-content w-44 text-left">
+            {#each tooltip as task (task.id)}
+                <ListTask {task} />
+            {/each}
+        </div>
+        <span>{day.day}</span>
+    {:else}
+        <span>{day.day}</span>
+    {/if}
+
     {#if dots.length > 0}
         <div class="dot-container flex h-1 items-center justify-center space-x-0.5">
             {#each dots.slice(0, 3) as dot, i (i)}

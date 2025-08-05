@@ -3,6 +3,7 @@
     import { DateTime } from "luxon";
     import { getTasksForMonth } from "../../utils/deferDateUtils";
     import { getPriorityClasses } from "../../utils/styleUtils";
+    import { compareByPriority } from "../../utils/comparisonUtils";
     import Calendar from "../interface/Calendar.svelte";
     import type { Task, Priority } from "../../types/todoist";
 
@@ -23,7 +24,7 @@
         }
     };
 
-    $: dateDots = (() => {
+    $: dateInfo = (() => {
         const now = DateTime.now().setZone(tz);
         const monthTasks = getTasksForMonth(
             tasks,
@@ -40,21 +41,23 @@
             },
         );
 
-        const finalDots = monthTasks.reduce(
+        monthTasks.sort(compareByPriority);
+
+        return monthTasks.reduce(
             (acc, task) => {
                 if (task.due) {
                     const date = task.due.date;
                     if (!acc[date]) {
-                        acc[date] = [];
+                        acc[date] = { dots: [], tasks: [] };
                     }
-                    acc[date].push({ color: getPriorityClasses(task.priority as Priority) });
+                    acc[date].dots.push({ color: getPriorityClasses(task.priority as Priority) });
+                    acc[date].tasks.push(task);
                 }
                 return acc;
             },
-            {} as Record<string, { color: string }[]>,
+            {} as Record<string, { dots: { color: string }[]; tasks: Task[] }>,
         );
-        return finalDots;
     })();
 </script>
 
-<Calendar {dateDots} onDayClick={handleDefer} />
+<Calendar {dateInfo} onDayClick={handleDefer} />

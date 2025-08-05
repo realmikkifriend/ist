@@ -1,13 +1,12 @@
 <script lang="ts">
-    import CalendarDay from "./CalendarDay.svelte";
-    import { DateTime } from "luxon";
     import { writable } from "svelte/store";
+    import { DateTime } from "luxon";
     import { Icon, ChevronUp, ChevronDown } from "svelte-hero-icons";
+    import CalendarDay from "./CalendarDay.svelte";
+    import type { Task } from "../../types/todoist";
 
-    export let dateDots: Record<string, { color: string }[]> = {};
+    export let dateInfo: Record<string, { dots: { color: string }[]; tasks: Task[] }> = {};
     export let onDayClick: (day: DateTime) => void = () => {};
-
-    // console.log(dateDots);
 
     const displayMonth = writable({
         date: DateTime.now(),
@@ -45,16 +44,31 @@
     }
 
     /**
-     * Processes the day data for dot display.
-     * @param day - The given day for which to retrieve dots.
-     * @returns The dots to display.
+     * Processes the day data for dot and tooltip display.
+     * @param day - The given day for which to retrieve info.
+     * @returns The info to display.
      */
-    function getDotsForDay(day: DateTime | null): { color: string }[] {
-        if (!day) return [];
+    function getInfoForDay(
+        day: DateTime | null,
+    ): { dots: { color: string }[]; tasks: Task[] } | null {
+        if (!day) return null;
 
-        return Object.keys(dateDots)
+        const infos = Object.keys(dateInfo)
             .filter((isoDateTime) => DateTime.fromISO(isoDateTime).hasSame(day, "day"))
-            .flatMap((isoDateTime) => dateDots[isoDateTime]);
+            .map((isoDateTime) => dateInfo[isoDateTime]);
+
+        if (infos.length === 0) {
+            return null;
+        }
+
+        return infos.reduce(
+            (acc, info) => {
+                acc.dots.push(...info.dots);
+                acc.tasks.push(...info.tasks);
+                return acc;
+            },
+            { dots: [], tasks: [] },
+        );
     }
 </script>
 
@@ -84,12 +98,12 @@
         {/each}
         {#each $displayMonth.days as day, i (i)}
             {#if day}
-                {@const dots = getDotsForDay(day)}
+                {@const info = getInfoForDay(day)}
                 <button
                     class="hover:text-primary hover:bg-neutral w-full cursor-pointer rounded-sm text-left"
                     on:click={() => onDayClick(day)}
                 >
-                    <CalendarDay {dots} {day} />
+                    <CalendarDay dots={info?.dots ?? []} tooltip={info?.tasks} {day} />
                 </button>
             {:else}
                 <div class="h-7 w-full"></div>
