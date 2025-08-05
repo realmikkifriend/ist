@@ -36,62 +36,6 @@ body {
     font-family: "Clear Sans", sans-serif;
 }
 
-/* TOAST NOTIFICATIONS */
-
-:root {
-    --toastBorderRadius: 0.5rem;
-    --toastWidth: 20rem;
-}
-
-._toastContainer {
-    position: relative;
-    right: 0.5rem;
-    top: unset !important;
-}
-
-/* DATE PICKER */
-
-:root {
-    --sdt-bg-main: var(--color-base-100);
-    --sdt-shadow-color: transparent;
-    --sdt-color: var(--color-primary-content);
-    --sdt-header-color: var(--color-primary-content);
-    --sdt-header-btn-bg-hover: var(--color-neutral);
-    --sdt-table-disabled-date: var(--color-neutral);
-    --sdt-table-data-bg-hover: var(--color-neutral);
-}
-
-.std-calendar-wrap {
-    min-width: 18rem;
-}
-
-.sdt-cal-td > button {
-    padding-top: 0;
-    padding-bottom: 0.25rem;
-}
-
-.sdt-cal-td > button:disabled {
-    pointer-events: none;
-}
-
-.sdt-cal-td {
-    cursor: not-allowed;
-}
-
-.sdt-tomorrow {
-    padding-top: 0.1rem;
-}
-
-.sdt-tomorrow > button {
-    outline: 0.1rem var(--fallback-p, oklch(var(--p) / 1)) solid;
-    outline-offset: -0.05rem;
-}
-
-.sdt-today::before,
-.modal-box * .btn:empty {
-    display: none;
-}
-
 /* GENERATED ELEMENTS */
 
 .prose ul,
