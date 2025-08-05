@@ -3,23 +3,11 @@
     import { Icon, XCircle, Calendar } from "svelte-hero-icons";
     import { todoistData, previousFirstDueTask } from "../../stores/stores";
     import { userSettings } from "../../stores/interface";
-    import { getPriorityClasses } from "../../utils/styleUtils";
     import { openAgenda } from "../../services/agendaService";
     import { getTasksGroupedByContext } from "../../utils/filterUtils";
-    import ListTask from "../task/ListTask.svelte";
+    import ContextButtonContents from "./ContextButtonContents.svelte";
     import type { Readable } from "svelte/motion";
-    import type { TasksGroupedByContext, Priority } from "../../types/todoist";
-
-    /**
-     * Returns the CSS class for a given priority.
-     * Necessary because Svelte 4 templates can't include type assertions.
-     * @param priorityNum - The given priority.
-     * @returns The Tailwind classes that correspond to the priority.
-     */
-    function getPriorityBadgeClass(priorityNum: number): string {
-        // Priority is a number enum, so coerce to Priority
-        return getPriorityClasses(priorityNum as Priority);
-    }
+    import type { TasksGroupedByContext } from "../../types/todoist";
 
     /**
      * A derived store grouping due tasks by context.
@@ -88,31 +76,7 @@
             class="bg-secondary text-base-100 tooltip sm:tooltip-right tooltip-bottom mb-2 rounded-lg"
             on:click={() => handleContextClick(context.id)}
         >
-            <div class="tooltip-content w-70 text-left">
-                {$dueTasksByContext[context.id].total} tasks due in this context:
-                <div class="my-2 space-y-1">
-                    {#each $dueTasksByContext[context.id].tasks as task (task.id)}
-                        <ListTask {task} />
-                    {/each}
-                </div>
-            </div>
-
-            <div class="gap-0 px-2 py-1">
-                <p class="cursor-pointer text-left text-lg font-bold">{context.name}</p>
-                <div class="flex flex-row items-start space-x-2">
-                    {#each Object.keys($dueTasksByContext[context.id].priorities).sort((a, b) => +b - +a) as priorityStr, index (index)}
-                        <div class="flex flex-row items-start space-x-1 py-1">
-                            {#each Array.from( { length: $dueTasksByContext[context.id].priorities[+priorityStr] }, ) as _, badgeIndex (badgeIndex)}
-                                <div
-                                    class="h-1 w-0.5 max-w-0.5 rounded-sm border-none p-1 {getPriorityBadgeClass(
-                                        +priorityStr,
-                                    )}"
-                                ></div>
-                            {/each}
-                        </div>
-                    {/each}
-                </div>
-            </div>
+            <ContextButtonContents {context} tasksForContext={$dueTasksByContext[context.id]} />
         </button>
     {/if}
 {/each}
