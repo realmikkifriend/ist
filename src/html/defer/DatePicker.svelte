@@ -1,55 +1,60 @@
 <script lang="ts">
-    import { afterUpdate, createEventDispatcher } from "svelte";
+    import { createEventDispatcher } from "svelte";
     import { DateTime } from "luxon";
-    import SveltyPicker from "svelty-picker";
-    import { updateCalendarCells } from "../../services/deferModalService";
-    import type { Task } from "../../types/todoist";
+    import { getTasksForMonth } from "../../utils/deferDateUtils";
+    import { getPriorityClasses } from "../../utils/styleUtils";
+    import Calendar from "../interface/Calendar.svelte";
+    import type { Task, Priority } from "../../types/todoist";
 
     export let taskToDefer: Task;
     export let tz: string;
     export let tasks: Task[];
 
-    const tomorrowStr: string = DateTime.now().setZone(tz).plus({ days: 1 }).toISODate() ?? "";
-
     const dispatch = createEventDispatcher<{ defer: { rawTime: string } }>();
 
     /**
      * Handles the defer event from the date picker.
-     * @param param0 - The event object containing the raw time string.
-     * @param param0.detail - Defer information to pass.
+     * @param day - The day to defer to.
      */
-    const handleDefer = ({ detail: rawTime }: { detail: string }): void => {
-        dispatch("defer", { rawTime });
-    };
-
-    /**
-     * Handles the click event on the calendar button.
-     * @param event - The click event on the calendar button.
-     */
-    const handleButtonClick = (event: Event): void => {
-        updateCalendarCells(event.currentTarget as HTMLElement, tz, tasks, taskToDefer);
-    };
-
-    /**
-     * Handles updates after the component has been updated.
-     */
-    const handleAfterUpdate = (): void => {
-        const buttonElement = document.querySelector("button[data-calendar-button]");
-        if (buttonElement) {
-            updateCalendarCells(buttonElement as HTMLElement, tz, tasks, taskToDefer);
+    const handleDefer = (day: DateTime): void => {
+        const isoDate = day.toISODate();
+        if (isoDate) {
+            dispatch("defer", { rawTime: isoDate });
         }
     };
 
-    afterUpdate(handleAfterUpdate);
+    $: dateDots = (() => {
+        const now = DateTime.now().setZone(tz);
+        const monthTasks = getTasksForMonth(
+            tasks,
+            {
+                start: now.startOf("month"),
+                end: now.endOf("month"),
+            },
+            {
+                tz,
+                contextId: taskToDefer.contextId ?? "",
+                monthYear: now.toFormat("MMMM yyyy"),
+                now,
+                soonTasks: tasks,
+            },
+        );
+
+        const finalDots = monthTasks.reduce(
+            (acc, task) => {
+                if (task.due) {
+                    const date = task.due.date;
+                    if (!acc[date]) {
+                        acc[date] = [];
+                    }
+                    acc[date].push({ color: getPriorityClasses(task.priority as Priority) });
+                }
+                return acc;
+            },
+            {} as Record<string, { color: string }[]>,
+        );
+        return finalDots;
+    })();
 </script>
 
-<button data-calendar-button on:click={handleButtonClick}>
-    <SveltyPicker
-        startDate={tomorrowStr}
-        pickerOnly={true}
-        mode="date"
-        todayBtnClasses="display: hidden"
-        clearBtnClasses="display: hidden"
-        on:change={handleDefer}
-    />
-</button>
+<Calendar {dateDots} onDayClick={handleDefer} />
