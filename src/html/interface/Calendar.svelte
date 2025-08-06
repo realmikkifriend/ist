@@ -2,12 +2,12 @@
     import { writable } from "svelte/store";
     import { DateTime } from "luxon";
     import { Icon, ChevronUp, ChevronDown } from "svelte-hero-icons";
+    import { getCalendarGrid, getInfoForDay } from "../../utils/calendarUtils";
     import CalendarDay from "./CalendarDay.svelte";
     import type { Task } from "../../types/todoist";
-    import { getCalendarGrid, getInfoForDay } from "../../utils/calendarUtils";
 
     export let dateInfo: Record<string, { dots: { color: string }[]; tasks: Task[] }> = {};
-    export let onDayClick: (day: DateTime) => void = () => {};
+    export let onDayClick: ((day: DateTime) => void) | undefined = undefined;
     export let disable: "past" | "future" | null = null;
 
     const displayMonth = writable({
@@ -18,6 +18,10 @@
     $: if ($displayMonth.date) {
         $displayMonth.days = getCalendarGrid($displayMonth.date);
     }
+    $: disablePrevMonth =
+        disable === "past" && $displayMonth.date.startOf("month") <= today.startOf("month");
+    $: disableNextMonth =
+        disable === "future" && $displayMonth.date.endOf("month") >= today.endOf("month");
 
     const today = DateTime.now().startOf("day");
     const weekDays = ["M", "T", "W", "T", "F", "S", "S"];
@@ -36,11 +40,6 @@
         }
         $displayMonth.date = newDate;
     }
-
-    $: disablePrevMonth =
-        disable === "past" && $displayMonth.date.startOf("month") <= today.startOf("month");
-    $: disableNextMonth =
-        disable === "future" && $displayMonth.date.endOf("month") >= today.endOf("month");
 </script>
 
 <div class="w-full">
@@ -72,14 +71,30 @@
         {#each $displayMonth.days as day, i (day ? day.toMillis() : `empty-${i}`)}
             {#if day}
                 {@const info = getInfoForDay(day, dateInfo)}
-                <button
-                    class="w-full cursor-pointer rounded-sm text-left"
-                    on:click={() => onDayClick(day)}
-                    disabled={(disable === "past" && day < today) ||
-                        (disable === "future" && day > today)}
-                >
-                    <CalendarDay dots={info?.dots ?? []} tooltip={info?.tasks} {day} {disable} />
-                </button>
+                {#if onDayClick}
+                    <button
+                        class="hover:bg-primary w-full cursor-pointer rounded-sm text-left disabled:hover:bg-transparent"
+                        on:click={() => onDayClick(day)}
+                        disabled={(disable === "past" && day < today) ||
+                            (disable === "future" && day > today)}
+                    >
+                        <CalendarDay
+                            dots={info?.dots ?? []}
+                            tooltip={info?.tasks}
+                            {day}
+                            {disable}
+                        />
+                    </button>
+                {:else}
+                    <div class="w-full rounded-sm text-left">
+                        <CalendarDay
+                            dots={info?.dots ?? []}
+                            tooltip={info?.tasks}
+                            {day}
+                            {disable}
+                        />
+                    </div>
+                {/if}
             {:else}
                 <div class="h-7 w-full"></div>
             {/if}

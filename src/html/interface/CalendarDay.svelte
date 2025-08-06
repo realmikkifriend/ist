@@ -16,7 +16,7 @@
 </script>
 
 <div
-    class="tooltip tooltip-top hover:bg-primary relative flex h-9 w-full flex-col items-center justify-center rounded-sm"
+    class="tooltip tooltip-top relative flex h-9 w-full flex-col items-center justify-center rounded-sm"
     class:bg-red-950={day.hasSame(today, "day")}
     class:bg-red-800={isTomorrow}
     class:opacity-50={isDisabled}
