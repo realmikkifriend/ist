@@ -10,20 +10,23 @@
     export let onDayClick: ((day: DateTime) => void) | undefined = undefined;
     export let disable: "past" | "future" | null = null;
 
+    const today = DateTime.now().startOf("day");
+
     const displayMonth = writable({
         date: DateTime.now(),
         days: [] as (DateTime | null)[],
+        disablePrevMonth: false,
+        disableNextMonth: false,
     });
 
     $: if ($displayMonth.date) {
         $displayMonth.days = getCalendarGrid($displayMonth.date);
+        $displayMonth.disablePrevMonth =
+            disable === "past" && $displayMonth.date.startOf("month") <= today.startOf("month");
+        $displayMonth.disableNextMonth =
+            disable === "future" && $displayMonth.date.endOf("month") >= today.endOf("month");
     }
-    $: disablePrevMonth =
-        disable === "past" && $displayMonth.date.startOf("month") <= today.startOf("month");
-    $: disableNextMonth =
-        disable === "future" && $displayMonth.date.endOf("month") >= today.endOf("month");
 
-    const today = DateTime.now().startOf("day");
     const weekDays = ["M", "T", "W", "T", "F", "S", "S"];
 
     /**
@@ -49,16 +52,16 @@
             <button
                 on:click={() => changeMonth(-1)}
                 class="hover:text-primary disabled:hover:bg-base-100 flex h-7 w-7 items-center justify-center rounded-sm hover:bg-gray-200"
-                disabled={disablePrevMonth}
+                disabled={$displayMonth.disablePrevMonth}
             >
-                <Icon src={!disablePrevMonth ? ChevronUp : ""} />
+                <Icon src={!$displayMonth.disablePrevMonth ? ChevronUp : ""} />
             </button>
             <button
                 on:click={() => changeMonth(1)}
                 class="hover:text-primary disabled:hover:bg-base-100 flex h-7 w-7 items-center justify-center rounded-sm hover:bg-gray-200"
-                disabled={disableNextMonth}
+                disabled={$displayMonth.disableNextMonth}
             >
-                <Icon src={!disableNextMonth ? ChevronDown : ""} />
+                <Icon src={!$displayMonth.disableNextMonth ? ChevronDown : ""} />
             </button>
         </div>
     </div>
