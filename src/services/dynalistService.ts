@@ -5,6 +5,7 @@ import { updateDynalist } from "../utils/dynalistApiPostUtils";
 import { success } from "./toastService";
 import type { DynalistApiResultBase, DynalistContent, DynalistCountData } from "../types/dynalist";
 import type { DynalistNode } from "../types/dynalist";
+import { DateTime } from "luxon";
 
 /**
  * Updates a Dynalist document with the given changes, retrieving the access token internally.
@@ -17,7 +18,8 @@ export async function updateDynalistWithToken(
     changes: unknown[],
 ): Promise<DynalistApiResultBase> {
     const accessToken = get(dynalistAccessToken);
-    return updateDynalist(file_id, changes, accessToken);
+    const result = await updateDynalist(file_id, changes, accessToken);
+    return result;
 }
 
 /**
@@ -63,4 +65,56 @@ export async function loadDynalistCommentWithToken(
 ): Promise<{ dynalistObject?: DynalistNode; selectedType?: string; error?: unknown }> {
     const accessToken = get(dynalistAccessToken);
     return loadDynalistComment(url, accessToken);
+}
+
+/**
+ * Handles the click for Dynalist tracking, updating the node.
+ * @param {DynalistNode} content - The Dynalist node content.
+ * @param {boolean} todayTracked - Whether today is already tracked.
+ * @returns {Promise<DynalistNode["children"]>} The updated children of the node.
+ */
+export async function handleDynalistTrackingClick(
+    content: DynalistNode,
+    todayTracked: boolean,
+): Promise<DynalistNode["children"]> {
+    const today = DateTime.now().toISODate();
+    const changeAction = todayTracked
+        ? {
+              action: "delete" as const,
+              node_id: (
+                  content.children?.find(
+                      (c) => typeof c !== "string" && c.content === today,
+                  ) as DynalistNode
+              )?.id,
+          }
+        : {
+              action: "insert" as const,
+              parent_id: content.id,
+              index: 0,
+              content: today,
+          };
+
+    if (changeAction.action === "delete" && !changeAction.node_id) {
+        return content.children;
+    }
+
+    const result = await updateDynalistWithToken(content.file_id, [changeAction]);
+
+    const existingNodes = (content.children ?? []).filter(
+        (c): c is DynalistNode => typeof c !== "string",
+    );
+
+    if (changeAction.action === "delete") {
+        success("Removed date from Dynalist!");
+        return existingNodes.filter((c) => c.content !== today);
+    } else {
+        success("Added date to Dynalist!");
+        const newNode: DynalistNode = {
+            id: result.new_node_ids?.[0] || "temp-id",
+            file_id: content.file_id,
+            content: today,
+            children: [],
+        };
+        return [...existingNodes, newNode];
+    }
 }

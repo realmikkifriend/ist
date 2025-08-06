@@ -39,7 +39,8 @@ export function updateDynalist(
             const data = result.data;
 
             if (result.response.ok) {
-                return { data };
+                const new_node_ids = (data as { new_node_ids?: string[] }).new_node_ids;
+                return { data, new_node_ids };
             } else {
                 return { error: "Network response was not ok", data };
             }

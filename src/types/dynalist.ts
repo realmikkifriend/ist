@@ -22,6 +22,7 @@ export interface DynalistApiResultBase {
     error?: string;
     data?: unknown;
     message?: string;
+    new_node_ids?: string[];
 }
 
 export interface FetchDynalistDocumentResult extends DynalistApiResultBase {
