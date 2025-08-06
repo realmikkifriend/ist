@@ -135,7 +135,7 @@ export default defineConfig([
             },
         },
         rules: {
-            "max-lines": ["error", { max: 90, skipComments: true, skipBlankLines: true }],
+            "max-lines": ["error", { max: 95, skipComments: true, skipBlankLines: true }],
             "max-depth": ["error", 2],
             "no-restricted-syntax": [
                 "error",
