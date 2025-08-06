@@ -28,7 +28,8 @@
         "src/**/*.tsx",
         "src/**/*.svelte",
         "src/types/**/*.ts",
-        "tests/**/*.ts"
+        "tests/**/*.ts",
+        "knip.ts"
     ],
     "exclude": [
         "node_modules"

@@ -1,8 +1,0 @@
-{
-    "project": ["**/*.ts", "**/*.svelte", "**/*.mjs"],
-    "ignoreExportsUsedInFile": {
-        "function": true,
-        "interface": true,
-        "type": true
-    }
-}

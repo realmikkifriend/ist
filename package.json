@@ -10,8 +10,9 @@
         "test:watch": "vitest",
         "test:coverage:watch": "vitest --coverage",
         "lint": "eslint 'src/**/*.{svelte,ts}'",
-        "depcruise": "depcruise src --include-only '^src' --output-type x-dot-webpage -f dependencies.htm",
-        "knip": "knip"
+        "depcruiser": "depcruise src --include-only '^src' --output-type x-dot-webpage -f dependencies.htm",
+        "knip": "knip",
+        "scan": "npm run depcruiser --silent && svelte-check && npm run knip --silent && npm run lint --silent"
     },
     "repository": {
         "type": "git",
@@ -62,7 +63,6 @@
         "css-loader": "^7.1.2",
         "daisyui": "^5.0.50",
         "dependency-cruiser": "^17.0.0",
-        "dotenv": "^17.2.1",
         "dotenv-cli": "^10.0.0",
         "dotenv-webpack": "^8.1.1",
         "eslint": "^9.32.0",
