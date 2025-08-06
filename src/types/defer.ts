@@ -39,3 +39,11 @@ export interface TimeButtonContext {
     index: number;
     processedButtons: (TimeButtonConfig | null)[];
 }
+
+export interface DeferEvent {
+    detail: DeferEventDetail;
+}
+
+export interface DeferEventDetail {
+    rawTime: string | number;
+}

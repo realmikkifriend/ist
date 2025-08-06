@@ -44,7 +44,13 @@ export type LabelInfo = {
     classes: string;
 };
 
-export type DynalistTaskType = "read" | "checklist" | "count" | "rotating" | "crossoff";
+export type DynalistTaskType =
+    | "read"
+    | "checklist"
+    | "count"
+    | "rotating"
+    | "crossoff"
+    | "tracking";
 
 export type DynalistChange =
     | {

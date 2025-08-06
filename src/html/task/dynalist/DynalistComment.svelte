@@ -23,6 +23,7 @@
     const loadPromise: Promise<DynalistStoreState> = loadDynalistCommentWithToken(url).then(
         (value: { dynalistObject?: DynalistContent; selectedType?: string; error?: unknown }) => {
             const { dynalistObject, selectedType, error } = value;
+
             if (error) {
                 let errorMsg: string;
                 if (hasError(error) && typeof error.error.message === "string") {
@@ -45,6 +46,7 @@
                     "count",
                     "rotating",
                     "crossoff",
+                    "tracking",
                     "",
                 ];
                 const safeSelectedType =

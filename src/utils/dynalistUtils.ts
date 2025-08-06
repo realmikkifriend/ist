@@ -41,7 +41,7 @@ export function processNode(node: DynalistNode, data: DynalistDocumentData): Dyn
  * @returns {string} The determined type.
  */
 export function getDynalistType(note: string | undefined): string {
-    const validTypes = ["read", "checklist", "rotating", "crossoff"];
+    const validTypes = ["read", "checklist", "rotating", "crossoff", "tracking"];
     const firstWordMatch = note && note.match(/^count \d+(\/|$)[\s\S]*$/);
 
     if (note && (validTypes.includes(note) || firstWordMatch)) {

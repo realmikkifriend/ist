@@ -9,6 +9,7 @@
     import TimePicker from "./TimePicker.svelte";
     import type { Writable, Readable } from "svelte/store";
     import type { Task } from "../../types/todoist";
+    import type { DeferEvent } from "../../types/defer";
 
     export let task: Task;
 
@@ -33,14 +34,6 @@
     const tz: string = Intl.DateTimeFormat().resolvedOptions().timeZone || "America/Chicago";
 
     const tasks: Readable<Task[]> = derived(todoistData, ($todoistData) => $todoistData.tasks);
-
-    interface DeferEventDetail {
-        rawTime: string | number;
-    }
-
-    interface DeferEvent {
-        detail: DeferEventDetail;
-    }
 
     const dispatch = createEventDispatcher<{
         defer: { task: Task; time: DateTime };

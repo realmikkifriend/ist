@@ -7,19 +7,15 @@
         ClipboardDocumentCheck,
         SquaresPlus,
         ArrowPathRoundedSquare,
+        CalendarDateRange,
         Inbox,
     } from "svelte-hero-icons";
     import Logo from "../../interface/Logo.svelte";
     import type { DynalistTaskType } from "../../../types/dynalist";
+    import type { IconPair } from "../../../types/interface";
 
     export let selectedType: DynalistTaskType;
     export let url: string;
-
-    interface IconPair {
-        icon: typeof ListBullet;
-        label: string;
-        type: DynalistTaskType;
-    }
 
     const iconPairs: IconPair[] = [
         { icon: ListBullet, label: "Read", type: "read" },
@@ -27,6 +23,7 @@
         { icon: SquaresPlus, label: "Count", type: "count" },
         { icon: ArrowPathRoundedSquare, label: "Rotating", type: "rotating" },
         { icon: Inbox, label: "Cross Off", type: "crossoff" },
+        { icon: CalendarDateRange, label: "Tracking", type: "tracking" },
     ];
 
     const dispatcher = createEventDispatcher<{ selectType: { type: DynalistTaskType } }>();

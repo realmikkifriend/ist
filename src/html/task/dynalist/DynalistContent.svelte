@@ -5,6 +5,7 @@
     import DynalistCount from "./DynalistCount.svelte";
     import DynalistRotating from "./DynalistRotating.svelte";
     import DynalistCrossOff from "./DynalistCrossOff.svelte";
+    import DynalistTracking from "./DynalistTracking.svelte";
     import DynalistTypeMenu from "./DynalistTypeMenu.svelte";
     import { generateDynalistComment } from "../../../utils/dynalistUtils";
     import type { DynalistContent, DynalistTaskType } from "../../../types/dynalist";
@@ -39,6 +40,8 @@
         <DynalistRotating content={dynalistObject} />
     {:else if selectedType === "crossoff"}
         <DynalistCrossOff content={dynalistObject} />
+    {:else if selectedType === "tracking"}
+        <DynalistTracking content={dynalistObject} />
     {/if}
 
     {#key selectedType}
