@@ -137,6 +137,17 @@ export default defineConfig([
         rules: {
             "max-lines": ["error", { max: 90, skipComments: true, skipBlankLines: true }],
             "max-depth": ["error", 2],
+            "no-restricted-syntax": [
+                "error",
+                {
+                    selector: "TSTypeAliasDeclaration",
+                    message: "Types are only allowed in src/types. Please import them.",
+                },
+                {
+                    selector: "TSInterfaceDeclaration",
+                    message: "Interfaces are only allowed in src/types. Please import them.",
+                },
+            ],
             "functional/no-let": "off",
             "@typescript-eslint/no-unused-vars": [
                 "error",
