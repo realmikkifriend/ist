@@ -7,6 +7,7 @@
 
     export let dateInfo: Record<string, { dots: { color: string }[]; tasks: Task[] }> = {};
     export let onDayClick: (day: DateTime) => void = () => {};
+    export let disable: "past" | "future" | null = null;
 
     const displayMonth = writable({
         date: DateTime.now(),
@@ -96,14 +97,16 @@
                 {day}
             </div>
         {/each}
-        {#each $displayMonth.days as day, i (i)}
+        {#each $displayMonth.days as day, i (day ? day.toMillis() : `empty-${i}`)}
             {#if day}
                 {@const info = getInfoForDay(day)}
                 <button
-                    class="hover:text-primary hover:bg-neutral w-full cursor-pointer rounded-sm text-left"
+                    class="w-full cursor-pointer rounded-sm text-left"
                     on:click={() => onDayClick(day)}
+                    disabled={(disable === "past" && day < DateTime.now().startOf("day")) ||
+                        (disable === "future" && day > DateTime.now().startOf("day"))}
                 >
-                    <CalendarDay dots={info?.dots ?? []} tooltip={info?.tasks} {day} />
+                    <CalendarDay dots={info?.dots ?? []} tooltip={info?.tasks} {day} {disable} />
                 </button>
             {:else}
                 <div class="h-7 w-full"></div>

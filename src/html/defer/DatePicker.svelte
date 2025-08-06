@@ -60,4 +60,4 @@
     })();
 </script>
 
-<Calendar {dateInfo} onDayClick={handleDefer} />
+<Calendar {dateInfo} onDayClick={handleDefer} disable="past" />
