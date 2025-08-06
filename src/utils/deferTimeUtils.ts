@@ -65,18 +65,19 @@ export const createButtons = (): TimeButtonConfig[] => {
                             .isAdjustedForNextDay,
                 ).length;
 
+                const calculatedTargetDateTime = isNextDayAdjustmentNeeded
+                    ? DateTime.fromJSDate(now)
+                          .plus({ days: 1 })
+                          .set({ hour: 6, minute: 0, second: 0, millisecond: 0 })
+                          .plus({ hours: nextDayHourButtonCount })
+                    : null;
+
                 const actualMs = isNextDayAdjustmentNeeded
-                    ? (() => {
-                          const targetHour = 6 + nextDayHourButtonCount;
-                          const targetDate = new Date(now);
-                          targetDate.setDate(now.getDate() + 1);
-                          targetDate.setHours(targetHour, 0, 0, 0);
-                          return targetDate.getTime() - now.getTime();
-                      })()
+                    ? calculatedTargetDateTime!.diff(DateTime.fromJSDate(now)).milliseconds
                     : baseMs;
 
                 const displayText = isNextDayAdjustmentNeeded
-                    ? `${6 + nextDayHourButtonCount} AM`
+                    ? calculatedTargetDateTime!.toFormat("h a")
                     : item.text || `${item.value} hrs`;
 
                 acc.push({
