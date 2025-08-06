@@ -1,10 +1,5 @@
 import { DateTime } from "luxon";
 import { createButtons, setupTomorrowButton, formatButtonTime } from "../utils/deferTimeUtils";
-import {
-    getCalendarDateRange,
-    getTasksForMonth,
-    processCalendarCell,
-} from "../utils/deferDateUtils";
 import { getSoonTasks, getTasksInTimeRange } from "../utils/filterUtils";
 import type { Task, Priority } from "../types/todoist";
 import type { DateButtonConfig } from "../types/defer";
@@ -53,41 +48,4 @@ export function updateMilliseconds(task: Task, tasks: Task[]): DateButtonConfig[
     }, soonTasks);
 
     return buttons;
-}
-
-/**
- * Updates all calendar cells in the given calendar element with task dots and highlights.
- * @param {HTMLElement} calendarElement - The calendar DOM element.
- * @param {string} tz - Timezone string.
- * @param {Task[]} tasks - Array of all tasks.
- * @param {Task} taskToDefer - The task being deferred (for contextId).
- */
-export function updateCalendarCells(
-    calendarElement: HTMLElement,
-    tz: string,
-    tasks: Task[],
-    taskToDefer: Task,
-): void {
-    if (!calendarElement) return;
-
-    const header = calendarElement.querySelector(".std-btn-header.sdt-toggle-btn");
-    if (!(header instanceof HTMLElement)) return;
-
-    const monthYear = header.innerText;
-    const now = DateTime.local().setZone(tz);
-    const dateRange = getCalendarDateRange(monthYear, now);
-    const contextId = taskToDefer.contextId ?? "";
-    const calendarContext = { monthYear, now, soonTasks: [] as Task[], tz, contextId };
-
-    calendarContext.soonTasks = getTasksForMonth(tasks, dateRange, calendarContext);
-
-    const calendarCells = calendarElement.querySelectorAll("td.sdt-cal-td.svelte-hexbpx");
-
-    calendarCells.forEach((cell) => {
-        const cellText = cell.textContent?.trim() ?? "";
-        const cellDate = parseInt(cellText);
-        if (!isNaN(cellDate)) {
-            processCalendarCell(cell as HTMLTableCellElement, cellDate, calendarContext);
-        }
-    });
 }

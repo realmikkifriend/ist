@@ -3,7 +3,6 @@ import globals from "globals";
 import { defineConfig } from "eslint/config";
 import functional from "eslint-plugin-functional";
 import svelte from "eslint-plugin-svelte";
-import svelteParser from "svelte-eslint-parser";
 import tseslint from "typescript-eslint";
 import jsdoc from "eslint-plugin-jsdoc";
 import svelteConfig from "./svelte.config.mjs";
@@ -124,7 +123,6 @@ export default defineConfig([
     {
         files: ["**/*.svelte"],
         languageOptions: {
-            parser: svelteParser,
             parserOptions: {
                 project: "./tsconfig.json",
                 tsconfigRootDir: import.meta.dirname,

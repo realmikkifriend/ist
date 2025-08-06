@@ -1,5 +1,4 @@
 import type { DateTime } from "luxon";
-import type { Task } from "./todoist";
 
 export interface TaskActivity {
     date: DateTime;
@@ -16,17 +15,4 @@ export interface TodoistActivity {
     extra_data: {
         content: string;
     };
-}
-
-export interface GetAllActivityDataParams {
-    startDate: DateTime;
-    endDate: DateTime;
-    accumulatedData?: TaskActivity[];
-    cursor?: string | null;
-    task: Task | null;
-}
-
-export interface TodoistActivityResponse {
-    next_cursor: string | null;
-    results: TodoistActivity[];
 }
