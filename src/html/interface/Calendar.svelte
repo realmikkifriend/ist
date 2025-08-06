@@ -19,6 +19,7 @@
         $displayMonth.days = getCalendarGrid($displayMonth.date);
     }
 
+    const today = DateTime.now().startOf("day");
     const weekDays = ["M", "T", "W", "T", "F", "S", "S"];
 
     /**
@@ -26,8 +27,20 @@
      * @param months - The number of months to move. Negative for past, positive for future.
      */
     function changeMonth(months: number) {
-        $displayMonth.date = $displayMonth.date.plus({ months });
+        const newDate = $displayMonth.date.plus({ months });
+        if (
+            (disable === "past" && newDate < today.startOf("month")) ||
+            (disable === "future" && newDate > today.endOf("month"))
+        ) {
+            return;
+        }
+        $displayMonth.date = newDate;
     }
+
+    $: disablePrevMonth =
+        disable === "past" && $displayMonth.date.startOf("month") <= today.startOf("month");
+    $: disableNextMonth =
+        disable === "future" && $displayMonth.date.endOf("month") >= today.endOf("month");
 </script>
 
 <div class="w-full">
@@ -36,15 +49,17 @@
         <div class="flex items-center">
             <button
                 on:click={() => changeMonth(-1)}
-                class="hover:text-primary flex h-5 w-5 items-center justify-center rounded-sm hover:bg-gray-200"
+                class="hover:text-primary disabled:hover:bg-base-100 flex h-7 w-7 items-center justify-center rounded-sm hover:bg-gray-200"
+                disabled={disablePrevMonth}
             >
-                <Icon src={ChevronUp} />
+                <Icon src={!disablePrevMonth ? ChevronUp : ""} />
             </button>
             <button
                 on:click={() => changeMonth(1)}
-                class="hover:text-primary flex h-5 w-5 items-center justify-center rounded-sm hover:bg-gray-200"
+                class="hover:text-primary disabled:hover:bg-base-100 flex h-7 w-7 items-center justify-center rounded-sm hover:bg-gray-200"
+                disabled={disableNextMonth}
             >
-                <Icon src={ChevronDown} />
+                <Icon src={!disableNextMonth ? ChevronDown : ""} />
             </button>
         </div>
     </div>
@@ -60,8 +75,8 @@
                 <button
                     class="w-full cursor-pointer rounded-sm text-left"
                     on:click={() => onDayClick(day)}
-                    disabled={(disable === "past" && day < DateTime.now().startOf("day")) ||
-                        (disable === "future" && day > DateTime.now().startOf("day"))}
+                    disabled={(disable === "past" && day < today) ||
+                        (disable === "future" && day > today)}
                 >
                     <CalendarDay dots={info?.dots ?? []} tooltip={info?.tasks} {day} {disable} />
                 </button>
