@@ -4,6 +4,7 @@
     import { Icon, ChevronUp, ChevronDown } from "svelte-hero-icons";
     import CalendarDay from "./CalendarDay.svelte";
     import type { Task } from "../../types/todoist";
+    import { getCalendarGrid, getInfoForDay } from "../../utils/calendarUtils";
 
     export let dateInfo: Record<string, { dots: { color: string }[]; tasks: Task[] }> = {};
     export let onDayClick: (day: DateTime) => void = () => {};
@@ -15,23 +16,7 @@
     });
 
     $: if ($displayMonth.date) {
-        getCalendarGrid();
-    }
-
-    /** Generates the calendar grid for the current month. */
-    function getCalendarGrid() {
-        const now = $displayMonth.date;
-        const startOfMonth = now.startOf("month");
-        const endOfMonth = now.endOf("month");
-
-        const startDay = startOfMonth.weekday;
-
-        const leadingEmptyDays: null[] = Array.from({ length: startDay - 1 }, () => null);
-        const monthDays: DateTime[] = Array.from({ length: endOfMonth.day }, (_, i) =>
-            DateTime.local(now.year, now.month, i + 1),
-        );
-
-        $displayMonth.days = [...leadingEmptyDays, ...monthDays] as (DateTime | null)[];
+        $displayMonth.days = getCalendarGrid($displayMonth.date);
     }
 
     const weekDays = ["M", "T", "W", "T", "F", "S", "S"];
@@ -42,34 +27,6 @@
      */
     function changeMonth(months: number) {
         $displayMonth.date = $displayMonth.date.plus({ months });
-    }
-
-    /**
-     * Processes the day data for dot and tooltip display.
-     * @param day - The given day for which to retrieve info.
-     * @returns The info to display.
-     */
-    function getInfoForDay(
-        day: DateTime | null,
-    ): { dots: { color: string }[]; tasks: Task[] } | null {
-        if (!day) return null;
-
-        const infos = Object.keys(dateInfo)
-            .filter((isoDateTime) => DateTime.fromISO(isoDateTime).hasSame(day, "day"))
-            .map((isoDateTime) => dateInfo[isoDateTime]);
-
-        if (infos.length === 0) {
-            return null;
-        }
-
-        return infos.reduce(
-            (acc, info) => {
-                acc.dots.push(...info.dots);
-                acc.tasks.push(...info.tasks);
-                return acc;
-            },
-            { dots: [], tasks: [] },
-        );
     }
 </script>
 
@@ -99,7 +56,7 @@
         {/each}
         {#each $displayMonth.days as day, i (day ? day.toMillis() : `empty-${i}`)}
             {#if day}
-                {@const info = getInfoForDay(day)}
+                {@const info = getInfoForDay(day, dateInfo)}
                 <button
                     class="w-full cursor-pointer rounded-sm text-left"
                     on:click={() => onDayClick(day)}
