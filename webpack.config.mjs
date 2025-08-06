@@ -1,12 +1,13 @@
-const path = require("path");
-const HtmlWebpackPlugin = require("html-webpack-plugin");
-const Dotenv = require("dotenv-webpack");
+import path from "path";
+import HtmlWebpackPlugin from "html-webpack-plugin";
+import Dotenv from "dotenv-webpack";
+import sveltePreprocess from "svelte-preprocess";
 
-module.exports = {
+export default {
     entry: "./src/js/index.ts",
     output: {
         filename: "bundle.js",
-        path: path.resolve(__dirname, "dist"),
+        // path: path.resolve(__dirname, "dist"),
         clean: true,
     },
     resolve: {
@@ -24,7 +25,7 @@ module.exports = {
                 use: {
                     loader: "svelte-loader",
                     options: {
-                        preprocess: require("svelte-preprocess")(),
+                        preprocess: sveltePreprocess(),
                     },
                 },
             },
