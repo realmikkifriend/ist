@@ -1,7 +1,7 @@
 <script lang="ts">
     import { createEventDispatcher } from "svelte";
     import { DateTime } from "luxon";
-    import { Icon, Check, Calendar, Clock, Forward, ArrowPath } from "svelte-hero-icons";
+    import { Icon, Check, Calendar, Clock, Forward } from "svelte-hero-icons";
     import { skipTask } from "../../services/firstTaskService";
     import { getPriorityBorder } from "../../utils/styleUtils";
     import Comments from "./Comments.svelte";
@@ -56,7 +56,7 @@
         <div class="card-body pb-7">
             {#if task.skip}
                 <button
-                    class="text-md btn btn-ghost btn-sm absolute top-0 right-0 h-8 min-h-8 content-center p-4"
+                    class="text-md hover:bg-accent btn btn-ghost btn-sm absolute top-0 right-0 h-8 min-h-8 content-center border-0 p-4"
                     title="skip task"
                     on:click={handleSkip}
                 >
@@ -86,20 +86,7 @@
         </div>
     </div>
     {#if task.comments}
-        {#await task.comments}
-            <div
-                class="prose bg-accent text-primary-content mx-auto flex w-11/12 flex-row items-center rounded-b-xl p-4 opacity-25"
-            >
-                <Icon src={ArrowPath} class="mr-2 h-4 w-4 animate-spin" />
-                <p>Loading comments...</p>
-            </div>
-        {:then comments}
-            <Comments {comments} />
-        {:catch error}
-            <div class="prose bg-accent text-primary-content mx-auto w-11/12 rounded-b-xl p-4">
-                <p>Error loading comments: {error.message}</p>
-            </div>
-        {/await}
+        <Comments commentsPromise={Promise.resolve(task.comments)} />
     {/if}
 </div>
 
