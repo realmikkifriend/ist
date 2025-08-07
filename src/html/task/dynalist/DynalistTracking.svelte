@@ -1,11 +1,11 @@
 <script lang="ts">
-    import { Icon, CalendarDateRange, Check, XMark, ArrowPath } from "svelte-hero-icons";
-    import type { DynalistNode } from "../../../types/dynalist";
-    import { DateTime } from "luxon";
-    import Calendar from "../../interface/Calendar.svelte";
-    import type { Task } from "../../../types/todoist";
-    import { handleDynalistTrackingClick } from "../../../services/dynalistService";
     import { writable } from "svelte/store";
+    import { DateTime } from "luxon";
+    import { Icon, CalendarDateRange, Check, XMark, ArrowPath } from "svelte-hero-icons";
+    import { handleDynalistTrackingClick } from "../../../services/dynalistService";
+    import History from "../../interface/History.svelte";
+    import type { Task } from "../../../types/todoist";
+    import type { DynalistNode } from "../../../types/dynalist";
 
     export let content: DynalistNode;
     const isLoading = writable(false);
@@ -79,16 +79,4 @@
     </button>
     <span class="text-lg">{content.content}</span>
 </div>
-
-<dialog id={`calendar_modal_${content.id}`} class="modal">
-    <div class="modal-box min-h-[64%] w-84 overflow-hidden">
-        <div class="mx-3 w-11/12 border-b-2 border-b-gray-200 p-0 text-lg">
-            <strong>History:</strong>
-            {content.content}
-        </div>
-        <Calendar {dateInfo} disable="future" />
-    </div>
-    <form method="dialog" class="modal-backdrop">
-        <button>close</button>
-    </form>
-</dialog>
+<History entityId={content.id ?? ""} content={content.content ?? ""} {dateInfo} title="History" />
