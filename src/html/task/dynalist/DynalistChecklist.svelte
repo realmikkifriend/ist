@@ -45,8 +45,8 @@
 {#if errorMessage}
     <div class="text-error italic">{errorMessage}</div>
 {:else if checklistItems && $currentIndex < checklistItems.length - 1}
-    <div class="mt-2">
-        <em class="absolute -top-3.5 -left-0.5 text-xs text-nowrap opacity-25">
+    <div class="mt-1">
+        <em class="absolute -top-2 -left-0.5 text-xs text-nowrap opacity-25">
             <span class="mr-0.5 inline-block w-7"
                 >{$currentIndex + 1}/{checklistItems.length - 1}</span
             >
