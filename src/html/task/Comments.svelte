@@ -21,10 +21,11 @@
 </script>
 
 {#if comments && comments.length > 0}
-    <div class="prose bg-accent text-primary-content mx-auto w-11/12 rounded-b-xl p-4">
+    <div
+        class="prose bg-accent text-primary-content divide-neutral mx-auto flex w-11/12 flex-col gap-y-2 divide-y-3 divide-solid rounded-b-xl p-4"
+    >
         {#if requiresAuthRequest && !$dynalistAccessToken}
             <DynalistAuthRequest />
-            <div class="divider my-1" />
         {/if}
 
         {#each comments as comment, index (index)}
@@ -36,10 +37,6 @@
                 {/if}
             {:else}
                 <Markdown md={comment.content} />
-            {/if}
-
-            {#if index < comments.length - 1}
-                <div class="divider relative z-10 my-1" />
             {/if}
         {/each}
     </div>
