@@ -1,13 +1,24 @@
 <script lang="ts">
+    import { processActivityForCalendar } from "../../utils/calendarUtils";
     import Calendar from "./Calendar.svelte";
+    import type { TaskActivity } from "../../types/activity";
     import type { Task } from "../../types/todoist";
 
     export let entityId: string;
     export let content: string;
-    export let dateInfo:
-        | Record<string, { dots: { color: string }[]; tasks: Task[] }>
-        | Promise<Record<string, { dots: { color: string }[]; tasks: Task[] }>> = {};
+    export let activity:
+        | TaskActivity[]
+        | Promise<TaskActivity[] | undefined>
+        | undefined
+        | Record<string, { dots: { color: string }[]; tasks: Task[] }>;
     export let title: string = "History";
+
+    const dateInfo = Promise.resolve(activity).then((res) => {
+        if (Array.isArray(res)) {
+            return processActivityForCalendar(res);
+        }
+        return res || {};
+    });
 </script>
 
 <dialog id={`calendar_modal_${entityId}`} class="modal">

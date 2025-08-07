@@ -5,17 +5,12 @@
     import { Check, Calendar as CalendarIcon, Clock, Forward } from "svelte-hero-icons";
     import { skipTask } from "../../services/firstTaskService";
     import { getPriorityBorder } from "../../utils/styleUtils";
-    import { processActivityForCalendar } from "../../utils/calendarUtils";
     import Comments from "./Comments.svelte";
     import DeferModal from "../defer/DeferModal.svelte";
     import History from "../interface/History.svelte";
     import type { Task, Priority } from "../../types/todoist";
 
     export let task: Task;
-
-    const dateInfo = task.activity
-        ? Promise.resolve(task.activity).then(processActivityForCalendar)
-        : Promise.resolve({});
 
     const priorityBorderClass = getPriorityBorder(task.priority as Priority);
 
@@ -109,4 +104,4 @@
     <DeferModal {task} on:defer={handleDefer} />
 </dialog>
 
-<History entityId={task.id} content={task.content} {dateInfo} />
+<History entityId={task.id} content={task.content} activity={task.activity} />

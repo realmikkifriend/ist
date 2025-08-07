@@ -79,4 +79,9 @@
     </button>
     <span class="text-lg">{content.content}</span>
 </div>
-<History entityId={content.id ?? ""} content={content.content ?? ""} {dateInfo} title="History" />
+<History
+    entityId={content.id ?? ""}
+    content={content.content ?? ""}
+    activity={dateInfo}
+    title="History"
+/>

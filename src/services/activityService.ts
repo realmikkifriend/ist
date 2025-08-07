@@ -154,7 +154,7 @@ const getAllActivityData = async (
  */
 export async function getNewActivity(task: Task | null = null, cursor: string | null = null) {
     const params: Record<string, string | number> = {
-        limit: 10,
+        limit: 100,
         object_type: "item",
         event_type: "completed",
     };
