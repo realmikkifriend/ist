@@ -1,14 +1,21 @@
 <script lang="ts">
     import { createEventDispatcher } from "svelte";
     import { DateTime } from "luxon";
-    import { Icon, Check, Calendar, Clock, Forward } from "svelte-hero-icons";
+    import { Icon, CalendarDateRange } from "svelte-hero-icons";
+    import { Check, Calendar as CalendarIcon, Clock, Forward } from "svelte-hero-icons";
     import { skipTask } from "../../services/firstTaskService";
     import { getPriorityBorder } from "../../utils/styleUtils";
+    import { processActivityForCalendar } from "../../utils/calendarUtils";
     import Comments from "./Comments.svelte";
     import DeferModal from "../defer/DeferModal.svelte";
+    import History from "../interface/History.svelte";
     import type { Task, Priority } from "../../types/todoist";
 
     export let task: Task;
+
+    const dateInfo = task.activity
+        ? Promise.resolve(task.activity).then(processActivityForCalendar)
+        : Promise.resolve({});
 
     const priorityBorderClass = getPriorityBorder(task.priority as Priority);
 
@@ -42,10 +49,11 @@
     };
 
     /**
-     * Opens the defer modal dialog.
+     * Opens a modal dialog by its ID.
+     * @param modalId - The ID of the modal to open.
      */
-    const openModal = (): void => {
-        (document.getElementById("defer_modal") as HTMLDialogElement | null)?.showModal();
+    const openModal = (modalId: string): void => {
+        (document.getElementById(modalId) as HTMLDialogElement | null)?.showModal();
     };
 </script>
 
@@ -54,6 +62,13 @@
         class={`card bg-neutral text-primary-content mt-0 rounded-xl border-b-[0.75rem] ${priorityBorderClass}`}
     >
         <div class="card-body pb-7">
+            <button
+                class="text-md hover:bg-accent btn btn-ghost btn-sm absolute top-0 left-0 h-8 min-h-8 content-center border-0 p-4"
+                title="view task completion history"
+                on:click={() => openModal(`calendar_modal_${task.id}`)}
+            >
+                <Icon src={CalendarDateRange} class="stroke-secondary h-5 w-5 [&>path]:stroke-2" />
+            </button>
             {#if task.skip}
                 <button
                     class="text-md hover:bg-accent btn btn-ghost btn-sm absolute top-0 right-0 h-8 min-h-8 content-center border-0 p-4"
@@ -74,10 +89,10 @@
                 </button>
                 <button
                     class="text-md btn btn-secondary h-8 min-h-8 content-center p-4"
-                    on:click={openModal}
+                    on:click={() => openModal("defer_modal")}
                 >
                     {#if task.due?.allDay === 1}
-                        <Icon src={Calendar} class="h-5 w-5 [&>path]:stroke-3" />
+                        <Icon src={CalendarIcon} class="h-5 w-5 [&>path]:stroke-3" />
                     {:else}
                         <Icon src={Clock} class="h-5 w-5 [&>path]:stroke-3" />
                     {/if}
@@ -93,3 +108,5 @@
 <dialog id="defer_modal" class="modal">
     <DeferModal {task} on:defer={handleDefer} />
 </dialog>
+
+<History entityId={task.id} content={task.content} {dateInfo} />

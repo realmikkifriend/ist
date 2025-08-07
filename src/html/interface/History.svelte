@@ -4,7 +4,9 @@
 
     export let entityId: string;
     export let content: string;
-    export let dateInfo: Record<string, { dots: { color: string }[]; tasks: Task[] }> = {};
+    export let dateInfo:
+        | Record<string, { dots: { color: string }[]; tasks: Task[] }>
+        | Promise<Record<string, { dots: { color: string }[]; tasks: Task[] }>> = {};
     export let title: string = "History";
 </script>
 
@@ -14,7 +16,13 @@
             <strong>{title}:</strong>
             {content}
         </div>
-        <Calendar {dateInfo} disable="future" />
+        {#await dateInfo}
+            <div class="flex h-full animate-pulse items-center justify-center blur-xs">
+                <Calendar disable="future" />
+            </div>
+        {:then resolvedDateInfo}
+            <Calendar dateInfo={resolvedDateInfo} disable="future" />
+        {/await}
     </div>
     <form method="dialog" class="modal-backdrop">
         <button>close</button>

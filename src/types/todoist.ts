@@ -5,6 +5,7 @@ import type {
     User as BaseUser,
     Comment as BaseComment,
 } from "@doist/todoist-api-typescript";
+import type { TaskActivity } from "./activity";
 
 export type Context = PersonalProject;
 
@@ -81,6 +82,7 @@ export type Task = Omit<
     skip?: boolean;
     firstDue?: boolean;
     comments?: Comment[] | Promise<Comment[]>;
+    activity?: TaskActivity[] | Promise<TaskActivity[]>;
 
     due: Due | null;
 };

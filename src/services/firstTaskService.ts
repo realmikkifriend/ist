@@ -1,11 +1,14 @@
 import { get } from "svelte/store";
+import { DateTime } from "luxon";
 import { todoistData, firstDueTask, previousFirstDueTask } from "../stores/stores";
 import { userSettings } from "../stores/interface";
 import { todoistAccessToken } from "../stores/secret";
 import { newFirstTask } from "../services/toastService";
 import { clearSelectedContext, updateDueTasks } from "../services/sidebarService";
 import { shouldShowNewTaskToast, loadCommentsForTask } from "../utils/firstTaskUtils";
+import { getActivity } from "../services/activityService";
 import type { Task, TodoistData } from "../types/todoist";
+import type { TaskActivity } from "../types/activity";
 
 const debounceState: { timeoutId: ReturnType<typeof setTimeout> | null } = { timeoutId: null };
 
@@ -81,14 +84,39 @@ export const updateFirstDueTask = (task: Task | null = null): void => {
  * @param {Task | null} prevTask - The previously set first due task.
  * @returns {Promise<boolean>} True if the function should exit early, false otherwise.
  */
+/**
+ * Loads activity for a given task.
+ * @param {Task} task - The task to load activity for.
+ * @returns {Task} The task with the activity loaded.
+ */
+const loadActivityForTask = (task: Task): Task => {
+    const activity = getActivity([DateTime.now().minus({ years: 1 }), DateTime.now()], task) as {
+        data: TaskActivity[];
+        promise: Promise<TaskActivity[]>;
+    };
+
+    const taskWithActivity = { ...task, activity: activity.data };
+
+    if (activity.promise != null) {
+        return {
+            ...taskWithActivity,
+            activity: activity.promise,
+        };
+    }
+
+    return taskWithActivity;
+};
+
 const handleInitialChecks = (
     task: Task | null,
     $todoistData: TodoistData,
     prevTask: Task | null,
 ): boolean => {
     if (task) {
-        const taskWithComments = loadCommentsForTask(task, get(todoistAccessToken));
-        setDueTaskStores(taskWithComments);
+        const taskWithData = loadActivityForTask(
+            loadCommentsForTask(task, get(todoistAccessToken)),
+        );
+        setDueTaskStores(taskWithData);
         return true;
     }
 
@@ -117,12 +145,14 @@ const processDueTaskUpdate = (
     if (!dueTasks.length) {
         return;
     }
-    const newTaskWithComments = loadCommentsForTask(dueTasks[0], get(todoistAccessToken));
+    const taskWithData = loadActivityForTask(
+        loadCommentsForTask(dueTasks[0], get(todoistAccessToken)),
+    );
 
-    if (shouldShowNewTaskToast(newTaskWithComments, prevTask, selectedContextId)) {
-        newFirstTask(() => setDueTaskStores(newTaskWithComments));
+    if (shouldShowNewTaskToast(taskWithData, prevTask, selectedContextId)) {
+        newFirstTask(() => setDueTaskStores(taskWithData));
     } else {
-        setDueTaskStores(newTaskWithComments);
+        setDueTaskStores(taskWithData);
     }
 };
 

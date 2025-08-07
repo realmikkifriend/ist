@@ -1,5 +1,6 @@
 import { DateTime } from "luxon";
 import type { Task } from "../types/todoist";
+import type { TaskActivity } from "../types/activity";
 /**
  * Generates the calendar grid for the current month.
  * @param {DateTime} displayMonthDate - The month to render as a calendar.
@@ -46,5 +47,28 @@ export function getInfoForDay(
             return acc;
         },
         { dots: [], tasks: [] },
+    );
+}
+
+/**
+ * Processes activity data for calendar display.
+ * @param {TaskActivity[]} activity - The activity data to process.
+ * @returns {Record<string, { dots: { color: string }[]; tasks: Task[] }>} The processed date information.
+ */
+export function processActivityForCalendar(
+    activity: TaskActivity[],
+): Record<string, { dots: { color: string }[]; tasks: Task[] }> {
+    return activity.reduce(
+        (acc, item) => {
+            const date = item.date.toISODate();
+            if (!date) return acc;
+
+            if (!acc[date]) {
+                acc[date] = { dots: [], tasks: [] };
+            }
+            acc[date].dots.push({ color: "w-8 h-1 bg-blue-500" });
+            return acc;
+        },
+        {} as Record<string, { dots: { color: string }[]; tasks: Task[] }>,
     );
 }
