@@ -45,6 +45,13 @@ body {
     margin-bottom: 0;
 }
 
+.prose code {
+    background-color: var(--color-primary);
+    border: none;
+    position: relative;
+    top: -0.09em;
+}
+
 /* AGENDA */
 
 #agenda h1,
