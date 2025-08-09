@@ -1,7 +1,8 @@
 <script lang="ts">
+    import { onMount } from "svelte";
     import { DateTime } from "luxon";
-    import { Icon, ChevronUp, ChevronDown } from "svelte-hero-icons";
     import { getCalendarGrid, getInfoForDay } from "../../utils/calendarUtils";
+    import CalendarHeader from "./CalendarHeader.svelte";
     import CalendarDay from "./CalendarDay.svelte";
     import type { CalendarProps } from "../../types/interface";
 
@@ -12,58 +13,31 @@
     let displayDate = $state(DateTime.now());
 
     const days = $derived(getCalendarGrid(displayDate));
-    const disablePrevMonth = $derived(
-        disable === "past" && displayDate.startOf("month") <= today.startOf("month"),
-    );
-    const disableNextMonth = $derived(
-        disable === "future" && displayDate.endOf("month") >= today.endOf("month"),
-    );
-
     const weekDays = ["M", "T", "W", "T", "F", "S", "S"];
 
     /**
-     * Navigates to the previous or next month.
-     * @param months - The number of months to move. Negative for past, positive for future.
+     * Changes the displayed month to the provided new month.
+     * @param newDate - The provided new month.
      */
-    function changeMonth(months: number) {
-        const newDate = displayDate.plus({ months });
-        if (
-            (disable === "past" && newDate < today.startOf("month")) ||
-            (disable === "future" && newDate > today.endOf("month"))
-        ) {
-            return;
-        }
+    function handleMonthChange(newDate: DateTime) {
         displayDate = newDate;
     }
+
+    onMount(() => {
+        const firstNonDisabledButton = document.querySelector(
+            ".grid-cols-7 button:not([disabled])",
+        ) as HTMLButtonElement;
+        if (firstNonDisabledButton) {
+            firstNonDisabledButton.focus();
+        }
+    });
 </script>
 
 <div class="w-full">
-    <div class="mx-3 my-5 flex items-center justify-between">
-        <div class="font-bold">{displayDate.monthLong} {displayDate.year}</div>
-        <div class="flex items-center">
-            <button
-                class="hover:text-primary disabled:hover:bg-base-100 flex h-7 w-7 items-center justify-center rounded-sm hover:bg-gray-200"
-                disabled={disablePrevMonth}
-                onclick={() => changeMonth(-1)}
-                type="button"
-            >
-                <Icon src={!disablePrevMonth ? ChevronUp : ""} />
-            </button>
-            <button
-                class="hover:text-primary disabled:hover:bg-base-100 flex h-7 w-7 items-center justify-center rounded-sm hover:bg-gray-200"
-                disabled={disableNextMonth}
-                onclick={() => changeMonth(1)}
-                type="button"
-            >
-                <Icon src={!disableNextMonth ? ChevronDown : ""} />
-            </button>
-        </div>
-    </div>
+    <CalendarHeader {disable} {displayDate} onchangeMonth={handleMonthChange} />
     <div class="grid grid-cols-7 gap-x-0.5 gap-y-1">
         {#each weekDays as day, i (i)}
-            <div class="text-secondary flex h-3 w-full items-center justify-center font-bold">
-                {day}
-            </div>
+            <div class="text-secondary flex h-3 w-full justify-center font-bold">{day}</div>
         {/each}
         {#each days as day, i (day ? day.toMillis() : `empty-${i}`)}
             {#if day}
