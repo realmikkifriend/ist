@@ -1,13 +1,12 @@
 <script lang="ts">
     import { DateTime } from "luxon";
-    import { Icon, CalendarDateRange } from "svelte-hero-icons";
-    import { Check, Calendar as CalendarIcon, Clock, Forward } from "svelte-hero-icons";
-    import { shortcut } from "@svelte-put/shortcut";
+    import { Icon, Forward } from "svelte-hero-icons";
     import { skipTask } from "../../services/firstTaskService";
     import { getPriorityBorder } from "../../utils/styleUtils";
     import Comments from "./Comments.svelte";
     import DeferModal from "../defer/DeferModal.svelte";
     import History from "../interface/History.svelte";
+    import TaskActions from "./TaskActions.svelte";
     import type { Task, Priority } from "../../types/todoist";
     import type { TaskDisplayProps } from "../../types/defer";
 
@@ -40,14 +39,6 @@
         class={`card bg-neutral text-primary-content mt-0 rounded-xl border-b-[0.75rem] ${priorityBorderClass}`}
     >
         <div class="card-body pb-7">
-            <button
-                class="text-md hover:bg-accent btn btn-ghost btn-sm absolute top-0 left-0 h-8 min-h-8 content-center border-0 p-4"
-                onclick={() => openModal(`calendar_modal_${task.id}`)}
-                title="view task completion history"
-                type="button"
-            >
-                <Icon class="stroke-secondary h-5 w-5 [&>path]:stroke-2" src={CalendarDateRange} />
-            </button>
             {#if task.skip}
                 <button
                     class="text-md hover:bg-accent btn btn-ghost btn-sm absolute top-0 right-0 h-8 min-h-8 content-center border-0 p-4"
@@ -59,29 +50,7 @@
                 </button>
             {/if}
             <h2 class="card-title text-center text-3xl">{task.content}</h2>
-            <div class="card-actions justify-center">
-                <button
-                    class="text-md btn btn-primary focus:btn-soft relative h-8 min-h-8 content-center p-4 focus:cursor-progress"
-                    onclick={() => onDone(task)}
-                    title={task.due?.string ? `repeats ${task.due.string}` : "one-time task"}
-                    type="button"
-                >
-                    <Icon class="h-5 w-5 [&>path]:stroke-3" src={Check} />
-                    <kbd>CTRL+Enter</kbd>
-                </button>
-                <button
-                    class="text-md btn btn-secondary relative h-8 min-h-8 content-center p-4"
-                    onclick={() => openModal("defer_modal")}
-                    type="button"
-                >
-                    {#if task.due?.allDay === 1}
-                        <Icon class="h-5 w-5 [&>path]:stroke-3" src={CalendarIcon} />
-                    {:else}
-                        <Icon class="h-5 w-5 [&>path]:stroke-3" src={Clock} />
-                    {/if}
-                    <kbd>d</kbd>
-                </button>
-            </div>
+            <TaskActions {onDone} {openModal} {task} />
         </div>
     </div>
     {#if task.comments}
@@ -94,20 +63,3 @@
 </dialog>
 
 <History activity={task.activity} content={task.content} entityId={task.id} />
-
-<svelte:window
-    use:shortcut={{
-        trigger: {
-            key: "d",
-            callback: () => openModal("defer_modal"),
-            modifier: false,
-        },
-    }}
-    use:shortcut={{
-        trigger: {
-            key: "Enter",
-            callback: () => onDone(task),
-            modifier: "ctrl",
-        },
-    }}
-/>
