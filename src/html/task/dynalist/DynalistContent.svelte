@@ -1,5 +1,4 @@
 <script lang="ts">
-    import { createEventDispatcher } from "svelte";
     import SvelteMarkdown from "@humanspeak/svelte-markdown";
     import DynalistChecklist from "./DynalistChecklist.svelte";
     import DynalistCount from "./DynalistCount.svelte";
@@ -10,18 +9,19 @@
     import { generateDynalistComment } from "../../../utils/dynalistUtils";
     import type { DynalistTaskType, DynalistViewProps } from "../../../types/dynalist";
 
-    let { dynalistObject, selectedType, url }: DynalistViewProps = $props();
-
-    const dispatch = createEventDispatcher<{
-        selectType: { type: DynalistTaskType };
-    }>();
+    let {
+        dynalistObject,
+        selectedType,
+        url,
+        onTypeChange,
+    }: DynalistViewProps & { onTypeChange: (type: DynalistTaskType) => void } = $props();
 
     /**
      * Handles selection of a Dynalist type from the menu.
      * @param event - The event containing the selected type.
      */
     const handleTypeSelection = (event: CustomEvent<{ type: DynalistTaskType }>) => {
-        dispatch("selectType", event.detail);
+        onTypeChange(event.detail.type);
     };
 </script>
 

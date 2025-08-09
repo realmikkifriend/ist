@@ -60,11 +60,11 @@
 
     /**
      * Handles selection of a Dynalist type from the menu.
-     * @param event - The event containing the selected type.
+     * @param type - The selected Dynalist type.
      * @returns nothing, but updates Dynalist store setting
      */
-    const handleTypeSelection = (event: CustomEvent<{ type: DynalistTaskType }>) =>
-        (dynalistStore = { ...dynalistStore, selectedType: event.detail.type });
+    const handleTypeChange = (type: DynalistTaskType) =>
+        (dynalistStore = { ...dynalistStore, selectedType: type });
 
     $effect(() => {
         if (
@@ -91,9 +91,9 @@
     {#if result.dynalistObject}
         <DynalistContentComponent
             dynalistObject={result.dynalistObject}
+            onTypeChange={handleTypeChange}
             selectedType={dynalistStore.selectedType}
             {url}
-            on:selectType={handleTypeSelection}
         />
     {:else}
         <span class="flex items-center text-red-600"> Error loading Dynalist document. </span>
