@@ -1,5 +1,4 @@
 <script lang="ts">
-    import { shortcut } from "@svelte-put/shortcut";
     import { todoistAccessToken } from "../stores/secret";
     import "@fontsource/clear-sans/400.css";
     import "@fontsource/clear-sans/700.css";
@@ -27,15 +26,3 @@
 {:else}
     <App />
 {/if}
-
-<svelte:window
-    use:shortcut={{
-        trigger: {
-            key: "?",
-            callback: () => {
-                document.body.classList.toggle("show-kbd");
-            },
-            modifier: "shift",
-        },
-    }}
-/>

@@ -2,10 +2,12 @@
     import { onMount } from "svelte";
     import { on } from "svelte/events";
     import { Icon, ArrowPath } from "svelte-hero-icons";
+    import { shortcut } from "@svelte-put/shortcut";
     import { todoistData, firstDueTask } from "../stores/stores";
     import { userSettings } from "../stores/interface";
     import { updateFirstDueTask } from "../services/firstTaskService";
     import { refreshData } from "../services/updateService";
+    import { toggleAgendaHash } from "../services/agendaService";
     import AppView from "./AppView.svelte";
     import Sidebar from "./sidebar/Sidebar.svelte";
     import ContextBadge from "./sidebar/ContextBadge.svelte";
@@ -89,3 +91,22 @@
 </div>
 
 <Toasts />
+
+<svelte:window
+    use:shortcut={{
+        trigger: {
+            key: "?",
+            callback: () => {
+                document.body.classList.toggle("show-kbd");
+            },
+            modifier: "shift",
+        },
+    }}
+    use:shortcut={{
+        trigger: {
+            key: "a",
+            callback: toggleAgendaHash,
+            modifier: false,
+        },
+    }}
+/>

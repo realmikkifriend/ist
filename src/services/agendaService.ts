@@ -57,6 +57,20 @@ export function openAgenda(agendaType: string = "today"): void {
 }
 
 /**
+ * Cycles through agenda views.
+ */
+export const toggleAgendaHash = (): void => {
+    const currentHash = window.location.hash;
+    if (currentHash === "#today") {
+        window.location.hash = "#tomorrow";
+    } else if (currentHash === "#tomorrow") {
+        window.location.hash = "";
+    } else {
+        window.location.hash = "#today";
+    }
+};
+
+/**
  * Determines which hours should be displayed in the agenda.
  * @param {AgendaData} agendaData - Information on tasks for calculations.
  * @param {DateTime} now - Current date-time object.
