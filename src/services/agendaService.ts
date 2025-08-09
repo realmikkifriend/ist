@@ -1,6 +1,7 @@
 import { get } from "svelte/store";
 import { DateTime } from "luxon";
 import { todoistData, firstDueTask } from "../stores/stores";
+import { closeSidebar } from "./sidebarService";
 import { getGradientColor } from "../utils/styleUtils";
 import { getTasksForDate, sortAgendaTasks } from "../utils/agendaUtils";
 import { filterAndSortTasks } from "../utils/filterUtils";
@@ -50,16 +51,15 @@ export function markTasks(tasks: Task[]): (Task & { firstDue?: boolean; closeTim
 export function openAgenda(agendaType: string = "today"): void {
     window.location.hash = agendaType;
 
-    const drawerCheckbox = document.getElementById("my-drawer") as HTMLInputElement | null;
-    if (drawerCheckbox) {
-        drawerCheckbox.checked = false;
-    }
+    closeSidebar();
 }
 
 /**
  * Cycles through agenda views.
  */
 export const toggleAgendaHash = (): void => {
+    closeSidebar();
+
     const currentHash = window.location.hash;
     if (currentHash === "#today") {
         window.location.hash = "#tomorrow";

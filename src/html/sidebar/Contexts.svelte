@@ -3,6 +3,7 @@
     import { todoistData, previousFirstDueTask } from "../../stores/stores";
     import { userSettings } from "../../stores/interface";
     import { openAgenda } from "../../services/agendaService";
+    import { closeSidebar } from "../../services/sidebarService";
     import { getTasksGroupedByContext } from "../../utils/filterUtils";
     import ContextButtonContents from "./ContextButtonContents.svelte";
 
@@ -10,16 +11,6 @@
      * A derived store grouping due tasks by context.
      */
     const dueTasksByContext = $derived(getTasksGroupedByContext($todoistData.dueTasks));
-
-    /**
-     * Closes the sidebar drawer by unchecking the drawer checkbox.
-     */
-    function closeDrawer(): void {
-        const drawerCheckbox = document.getElementById("my-drawer") as HTMLInputElement | null;
-        if (drawerCheckbox) {
-            drawerCheckbox.checked = false;
-        }
-    }
 
     /**
      * Handles clicking on a context button.
@@ -42,14 +33,14 @@
         }));
 
         if (newSelectedContext !== null) {
-            closeDrawer();
+            closeSidebar();
         }
     }
 </script>
 
 <div class="mb-2 ml-2 flex items-center justify-between">
     <div class="buttons">
-        <button onclick={() => openAgenda("today")} type="button">
+        <button class="relative" onclick={() => openAgenda("today")} type="button">
             <Icon class="h-7 w-8" src={Calendar} />
         </button>
     </div>
