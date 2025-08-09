@@ -1,16 +1,25 @@
 import { get } from "svelte/store";
-import { DateTime } from "luxon";
 import { todoistData, firstDueTask, previousFirstDueTask } from "../stores/stores";
 import { userSettings } from "../stores/interface";
 import { todoistAccessToken } from "../stores/secret";
+import { handleInitialChecks, loadActivityForTask } from "./taskEnrichmentService";
 import { newFirstTask } from "../services/toastService";
 import { clearSelectedContext, updateDueTasks } from "../services/sidebarService";
 import { shouldShowNewTaskToast, loadCommentsForTask } from "../utils/firstTaskUtils";
-import { getActivity } from "../services/activityService";
-import type { Task, TodoistData, InitialCheckOutcome } from "../types/todoist";
-import type { TaskActivity } from "../types/activity";
+import type { Task, TodoistData } from "../types/todoist";
 
-const debounceState: { timeoutId: ReturnType<typeof setTimeout> | null } = { timeoutId: null };
+const debounceState: {
+    timeoutId: ReturnType<typeof setTimeout> | null;
+    clearDebounceTimeout: () => void;
+} = {
+    timeoutId: null,
+    clearDebounceTimeout: (): void => {
+        if (debounceState.timeoutId) {
+            clearTimeout(debounceState.timeoutId);
+            debounceState.timeoutId = null;
+        }
+    },
+};
 
 /**
  * Sets the firstDueTask and previousFirstDueTask stores.
@@ -18,14 +27,15 @@ const debounceState: { timeoutId: ReturnType<typeof setTimeout> | null } = { tim
  * @returns {void}
  */
 const setDueTaskStores = (task: Task | null | Promise<Task>): void => {
+    const setTask = (t: Task | null) => {
+        firstDueTask.set(t);
+        previousFirstDueTask.set(t);
+    };
+
     if (task instanceof Promise) {
-        void task.then((resolvedTask) => {
-            firstDueTask.set(resolvedTask);
-            previousFirstDueTask.set(resolvedTask);
-        });
+        void task.then(setTask);
     } else {
-        firstDueTask.set(task);
-        previousFirstDueTask.set(task);
+        setTask(task);
     }
 };
 
@@ -61,15 +71,18 @@ export const updateFirstDueTask = (task: Task | null = null): void => {
 
     const initialCheckResult = handleInitialChecks(task, $todoistData, prevTask);
 
-    switch (initialCheckResult.action) {
-        case "set_task_and_exit":
-            setDueTaskStores(initialCheckResult.taskToSet!);
+    if (initialCheckResult.action === "exit") {
+        return;
+    }
+
+    if (
+        initialCheckResult.action === "set_task_and_exit" ||
+        initialCheckResult.action === "set_task_and_continue"
+    ) {
+        setDueTaskStores(initialCheckResult.taskToSet!);
+        if (initialCheckResult.action === "set_task_and_exit") {
             return;
-        case "exit":
-            return;
-        case "set_task_and_continue":
-            setDueTaskStores(initialCheckResult.taskToSet!);
-            break;
+        }
     }
 
     if (debounceState.timeoutId) {
@@ -84,52 +97,6 @@ export const updateFirstDueTask = (task: Task | null = null): void => {
     debounceState.timeoutId = setTimeout(() => {
         debounceState.timeoutId = null;
     }, 2000);
-};
-
-/**
- * Loads activity for a given task.
- * @param {Task} task - The task to load activity for.
- * @returns {Task} The task with the activity loaded.
- */
-const loadActivityForTask = (task: Task): Task => {
-    const activity = getActivity([DateTime.now().minus({ years: 1 }), DateTime.now()], task) as {
-        data: TaskActivity[];
-        promise: Promise<TaskActivity[]>;
-    };
-
-    return {
-        ...task,
-        activity: activity.promise ?? activity.data,
-    };
-};
-
-/**
- * Handles initial checks and early exits for updateFirstDueTask.
- * @param {Task | null} task - Optional task to set as the first due task.
- * @param {TodoistData} $todoistData - The current Todoist data.
- * @param {Task | null} prevTask - The previously set first due task.
- * @returns {InitialCheckOutcome} An object indicating the outcome of the checks.
- */
-const handleInitialChecks = (
-    task: Task | null,
-    $todoistData: TodoistData,
-    prevTask: Task | null,
-): InitialCheckOutcome => {
-    if (task) {
-        const taskWithData = loadActivityForTask(
-            loadCommentsForTask(task, get(todoistAccessToken)),
-        );
-        return { action: "set_task_and_continue", taskToSet: taskWithData };
-    }
-
-    if (prevTask?.summoned && !task) {
-        return { action: "exit" };
-    }
-
-    if (!$todoistData?.dueTasks?.length) {
-        return { action: "set_task_and_exit", taskToSet: null };
-    }
-    return { action: "continue" };
 };
 
 /**
@@ -196,9 +163,12 @@ export function clearSelectedTask(): void {
         window.location.hash = $firstDueTask.summoned as string;
 
         firstDueTask.set(null);
-
+        previousFirstDueTask.set(null);
+        debounceState.clearDebounceTimeout();
         void updateFirstDueTask();
     } else if (selectedContext) {
         clearSelectedContext();
+        debounceState.clearDebounceTimeout();
+        void updateFirstDueTask();
     }
 }

@@ -148,3 +148,11 @@ export interface InitialCheckOutcome {
     action: "continue" | "exit" | "set_task_and_exit" | "set_task_and_continue";
     taskToSet?: Task | null;
 }
+
+export type GetAllActivityDataParams = {
+    timeframe: DateTime[];
+    accumulatedData?: TaskActivity[];
+    cursor?: string | null;
+    task: Task | null;
+    emptyResponsesCount?: number;
+};

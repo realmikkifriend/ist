@@ -1,5 +1,4 @@
 import type { DateTime } from "luxon";
-import type { Task } from "../types/todoist";
 
 export interface TaskActivity {
     date: DateTime;
@@ -23,14 +22,6 @@ export interface DailyGoalTooltipProps {
     sortedByTime: TaskActivity[];
     isLoading: boolean;
 }
-
-export type GetAllActivityDataParams = {
-    timeframe: DateTime[];
-    accumulatedData?: TaskActivity[];
-    cursor?: string | null;
-    task: Task | null;
-    emptyResponsesCount?: number;
-};
 
 export type ProcessActivityAccumulationParams = {
     processedActivityData: TaskActivity[];
