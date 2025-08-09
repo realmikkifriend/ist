@@ -94,3 +94,8 @@ kbd {
 body.show-kbd kbd {
     display: inline-block;
 }
+
+:hover > kbd {
+    display: inline-block;
+    opacity: 0.5;
+}
