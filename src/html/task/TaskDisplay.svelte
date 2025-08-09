@@ -1,5 +1,4 @@
 <script lang="ts">
-    import { createEventDispatcher } from "svelte";
     import { DateTime } from "luxon";
     import { Icon, CalendarDateRange } from "svelte-hero-icons";
     import { Check, Calendar as CalendarIcon, Clock, Forward } from "svelte-hero-icons";
@@ -9,31 +8,28 @@
     import DeferModal from "../defer/DeferModal.svelte";
     import History from "../interface/History.svelte";
     import type { Task, Priority } from "../../types/todoist";
+    import type { TaskDisplayProps } from "../../types/defer";
 
-    export let task: Task;
+    let { task, onDone, onDefer }: TaskDisplayProps = $props();
 
     const priorityBorderClass = getPriorityBorder(task.priority as Priority);
 
-    const dispatch = createEventDispatcher<{
-        done: { task: Task };
-        defer: { task: Task; time: string };
-    }>();
-
     /**
-     * Handles marking the task as done and dispatches a "done" event.
+     * Handles marking the task as done.
      */
     const handleDone = (): void => {
-        dispatch("done", { task });
+        onDone(task);
     };
 
     /**
-     * Handles deferring the task, closes the modal, and dispatches a "defer" event.
-     * @param event - The event containing the deferred task and time (as DateTime).
+     * Handles deferring the task, closes the modal, and calls the onDefer prop.
+     * @param detail - The deferred task and time (as DateTime).
+     * @param detail.task - The deferred task.
+     * @param detail.time - The time (as DateTime).
      */
-    const handleDefer = (event: CustomEvent<{ task: Task; time: DateTime }>): void => {
+    const handleDefer = (detail: { task: Task; time: DateTime }): void => {
         (document.getElementById("defer_modal") as HTMLDialogElement | null)?.close();
-        // Convert DateTime to ISO string before dispatching
-        dispatch("defer", { task: event.detail.task, time: event.detail.time.toISO() ?? "" });
+        onDefer({ task: detail.task, time: detail.time.toISO() ?? "" });
     };
 
     /**
@@ -60,7 +56,7 @@
             <button
                 class="text-md hover:bg-accent btn btn-ghost btn-sm absolute top-0 left-0 h-8 min-h-8 content-center border-0 p-4"
                 title="view task completion history"
-                on:click={() => openModal(`calendar_modal_${task.id}`)}
+                onclick={() => openModal(`calendar_modal_${task.id}`)}
             >
                 <Icon src={CalendarDateRange} class="stroke-secondary h-5 w-5 [&>path]:stroke-2" />
             </button>
@@ -68,7 +64,7 @@
                 <button
                     class="text-md hover:bg-accent btn btn-ghost btn-sm absolute top-0 right-0 h-8 min-h-8 content-center border-0 p-4"
                     title="skip task"
-                    on:click={handleSkip}
+                    onclick={handleSkip}
                 >
                     <Icon src={Forward} class="h-5 w-5 stroke-yellow-500 [&>path]:stroke-3" />
                 </button>
@@ -78,13 +74,13 @@
                 <button
                     class="text-md btn btn-primary focus:btn-soft h-8 min-h-8 content-center p-4 focus:cursor-progress"
                     title={task.due?.string ? `repeats ${task.due.string}` : "one-time task"}
-                    on:click={handleDone}
+                    onclick={handleDone}
                 >
                     <Icon src={Check} class="h-5 w-5 [&>path]:stroke-3" />
                 </button>
                 <button
                     class="text-md btn btn-secondary h-8 min-h-8 content-center p-4"
-                    on:click={() => openModal("defer_modal")}
+                    onclick={() => openModal("defer_modal")}
                 >
                     {#if task.due?.allDay === 1}
                         <Icon src={CalendarIcon} class="h-5 w-5 [&>path]:stroke-3" />
@@ -101,7 +97,7 @@
 </div>
 
 <dialog id="defer_modal" class="modal">
-    <DeferModal {task} on:defer={handleDefer} />
+    <DeferModal {task} onDeferFinal={handleDefer} />
 </dialog>
 
 <History entityId={task.id} content={task.content} activity={task.activity} />

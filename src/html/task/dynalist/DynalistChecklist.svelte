@@ -1,28 +1,32 @@
 <script lang="ts">
-    import Markdown from "svelte-exmarkdown";
+    import SvelteMarkdown from "@humanspeak/svelte-markdown";
     import { Icon, Backward } from "svelte-hero-icons";
     import { writable } from "svelte/store";
     import { parseList, hasError } from "../../../utils/dynalistUtils";
 
-    export let content: string | undefined;
+    let { content }: { content: string } = $props();
 
     const currentIndex = writable(0);
 
-    $: checklistItems = (() => {
-        if (!content || hasError(content)) {
-            return [];
-        }
-        const result = parseList(typeof content === "string" ? content : "");
-        return result instanceof Error ? [] : result;
-    })();
+    let checklistItems = $derived(
+        (() => {
+            if (!content || hasError(content)) {
+                return [];
+            }
+            const result = parseList(typeof content === "string" ? content : "");
+            return result instanceof Error ? [] : result;
+        })(),
+    );
 
-    $: errorMessage = !content
-        ? "No checklist content provided."
-        : hasError(content)
-          ? content.error?.message || "Failed to load Dynalist checklist."
-          : checklistItems.length === 0
-            ? "No checklist items found."
-            : null;
+    let errorMessage = $derived(
+        !content
+            ? "No checklist content provided."
+            : hasError(content)
+              ? content.error?.message || "Failed to load Dynalist checklist."
+              : checklistItems.length === 0
+                ? "No checklist items found."
+                : null,
+    );
 
     /**
      * Handles the click event to show the next checklist item.
@@ -53,9 +57,10 @@
         </em>
         <button
             class="border-primary-content float-left mt-1 mr-2 inline-block h-5 w-5 cursor-pointer border-2 transition-colors"
-            on:click={showNextItem}
-        />
-        <Markdown md={checklistItems[$currentIndex] ?? ""} />
+            onclick={showNextItem}
+            aria-label="Next item"
+        ></button>
+        <SvelteMarkdown source={checklistItems[$currentIndex] ?? ""} />
     </div>
 {:else}
     <span class="italic">End of list!</span>
@@ -67,7 +72,8 @@
             class="btn text-primary-content hover:bg-primary m-0 h-2 min-h-8 gap-0 border-transparent p-1 pt-1 pb-2.5 shadow-none hover:text-white"
             class:bg-accent={$currentIndex < checklistItems.length - 1}
             class:bg-primary={$currentIndex === checklistItems.length - 1}
-            on:click={() => currentIndex.set(0)}
+            onclick={() => currentIndex.set(0)}
+            aria-label="Reset checklist"
         >
             <Icon src={Backward} class="h-5 w-5" />
         </button>

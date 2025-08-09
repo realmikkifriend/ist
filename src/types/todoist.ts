@@ -9,8 +9,6 @@ import type { TaskActivity } from "./activity";
 
 export type Context = PersonalProject;
 
-export type Comment = BaseComment;
-
 export interface TodoistData {
     tasks: Task[];
     contexts: Context[];
@@ -113,6 +111,11 @@ export interface TasksGroupedByContext {
     };
 }
 
+export interface ContextButtonProps {
+    context: Context;
+    tasksForContext: TasksGroupedByContext[string];
+}
+
 export interface DueTasksData {
     tasks: Task[];
     contexts: Context[];
@@ -120,3 +123,13 @@ export interface DueTasksData {
 }
 
 export type TaskUpdates = Array<[string, Date | DateTime | string]>;
+
+export type Comment = BaseComment;
+
+export interface CommentsProps {
+    commentsPromise: Promise<Comment[]>;
+}
+
+export interface ListTaskProps {
+    task: Task;
+}

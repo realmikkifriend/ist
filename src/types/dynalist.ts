@@ -79,3 +79,9 @@ export interface DetermineLabelAndClassesParams {
     current: number;
     goalCount: number;
 }
+
+export interface DynalistViewProps {
+    dynalistObject?: DynalistContent;
+    selectedType?: DynalistTaskType | "";
+    url?: string;
+}

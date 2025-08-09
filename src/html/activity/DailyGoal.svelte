@@ -13,37 +13,39 @@
     });
     const isLoading = writable<boolean>(true);
 
-    const debounceState: { timeoutId: ReturnType<typeof setTimeout> | null } = { timeoutId: null };
+    let debounceTimeoutId: ReturnType<typeof setTimeout> | null = null;
 
-    $: dailyGoal = $todoistData.user.daily_goal;
+    let dailyGoal = $derived($todoistData.user.daily_goal);
 
-    $: if ($todoistData.tasks) {
-        if (debounceState.timeoutId) {
-            clearTimeout(debounceState.timeoutId);
-        }
-
-        debounceState.timeoutId = setTimeout(() => {
-            const activity = fetchDailyActivity();
-            sortedLists.set(
-                activity.preliminary as { byContext: TaskActivity[]; byTime: TaskActivity[] },
-            );
-
-            if (activity.promise) {
-                isLoading.set(true);
-                void (
-                    activity.promise as Promise<{
-                        byContext: TaskActivity[];
-                        byTime: TaskActivity[];
-                    }>
-                ).then((promisedActivity) => {
-                    sortedLists.set(promisedActivity);
-                    isLoading.set(false);
-                });
-            } else {
-                isLoading.set(false);
+    $effect(() => {
+        if ($todoistData.tasks) {
+            if (debounceTimeoutId) {
+                clearTimeout(debounceTimeoutId);
             }
-        }, 2000);
-    }
+
+            debounceTimeoutId = setTimeout(() => {
+                const activity = fetchDailyActivity();
+                sortedLists.set(
+                    activity.preliminary as { byContext: TaskActivity[]; byTime: TaskActivity[] },
+                );
+
+                if (activity.promise) {
+                    isLoading.set(true);
+                    void (
+                        activity.promise as Promise<{
+                            byContext: TaskActivity[];
+                            byTime: TaskActivity[];
+                        }>
+                    ).then((promisedActivity) => {
+                        sortedLists.set(promisedActivity);
+                        isLoading.set(false);
+                    });
+                } else {
+                    isLoading.set(false);
+                }
+            }, 2000);
+        }
+    });
 </script>
 
 <div class="tooltip min-w-32" class:cursor-progress={$isLoading}>

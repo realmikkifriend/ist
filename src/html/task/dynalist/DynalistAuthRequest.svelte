@@ -71,7 +71,7 @@
             <p class="invalid-token text-red-500" style="display:none;">Invalid token</p>
         </div>
     </div>
-    <form class="flex gap-2" on:submit={handleToken}>
+    <form class="flex gap-2" onsubmit={handleToken}>
         <input type="text" name="token" placeholder="Enter your token" class="input min-w-4 grow" />
         <span class="submit-content" style="display:flex;">
             <button

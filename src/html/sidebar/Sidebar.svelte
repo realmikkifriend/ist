@@ -5,8 +5,9 @@
     import Footer from "../interface/Footer.svelte";
     import { todoistData } from "../../stores/stores";
     import { handleLogout } from "../../services/updateService";
+    import type { HashProp } from "../../types/interface";
 
-    export let hash: string;
+    let { hash }: HashProp = $props();
 </script>
 
 <div class="drawer">
@@ -33,7 +34,7 @@
                     <DailyGoal />
                 </div>
                 <Footer />
-                <button class="btn btn-secondary w-full" on:click={handleLogout}
+                <button class="btn btn-secondary w-full" onclick={handleLogout}
                     ><Icon src={ArrowLeftOnRectangle} class="h-6 w-6" />Log Out</button
                 >
             </div>

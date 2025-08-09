@@ -1,5 +1,4 @@
 <script lang="ts">
-    import { createEventDispatcher } from "svelte";
     import { writable, derived } from "svelte/store";
     import { Icon, Calendar, Clock } from "svelte-hero-icons";
     import { DateTime } from "luxon";
@@ -9,12 +8,15 @@
     import TimePicker from "./TimePicker.svelte";
     import type { Writable, Readable } from "svelte/store";
     import type { Task } from "../../types/todoist";
-    import type { DeferEvent } from "../../types/defer";
+    import type { DeferEventDetail, DeferModalProps } from "../../types/defer";
 
-    export let task: Task;
+    let { task, onDeferFinal }: DeferModalProps = $props();
 
     const isTimeTabActive: Writable<boolean> = writable(false);
-    $: isTimeTabActive.set(Boolean(task.due && task.due.allDay !== 1));
+
+    $effect(() => {
+        isTimeTabActive.set(Boolean(task.due && task.due.allDay !== 1));
+    });
 
     /**
      * Selects the active tab ("time" or "calendar").
@@ -23,29 +25,18 @@
     function selectTab(tab: "time" | "calendar"): void {
         isTimeTabActive.set(tab === "time");
     }
-    /**
-     * Helper to safely select tab from string (for template use).
-     * @param tab - Defer modal tab to be selected.
-     */
-    function selectTabSafe(tab: string): void {
-        selectTab(tab as "time" | "calendar");
-    }
 
     const tz: string = Intl.DateTimeFormat().resolvedOptions().timeZone || "America/Chicago";
 
     const tasks: Readable<Task[]> = derived(todoistData, ($todoistData) => $todoistData.tasks);
 
-    const dispatch = createEventDispatcher<{
-        defer: { task: Task; time: DateTime };
-    }>();
-
     /**
      * Handles the defer event from the child component.
      * Calculates the new time and dispatches the "defer" event.
-     * @param event - The event containing the raw time to defer to.
+     * @param detail - The detail containing the raw time to defer to.
      */
-    function handleDefer(event: DeferEvent): void {
-        const { rawTime } = event.detail;
+    function handleDefer(detail: DeferEventDetail): void {
+        const { rawTime } = detail;
         isTimeTabActive.set(true);
 
         const time: DateTime =
@@ -66,7 +57,7 @@
                       }
                   })();
 
-        dispatch("defer", { task, time });
+        onDeferFinal({ task, time });
     }
 </script>
 
@@ -83,7 +74,7 @@
                                 ? "tab-active"
                                 : "bg-neutral"
                         }`}
-                        on:click={() => selectTabSafe(tab)}
+                        onclick={() => selectTab(tab as "time" | "calendar")}
                     >
                         <Icon
                             src={tab === "time" ? Clock : Calendar}
@@ -96,9 +87,9 @@
 
         {#key $tasks}
             {#if $isTimeTabActive}
-                <TimePicker {task} tasks={$tasks} on:defer={handleDefer} />
+                <TimePicker {task} tasks={$tasks} onDefer={handleDefer} />
             {:else}
-                <DatePicker taskToDefer={task} {tz} tasks={$tasks} on:defer={handleDefer} />
+                <DatePicker taskToDefer={task} {tz} tasks={$tasks} onDefer={handleDefer} />
             {/if}
         {/key}
     {/key}

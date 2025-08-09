@@ -1,7 +1,7 @@
 <script lang="ts">
-    export let type,
-        size = 8,
-        style = "";
+    import type { LogoProps } from "../../types/interface";
+
+    let { type, size = 8, style = "" }: LogoProps = $props();
 </script>
 
 {#if type === "dynalist"}

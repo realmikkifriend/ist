@@ -1,12 +1,12 @@
 <script lang="ts">
     import { Icon, ArrowPath } from "svelte-hero-icons";
-    import Markdown from "svelte-exmarkdown";
+    import SvelteMarkdown from "@humanspeak/svelte-markdown";
     import DynalistComment from "./dynalist/DynalistComment.svelte";
     import DynalistAuthRequest from "./dynalist/DynalistAuthRequest.svelte";
     import { dynalistAccessToken } from "../../stores/secret";
-    import type { Comment } from "../../types/todoist";
+    import type { Comment, CommentsProps } from "../../types/todoist";
 
-    export let commentsPromise: Promise<Comment[]>;
+    let { commentsPromise }: CommentsProps = $props();
 
     /**
      * Checks provided comments for Dynalist URL.
@@ -43,7 +43,7 @@
                             Dynalist URL detected but no access code stored.
                         {/if}
                     {:else}
-                        <Markdown md={comment.content} />
+                        <SvelteMarkdown source={comment.content} />
                     {/if}
                 {/each}
             </div>

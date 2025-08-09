@@ -7,7 +7,6 @@ const config = {
 
     compilerOptions: {
         // Enable TypeScript support
-        enableSourcemap: true,
     },
 
     kit: {

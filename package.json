@@ -29,23 +29,19 @@
     },
     "dependenciesComments": {
         "webpack": "locked at 5.99.8 for compatibility with Console Ninja. Re-evaluate 2025-10-01",
-        "typescript": "locked at 5.8.2 as webpack dependency",
-        "svelte": "locked at 4.x since 5.x introduces major changes.",
-        "svelty-picker": "locked at 5.x since 6.x requires svelte 5.x",
-        "svelty-exmarkdown": "locked at 3.x since 4.x requires svelte 5.x",
-        "@sveltejs/vite-plugin-svelte": "locked at 3.x since 4.x requires svelte 5.x"
+        "typescript": "locked at 5.8.2 as webpack dependency"
     },
     "dependencies": {
-        "@doist/todoist-api-typescript": "^5.1.0",
+        "@doist/todoist-api-typescript": "^5.1.1",
         "@fontsource/clear-sans": "^5.2.5",
+        "@humanspeak/svelte-markdown": "^0.8.9",
         "@tailwindcss/postcss": "^4.1.11",
         "@tailwindcss/typography": "^0.5.16",
         "@tailwindcss/vite": "^4.1.11",
         "@vitest/eslint-plugin": "^1.3.4",
         "chrono-node": "^2.8.3",
         "luxon": "^3.7.1",
-        "svelte": "^4.2.20",
-        "svelte-exmarkdown": "^3.0.5",
+        "svelte": "^5.0.0",
         "svelte-hero-icons": "^5.2.0",
         "svelte-loader": "^3.2.4",
         "svelte-persisted-store": "^0.12.0",
@@ -53,7 +49,7 @@
     },
     "devDependencies": {
         "@eslint/js": "^9.32.0",
-        "@sveltejs/vite-plugin-svelte": "^3.1.2",
+        "@sveltejs/vite-plugin-svelte": "^4.0.0",
         "@testing-library/jest-dom": "^6.6.4",
         "@testing-library/svelte": "^5.2.8",
         "@types/luxon": "^3.7.1",

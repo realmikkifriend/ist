@@ -10,10 +10,10 @@
     <span>No due tasks...</span>
 
     <div class="mt-3 flex flex-row space-x-4">
-        <button class={buttonClasses} on:click={() => openAgenda("today")}>
+        <button class={buttonClasses} onclick={() => openAgenda("today")}>
             <Icon src={Calendar} class="h-4 w-5" /> <span>Today</span>
         </button>
-        <button class={buttonClasses} on:click={() => openAgenda("tomorrow")}>
+        <button class={buttonClasses} onclick={() => openAgenda("tomorrow")}>
             <Icon src={Calendar} class="h-4 w-5" /> <span>Tomorrow</span>
         </button>
     </div>

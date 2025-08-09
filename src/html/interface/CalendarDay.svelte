@@ -1,12 +1,9 @@
 <script lang="ts">
     import { DateTime } from "luxon";
     import ListTask from "../task/ListTask.svelte";
-    import type { Task } from "../../types/todoist";
+    import type { CalendarDayProps } from "../../types/defer";
 
-    export let day: DateTime;
-    export let dots: { color: string }[];
-    export let tooltip: Task[] | undefined = undefined;
-    export let disable: "past" | "future" | null = null;
+    let { day, dots, tooltip = undefined, disable = null }: CalendarDayProps = $props();
 
     const today = DateTime.now().startOf("day");
     const tomorrow = today.plus({ days: 1 });

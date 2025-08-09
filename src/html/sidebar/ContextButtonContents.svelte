@@ -1,10 +1,9 @@
 <script lang="ts">
     import { getPriorityClasses } from "../../utils/styleUtils";
     import ListTask from "../task/ListTask.svelte";
-    import type { Priority, Context, TasksGroupedByContext } from "../../types/todoist";
+    import type { Priority, ContextButtonProps } from "../../types/todoist";
 
-    export let context: Context;
-    export let tasksForContext: TasksGroupedByContext[string];
+    let { context, tasksForContext }: ContextButtonProps = $props();
 
     /**
      * Returns the CSS class for a given priority.

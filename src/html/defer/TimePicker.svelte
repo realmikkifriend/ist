@@ -1,12 +1,11 @@
 <script lang="ts">
-    import { createEventDispatcher, onDestroy } from "svelte";
+    import { onDestroy } from "svelte";
     import { updateMilliseconds } from "../../services/deferModalService";
     import { getPriorityClasses } from "../../utils/styleUtils";
     import ListTask from "../task/ListTask.svelte";
-    import type { Task } from "../../types/todoist";
+    import type { TimePickerProps } from "../../types/defer";
 
-    export let task: Task;
-    export let tasks: Task[];
+    let { task, tasks = $bindable(), onDefer }: TimePickerProps = $props();
 
     const triggerButtonUpdate = (): void => {
         tasks = [...tasks];
@@ -18,10 +17,8 @@
         clearInterval(interval);
     });
 
-    const dispatch = createEventDispatcher<{ defer: { rawTime: number } }>();
-
     const handleDefer = (rawTime: number): void => {
-        dispatch("defer", { rawTime });
+        onDefer({ rawTime });
     };
 </script>
 
@@ -32,7 +29,7 @@
                 <button
                     class={"btn hover:bg-secondary min-h-4 w-full rounded-md px-1 " +
                         button.stylingButton}
-                    on:click={() => handleDefer(Number(button.ms))}>{button.text}</button
+                    onclick={() => handleDefer(Number(button.ms))}>{button.text}</button
                 >
                 {#if button.time}
                     <div class="flex max-h-4 w-full justify-between text-xs">

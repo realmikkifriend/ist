@@ -1,8 +1,8 @@
 <script lang="ts">
     import { getPriorityClasses } from "../../utils/styleUtils";
-    import type { Priority, Task } from "../../types/todoist";
+    import type { Priority, ListTaskProps } from "../../types/todoist";
 
-    export let task: Task;
+    let { task }: ListTaskProps = $props();
 
     /**
      * Returns the CSS class for a given priority.

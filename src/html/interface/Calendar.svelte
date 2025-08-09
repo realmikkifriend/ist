@@ -4,28 +4,21 @@
     import { Icon, ChevronUp, ChevronDown } from "svelte-hero-icons";
     import { getCalendarGrid, getInfoForDay } from "../../utils/calendarUtils";
     import CalendarDay from "./CalendarDay.svelte";
-    import type { Task } from "../../types/todoist";
+    import type { CalendarProps } from "../../types/interface";
 
-    export let dateInfo: Record<string, { dots: { color: string }[]; tasks: Task[] }> = {};
-    export let onDayClick: ((day: DateTime) => void) | undefined = undefined;
-    export let disable: "past" | "future" | null = null;
+    let { dateInfo = {}, onDayClick = undefined, disable = null }: CalendarProps = $props();
 
     const today = DateTime.now().startOf("day");
 
-    const displayMonth = writable({
-        date: DateTime.now(),
-        days: [] as (DateTime | null)[],
-        disablePrevMonth: false,
-        disableNextMonth: false,
-    });
+    const displayDate = writable(DateTime.now());
 
-    $: if ($displayMonth.date) {
-        $displayMonth.days = getCalendarGrid($displayMonth.date);
-        $displayMonth.disablePrevMonth =
-            disable === "past" && $displayMonth.date.startOf("month") <= today.startOf("month");
-        $displayMonth.disableNextMonth =
-            disable === "future" && $displayMonth.date.endOf("month") >= today.endOf("month");
-    }
+    const days = $derived(getCalendarGrid($displayDate));
+    const disablePrevMonth = $derived(
+        disable === "past" && $displayDate.startOf("month") <= today.startOf("month"),
+    );
+    const disableNextMonth = $derived(
+        disable === "future" && $displayDate.endOf("month") >= today.endOf("month"),
+    );
 
     const weekDays = ["M", "T", "W", "T", "F", "S", "S"];
 
@@ -34,34 +27,34 @@
      * @param months - The number of months to move. Negative for past, positive for future.
      */
     function changeMonth(months: number) {
-        const newDate = $displayMonth.date.plus({ months });
+        const newDate = $displayDate.plus({ months });
         if (
             (disable === "past" && newDate < today.startOf("month")) ||
             (disable === "future" && newDate > today.endOf("month"))
         ) {
             return;
         }
-        $displayMonth.date = newDate;
+        displayDate.set(newDate);
     }
 </script>
 
 <div class="w-full">
     <div class="mx-3 my-5 flex items-center justify-between">
-        <div class="font-bold">{$displayMonth.date.monthLong} {$displayMonth.date.year}</div>
+        <div class="font-bold">{$displayDate.monthLong} {$displayDate.year}</div>
         <div class="flex items-center">
             <button
-                on:click={() => changeMonth(-1)}
+                onclick={() => changeMonth(-1)}
                 class="hover:text-primary disabled:hover:bg-base-100 flex h-7 w-7 items-center justify-center rounded-sm hover:bg-gray-200"
-                disabled={$displayMonth.disablePrevMonth}
+                disabled={disablePrevMonth}
             >
-                <Icon src={!$displayMonth.disablePrevMonth ? ChevronUp : ""} />
+                <Icon src={!disablePrevMonth ? ChevronUp : ""} />
             </button>
             <button
-                on:click={() => changeMonth(1)}
+                onclick={() => changeMonth(1)}
                 class="hover:text-primary disabled:hover:bg-base-100 flex h-7 w-7 items-center justify-center rounded-sm hover:bg-gray-200"
-                disabled={$displayMonth.disableNextMonth}
+                disabled={disableNextMonth}
             >
-                <Icon src={!$displayMonth.disableNextMonth ? ChevronDown : ""} />
+                <Icon src={!disableNextMonth ? ChevronDown : ""} />
             </button>
         </div>
     </div>
@@ -71,13 +64,13 @@
                 {day}
             </div>
         {/each}
-        {#each $displayMonth.days as day, i (day ? day.toMillis() : `empty-${i}`)}
+        {#each days as day, i (day ? day.toMillis() : `empty-${i}`)}
             {#if day}
                 {@const info = getInfoForDay(day, dateInfo)}
                 {#if onDayClick}
                     <button
                         class="hover:bg-primary w-full cursor-pointer rounded-sm text-left disabled:hover:bg-transparent"
-                        on:click={() => onDayClick(day)}
+                        onclick={() => onDayClick(day)}
                         disabled={(disable === "past" && day < today) ||
                             (disable === "future" && day > today)}
                     >

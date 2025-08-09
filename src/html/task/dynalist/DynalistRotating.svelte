@@ -2,23 +2,18 @@
     import { writable } from "svelte/store";
     import { Icon, ArrowUturnDown } from "svelte-hero-icons";
     import { DateTime } from "luxon";
-    import Markdown from "svelte-exmarkdown";
+    import SvelteMarkdown from "@humanspeak/svelte-markdown";
     import { isMonthYearFormat } from "../../../utils/timeUtils";
     import { generateDynalistComment } from "../../../utils/dynalistUtils";
     import { updateDynalistWithToken } from "../../../services/dynalistService";
     import { success } from "../../../services/toastService";
     import type { Writable } from "svelte/store";
-    import type { DynalistContent, DynalistNode, DynalistChange } from "../../../types/dynalist";
+    import type { DynalistNode, DynalistChange, DynalistViewProps } from "../../../types/dynalist";
 
-    export let content: DynalistContent;
+    let { dynalistObject: content }: DynalistViewProps = $props();
 
     const rotationIndex: Writable<number> = writable(0);
     const isLoading: Writable<boolean> = writable(false);
-
-    $: checklistItems = (content?.children as DynalistNode[]) || [];
-    $: rotatedItems = rotateArray(checklistItems, $rotationIndex);
-    $: currentItem = rotatedItems[0];
-    $: hasItems = checklistItems.length > 0;
 
     /**
      * Rotates an array by the given index.
@@ -42,7 +37,7 @@
             {
                 action: "move",
                 node_id: item.id,
-                parent_id: content.id,
+                parent_id: content?.id,
                 index: -1,
             },
         ];
@@ -65,7 +60,7 @@
      * @returns A promise resolving to true if successful, false otherwise.
      */
     async function showNextItem(): Promise<boolean> {
-        if (!currentItem || $isLoading) return false;
+        if (!currentItem || $isLoading || !content) return false;
 
         isLoading.set(true);
         rotationIndex.update((index) => (index + 1) % checklistItems.length);
@@ -85,6 +80,10 @@
             },
         );
     }
+    let checklistItems = $derived((content?.children as DynalistNode[]) || []);
+    let rotatedItems = $derived(rotateArray(checklistItems, $rotationIndex));
+    let currentItem = $derived(rotatedItems[0]);
+    let hasItems = $derived(checklistItems.length > 0);
 </script>
 
 {#if hasItems}
@@ -93,7 +92,7 @@
             class="bg-primary float-left mt-0.5 mr-2 inline-block h-5 w-5 cursor-pointer rounded-sm p-1 pr-5 pb-5 {$isLoading
                 ? 'animate-ping'
                 : ''}"
-            on:click={showNextItem}
+            onclick={showNextItem}
             disabled={$isLoading}
         >
             <Icon src={ArrowUturnDown} class="h-4 w-4" />
@@ -106,8 +105,8 @@
                     <span>last completed {currentItem.note}</span>
                 {/if}
             </em>
-            <Markdown
-                md={`${currentItem?.content || ""}\n${generateDynalistComment(currentItem)}`}
+            <SvelteMarkdown
+                source={`${currentItem?.content || ""}\n${generateDynalistComment(currentItem)}`}
             />
         {/key}
     </div>

@@ -7,39 +7,50 @@
     import type { Task } from "../../../types/todoist";
     import type { DynalistNode } from "../../../types/dynalist";
 
-    export let content: DynalistNode;
+    let { dynalistObject: content = $bindable() }: { dynalistObject?: DynalistNode } = $props();
     const isLoading = writable(false);
 
-    $: trackedDates =
-        content.children
-            ?.map((c) => (typeof c === "string" ? c : c.content))
-            .filter((c): c is string => !!c) ?? [];
-
-    $: todayTracked = trackedDates.includes(DateTime.now().toISODate());
-
-    $: dateInfo = trackedDates.reduce(
-        (acc, dateStr) => {
-            acc[dateStr] = {
-                dots: [{ color: "w-8 h-1 bg-red-500" }],
-                tasks: [],
-            };
-            return acc;
-        },
-        {} as Record<string, { dots: { color: string }[]; tasks: Task[] }>,
+    let trackedDates: string[] = $derived(
+        Array.isArray(content?.children)
+            ? content.children
+                  .map((c: DynalistNode | string) => (typeof c === "string" ? c : c.content))
+                  .filter((c): c is string => !!c)
+            : [],
     );
+
+    let todayTracked = $derived(trackedDates.includes(DateTime.now().toISODate()));
+
+    let dateInfo: Record<string, { dots: { color: string }[]; tasks: Task[] }> | undefined =
+        $derived(
+            trackedDates.length > 0
+                ? trackedDates.reduce(
+                      (
+                          acc: Record<string, { dots: { color: string }[]; tasks: Task[] }>,
+                          dateStr: string,
+                      ) => {
+                          acc[dateStr] = {
+                              dots: [{ color: "w-8 h-1 bg-red-500" }],
+                              tasks: [],
+                          };
+                          return acc;
+                      },
+                      {},
+                  )
+                : undefined,
+        );
 
     /**
      * Opens the calendar modal.
      */
     function openCalendarModal() {
         const modal = document.getElementById(
-            `calendar_modal_${content.id}`,
+            `calendar_modal_${content?.id}`,
         ) as HTMLDialogElement | null;
         modal?.showModal();
     }
 
     const handleClick = async () => {
-        if ($isLoading) return;
+        if ($isLoading || !content) return;
         isLoading.set(true);
         content.children = await handleDynalistTrackingClick(content, todayTracked);
         isLoading.set(false);
@@ -51,7 +62,7 @@
         class="group h-5 w-5 rounded-sm text-white outline-2 outline-blue-500 hover:bg-blue-500/25"
         class:bg-blue-500={todayTracked}
         class:hover:bg-blue-300={todayTracked}
-        on:click={handleClick}
+        onclick={handleClick}
         disabled={$isLoading}
     >
         <Icon
@@ -73,15 +84,15 @@
     </button>
     <button
         class="bg-neutral hover:bg-secondary rounded-full p-0.5 text-gray-200"
-        on:click={openCalendarModal}
+        onclick={openCalendarModal}
     >
         <Icon class="h-6 w-6 p-1" src={CalendarDateRange} />
     </button>
-    <span class="text-lg">{content.content}</span>
+    <span class="text-lg">{content?.content}</span>
 </div>
 <History
-    entityId={content.id ?? ""}
-    content={content.content ?? ""}
+    entityId={content?.id ?? ""}
+    content={content?.content ?? ""}
     activity={dateInfo}
     title="History"
 />

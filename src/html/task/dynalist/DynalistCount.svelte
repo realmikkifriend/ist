@@ -3,14 +3,15 @@
     import { handleCount } from "../../../services/dynalistService";
     import { parseCountData, calculateLabel } from "../../../utils/dynalistUtils";
     import type { Writable } from "svelte/store";
-    import type { DynalistNode, DynalistCountData, LabelInfo } from "../../../types/dynalist";
+    import type { DynalistCountData, LabelInfo, DynalistViewProps } from "../../../types/dynalist";
 
-    export let content: DynalistNode;
+    let { dynalistObject: content }: DynalistViewProps = $props();
 
     const todayFormatted: string = new Date().toLocaleDateString("en-CA");
     const options: string[] = ["+1", "+5", "+10"];
 
-    const initialData: DynalistCountData = parseCountData(content.note ?? "");
+    const noteContent: string = typeof content?.note === "string" ? content.note : "";
+    const initialData: DynalistCountData = parseCountData(noteContent);
 
     const countData: Writable<DynalistCountData> = writable(
         initialData.date !== todayFormatted
@@ -24,16 +25,17 @@
      * @param option - The increment option selected (e.g., "+1", "+5", "+10")
      */
     async function handleCountClick(option: string): Promise<void> {
+        if (!content) return;
         const updatedData: DynalistCountData = await handleCount(option, $countData, content);
         countData.set(updatedData);
     }
 
-    $: labelInfo = calculateLabel($countData) as LabelInfo;
+    let labelInfo = $derived(calculateLabel($countData) as LabelInfo);
 </script>
 
 <span class="flex w-full flex-col justify-between">
     <span class="flex w-full items-center text-xl">
-        {content.content}
+        {content?.content}
         <span
             class="badge badge-xs ml-1 w-fit overflow-hidden p-2 px-3 pt-[0.45rem] text-[0.6rem] font-bold whitespace-nowrap uppercase {labelInfo.classes}"
         >
@@ -60,7 +62,7 @@
                     $countData.total
                         ? 'bg-neutral'
                         : 'bg-primary'}"
-                    on:click={() => handleCountClick(option)}
+                    onclick={() => handleCountClick(option)}
                 >
                     {option}
                 </button>

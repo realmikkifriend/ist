@@ -2,7 +2,7 @@
     import { writable } from "svelte/store";
     import { Icon, ArrowPath } from "svelte-hero-icons";
     import { loadDynalistCommentWithToken } from "../../../services/dynalistService";
-    import { hasError } from "../../../utils/dynalistUtils";
+    import { hasError, getDynalistType } from "../../../utils/dynalistUtils";
     import DynalistContentComponent from "./DynalistContent.svelte";
     import { error as showError } from "../../../services/toastService";
     import type { Writable } from "svelte/store";
@@ -10,9 +10,10 @@
         DynalistContent,
         DynalistTaskType,
         DynalistStoreState,
+        DynalistViewProps,
     } from "../../../types/dynalist";
 
-    export let url: string;
+    let { url = "" }: DynalistViewProps = $props();
 
     const dynalistStore: Writable<DynalistStoreState> = writable({
         dynalistObject: undefined,
@@ -20,9 +21,13 @@
         error: undefined,
     });
 
+    const resolvedLoadStateStore: Writable<DynalistStoreState | undefined> = writable(undefined);
+
     const loadPromise: Promise<DynalistStoreState> = loadDynalistCommentWithToken(url).then(
         (value: { dynalistObject?: DynalistContent; selectedType?: string; error?: unknown }) => {
             const { dynalistObject, selectedType, error } = value;
+
+            let newState: DynalistStoreState;
 
             if (error) {
                 let errorMsg: string;
@@ -35,32 +40,23 @@
                 showError(errorMsg);
                 console.error(errorMsg);
 
-                return {
+                newState = {
                     dynalistObject: undefined,
                     selectedType: "",
+                    error: errorMsg,
                 };
             } else {
-                const validTypes: (DynalistTaskType | "")[] = [
-                    "read",
-                    "checklist",
-                    "count",
-                    "rotating",
-                    "crossoff",
-                    "tracking",
-                    "",
-                ];
-                const safeSelectedType =
-                    selectedType && validTypes.includes(selectedType as DynalistTaskType | "")
-                        ? (selectedType as DynalistTaskType | "")
-                        : "";
-                const newState: DynalistStoreState = {
+                const safeSelectedType = getDynalistType(selectedType);
+
+                newState = {
                     dynalistObject,
-                    selectedType: safeSelectedType,
+                    selectedType: safeSelectedType as DynalistTaskType | "",
                     error: undefined,
                 };
-                dynalistStore.set(newState);
-                return newState;
             }
+            dynalistStore.set(newState);
+            resolvedLoadStateStore.set(newState);
+            return newState;
         },
     );
 
@@ -72,16 +68,21 @@
     const handleTypeSelection = (event: CustomEvent<{ type: DynalistTaskType }>) =>
         dynalistStore.update((state) => ({ ...state, selectedType: event.detail.type }));
 
-    $: if ($dynalistStore.selectedType === "" && $dynalistStore.dynalistObject) {
-        dynalistStore.update((state) => ({
-            ...state,
-            selectedType: state.dynalistObject
-                ? (loadPromise.then((result) => result.selectedType) as unknown as
-                      | DynalistTaskType
-                      | "")
-                : "",
-        }));
-    }
+    $effect(() => {
+        if (
+            $dynalistStore.selectedType === "" &&
+            $dynalistStore.dynalistObject &&
+            $resolvedLoadStateStore
+        ) {
+            const initialSelectedType = $resolvedLoadStateStore.selectedType;
+            if (initialSelectedType !== "") {
+                dynalistStore.update((state) => ({
+                    ...state,
+                    selectedType: initialSelectedType,
+                }));
+            }
+        }
+    });
 </script>
 
 {#await loadPromise}

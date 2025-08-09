@@ -6,12 +6,9 @@
     import { markTasks } from "../../services/agendaService";
     import AgendaTask from "./AgendaTask.svelte";
     import type { Task, Context, ColorName } from "../../types/todoist";
-    import type { QuarterHourPosition } from "../../types/agenda";
+    import type { QuarterHourPosition, AgendaHourProps } from "../../types/agenda";
 
-    export let tasks: Task[];
-    export let hour: number;
-    export let title: string;
-    export let now: DateTime;
+    let { tasks, hour, title, now }: AgendaHourProps = $props();
 
     const currentHour: boolean = title === "Today" && hour === now.hour;
 

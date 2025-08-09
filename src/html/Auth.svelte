@@ -7,13 +7,18 @@
     import OAuthCallback from "./OAuthCallback.svelte";
     import "../css/styles.css";
 
-    $: if (window.location.search.startsWith("?code") && $todoistAccessToken) {
-        window.history.pushState({ path: "/" }, "", "/");
-    }
+    const isBrowser = typeof window !== "undefined";
+    const search = isBrowser ? window.location.search : "";
+
+    $effect(() => {
+        if (isBrowser && search.startsWith("?code") && $todoistAccessToken) {
+            window.history.pushState({ path: "/" }, "", "/");
+        }
+    });
 </script>
 
 {#if !$todoistAccessToken}
-    {#if window.location.search.startsWith("?code")}
+    {#if isBrowser && search.startsWith("?code")}
         <OAuthCallback />
     {:else}
         <LandingPage />

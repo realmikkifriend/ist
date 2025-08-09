@@ -18,7 +18,7 @@
            {$userSettings.selectedContext ? 'text-primary' : ''}
            {$firstDueTask?.summoned ? 'border-purple-400 text-purple-400' : ''}
            {$firstDueTask?.skip ? 'border-yellow-500 text-yellow-500' : ''}"
-    on:click={clearSelectedTask}
+    onclick={clearSelectedTask}
 >
     {#if $firstDueTask?.skip}
         low priority, defer?

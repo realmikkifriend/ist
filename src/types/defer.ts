@@ -40,10 +40,37 @@ export interface TimeButtonContext {
     processedButtons: (TimeButtonConfig | null)[];
 }
 
-export interface DeferEvent {
-    detail: DeferEventDetail;
-}
-
 export interface DeferEventDetail {
     rawTime: string | number;
+}
+
+export interface DatePickerProps {
+    taskToDefer: Task;
+    tz: string;
+    tasks: Task[];
+    onDefer: (detail: DeferEventDetail) => void;
+}
+
+export interface CalendarDayProps {
+    day: DateTime;
+    dots: { color: string }[];
+    tooltip?: Task[] | undefined;
+    disable?: "past" | "future" | null;
+}
+
+export interface TimePickerProps {
+    task: Task;
+    tasks: Task[];
+    onDefer: (detail: DeferEventDetail) => void;
+}
+
+export interface DeferModalProps {
+    task: Task;
+    onDeferFinal: (detail: { task: Task; time: DateTime }) => void;
+}
+
+export interface TaskDisplayProps {
+    task: Task;
+    onDone: (task: Task) => void;
+    onDefer: (detail: { task: Task; time: string }) => void;
 }

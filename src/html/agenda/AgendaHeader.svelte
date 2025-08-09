@@ -2,13 +2,12 @@
     import { Icon, XCircle, Calendar, BarsArrowUp } from "svelte-hero-icons";
     import { todoistData } from "../../stores/stores";
     import { summonTask } from "../../services/firstTaskService";
-    import type { AgendaData, DisplayData } from "../../types/agenda";
+    import type { AgendaHeaderProps } from "../../types/agenda";
 
-    export let agendaData: AgendaData;
-    export let displayData: DisplayData;
+    let { agendaData, displayData }: AgendaHeaderProps = $props();
 
-    $: ({ tasks, tasksWithNoTime, todayTasks } = agendaData);
-    $: ({ title, headerGradientColor } = displayData);
+    let { tasks, tasksWithNoTime, todayTasks } = $derived(agendaData);
+    let { title, headerGradientColor } = $derived(displayData);
 
     /**
      * Switches the agenda view between "today" and "tomorrow".
@@ -41,13 +40,13 @@
 
 <div class="flex items-center justify-between pb-2 pl-16">
     <button
-        on:click={switchView}
+        onclick={switchView}
         class="rounded-full p-1 transition-colors duration-200 hover:bg-blue-800"
     >
         <Icon src={Calendar} class="h-5 w-6" />
     </button>
     <button
-        on:click={viewReverseTaskList}
+        onclick={viewReverseTaskList}
         class="rounded-full p-1 transition-colors duration-200 hover:bg-blue-800"
     >
         <Icon src={BarsArrowUp} class="h-5 w-6" />
@@ -67,7 +66,7 @@
         </h2>
     </div>
     <button
-        on:click={closeAgenda}
+        onclick={closeAgenda}
         class="rounded-full p-1 transition-colors duration-200 hover:bg-red-700"
     >
         <Icon src={XCircle} class="h-5 w-6" />

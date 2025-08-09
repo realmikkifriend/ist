@@ -1,20 +1,22 @@
 <script lang="ts">
     import { writable } from "svelte/store";
     import { Icon, Backspace } from "svelte-hero-icons";
-    import Markdown from "svelte-exmarkdown";
+    import SvelteMarkdown from "@humanspeak/svelte-markdown";
     import { generateDynalistComment } from "../../../utils/dynalistUtils";
     import { updateDynalistWithToken } from "../../../services/dynalistService";
     import { success } from "../../../services/toastService";
     import type { Writable } from "svelte/store";
-    import type { DynalistContent, DynalistNode } from "../../../types/dynalist";
+    import type { DynalistNode, DynalistViewProps } from "../../../types/dynalist";
 
-    export let content: DynalistContent;
+    let { dynalistObject }: DynalistViewProps = $props();
 
     const removedItemIds: Writable<Set<string>> = writable(new Set());
 
-    $: checklistItems =
-        (content?.children as DynalistNode[])?.filter((item) => !$removedItemIds.has(item.id)) ||
-        [];
+    let checklistItems = $derived(
+        (dynalistObject?.children as DynalistNode[])?.filter(
+            (item) => !$removedItemIds.has(item.id),
+        ) || [],
+    );
 
     /**
      * Creates a handler function to cross off the next checklist item when the button is clicked.
@@ -25,6 +27,10 @@
     const createShowNextItemHandler =
         (buttonElement: HTMLButtonElement) => async (): Promise<void> => {
             if (checklistItems.length === 0) return;
+            if (!dynalistObject) {
+                console.error("Dynalist object is undefined.");
+                return;
+            }
 
             buttonElement.classList.add("animate-ping");
 
@@ -38,7 +44,7 @@
                 },
             ];
 
-            await updateDynalistWithToken(content.file_id, changes)
+            await updateDynalistWithToken(dynalistObject.file_id, changes)
                 .then(() => {
                     removedItemIds.update((ids) => new Set([...ids, itemToRemove.id]));
                     success("Removed from list in Dynalist!");
@@ -84,8 +90,8 @@
             ><Icon src={Backspace} class="h-4 w-4" /></button
         >
         {#key checklistItems}
-            <Markdown
-                md={`${checklistItems[0].content}\n${generateDynalistComment(checklistItems[0])}`}
+            <SvelteMarkdown
+                source={`${checklistItems[0].content}\n${generateDynalistComment(checklistItems[0])}`}
             />
         {/key}
     </div>

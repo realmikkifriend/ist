@@ -11,16 +11,16 @@
     import ContextBadge from "./sidebar/ContextBadge.svelte";
     import Agenda from "./agenda/Agenda.svelte";
     import Toasts from "./interface/Toasts.svelte";
-    import type { Writable } from "svelte/store";
 
-    const isSpinning: Writable<boolean> = writable(false);
-    const hash: Writable<string> = writable(window.location.hash);
+    const isSpinning = writable(false);
+    const hash = writable(window.location.hash);
+    let dataPromise: Promise<void> = $state(Promise.resolve());
 
-    $: {
+    $effect(() => {
         if ($userSettings.selectedContext || $todoistData.dueTasks) {
             void updateFirstDueTask();
         }
-    }
+    });
 
     /**
      * Sets up hash change listener and periodic refresh on mount.
@@ -55,22 +55,16 @@
      */
     const handleRefresh = async (): Promise<void> => {
         isSpinning.set(true);
-
-        await refreshData().finally(() => {
-            isSpinning.set(false);
-        });
+        await refreshData();
+        isSpinning.set(false);
     };
 
-    /**
-     * Returns a promise for refreshing data, for use in Svelte's {#await}.
-     * @returns Promise for refreshing data.
-     */
-    const dataPromise = (): Promise<void> => {
-        if ($firstDueTask?.summoned) {
-            return Promise.resolve();
-        }
-        return handleRefresh();
-    };
+    // Initialize dataPromise on component creation
+    if ($firstDueTask?.summoned) {
+        dataPromise = Promise.resolve();
+    } else {
+        dataPromise = handleRefresh();
+    }
 </script>
 
 <div class="flex w-fit items-center">
@@ -86,11 +80,11 @@
 {#if $hash === "#today" || $hash === "#tomorrow"}
     <Agenda />
 {:else}
-    <AppView dataPromise={dataPromise()} />
+    <AppView {dataPromise} />
 {/if}
 
 <div class="fixed right-2 bottom-2 z-10">
-    <button class="bg-base-100 rounded-md p-1" on:click={handleRefresh}>
+    <button class="bg-base-100 rounded-md p-1" onclick={handleRefresh}>
         <Icon src={ArrowPath} class="h-6 w-6 {$isSpinning ? 'animate-spin cursor-wait' : ''}" />
     </button>
 </div>

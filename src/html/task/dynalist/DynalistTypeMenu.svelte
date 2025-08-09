@@ -11,11 +11,10 @@
         Inbox,
     } from "svelte-hero-icons";
     import Logo from "../../interface/Logo.svelte";
-    import type { DynalistTaskType } from "../../../types/dynalist";
+    import type { DynalistTaskType, DynalistViewProps } from "../../../types/dynalist";
     import type { IconPair } from "../../../types/interface";
 
-    export let selectedType: DynalistTaskType;
-    export let url: string;
+    let { selectedType, url }: DynalistViewProps = $props();
 
     const iconPairs: IconPair[] = [
         { icon: ListBullet, label: "Read", type: "read" },
@@ -61,7 +60,7 @@
                 >
             {/if}
             <button
-                on:click={() => handleSelectType(type)}
+                onclick={() => handleSelectType(type)}
                 class="m-0 flex w-full flex-row items-center gap-1 rounded-sm p-1 font-bold {selectedType ===
                 type
                     ? 'text-base-100 cursor-auto'

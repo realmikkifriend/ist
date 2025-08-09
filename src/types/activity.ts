@@ -1,4 +1,5 @@
 import type { DateTime } from "luxon";
+import type { Task } from "./todoist";
 
 export interface TaskActivity {
     date: DateTime;
@@ -15,4 +16,21 @@ export interface TodoistActivity {
     extra_data: {
         content: string;
     };
+}
+
+export interface HistoryProps {
+    entityId: string;
+    content: string;
+    activity:
+        | TaskActivity[]
+        | Promise<TaskActivity[] | undefined>
+        | undefined
+        | Record<string, { dots: { color: string }[]; tasks: Task[] }>;
+    title?: string;
+}
+
+export interface DailyGoalTooltipProps {
+    dailyGoal: number;
+    sortedByTime: TaskActivity[];
+    isLoading: boolean;
 }

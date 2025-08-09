@@ -18,7 +18,7 @@
             in:fly={{ x: 200, duration: 300 }}
             out:fly={{ x: 200, duration: 300 }}
             class="alert {alertClass} cursor-pointer"
-            on:click={() => {
+            onclick={() => {
                 if (toast.action) {
                     toast.action();
                 }

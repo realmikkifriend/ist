@@ -3,10 +3,10 @@
     import { Icon, InboxArrowDown, Inbox } from "svelte-hero-icons";
     import { getPriorityClasses, colorClasses, borderClasses } from "../../utils/styleUtils";
     import { summonTask } from "../../services/firstTaskService";
-    import type { Task, ColorName, Priority } from "../../types/todoist";
+    import type { Priority } from "../../types/todoist";
+    import type { AgendaTaskProps } from "../../types/agenda";
 
-    export let task: Task;
-    export let color: ColorName;
+    let { task, color }: AgendaTaskProps = $props();
 
     const firstDueClasses = "shadow-sm shadow-red-400";
     const taskPriority = task.priority as Priority;
@@ -23,7 +23,7 @@
     ].join(" ")}
 >
     <button
-        on:click={() => summonTask(task)}
+        onclick={() => summonTask(task)}
         class={`priority-element relative -left-1.5 mt-0 flex h-fit min-h-2.5 min-w-10 shrink-0 flex-row items-center justify-center rounded-md pr-1 pl-2 text-xs font-bold ${getPriorityClasses(taskPriority)}`}
     >
         {#if task.due && task.due.date && task.due.date.includes("T")}

@@ -1,10 +1,8 @@
 <script lang="ts">
     import { Icon, ArrowPath } from "svelte-hero-icons";
-    import type { TaskActivity } from "../../types/activity";
+    import type { DailyGoalTooltipProps } from "../../types/activity";
 
-    export let dailyGoal: number;
-    export let sortedByTime: TaskActivity[];
-    export let isLoading: boolean;
+    let { dailyGoal, sortedByTime, isLoading }: DailyGoalTooltipProps = $props();
 </script>
 
 <div class="tooltip-content ml-24 w-80 text-left">

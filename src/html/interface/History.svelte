@@ -1,17 +1,9 @@
 <script lang="ts">
     import { processActivityForCalendar } from "../../utils/calendarUtils";
     import Calendar from "./Calendar.svelte";
-    import type { TaskActivity } from "../../types/activity";
-    import type { Task } from "../../types/todoist";
+    import type { HistoryProps } from "../../types/activity";
 
-    export let entityId: string;
-    export let content: string;
-    export let activity:
-        | TaskActivity[]
-        | Promise<TaskActivity[] | undefined>
-        | undefined
-        | Record<string, { dots: { color: string }[]; tasks: Task[] }>;
-    export let title: string = "History";
+    let { entityId, content, activity, title = "History" }: HistoryProps = $props();
 
     const dateInfo = Promise.resolve(activity).then((res) => {
         if (Array.isArray(res)) {

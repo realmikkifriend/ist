@@ -1,6 +1,6 @@
 <script lang="ts">
     import { createEventDispatcher } from "svelte";
-    import Markdown from "svelte-exmarkdown";
+    import SvelteMarkdown from "@humanspeak/svelte-markdown";
     import DynalistChecklist from "./DynalistChecklist.svelte";
     import DynalistCount from "./DynalistCount.svelte";
     import DynalistRotating from "./DynalistRotating.svelte";
@@ -8,11 +8,9 @@
     import DynalistTracking from "./DynalistTracking.svelte";
     import DynalistTypeMenu from "./DynalistTypeMenu.svelte";
     import { generateDynalistComment } from "../../../utils/dynalistUtils";
-    import type { DynalistContent, DynalistTaskType } from "../../../types/dynalist";
+    import type { DynalistTaskType, DynalistViewProps } from "../../../types/dynalist";
 
-    export let dynalistObject: DynalistContent;
-    export let selectedType: DynalistTaskType | "";
-    export let url: string;
+    let { dynalistObject, selectedType, url }: DynalistViewProps = $props();
 
     const dispatch = createEventDispatcher<{
         selectType: { type: DynalistTaskType };
@@ -28,27 +26,30 @@
 </script>
 
 <div class="relative">
-    {#if selectedType === "read"}
-        <Markdown
-            md={generateDynalistComment(dynalistObject) || "Unsupported format, but stay tuned."}
-        />
-    {:else if selectedType === "checklist"}
-        <DynalistChecklist content={generateDynalistComment(dynalistObject)} />
-    {:else if selectedType === "count"}
-        <DynalistCount content={dynalistObject} />
-    {:else if selectedType === "rotating"}
-        <DynalistRotating content={dynalistObject} />
-    {:else if selectedType === "crossoff"}
-        <DynalistCrossOff content={dynalistObject} />
-    {:else if selectedType === "tracking"}
-        <DynalistTracking content={dynalistObject} />
-    {/if}
+    {#if dynalistObject}
+        {#if selectedType === "read"}
+            <SvelteMarkdown
+                source={generateDynalistComment(dynalistObject) ||
+                    "Unsupported format, but stay tuned."}
+            />
+        {:else if selectedType === "checklist"}
+            <DynalistChecklist content={generateDynalistComment(dynalistObject)} />
+        {:else if selectedType === "count"}
+            <DynalistCount {dynalistObject} />
+        {:else if selectedType === "rotating"}
+            <DynalistRotating {dynalistObject} />
+        {:else if selectedType === "crossoff"}
+            <DynalistCrossOff {dynalistObject} />
+        {:else if selectedType === "tracking"}
+            <DynalistTracking {dynalistObject} />
+        {/if}
 
-    {#key selectedType}
-        <DynalistTypeMenu
-            selectedType={selectedType === "" ? "read" : selectedType}
-            {url}
-            on:selectType={handleTypeSelection}
-        />
-    {/key}
+        {#key selectedType}
+            <DynalistTypeMenu
+                selectedType={selectedType || "read"}
+                url={url || ""}
+                on:selectType={handleTypeSelection}
+            />
+        {/key}
+    {/if}
 </div>

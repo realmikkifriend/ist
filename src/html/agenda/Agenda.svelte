@@ -28,7 +28,11 @@
 
     const setAgendaData = () => ($agendaStore = updateAgenda());
 
-    $: if ($todoistData) setAgendaData();
+    $effect(() => {
+        if ($todoistData) {
+            setAgendaData();
+        }
+    });
 
     onMount(() => {
         if ($todoistData.tasks) {
