@@ -14,11 +14,11 @@
 
 <div
     class="tooltip tooltip-top relative flex h-9 w-full flex-col items-center justify-center rounded-sm"
-    class:bg-red-950={day.hasSame(today, "day")}
     class:bg-red-800={isTomorrow}
-    class:opacity-50={isDisabled}
-    class:hover:bg-transparent={isDisabled}
+    class:bg-red-950={day.hasSame(today, "day")}
     class:cursor-not-allowed={isDisabled}
+    class:hover:bg-transparent={isDisabled}
+    class:opacity-50={isDisabled}
 >
     {#if tooltip}
         <div class="tooltip-content w-44 text-left">

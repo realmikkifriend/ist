@@ -1,8 +1,6 @@
 <script lang="ts">
-    import { writable } from "svelte/store";
     import { handleCount } from "../../../services/dynalistService";
     import { parseCountData, calculateLabel } from "../../../utils/dynalistUtils";
-    import type { Writable } from "svelte/store";
     import type { DynalistCountData, LabelInfo, DynalistViewProps } from "../../../types/dynalist";
 
     let { dynalistObject: content }: DynalistViewProps = $props();
@@ -13,7 +11,7 @@
     const noteContent: string = typeof content?.note === "string" ? content.note : "";
     const initialData: DynalistCountData = parseCountData(noteContent);
 
-    const countData: Writable<DynalistCountData> = writable(
+    let countData: DynalistCountData = $state(
         initialData.date !== todayFormatted
             ? { ...initialData, date: todayFormatted, current: 0 }
             : initialData,
@@ -26,11 +24,11 @@
      */
     async function handleCountClick(option: string): Promise<void> {
         if (!content) return;
-        const updatedData: DynalistCountData = await handleCount(option, $countData, content);
-        countData.set(updatedData);
+        const updatedData: DynalistCountData = await handleCount(option, countData, content);
+        countData = updatedData;
     }
 
-    let labelInfo = $derived(calculateLabel($countData) as LabelInfo);
+    let labelInfo = $derived(calculateLabel(countData) as LabelInfo);
 </script>
 
 <span class="flex w-full flex-col justify-between">
@@ -45,24 +43,25 @@
 
     <span class="flex w-full items-end justify-between">
         <span class="flex flex-nowrap items-baseline">
-            <span class="text-2xl {$countData.current >= $countData.total ? 'text-blue-500' : ''}"
-                >{$countData.current}</span
+            <span class="text-2xl" class:text-blue-500={countData.current >= countData.total}
+                >{countData.current}</span
             >
             <span class="text-secondary mr-3 ml-2 text-base">
-                <span class="text-lg">&#8725;</span>{$countData.total}
+                <span class="text-lg">&#8725;</span>{countData.total}
             </span>
-            <small class={$countData.current >= $countData.total ? "text-blue-500" : ""}>
-                {`${Math.round(($countData.current / $countData.total) * 100)}%`}
+            <small class:text-blue-500={countData.current >= countData.total}>
+                {`${Math.round((countData.current / countData.total) * 100)}%`}
             </small>
         </span>
         <span class="flex flex-nowrap items-end">
             {#each options as option, index (index)}
                 <button
-                    class="btn text-primary-content hover:bg-base-100 active:bg-primary ml-1 h-8 min-h-8 px-1 pt-0 pb-1 {$countData.current >=
-                    $countData.total
+                    class="btn text-primary-content hover:bg-base-100 active:bg-primary ml-1 h-8 min-h-8 px-1 pt-0 pb-1 {countData.current >=
+                    countData.total
                         ? 'bg-neutral'
                         : 'bg-primary'}"
                     onclick={() => handleCountClick(option)}
+                    type="button"
                 >
                     {option}
                 </button>

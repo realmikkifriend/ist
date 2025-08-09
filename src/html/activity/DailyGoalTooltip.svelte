@@ -16,7 +16,7 @@
                     >
                     {r.title}
                     {#if r.temporary}
-                        <Icon src={ArrowPath} class="inline-block h-3 w-3 opacity-50" />
+                        <Icon class="inline-block h-3 w-3 opacity-50" src={ArrowPath} />
                     {/if}
                 </div>
             {/each}

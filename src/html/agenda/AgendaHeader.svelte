@@ -40,16 +40,18 @@
 
 <div class="flex items-center justify-between pb-2 pl-16">
     <button
-        onclick={switchView}
         class="rounded-full p-1 transition-colors duration-200 hover:bg-blue-800"
+        onclick={switchView}
+        type="button"
     >
-        <Icon src={Calendar} class="h-5 w-6" />
+        <Icon class="h-5 w-6" src={Calendar} />
     </button>
     <button
-        onclick={viewReverseTaskList}
         class="rounded-full p-1 transition-colors duration-200 hover:bg-blue-800"
+        onclick={viewReverseTaskList}
+        type="button"
     >
-        <Icon src={BarsArrowUp} class="h-5 w-6" />
+        <Icon class="h-5 w-6" src={BarsArrowUp} />
     </button>
     <div class="mr-6 flex grow cursor-default flex-col items-center">
         <h1 class="flex-1 text-center">{title}</h1>
@@ -66,9 +68,10 @@
         </h2>
     </div>
     <button
-        onclick={closeAgenda}
         class="rounded-full p-1 transition-colors duration-200 hover:bg-red-700"
+        onclick={closeAgenda}
+        type="button"
     >
-        <Icon src={XCircle} class="h-5 w-6" />
+        <Icon class="h-5 w-6" src={XCircle} />
     </button>
 </div>

@@ -55,37 +55,41 @@
         <div class="card-body pb-7">
             <button
                 class="text-md hover:bg-accent btn btn-ghost btn-sm absolute top-0 left-0 h-8 min-h-8 content-center border-0 p-4"
-                title="view task completion history"
                 onclick={() => openModal(`calendar_modal_${task.id}`)}
+                title="view task completion history"
+                type="button"
             >
-                <Icon src={CalendarDateRange} class="stroke-secondary h-5 w-5 [&>path]:stroke-2" />
+                <Icon class="stroke-secondary h-5 w-5 [&>path]:stroke-2" src={CalendarDateRange} />
             </button>
             {#if task.skip}
                 <button
                     class="text-md hover:bg-accent btn btn-ghost btn-sm absolute top-0 right-0 h-8 min-h-8 content-center border-0 p-4"
-                    title="skip task"
                     onclick={handleSkip}
+                    title="skip task"
+                    type="button"
                 >
-                    <Icon src={Forward} class="h-5 w-5 stroke-yellow-500 [&>path]:stroke-3" />
+                    <Icon class="h-5 w-5 stroke-yellow-500 [&>path]:stroke-3" src={Forward} />
                 </button>
             {/if}
             <h2 class="card-title text-center text-3xl">{task.content}</h2>
             <div class="card-actions justify-center">
                 <button
                     class="text-md btn btn-primary focus:btn-soft h-8 min-h-8 content-center p-4 focus:cursor-progress"
-                    title={task.due?.string ? `repeats ${task.due.string}` : "one-time task"}
                     onclick={handleDone}
+                    title={task.due?.string ? `repeats ${task.due.string}` : "one-time task"}
+                    type="button"
                 >
-                    <Icon src={Check} class="h-5 w-5 [&>path]:stroke-3" />
+                    <Icon class="h-5 w-5 [&>path]:stroke-3" src={Check} />
                 </button>
                 <button
                     class="text-md btn btn-secondary h-8 min-h-8 content-center p-4"
                     onclick={() => openModal("defer_modal")}
+                    type="button"
                 >
                     {#if task.due?.allDay === 1}
-                        <Icon src={CalendarIcon} class="h-5 w-5 [&>path]:stroke-3" />
+                        <Icon class="h-5 w-5 [&>path]:stroke-3" src={CalendarIcon} />
                     {:else}
-                        <Icon src={Clock} class="h-5 w-5 [&>path]:stroke-3" />
+                        <Icon class="h-5 w-5 [&>path]:stroke-3" src={Clock} />
                     {/if}
                 </button>
             </div>
@@ -97,7 +101,7 @@
 </div>
 
 <dialog id="defer_modal" class="modal">
-    <DeferModal {task} onDeferFinal={handleDefer} />
+    <DeferModal onDeferFinal={handleDefer} {task} />
 </dialog>
 
-<History entityId={task.id} content={task.content} activity={task.activity} />
+<History activity={task.activity} content={task.content} entityId={task.id} />

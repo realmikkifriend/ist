@@ -10,11 +10,11 @@
     <span>No due tasks...</span>
 
     <div class="mt-3 flex flex-row space-x-4">
-        <button class={buttonClasses} onclick={() => openAgenda("today")}>
-            <Icon src={Calendar} class="h-4 w-5" /> <span>Today</span>
+        <button class={buttonClasses} onclick={() => openAgenda("today")} type="button">
+            <Icon class="h-4 w-5" src={Calendar} /> <span>Today</span>
         </button>
-        <button class={buttonClasses} onclick={() => openAgenda("tomorrow")}>
-            <Icon src={Calendar} class="h-4 w-5" /> <span>Tomorrow</span>
+        <button class={buttonClasses} onclick={() => openAgenda("tomorrow")} type="button">
+            <Icon class="h-4 w-5" src={Calendar} /> <span>Tomorrow</span>
         </button>
     </div>
 </div>

@@ -1,5 +1,4 @@
 <script lang="ts">
-    import { writable } from "svelte/store";
     import { Icon, ArrowUturnDown } from "svelte-hero-icons";
     import { DateTime } from "luxon";
     import SvelteMarkdown from "@humanspeak/svelte-markdown";
@@ -7,13 +6,12 @@
     import { generateDynalistComment } from "../../../utils/dynalistUtils";
     import { updateDynalistWithToken } from "../../../services/dynalistService";
     import { success } from "../../../services/toastService";
-    import type { Writable } from "svelte/store";
     import type { DynalistNode, DynalistChange, DynalistViewProps } from "../../../types/dynalist";
 
     let { dynalistObject: content }: DynalistViewProps = $props();
 
-    const rotationIndex: Writable<number> = writable(0);
-    const isLoading: Writable<boolean> = writable(false);
+    let rotationIndex = $state(0);
+    let isLoading = $state(false);
 
     /**
      * Rotates an array by the given index.
@@ -37,7 +35,7 @@
             {
                 action: "move",
                 node_id: item.id,
-                parent_id: content?.id,
+                parent_id: content!.id,
                 index: -1,
             },
         ];
@@ -60,28 +58,28 @@
      * @returns A promise resolving to true if successful, false otherwise.
      */
     async function showNextItem(): Promise<boolean> {
-        if (!currentItem || $isLoading || !content) return false;
+        if (!currentItem || isLoading || !content) return false;
 
-        isLoading.set(true);
-        rotationIndex.update((index) => (index + 1) % checklistItems.length);
+        isLoading = true;
+        rotationIndex = (rotationIndex + 1) % checklistItems.length;
 
         const changes = createUpdateChanges(currentItem);
 
         return updateDynalistWithToken(content.file_id, changes).then(
             () => {
                 success("Sent to bottom of list in Dynalist!");
-                isLoading.set(false);
+                isLoading = false;
                 return true;
             },
             (error: unknown) => {
                 console.error("Failed to update Dynalist:", error);
-                isLoading.set(false);
+                isLoading = false;
                 return false;
             },
         );
     }
     let checklistItems = $derived((content?.children as DynalistNode[]) || []);
-    let rotatedItems = $derived(rotateArray(checklistItems, $rotationIndex));
+    let rotatedItems = $derived(rotateArray(checklistItems, rotationIndex));
     let currentItem = $derived(rotatedItems[0]);
     let hasItems = $derived(checklistItems.length > 0);
 </script>
@@ -89,16 +87,16 @@
 {#if hasItems}
     <div class="mt-2">
         <button
-            class="bg-primary float-left mt-0.5 mr-2 inline-block h-5 w-5 cursor-pointer rounded-sm p-1 pr-5 pb-5 {$isLoading
-                ? 'animate-ping'
-                : ''}"
+            class="bg-primary float-left mt-0.5 mr-2 inline-block h-5 w-5 cursor-pointer rounded-sm p-1 pr-5 pb-5"
+            class:animate-ping={isLoading}
+            disabled={isLoading}
             onclick={showNextItem}
-            disabled={$isLoading}
+            type="button"
         >
-            <Icon src={ArrowUturnDown} class="h-4 w-4" />
+            <Icon class="h-4 w-4" src={ArrowUturnDown} />
         </button>
 
-        {#key $rotationIndex}
+        {#key rotationIndex}
             <em class="absolute -top-3.5 left-0 text-xs text-nowrap opacity-25">
                 <span class="mr-0.5 inline-block w-7">&infin;{checklistItems.length}</span>
                 {#if currentItem?.note && isMonthYearFormat(currentItem.note)}

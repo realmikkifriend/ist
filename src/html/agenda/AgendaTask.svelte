@@ -23,17 +23,18 @@
     ].join(" ")}
 >
     <button
-        onclick={() => summonTask(task)}
         class={`priority-element relative -left-1.5 mt-0 flex h-fit min-h-2.5 min-w-10 shrink-0 flex-row items-center justify-center rounded-md pr-1 pl-2 text-xs font-bold ${getPriorityClasses(taskPriority)}`}
+        onclick={() => summonTask(task)}
+        type="button"
     >
         {#if task.due && task.due.date && task.due.date.includes("T")}
             {DateTime.fromISO(task.due.date).toFormat("h:mm")}
         {/if}
 
         {#if task.firstDue}
-            <Icon src={Inbox} class="h-3 min-h-3 w-4 min-w-4" />
+            <Icon class="h-3 min-h-3 w-4 min-w-4" src={Inbox} />
         {:else}
-            <Icon src={InboxArrowDown} class="h-3 min-h-3 w-4 min-w-4" />
+            <Icon class="h-3 min-h-3 w-4 min-w-4" src={InboxArrowDown} />
         {/if}
     </button>
 

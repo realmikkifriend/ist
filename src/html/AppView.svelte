@@ -51,7 +51,7 @@
     {#if $todoistData.tasks}
         {#if $firstDueTask}
             {#key $firstDueTask.id}
-                <TaskDisplay task={$firstDueTask} onDone={handleDone} onDefer={handleDefer} />
+                <TaskDisplay onDefer={handleDefer} onDone={handleDone} task={$firstDueTask} />
             {/key}
         {:else}
             <NoTasks />

@@ -1,20 +1,19 @@
 <script lang="ts">
-    import { writable } from "svelte/store";
+    import { on } from "svelte/events";
     import { Icon, Backspace } from "svelte-hero-icons";
     import SvelteMarkdown from "@humanspeak/svelte-markdown";
     import { generateDynalistComment } from "../../../utils/dynalistUtils";
     import { updateDynalistWithToken } from "../../../services/dynalistService";
     import { success } from "../../../services/toastService";
-    import type { Writable } from "svelte/store";
     import type { DynalistNode, DynalistViewProps } from "../../../types/dynalist";
 
     let { dynalistObject }: DynalistViewProps = $props();
 
-    const removedItemIds: Writable<Set<string>> = writable(new Set());
+    let removedItemIds = $state(new Set<string>());
 
     let checklistItems = $derived(
         (dynalistObject?.children as DynalistNode[])?.filter(
-            (item) => !$removedItemIds.has(item.id),
+            (item) => !removedItemIds.has(item.id),
         ) || [],
     );
 
@@ -46,7 +45,7 @@
 
             await updateDynalistWithToken(dynalistObject.file_id, changes)
                 .then(() => {
-                    removedItemIds.update((ids) => new Set([...ids, itemToRemove.id]));
+                    removedItemIds = new Set([...removedItemIds, itemToRemove.id]);
                     success("Removed from list in Dynalist!");
                 })
                 .catch((error: unknown) => {
@@ -69,7 +68,7 @@
         const syncHandler = () => {
             void handleClick();
         };
-        node.addEventListener("click", syncHandler);
+        on(node, "click", syncHandler);
 
         return {
             destroy() {
@@ -85,9 +84,9 @@
             <span>{checklistItems.length} remaining</span>
         </em>
         <button
-            use:buttonAction
             class="bg-primary float-left mt-0.5 mr-2 inline-block h-5 w-5 cursor-pointer rounded-sm p-1 pr-5 pb-5"
-            ><Icon src={Backspace} class="h-4 w-4" /></button
+            type="button"
+            use:buttonAction><Icon class="h-4 w-4" src={Backspace} /></button
         >
         {#key checklistItems}
             <SvelteMarkdown

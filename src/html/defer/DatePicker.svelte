@@ -51,11 +51,11 @@
 
 <Calendar
     {dateInfo}
+    disable="past"
     onDayClick={(day: DateTime) => {
         const isoDate = day.toISODate();
         if (isoDate) {
             onDefer({ rawTime: isoDate });
         }
     }}
-    disable="past"
 />

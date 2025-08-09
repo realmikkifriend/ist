@@ -23,7 +23,7 @@
         <div
             class="prose bg-accent text-primary-content mx-auto flex w-11/12 flex-row items-center rounded-b-xl p-4 opacity-25"
         >
-            <Icon src={ArrowPath} class="mr-2 h-4 w-4 animate-spin" />
+            <Icon class="mr-2 h-4 w-4 animate-spin" src={ArrowPath} />
             <p>Loading comments...</p>
         </div>
     {:then comments}

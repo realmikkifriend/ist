@@ -1,34 +1,28 @@
 <script lang="ts">
-    import { writable, derived } from "svelte/store";
     import { Icon, Calendar, Clock } from "svelte-hero-icons";
     import { DateTime } from "luxon";
     import { todoistData } from "../../stores/stores";
     import { createDateWithTime } from "../../utils/timeUtils";
     import DatePicker from "./DatePicker.svelte";
     import TimePicker from "./TimePicker.svelte";
-    import type { Writable, Readable } from "svelte/store";
     import type { Task } from "../../types/todoist";
     import type { DeferEventDetail, DeferModalProps } from "../../types/defer";
 
     let { task, onDeferFinal }: DeferModalProps = $props();
 
-    const isTimeTabActive: Writable<boolean> = writable(false);
-
-    $effect(() => {
-        isTimeTabActive.set(Boolean(task.due && task.due.allDay !== 1));
-    });
+    let isTimeTabActive: boolean = $derived(Boolean(task.due && task.due.allDay !== 1));
 
     /**
      * Selects the active tab ("time" or "calendar").
      * @param tab - The tab to activate.
      */
     function selectTab(tab: "time" | "calendar"): void {
-        isTimeTabActive.set(tab === "time");
+        isTimeTabActive = tab === "time";
     }
 
     const tz: string = Intl.DateTimeFormat().resolvedOptions().timeZone || "America/Chicago";
 
-    const tasks: Readable<Task[]> = derived(todoistData, ($todoistData) => $todoistData.tasks);
+    const tasks: Task[] = $derived($todoistData.tasks);
 
     /**
      * Handles the defer event from the child component.
@@ -37,7 +31,7 @@
      */
     function handleDefer(detail: DeferEventDetail): void {
         const { rawTime } = detail;
-        isTimeTabActive.set(true);
+        isTimeTabActive = true;
 
         const time: DateTime =
             typeof rawTime === "number"
@@ -64,37 +58,38 @@
 <div class="modal-box flex min-h-[64%] w-84 flex-col justify-start overflow-hidden">
     {#key task}
         <div class="flex justify-center">
-            <div role="tablist" class="tabs-box tabs bg-neutral h-10 w-2/3 justify-center">
+            <div class="tabs-box tabs bg-neutral h-10 w-2/3 justify-center" role="tablist">
                 {#each ["time", "calendar"] as tab (tab)}
                     <button
-                        role="tab"
-                        tabindex="0"
                         class={`tab h-8 w-1/2 ${
-                            tab === ($isTimeTabActive ? "time" : "calendar")
+                            tab === (isTimeTabActive ? "time" : "calendar")
                                 ? "tab-active"
                                 : "bg-neutral"
                         }`}
                         onclick={() => selectTab(tab as "time" | "calendar")}
+                        role="tab"
+                        tabindex="0"
+                        type="button"
                     >
                         <Icon
-                            src={tab === "time" ? Clock : Calendar}
                             class="h-5 w-5 [&>path]:stroke-3"
+                            src={tab === "time" ? Clock : Calendar}
                         />
                     </button>
                 {/each}
             </div>
         </div>
 
-        {#key $tasks}
-            {#if $isTimeTabActive}
-                <TimePicker {task} tasks={$tasks} onDefer={handleDefer} />
+        {#key tasks}
+            {#if isTimeTabActive}
+                <TimePicker onDefer={handleDefer} {task} {tasks} />
             {:else}
-                <DatePicker taskToDefer={task} {tz} tasks={$tasks} onDefer={handleDefer} />
+                <DatePicker onDefer={handleDefer} taskToDefer={task} {tasks} {tz} />
             {/if}
         {/key}
     {/key}
 </div>
 
-<form method="dialog" class="modal-backdrop">
-    <button>close</button>
+<form class="modal-backdrop" method="dialog">
+    <button type="submit">close</button>
 </form>

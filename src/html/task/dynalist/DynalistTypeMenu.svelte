@@ -38,36 +38,38 @@
 
 <div class="dropdown dropdown-left absolute -top-3 -right-7">
     <div
-        tabindex="0"
-        role="button"
         class="btn bg-accent hover:bg-primary m-0 flex h-2 min-h-8 flex-row content-center gap-0 border-transparent px-1 py-0 shadow-none"
+        role="button"
+        tabindex="0"
     >
-        <Logo type="dynalist" size={6} />
-        <Icon src={ChevronDown} class="h-3 w-3" />
+        <Logo size={6} type="dynalist" />
+        <Icon class="h-3 w-3" src={ChevronDown} />
     </div>
-    <ul tabindex="-1" class="menu dropdown-content bg-neutral z-20 -mr-16 w-fit rounded-lg p-1">
+    <ul class="menu dropdown-content bg-neutral z-20 -mr-16 w-fit rounded-lg p-1" tabindex="-1">
         {#each iconPairs as { icon, label, type }, index (index)}
             {#if index === 0}
                 <span class="cursor-default text-center text-xs text-nowrap"
-                    >&mdash;read <a target="_blank" href={url}>original document</a>&mdash;</span
+                    >&mdash;read <a href={url} target="_blank">original document</a>&mdash;</span
                 >
             {/if}
             {#if index === 3}
                 <span class="text-primary cursor-default text-center text-xs text-nowrap"
-                    >&mdash;modify <a class="text-primary" target="_blank" href={url}
+                    >&mdash;modify <a class="text-primary" href={url} target="_blank"
                         >original document</a
                     >&mdash;</span
                 >
             {/if}
             <button
-                onclick={() => handleSelectType(type)}
-                class="m-0 flex w-full flex-row items-center gap-1 rounded-sm p-1 font-bold {selectedType ===
-                type
-                    ? 'text-base-100 cursor-auto'
-                    : 'hover:bg-accent cursor-pointer'}"
+                class="m-0 flex w-full flex-row items-center gap-1 rounded-sm p-1 font-bold"
+                class:cursor-auto={selectedType === type}
+                class:cursor-pointer={selectedType !== type}
+                class:hover:bg-accent={selectedType !== type}
+                class:text-base-100={selectedType === type}
                 disabled={selectedType === type}
+                onclick={() => handleSelectType(type)}
+                type="submit"
             >
-                <Icon src={icon} class="mr-1 h-6 w-6" />
+                <Icon class="mr-1 h-6 w-6" src={icon} />
                 {label}
             </button>
         {/each}

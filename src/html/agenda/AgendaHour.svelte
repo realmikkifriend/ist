@@ -67,9 +67,9 @@
         {/each}
         {#if currentHour}
             <div
-                class="rounded-badge absolute left-0 z-40 h-0.5 w-full bg-red-600"
-                style="top: {(now.minute / 60) * 100}%;"
                 id="today-marker"
+                style:top="{(now.minute / 60) * 100}%"
+                class="rounded-badge absolute left-0 z-40 h-0.5 w-full bg-red-600"
             >
                 <div
                     class="absolute -top-[0.2rem] -right-[0.3rem] h-2 w-2 rounded-full bg-red-600"
@@ -79,10 +79,15 @@
         <div class="clipped flex w-full flex-col py-0.5 pr-1">
             {#each processedTasks as task, index (index)}
                 <div
-                    class={`task-container w-[98%] ${calculateTaskStyle(index, processedTasks)}`}
-                    style={`margin-top: ${calculateTaskPosition(task, processedTasks[index - 1])}rem; filter: ${task.due && DateTime.fromISO(task.due.date) > now && title === "Today" ? "brightness(0.75)" : "brightness(1)"};`}
+                    style:margin-top="{calculateTaskPosition(task, processedTasks[index - 1])}rem"
+                    style:filter={task.due &&
+                    DateTime.fromISO(task.due.date) > now &&
+                    title === "Today"
+                        ? "brightness(0.75)"
+                        : "brightness(1)"}
+                    class="task-container w-[98%] {calculateTaskStyle(index, processedTasks)}"
                 >
-                    <AgendaTask {task} color={getTaskColor(task.contextId) ?? "berry_red"} />
+                    <AgendaTask color={getTaskColor(task.contextId) ?? "berry_red"} {task} />
                 </div>
             {/each}
         </div>

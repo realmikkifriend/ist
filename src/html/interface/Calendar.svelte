@@ -1,5 +1,4 @@
 <script lang="ts">
-    import { writable } from "svelte/store";
     import { DateTime } from "luxon";
     import { Icon, ChevronUp, ChevronDown } from "svelte-hero-icons";
     import { getCalendarGrid, getInfoForDay } from "../../utils/calendarUtils";
@@ -10,14 +9,14 @@
 
     const today = DateTime.now().startOf("day");
 
-    const displayDate = writable(DateTime.now());
+    let displayDate = $state(DateTime.now());
 
-    const days = $derived(getCalendarGrid($displayDate));
+    const days = $derived(getCalendarGrid(displayDate));
     const disablePrevMonth = $derived(
-        disable === "past" && $displayDate.startOf("month") <= today.startOf("month"),
+        disable === "past" && displayDate.startOf("month") <= today.startOf("month"),
     );
     const disableNextMonth = $derived(
-        disable === "future" && $displayDate.endOf("month") >= today.endOf("month"),
+        disable === "future" && displayDate.endOf("month") >= today.endOf("month"),
     );
 
     const weekDays = ["M", "T", "W", "T", "F", "S", "S"];
@@ -27,32 +26,34 @@
      * @param months - The number of months to move. Negative for past, positive for future.
      */
     function changeMonth(months: number) {
-        const newDate = $displayDate.plus({ months });
+        const newDate = displayDate.plus({ months });
         if (
             (disable === "past" && newDate < today.startOf("month")) ||
             (disable === "future" && newDate > today.endOf("month"))
         ) {
             return;
         }
-        displayDate.set(newDate);
+        displayDate = newDate;
     }
 </script>
 
 <div class="w-full">
     <div class="mx-3 my-5 flex items-center justify-between">
-        <div class="font-bold">{$displayDate.monthLong} {$displayDate.year}</div>
+        <div class="font-bold">{displayDate.monthLong} {displayDate.year}</div>
         <div class="flex items-center">
             <button
-                onclick={() => changeMonth(-1)}
                 class="hover:text-primary disabled:hover:bg-base-100 flex h-7 w-7 items-center justify-center rounded-sm hover:bg-gray-200"
                 disabled={disablePrevMonth}
+                onclick={() => changeMonth(-1)}
+                type="button"
             >
                 <Icon src={!disablePrevMonth ? ChevronUp : ""} />
             </button>
             <button
-                onclick={() => changeMonth(1)}
                 class="hover:text-primary disabled:hover:bg-base-100 flex h-7 w-7 items-center justify-center rounded-sm hover:bg-gray-200"
                 disabled={disableNextMonth}
+                onclick={() => changeMonth(1)}
+                type="button"
             >
                 <Icon src={!disableNextMonth ? ChevronDown : ""} />
             </button>
@@ -70,24 +71,25 @@
                 {#if onDayClick}
                     <button
                         class="hover:bg-primary w-full cursor-pointer rounded-sm text-left disabled:hover:bg-transparent"
-                        onclick={() => onDayClick(day)}
                         disabled={(disable === "past" && day < today) ||
                             (disable === "future" && day > today)}
+                        onclick={() => onDayClick(day)}
+                        type="button"
                     >
                         <CalendarDay
-                            dots={info?.dots ?? []}
-                            tooltip={info?.tasks}
                             {day}
                             {disable}
+                            dots={info?.dots ?? []}
+                            tooltip={info?.tasks}
                         />
                     </button>
                 {:else}
                     <div class="w-full rounded-sm text-left">
                         <CalendarDay
-                            dots={info?.dots ?? []}
-                            tooltip={info?.tasks}
                             {day}
                             {disable}
+                            dots={info?.dots ?? []}
+                            tooltip={info?.tasks}
                         />
                     </div>
                 {/if}

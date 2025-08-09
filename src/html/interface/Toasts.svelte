@@ -15,8 +15,6 @@
     {#each $toastMessages as toast (toast.id)}
         {@const alertClass = alertClasses[toast.type]}
         <button
-            in:fly={{ x: 200, duration: 300 }}
-            out:fly={{ x: 200, duration: 300 }}
             class="alert {alertClass} cursor-pointer"
             onclick={() => {
                 if (toast.action) {
@@ -24,6 +22,9 @@
                 }
                 removeToast(toast.id);
             }}
+            type="button"
+            in:fly={{ x: 200, duration: 300 }}
+            out:fly={{ x: 200, duration: 300 }}
         >
             <span>{toast.message}</span>
         </button>

@@ -29,7 +29,8 @@
                 <button
                     class={"btn hover:bg-secondary min-h-4 w-full rounded-md px-1 " +
                         button.stylingButton}
-                    onclick={() => handleDefer(Number(button.ms))}>{button.text}</button
+                    onclick={() => handleDefer(Number(button.ms))}
+                    type="button">{button.text}</button
                 >
                 {#if button.time}
                     <div class="flex max-h-4 w-full justify-between text-xs">

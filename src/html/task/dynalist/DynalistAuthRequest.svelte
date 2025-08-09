@@ -62,26 +62,25 @@
 
 <div class="dynalistPrompt w-full">
     <div class="mb-1 flex items-center space-x-1">
-        <Logo type="dynalist" size={8} />
+        <Logo size={8} type="dynalist" />
         <div class="overflow-x-hidden text-nowrap">
             Provide <a
-                href="https://dynalist.io/developer"
-                class="href text-blue-500 hover:underline">Dynalist access</a
+                class="href text-blue-500 hover:underline"
+                href="https://dynalist.io/developer">Dynalist access</a
             >
-            <p class="invalid-token text-red-500" style="display:none;">Invalid token</p>
+            <p class="invalid-token invisible text-red-500">Invalid token</p>
         </div>
     </div>
     <form class="flex gap-2" onsubmit={handleToken}>
-        <input type="text" name="token" placeholder="Enter your token" class="input min-w-4 grow" />
-        <span class="submit-content" style="display:flex;">
+        <input name="token" class="input min-w-4 grow" placeholder="Enter your token" type="text" />
+        <span class="submit-content flex">
             <button
-                type="submit"
                 class="btn bg-primary hover:bg-primary grow-0 text-white hover:opacity-75"
-                ><Icon src={Key} class="h-5 w-5" /></button
+                type="submit"><Icon class="h-5 w-5" src={Key} /></button
             >
         </span>
-        <span class="spinner" style="display:none;">
-            <Icon src={ArrowPath} class="h-6 w-6 animate-spin" />
+        <span class="spinner invisible">
+            <Icon class="h-6 w-6 animate-spin" src={ArrowPath} />
         </span>
     </form>
 </div>

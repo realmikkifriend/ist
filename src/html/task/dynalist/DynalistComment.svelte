@@ -1,11 +1,9 @@
 <script lang="ts">
-    import { writable } from "svelte/store";
     import { Icon, ArrowPath } from "svelte-hero-icons";
     import { loadDynalistCommentWithToken } from "../../../services/dynalistService";
     import { hasError, getDynalistType } from "../../../utils/dynalistUtils";
     import DynalistContentComponent from "./DynalistContent.svelte";
     import { error as showError } from "../../../services/toastService";
-    import type { Writable } from "svelte/store";
     import type {
         DynalistContent,
         DynalistTaskType,
@@ -15,13 +13,13 @@
 
     let { url = "" }: DynalistViewProps = $props();
 
-    const dynalistStore: Writable<DynalistStoreState> = writable({
+    let dynalistStore: DynalistStoreState = $state({
         dynalistObject: undefined,
         selectedType: "",
         error: undefined,
     });
 
-    const resolvedLoadStateStore: Writable<DynalistStoreState | undefined> = writable(undefined);
+    let resolvedLoadStateStore: DynalistStoreState | undefined = $state(undefined);
 
     const loadPromise: Promise<DynalistStoreState> = loadDynalistCommentWithToken(url).then(
         (value: { dynalistObject?: DynalistContent; selectedType?: string; error?: unknown }) => {
@@ -54,8 +52,8 @@
                     error: undefined,
                 };
             }
-            dynalistStore.set(newState);
-            resolvedLoadStateStore.set(newState);
+            dynalistStore = newState;
+            resolvedLoadStateStore = newState;
             return newState;
         },
     );
@@ -66,20 +64,20 @@
      * @returns nothing, but updates Dynalist store setting
      */
     const handleTypeSelection = (event: CustomEvent<{ type: DynalistTaskType }>) =>
-        dynalistStore.update((state) => ({ ...state, selectedType: event.detail.type }));
+        (dynalistStore = { ...dynalistStore, selectedType: event.detail.type });
 
     $effect(() => {
         if (
-            $dynalistStore.selectedType === "" &&
-            $dynalistStore.dynalistObject &&
-            $resolvedLoadStateStore
+            dynalistStore.selectedType === "" &&
+            dynalistStore.dynalistObject &&
+            resolvedLoadStateStore
         ) {
-            const initialSelectedType = $resolvedLoadStateStore.selectedType;
+            const initialSelectedType = resolvedLoadStateStore.selectedType;
             if (initialSelectedType !== "") {
-                dynalistStore.update((state) => ({
-                    ...state,
+                dynalistStore = {
+                    ...dynalistStore,
                     selectedType: initialSelectedType,
-                }));
+                };
             }
         }
     });
@@ -87,13 +85,13 @@
 
 {#await loadPromise}
     <span class="flex items-center">
-        <Icon src={ArrowPath} class="mr-2 h-4 w-4 animate-spin" /> Retrieving Dynalist document...
+        <Icon class="mr-2 h-4 w-4 animate-spin" src={ArrowPath} /> Retrieving Dynalist document...
     </span>
 {:then result}
     {#if result.dynalistObject}
         <DynalistContentComponent
             dynalistObject={result.dynalistObject}
-            selectedType={$dynalistStore.selectedType}
+            selectedType={dynalistStore.selectedType}
             {url}
             on:selectType={handleTypeSelection}
         />

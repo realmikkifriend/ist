@@ -1,5 +1,4 @@
 <script lang="ts">
-    import { writable } from "svelte/store";
     import { DateTime } from "luxon";
     import { Icon, CalendarDateRange, Check, XMark, ArrowPath } from "svelte-hero-icons";
     import { handleDynalistTrackingClick } from "../../../services/dynalistService";
@@ -8,7 +7,7 @@
     import type { DynalistNode } from "../../../types/dynalist";
 
     let { dynalistObject: content = $bindable() }: { dynalistObject?: DynalistNode } = $props();
-    const isLoading = writable(false);
+    let isLoading = $state(false);
 
     let trackedDates: string[] = $derived(
         Array.isArray(content?.children)
@@ -50,10 +49,10 @@
     }
 
     const handleClick = async () => {
-        if ($isLoading || !content) return;
-        isLoading.set(true);
+        if (isLoading || !content) return;
+        isLoading = true;
         content.children = await handleDynalistTrackingClick(content, todayTracked);
-        isLoading.set(false);
+        isLoading = false;
     };
 </script>
 
@@ -62,37 +61,39 @@
         class="group h-5 w-5 rounded-sm text-white outline-2 outline-blue-500 hover:bg-blue-500/25"
         class:bg-blue-500={todayTracked}
         class:hover:bg-blue-300={todayTracked}
+        disabled={isLoading}
         onclick={handleClick}
-        disabled={$isLoading}
+        type="button"
     >
         <Icon
-            src={$isLoading ? ArrowPath : ""}
-            class={$isLoading ? "h-5 w-5 animate-spin cursor-wait" : "h-0 w-0"}
+            class={isLoading ? "h-5 w-5 animate-spin cursor-wait" : "h-0 w-0"}
+            src={isLoading ? ArrowPath : ""}
         />
         <Icon
-            class={!$isLoading
+            class={!isLoading
                 ? "visible h-5 w-5 p-0.5 group-hover:invisible group-hover:h-0 group-hover:p-0"
                 : ""}
-            src={todayTracked && !$isLoading ? Check : ""}
+            src={todayTracked && !isLoading ? Check : ""}
         />
         <Icon
-            class="invisible h-0 w-0 {!$isLoading
+            class="invisible h-0 w-0 {!isLoading
                 ? 'group-hover:visible group-hover:h-5 group-hover:p-0.5'
                 : ''}"
-            src={todayTracked && !$isLoading ? XMark : ""}
+            src={todayTracked && !isLoading ? XMark : ""}
         />
     </button>
     <button
         class="bg-neutral hover:bg-secondary rounded-full p-0.5 text-gray-200"
         onclick={openCalendarModal}
+        type="button"
     >
         <Icon class="h-6 w-6 p-1" src={CalendarDateRange} />
     </button>
     <span class="text-lg">{content?.content}</span>
 </div>
 <History
-    entityId={content?.id ?? ""}
-    content={content?.content ?? ""}
     activity={dateInfo}
+    content={content?.content ?? ""}
+    entityId={content?.id ?? ""}
     title="History"
 />

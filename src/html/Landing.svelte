@@ -20,7 +20,7 @@
         : undefined;
 </script>
 
-<div class="hero py-6 md:py-20" id="landing">
+<div id="landing" class="hero py-6 md:py-20">
     <div class="hero-content text-center">
         <div class="max-w-lg" aria-label="Quick Explanation">
             <h1 class="text-5xl font-bold">One Task at a Time</h1>
@@ -34,12 +34,16 @@
                         class="btn btn-outline btn-primary items-center text-lg"
                         href={todoistAuthURL}
                     >
-                        <Logo type="todoist" style="max-height: 55%;" />
+                        <Logo style="max-height: 55%;" type="todoist" />
                         <p class="pb-1">Continue with Todoist</p>
                     </a>
                 {:else}
-                    <button class="btn btn-outline btn-primary items-center text-lg" disabled>
-                        <Logo type="todoist" style="max-height: 55%;" />
+                    <button
+                        class="btn btn-outline btn-primary items-center text-lg"
+                        disabled
+                        type="button"
+                    >
+                        <Logo style="max-height: 55%;" type="todoist" />
                         <p class="pb-1">Todoist Client ID not configured</p>
                     </button>
                 {/if}

@@ -8,17 +8,18 @@
 </script>
 
 <button
-    class="group badge badge-outline items-center whitespace-nowrap
-           {$userSettings.selectedContext
-        ? 'cursor-pointer'
-        : !$firstDueTask?.summoned
-          ? 'cursor-default'
-          : ''}
-           {$userSettings.selectedContext ? 'opacity-75' : 'opacity-40'}
-           {$userSettings.selectedContext ? 'text-primary' : ''}
-           {$firstDueTask?.summoned ? 'border-purple-400 text-purple-400' : ''}
-           {$firstDueTask?.skip ? 'border-yellow-500 text-yellow-500' : ''}"
+    class="group badge badge-outline items-center whitespace-nowrap"
+    class:border-purple-400={$firstDueTask?.summoned}
+    class:border-yellow-500={$firstDueTask?.skip}
+    class:cursor-default={!$firstDueTask?.summoned && !$userSettings.selectedContext}
+    class:cursor-pointer={$userSettings.selectedContext}
+    class:opacity-40={!$userSettings.selectedContext}
+    class:opacity-75={$userSettings.selectedContext}
+    class:text-primary={$userSettings.selectedContext}
+    class:text-purple-400={$firstDueTask?.summoned}
+    class:text-yellow-500={$firstDueTask?.skip}
     onclick={clearSelectedTask}
+    type="reset"
 >
     {#if $firstDueTask?.skip}
         low priority, defer?
@@ -33,7 +34,7 @@
     {/if}
     {#if $userSettings.selectedContext || $firstDueTask?.summoned}
         <p class="ml-1 block sm:hidden sm:group-hover:block">
-            <Icon src={XMark} class="h-4 w-4" />
+            <Icon class="h-4 w-4" src={XMark} />
         </p>
     {/if}
 </button>

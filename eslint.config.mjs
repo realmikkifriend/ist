@@ -3,7 +3,7 @@ import globals from "globals";
 import { defineConfig } from "eslint/config";
 import functional from "eslint-plugin-functional";
 import svelte from "eslint-plugin-svelte";
-import tseslint from "typescript-eslint";
+import ts from "typescript-eslint";
 import jsdoc from "eslint-plugin-jsdoc";
 import svelteConfig from "./svelte.config.mjs";
 import vitest from "@vitest/eslint-plugin";
@@ -29,7 +29,7 @@ export default defineConfig([
 
     // -----------------------------------
     // `     TypeScript Configuration
-    ...tseslint.configs.recommendedTypeChecked,
+    ...ts.configs.recommendedTypeChecked,
     {
         files: ["**/*.ts", "**/*.tsx"],
         languageOptions: {
@@ -124,13 +124,14 @@ export default defineConfig([
         files: ["**/*.svelte"],
         languageOptions: {
             parserOptions: {
-                project: "./tsconfig.json",
-                tsconfigRootDir: import.meta.dirname,
+                // project: "./tsconfig.json",
+                // tsconfigRootDir: import.meta.dirname,
+                projectService: true,
                 extraFileExtensions: [".svelte"],
-                parser: "@typescript-eslint/parser",
-                svelteFeatures: {
-                    experimentalGenerics: true,
-                },
+                parser: ts.parser,
+                // svelteFeatures: {
+                //     experimentalGenerics: true,
+                // },
                 svelteConfig,
             },
         },
@@ -138,7 +139,7 @@ export default defineConfig([
             "max-lines": ["error", { max: 95, skipComments: true, skipBlankLines: true }],
             "max-depth": ["error", 2],
             "no-restricted-syntax": [
-                "error",
+                "warn",
                 {
                     selector: "TSTypeAliasDeclaration",
                     message: "Types are only allowed in src/types. Please import them.",
@@ -148,6 +149,15 @@ export default defineConfig([
                     message: "Interfaces are only allowed in src/types. Please import them.",
                 },
             ],
+            "no-restricted-imports": [
+                "warn",
+                {
+                    name: "svelte/store",
+                    importNames: ["writable"],
+                    message:
+                        "Avoid importing `writable`. Migrate state management to Svelte 5 runes.",
+                },
+            ],
             "functional/no-let": "off",
             "@typescript-eslint/no-unused-vars": [
                 "error",
@@ -155,6 +165,12 @@ export default defineConfig([
                     argsIgnorePattern: "^_",
                 },
             ],
+            "svelte/no-add-event-listener": "warn",
+            "svelte/button-has-type": "warn",
+            "svelte/prefer-class-directive": "warn",
+            "svelte/prefer-style-directive": "warn",
+            "svelte/sort-attributes": "warn",
+            "svelte/require-stores-init": "warn",
         },
     },
     // -----------------------------------

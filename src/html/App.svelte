@@ -1,6 +1,6 @@
 <script lang="ts">
     import { onMount } from "svelte";
-    import { writable } from "svelte/store";
+    import { on } from "svelte/events";
     import { Icon, ArrowPath } from "svelte-hero-icons";
     import { todoistData, firstDueTask } from "../stores/stores";
     import { userSettings } from "../stores/interface";
@@ -12,8 +12,8 @@
     import Agenda from "./agenda/Agenda.svelte";
     import Toasts from "./interface/Toasts.svelte";
 
-    const isSpinning = writable(false);
-    const hash = writable(window.location.hash);
+    let isSpinning = $state(false);
+    let hash = $state(window.location.hash);
     let dataPromise: Promise<void> = $state(Promise.resolve());
 
     $effect(() => {
@@ -31,9 +31,9 @@
          * Updates the hash store with the current window location hash.
          * @returns Current browser location.
          */
-        const updateHash = (): void => hash.set(window.location.hash);
+        const updateHash = () => (hash = window.location.hash);
 
-        window.addEventListener("hashchange", updateHash);
+        on(window, "hashchange", updateHash);
 
         updateHash();
 
@@ -54,12 +54,11 @@
      * @returns Promise that resolves when data is refreshed and spinning state is updated.
      */
     const handleRefresh = async (): Promise<void> => {
-        isSpinning.set(true);
+        isSpinning = true;
         await refreshData();
-        isSpinning.set(false);
+        isSpinning = false;
     };
 
-    // Initialize dataPromise on component creation
     if ($firstDueTask?.summoned) {
         dataPromise = Promise.resolve();
     } else {
@@ -68,24 +67,24 @@
 </script>
 
 <div class="flex w-fit items-center">
-    <Sidebar hash={$hash} />
+    <Sidebar {hash} />
 
-    {#if $firstDueTask && $hash !== "#today" && $hash !== "#tomorrow"}
+    {#if $firstDueTask && hash !== "#today" && hash !== "#tomorrow"}
         {#key $firstDueTask.id}
             <ContextBadge />
         {/key}
     {/if}
 </div>
 
-{#if $hash === "#today" || $hash === "#tomorrow"}
+{#if hash === "#today" || hash === "#tomorrow"}
     <Agenda />
 {:else}
     <AppView {dataPromise} />
 {/if}
 
 <div class="fixed right-2 bottom-2 z-10">
-    <button class="bg-base-100 rounded-md p-1" onclick={handleRefresh}>
-        <Icon src={ArrowPath} class="h-6 w-6 {$isSpinning ? 'animate-spin cursor-wait' : ''}" />
+    <button class="bg-base-100 rounded-md p-1" onclick={handleRefresh} type="button">
+        <Icon class="h-6 w-6 {isSpinning ? 'animate-spin cursor-wait' : ''}" src={ArrowPath} />
     </button>
 </div>
 

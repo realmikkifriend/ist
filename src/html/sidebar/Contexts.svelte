@@ -49,26 +49,27 @@
 
 <div class="mb-2 ml-2 flex items-center justify-between">
     <div class="buttons">
-        <button onclick={() => openAgenda("today")}>
-            <Icon src={Calendar} class="h-7 w-8" />
+        <button onclick={() => openAgenda("today")} type="button">
+            <Icon class="h-7 w-8" src={Calendar} />
         </button>
     </div>
     <h1 class="text-2xl font-bold">Contexts</h1>
     <label
-        for="my-drawer"
         class="btn drawer-button bg-transparent px-0 hover:border-transparent hover:bg-transparent"
+        for="my-drawer"
     >
-        <Icon src={XCircle} class="h-7 w-8" />
+        <Icon class="h-7 w-8" src={XCircle} />
     </label>
 </div>
 
 {#each $todoistData.contexts as context, index (index)}
     {#if dueTasksByContext[context.id] && dueTasksByContext[context.id].total > 0}
         <button
+            class="bg-secondary text-base-100 tooltip sm:tooltip-right tooltip-bottom mb-2 rounded-lg"
             class:opacity-25={$userSettings.selectedContext &&
                 $userSettings.selectedContext.id !== context.id}
-            class="bg-secondary text-base-100 tooltip sm:tooltip-right tooltip-bottom mb-2 rounded-lg"
             onclick={() => handleContextClick(context.id)}
+            type="button"
         >
             <ContextButtonContents {context} tasksForContext={dueTasksByContext[context.id]} />
         </button>

@@ -27,7 +27,7 @@
             <Calendar dateInfo={resolvedDateInfo} disable="future" />
         {/await}
     </div>
-    <form method="dialog" class="modal-backdrop">
-        <button>close</button>
+    <form class="modal-backdrop" method="dialog">
+        <button type="submit">close</button>
     </form>
 </dialog>

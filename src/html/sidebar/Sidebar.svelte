@@ -11,19 +11,19 @@
 </script>
 
 <div class="drawer">
-    <input id="my-drawer" type="checkbox" class="drawer-toggle" />
+    <input id="my-drawer" class="drawer-toggle" type="checkbox" />
     <div class="drawer-content flex flex-row items-center">
         <label
-            for="my-drawer"
             class="btn drawer-button hover:bg-primary mt-0 bg-transparent shadow-none"
+            for="my-drawer"
         >
             {#if hash !== "#today" && hash !== "#tomorrow"}
-                <Icon src={Bars3} class="h-8 w-8" />
+                <Icon class="h-8 w-8" src={Bars3} />
             {/if}
         </label>
     </div>
     <div class="drawer-side z-30">
-        <label for="my-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
+        <label class="drawer-overlay" aria-label="close sidebar" for="my-drawer"></label>
         <ul class="menu bg-base-100 text-base-content min-h-full w-80 px-4 py-2">
             {#if $todoistData.contexts}
                 <Contexts />
@@ -34,9 +34,9 @@
                     <DailyGoal />
                 </div>
                 <Footer />
-                <button class="btn btn-secondary w-full" onclick={handleLogout}
-                    ><Icon src={ArrowLeftOnRectangle} class="h-6 w-6" />Log Out</button
-                >
+                <button class="btn btn-secondary w-full" onclick={handleLogout} type="submit">
+                    <Icon class="h-6 w-6" src={ArrowLeftOnRectangle} />Log Out
+                </button>
             </div>
         </ul>
     </div>
