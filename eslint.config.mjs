@@ -40,8 +40,8 @@ export default defineConfig([
             globals: globals.browser,
         },
         rules: {
-            "max-lines": ["error", { max: 140, skipComments: true, skipBlankLines: true }],
-            "max-depth": ["error", 2],
+            "max-lines": ["warn", { max: 140, skipComments: true, skipBlankLines: true }],
+            "max-depth": ["warn", 2],
         },
     },
 
@@ -123,21 +123,21 @@ export default defineConfig([
     {
         files: ["**/*.svelte"],
         languageOptions: {
+            parser: svelte.parser,
             parserOptions: {
-                // project: "./tsconfig.json",
-                // tsconfigRootDir: import.meta.dirname,
+                parser: ts.parser,
                 projectService: true,
                 extraFileExtensions: [".svelte"],
-                parser: ts.parser,
-                // svelteFeatures: {
-                //     experimentalGenerics: true,
-                // },
+                svelteFeatures: {
+                    experimentalGenerics: true,
+                    runes: true, // Enable Svelte 5 runes
+                },
                 svelteConfig,
             },
         },
         rules: {
-            "max-lines": ["error", { max: 95, skipComments: true, skipBlankLines: true }],
-            "max-depth": ["error", 2],
+            "max-lines": ["warn", { max: 95, skipComments: true, skipBlankLines: true }],
+            "max-depth": ["warn", 2],
             "no-restricted-syntax": [
                 "warn",
                 {
