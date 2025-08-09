@@ -1,11 +1,16 @@
 <script lang="ts">
     import { onDestroy } from "svelte";
+    import { shortcut } from "@svelte-put/shortcut";
     import { updateMilliseconds } from "../../services/deferModalService";
     import { getPriorityClasses } from "../../utils/styleUtils";
+    import { getShiftedSymbol } from "../../utils/deferTimeConfigs";
     import ListTask from "../task/ListTask.svelte";
+    import type { ShortcutModifierDefinition } from "@svelte-put/shortcut";
     import type { TimePickerProps } from "../../types/defer";
 
     let { task, tasks = $bindable(), onDefer }: TimePickerProps = $props();
+
+    let buttons: HTMLButtonElement[] = [];
 
     const triggerButtonUpdate = (): void => {
         tasks = [...tasks];
@@ -20,18 +25,35 @@
     const handleDefer = (rawTime: number): void => {
         onDefer({ rawTime });
     };
+
+    const shortcutTriggers = Array.from({ length: 10 }, (_, i) => {
+        const hotkey = i + 1;
+        return {
+            key: hotkey >= 10 ? getShiftedSymbol(hotkey - 10) : String(hotkey),
+            callback: () => {
+                if (buttons[i]) {
+                    buttons[i].click();
+                }
+            },
+            modifier: (hotkey >= 10 ? "shift" : undefined) as
+                | ShortcutModifierDefinition
+                | undefined,
+        };
+    });
 </script>
 
 <div class="mt-2 flex w-72 flex-row flex-wrap gap-x-2 gap-y-1">
-    {#each updateMilliseconds(task, tasks) as button (button.ms)}
+    {#each updateMilliseconds(task, tasks) as button, i (button.ms)}
         {#if button.ms !== undefined}
-            <div class={button.styling}>
+            <div class={button.styling + " relative"}>
                 <button
+                    bind:this={buttons[i]}
                     class={"btn hover:bg-secondary min-h-4 w-full rounded-md px-1 " +
                         button.stylingButton}
                     onclick={() => handleDefer(Number(button.ms))}
                     type="button">{button.text}</button
                 >
+                <kbd>{i + 1 >= 10 ? "SHIFT+" + (i - 9) : i + 1}</kbd>
                 {#if button.time}
                     <div class="flex max-h-4 w-full justify-between text-xs">
                         <span
@@ -61,3 +83,8 @@
         {/if}
     {/each}
 </div>
+<svelte:window
+    use:shortcut={{
+        trigger: shortcutTriggers,
+    }}
+/>

@@ -89,3 +89,24 @@ export function handleSameDayButton(
         stylingButton,
     };
 }
+
+/**
+ * Returns the symbol for the given number, for keyboard shortcuts.
+ * @param {number} num - The given number.
+ * @returns The symbol corresponding to the given number.
+ */
+export const getShiftedSymbol = (num: number): string => {
+    const symbols: { [key: number]: string } = {
+        0: ")",
+        1: "!",
+        2: "@",
+        3: "#",
+        4: "$",
+        5: "%",
+        6: "^",
+        7: "&",
+        8: "*",
+        9: "(",
+    };
+    return symbols[num] || String(num);
+};

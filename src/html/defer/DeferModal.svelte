@@ -1,6 +1,7 @@
 <script lang="ts">
     import { Icon, Calendar, Clock } from "svelte-hero-icons";
     import { DateTime } from "luxon";
+    import { shortcut } from "@svelte-put/shortcut";
     import { todoistData } from "../../stores/stores";
     import { createDateWithTime } from "../../utils/timeUtils";
     import DatePicker from "./DatePicker.svelte";
@@ -75,6 +76,7 @@
                             class="h-5 w-5 [&>path]:stroke-3"
                             src={tab === "time" ? Clock : Calendar}
                         />
+                        <kbd>{tab === "time" ? "←" : "→"}</kbd>
                     </button>
                 {/each}
             </div>
@@ -93,3 +95,20 @@
 <form class="modal-backdrop" method="dialog">
     <button type="submit">close</button>
 </form>
+
+<svelte:window
+    use:shortcut={{
+        trigger: {
+            key: "ArrowRight",
+            callback: () => selectTab("calendar"),
+            modifier: false,
+        },
+    }}
+    use:shortcut={{
+        trigger: {
+            key: "ArrowLeft",
+            callback: () => selectTab("time"),
+            modifier: false,
+        },
+    }}
+/>

@@ -75,3 +75,22 @@ button,
     box-shadow: none;
     cursor: pointer;
 }
+
+kbd {
+    position: absolute;
+    top: -0.5em;
+    right: -0.5em;
+    padding: 0.1em 0.5em;
+    background-color: var(--color-primary);
+    color: var(--color-base-100);
+    border-radius: 2em;
+    font-family: monospace;
+    font-size: small;
+    font-weight: bold;
+    display: none;
+    z-index: 999;
+}
+
+body.show-kbd kbd {
+    display: inline-block;
+}

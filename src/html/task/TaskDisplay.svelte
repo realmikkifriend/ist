@@ -2,6 +2,7 @@
     import { DateTime } from "luxon";
     import { Icon, CalendarDateRange } from "svelte-hero-icons";
     import { Check, Calendar as CalendarIcon, Clock, Forward } from "svelte-hero-icons";
+    import { shortcut } from "@svelte-put/shortcut";
     import { skipTask } from "../../services/firstTaskService";
     import { getPriorityBorder } from "../../utils/styleUtils";
     import Comments from "./Comments.svelte";
@@ -82,7 +83,7 @@
                     <Icon class="h-5 w-5 [&>path]:stroke-3" src={Check} />
                 </button>
                 <button
-                    class="text-md btn btn-secondary h-8 min-h-8 content-center p-4"
+                    class="text-md btn btn-secondary relative h-8 min-h-8 content-center p-4"
                     onclick={() => openModal("defer_modal")}
                     type="button"
                 >
@@ -91,6 +92,7 @@
                     {:else}
                         <Icon class="h-5 w-5 [&>path]:stroke-3" src={Clock} />
                     {/if}
+                    <kbd>d</kbd>
                 </button>
             </div>
         </div>
@@ -105,3 +107,13 @@
 </dialog>
 
 <History activity={task.activity} content={task.content} entityId={task.id} />
+
+<svelte:window
+    use:shortcut={{
+        trigger: {
+            key: "d",
+            callback: () => openModal("defer_modal"),
+            modifier: false,
+        },
+    }}
+/>
