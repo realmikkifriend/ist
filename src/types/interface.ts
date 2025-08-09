@@ -39,6 +39,9 @@ export interface CalendarProps {
     dateInfo?: Record<string, { dots: { color: string }[]; tasks: Task[] }>;
     onDayClick?: ((day: DateTime) => void) | undefined;
     disable?: "past" | "future" | null;
+}
+export interface CalendarHeaderProps {
+    disable?: "past" | "future" | null;
     displayDate: DateTime;
     onchangeMonth: (date: DateTime) => void;
 }

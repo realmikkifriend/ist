@@ -1,5 +1,4 @@
 <script lang="ts">
-    import { onMount } from "svelte";
     import { DateTime } from "luxon";
     import { getCalendarGrid, getInfoForDay } from "../../utils/calendarUtils";
     import CalendarHeader from "./CalendarHeader.svelte";
@@ -21,21 +20,19 @@
      */
     function handleMonthChange(newDate: DateTime) {
         displayDate = newDate;
-    }
 
-    onMount(() => {
         const firstNonDisabledButton = document.querySelector(
             ".grid-cols-7 button:not([disabled])",
         ) as HTMLButtonElement;
         if (firstNonDisabledButton) {
             firstNonDisabledButton.focus();
         }
-    });
+    }
 </script>
 
 <div class="w-full">
     <CalendarHeader {disable} {displayDate} onchangeMonth={handleMonthChange} />
-    <div class="grid grid-cols-7 gap-x-0.5 gap-y-1">
+    <div class="relative grid grid-cols-7 gap-x-0.5 gap-y-1">
         {#each weekDays as day, i (i)}
             <div class="text-secondary flex h-3 w-full justify-center font-bold">{day}</div>
         {/each}
@@ -71,5 +68,6 @@
                 <div class="h-7 w-full"></div>
             {/if}
         {/each}
+        <kbd>TAB</kbd>
     </div>
 </div>
