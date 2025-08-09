@@ -40,11 +40,12 @@
 
 <div class="flex items-center justify-between pb-2 pl-16">
     <button
-        class="rounded-full p-1 transition-colors duration-200 hover:bg-blue-800"
+        class="relative rounded-full p-1 transition-colors duration-200 hover:bg-blue-800"
         onclick={switchView}
         type="button"
     >
         <Icon class="h-5 w-6" src={Calendar} />
+        <kbd>a</kbd>
     </button>
     <button
         class="rounded-full p-1 transition-colors duration-200 hover:bg-blue-800"

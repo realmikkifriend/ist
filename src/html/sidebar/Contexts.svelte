@@ -42,14 +42,16 @@
     <div class="buttons">
         <button class="relative" onclick={() => openAgenda("today")} type="button">
             <Icon class="h-7 w-8" src={Calendar} />
+            <kbd>a</kbd>
         </button>
     </div>
     <h1 class="text-2xl font-bold">Contexts</h1>
     <label
-        class="btn drawer-button bg-transparent px-0 hover:border-transparent hover:bg-transparent"
+        class="btn drawer-button relative bg-transparent px-0 hover:border-transparent hover:bg-transparent"
         for="my-drawer"
     >
         <Icon class="h-7 w-8" src={XCircle} />
+        <kbd>ESC</kbd>
     </label>
 </div>
 
