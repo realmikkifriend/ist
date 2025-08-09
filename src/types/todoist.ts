@@ -143,3 +143,8 @@ export interface HistoryProps {
         | Record<string, { dots: { color: string }[]; tasks: Task[] }>;
     title?: string;
 }
+
+export interface InitialCheckOutcome {
+    action: "continue" | "exit" | "set_task_and_exit" | "set_task_and_continue";
+    taskToSet?: Task | null;
+}

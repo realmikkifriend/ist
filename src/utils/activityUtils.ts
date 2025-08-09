@@ -1,5 +1,10 @@
 import { DateTime } from "luxon";
-import type { TaskActivity, TodoistActivity } from "../types/activity";
+import type {
+    TaskActivity,
+    TodoistActivity,
+    ProcessActivityAccumulationParams,
+    ProcessActivityAccumulationResult,
+} from "../types/activity";
 
 /**
  * Filters activity logs by timeframe.
@@ -112,3 +117,46 @@ export const mergeActivity = (
         [...baseActivity],
     );
 };
+
+/**
+ * Checks inputs to determine whether activity-fetching should continue.
+ * @param {string | null} nextCursor - The API cursor if provided.
+ * @param {boolean} done - Whether the timeframe has been fulfilled.
+ * @param {number} emptyResponsesCount - The number of empty responses received so far.
+ * @returns {boolean} Whether or not to continue fetching activity.
+ */
+export function shouldContinueFetchingActivity(
+    nextCursor: string | null,
+    done: boolean,
+    emptyResponsesCount: number,
+): boolean {
+    return Boolean(nextCursor && !done && emptyResponsesCount < 2);
+}
+
+/**
+ * Processes accumulated activity data.
+ * @param {TaskActivity[]} processedActivityData - Data that has already been processed.
+ * @returns {ProcessActivityAccumulationResult} Activity data that has been processed.
+ */
+export function processActivityAccumulation({
+    processedActivityData,
+    accumulatedData,
+    startDate,
+    endDate,
+    emptyResponsesCount,
+}: ProcessActivityAccumulationParams): ProcessActivityAccumulationResult {
+    const currentAccumulatedData =
+        processedActivityData.length > 0
+            ? mergeActivity(accumulatedData, processedActivityData)
+            : accumulatedData;
+
+    const updatedEmptyResponsesCount =
+        processedActivityData.length === 0 ? emptyResponsesCount + 1 : 0;
+
+    const [startCovered, endCovered] = checkCoverage(currentAccumulatedData, startDate, endDate);
+
+    const startIsToday = startDate.hasSame(DateTime.now(), "day");
+    const done = startCovered && (endCovered || startIsToday);
+
+    return { currentAccumulatedData, updatedEmptyResponsesCount, done };
+}

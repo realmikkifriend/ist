@@ -7,7 +7,7 @@ import { newFirstTask } from "../services/toastService";
 import { clearSelectedContext, updateDueTasks } from "../services/sidebarService";
 import { shouldShowNewTaskToast, loadCommentsForTask } from "../utils/firstTaskUtils";
 import { getActivity } from "../services/activityService";
-import type { Task, TodoistData } from "../types/todoist";
+import type { Task, TodoistData, InitialCheckOutcome } from "../types/todoist";
 import type { TaskActivity } from "../types/activity";
 
 const debounceState: { timeoutId: ReturnType<typeof setTimeout> | null } = { timeoutId: null };
@@ -59,8 +59,17 @@ export const updateFirstDueTask = (task: Task | null = null): void => {
     const $todoistData: TodoistData = get(todoistData);
     const prevTask: Task | null = get(previousFirstDueTask);
 
-    if (handleInitialChecks(task, $todoistData, prevTask)) {
-        return;
+    const initialCheckResult = handleInitialChecks(task, $todoistData, prevTask);
+
+    switch (initialCheckResult.action) {
+        case "set_task_and_exit":
+            setDueTaskStores(initialCheckResult.taskToSet!);
+            return;
+        case "exit":
+            return;
+        case "set_task_and_continue":
+            setDueTaskStores(initialCheckResult.taskToSet!);
+            break;
     }
 
     if (debounceState.timeoutId) {
@@ -78,13 +87,6 @@ export const updateFirstDueTask = (task: Task | null = null): void => {
 };
 
 /**
- * Handles initial checks and early exits for updateFirstDueTask.
- * @param {Task | null} task - Optional task to set as the first due task.
- * @param {TodoistData} $todoistData - The current Todoist data.
- * @param {Task | null} prevTask - The previously set first due task.
- * @returns {Promise<boolean>} True if the function should exit early, false otherwise.
- */
-/**
  * Loads activity for a given task.
  * @param {Task} task - The task to load activity for.
  * @returns {Task} The task with the activity loaded.
@@ -95,40 +97,39 @@ const loadActivityForTask = (task: Task): Task => {
         promise: Promise<TaskActivity[]>;
     };
 
-    const taskWithActivity = { ...task, activity: activity.data };
-
-    if (activity.promise != null) {
-        return {
-            ...taskWithActivity,
-            activity: activity.promise,
-        };
-    }
-
-    return taskWithActivity;
+    return {
+        ...task,
+        activity: activity.promise ?? activity.data,
+    };
 };
 
+/**
+ * Handles initial checks and early exits for updateFirstDueTask.
+ * @param {Task | null} task - Optional task to set as the first due task.
+ * @param {TodoistData} $todoistData - The current Todoist data.
+ * @param {Task | null} prevTask - The previously set first due task.
+ * @returns {InitialCheckOutcome} An object indicating the outcome of the checks.
+ */
 const handleInitialChecks = (
     task: Task | null,
     $todoistData: TodoistData,
     prevTask: Task | null,
-): boolean => {
+): InitialCheckOutcome => {
     if (task) {
         const taskWithData = loadActivityForTask(
             loadCommentsForTask(task, get(todoistAccessToken)),
         );
-        setDueTaskStores(taskWithData);
-        return true;
+        return { action: "set_task_and_continue", taskToSet: taskWithData };
     }
 
     if (prevTask?.summoned && !task) {
-        return true;
+        return { action: "exit" };
     }
 
     if (!$todoistData?.dueTasks?.length) {
-        setDueTaskStores(null);
-        return true;
+        return { action: "set_task_and_exit", taskToSet: null };
     }
-    return false;
+    return { action: "continue" };
 };
 
 /**

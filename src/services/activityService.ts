@@ -5,13 +5,15 @@ import {
     filterActivityByTimeframe,
     mergeActivity,
     processActivityData,
+    shouldContinueFetchingActivity,
+    processActivityAccumulation,
 } from "../utils/activityUtils";
 import { getEndpoint } from "../utils/apiUtils";
 import { colorClasses } from "../utils/styleUtils";
 import { todoistData, taskActivity } from "../stores/stores";
 import { todoistAccessToken } from "../stores/secret";
 import type { Task, ColorName } from "../types/todoist";
-import type { TaskActivity, TodoistActivity } from "../types/activity";
+import type { TaskActivity, TodoistActivity, GetAllActivityDataParams } from "../types/activity";
 
 /**
  * Creates dataset for display.
@@ -87,12 +89,13 @@ export function getActivity(
     }
 
     const promise = (async () => {
-        const allUpdatedActivityData = await getAllActivityData(
+        const allUpdatedActivityData = await getAllActivityData({
             timeframe,
-            relevantActivity,
-            null,
+            accumulatedData: relevantActivity,
+            cursor: null,
             task,
-        );
+            emptyResponsesCount: 0,
+        });
 
         const relevantUpdatedActivity = filterActivityByTimeframe(
             allUpdatedActivityData,
@@ -113,18 +116,16 @@ export function getActivity(
 /**
  * Retrieves all activity data within the specified timeframe.
  * Uses recursion to handle pagination.
- * @param {DateTime[]} timeframe - Timeframe (start and end) to filter activity by.
- * @param {TaskActivity[]} accumulatedData - Accumulated activity log data.
- * @param {string | null} cursor - The cursor for pagination.
- * @param {Task | null} task - Optional task to filter activity by.
+ * @param {GetAllActivityDataParams} params - Parameters for retrieving activity data.
  * @returns {Promise<TaskActivity[]>} - A promise that resolves to an array of TaskActivity objects.
  */
-const getAllActivityData = async (
-    timeframe: DateTime[],
-    accumulatedData: TaskActivity[] = [],
-    cursor: string | null = null,
-    task: Task | null,
-): Promise<TaskActivity[]> => {
+const getAllActivityData = async ({
+    timeframe,
+    accumulatedData = [],
+    cursor = null,
+    task,
+    emptyResponsesCount = 0,
+}: GetAllActivityDataParams): Promise<TaskActivity[]> => {
     const [startDate, endDate] = timeframe;
     const newActivityData = (await getNewActivity(task, cursor)) as {
         next_cursor: string | null;
@@ -132,18 +133,33 @@ const getAllActivityData = async (
     };
 
     const processedActivityData: TaskActivity[] = processActivityData(newActivityData);
-    const allData = mergeActivity(accumulatedData, processedActivityData);
 
-    const [startCovered, endCovered] = checkCoverage(allData, startDate, endDate);
+    const { currentAccumulatedData, updatedEmptyResponsesCount, done } =
+        processActivityAccumulation({
+            processedActivityData,
+            accumulatedData,
+            startDate,
+            endDate,
+            emptyResponsesCount,
+        });
 
-    const startIsToday = startDate.hasSame(DateTime.now(), "day");
-    const done = startCovered && (endCovered || startIsToday);
-
-    if (newActivityData.next_cursor && !done) {
-        return getAllActivityData(timeframe, allData, newActivityData.next_cursor, task);
+    if (
+        shouldContinueFetchingActivity(
+            newActivityData.next_cursor,
+            done,
+            updatedEmptyResponsesCount,
+        )
+    ) {
+        return getAllActivityData({
+            timeframe,
+            accumulatedData: currentAccumulatedData,
+            cursor: newActivityData.next_cursor,
+            task,
+            emptyResponsesCount: updatedEmptyResponsesCount,
+        });
     }
 
-    return allData;
+    return currentAccumulatedData;
 };
 
 /**
