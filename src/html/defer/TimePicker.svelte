@@ -10,7 +10,7 @@
 
     let { task, tasks = $bindable(), onDefer }: TimePickerProps = $props();
 
-    let buttons: HTMLButtonElement[] = [];
+    let buttons: HTMLButtonElement[] = $state([]);
 
     const triggerButtonUpdate = (): void => {
         tasks = [...tasks];
@@ -26,24 +26,29 @@
         onDefer({ rawTime });
     };
 
-    const shortcutTriggers = Array.from({ length: 10 }, (_, i) => {
-        const hotkey = i + 1;
-        return {
-            key: hotkey >= 10 ? getShiftedSymbol(hotkey - 10) : String(hotkey),
-            callback: () => {
-                if (buttons[i]) {
-                    buttons[i].click();
-                }
-            },
-            modifier: (hotkey >= 10 ? "shift" : undefined) as
-                | ShortcutModifierDefinition
-                | undefined,
-        };
-    });
+    const shortcutTriggers = $derived(
+        Array.from({ length: buttons.length }, (_, i) => {
+            const hotkey = i + 1;
+            const returnKey = {
+                key: hotkey >= 10 ? getShiftedSymbol(hotkey - 10) : String(hotkey),
+                callback: () => {
+                    if (buttons[i]) {
+                        buttons[i].click();
+                    }
+                },
+                modifier: (hotkey >= 10 ? "shift" : undefined) as
+                    | ShortcutModifierDefinition
+                    | undefined,
+            };
+            return returnKey;
+        }),
+    );
+
+    const deferButtons = $derived(updateMilliseconds(task, tasks));
 </script>
 
 <div class="mt-2 flex w-72 flex-row flex-wrap gap-x-2 gap-y-1">
-    {#each updateMilliseconds(task, tasks) as button, i (button.ms)}
+    {#each deferButtons as button, i (button.ms)}
         {#if button.ms !== undefined}
             <div class={button.styling + " relative"}>
                 <button
