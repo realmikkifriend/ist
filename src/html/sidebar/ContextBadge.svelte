@@ -1,5 +1,6 @@
 <script lang="ts">
     import { Icon, XMark } from "svelte-hero-icons";
+    import { shortcut } from "@svelte-put/shortcut";
     import { todoistData, firstDueTask } from "../../stores/stores";
     import { userSettings } from "../../stores/interface";
     import { getDueTaskCountByContext } from "../../services/sidebarService";
@@ -8,7 +9,7 @@
 </script>
 
 <button
-    class="group badge badge-outline items-center whitespace-nowrap"
+    class="group badge badge-outline relative items-center whitespace-nowrap"
     class:border-purple-400={$firstDueTask?.summoned}
     class:border-yellow-500={$firstDueTask?.skip}
     class:cursor-default={!$firstDueTask?.summoned && !$userSettings.selectedContext}
@@ -23,8 +24,10 @@
 >
     {#if $firstDueTask?.skip}
         low priority, defer?
+        <kbd>x</kbd>
     {:else if $firstDueTask?.summoned}
         summoned task
+        <kbd>x</kbd>
     {:else}
         {getDueTaskCountByContext($firstDueTask?.contextId ?? "")} left in {getSelectedContextName(
             $todoistData,
@@ -33,8 +36,19 @@
         )}
     {/if}
     {#if $userSettings.selectedContext || $firstDueTask?.summoned}
-        <p class="ml-1 block sm:hidden sm:group-hover:block">
+        <p class="block sm:hidden sm:group-hover:block">
             <Icon class="h-4 w-4" src={XMark} />
         </p>
+        <kbd>x</kbd>
     {/if}
 </button>
+
+<svelte:window
+    use:shortcut={{
+        trigger: {
+            key: "x",
+            callback: () => clearSelectedTask(),
+            modifier: false,
+        },
+    }}
+/>
