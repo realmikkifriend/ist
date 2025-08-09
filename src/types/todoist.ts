@@ -133,3 +133,13 @@ export interface CommentsProps {
 export interface ListTaskProps {
     task: Task;
 }
+export interface HistoryProps {
+    entityId: string;
+    content: string;
+    activity:
+        | TaskActivity[]
+        | Promise<TaskActivity[] | undefined>
+        | undefined
+        | Record<string, { dots: { color: string }[]; tasks: Task[] }>;
+    title?: string;
+}
