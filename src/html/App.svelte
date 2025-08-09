@@ -94,19 +94,19 @@
 
 <svelte:window
     use:shortcut={{
-        trigger: {
-            key: "?",
-            callback: () => {
-                document.body.classList.toggle("show-kbd");
+        trigger: [
+            {
+                key: "?",
+                callback: () => {
+                    document.body.classList.toggle("show-kbd");
+                },
+                modifier: "shift",
             },
-            modifier: "shift",
-        },
-    }}
-    use:shortcut={{
-        trigger: {
-            key: "a",
-            callback: toggleAgendaHash,
-            modifier: false,
-        },
+            {
+                key: "a",
+                callback: toggleAgendaHash,
+                modifier: false,
+            },
+        ],
     }}
 />
