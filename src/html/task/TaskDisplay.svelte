@@ -16,13 +16,6 @@
     const priorityBorderClass = getPriorityBorder(task.priority as Priority);
 
     /**
-     * Handles marking the task as done.
-     */
-    const handleDone = (): void => {
-        onDone(task);
-    };
-
-    /**
      * Handles deferring the task, closes the modal, and calls the onDefer prop.
      * @param detail - The deferred task and time (as DateTime).
      * @param detail.task - The deferred task.
@@ -31,13 +24,6 @@
     const handleDefer = (detail: { task: Task; time: DateTime }): void => {
         (document.getElementById("defer_modal") as HTMLDialogElement | null)?.close();
         onDefer({ task: detail.task, time: detail.time.toISO() ?? "" });
-    };
-
-    /**
-     * Handles skipping the task.
-     */
-    const handleSkip = (): void => {
-        skipTask(task);
     };
 
     /**
@@ -65,7 +51,7 @@
             {#if task.skip}
                 <button
                     class="text-md hover:bg-accent btn btn-ghost btn-sm absolute top-0 right-0 h-8 min-h-8 content-center border-0 p-4"
-                    onclick={handleSkip}
+                    onclick={() => skipTask(task)}
                     title="skip task"
                     type="button"
                 >
@@ -75,12 +61,13 @@
             <h2 class="card-title text-center text-3xl">{task.content}</h2>
             <div class="card-actions justify-center">
                 <button
-                    class="text-md btn btn-primary focus:btn-soft h-8 min-h-8 content-center p-4 focus:cursor-progress"
-                    onclick={handleDone}
+                    class="text-md btn btn-primary focus:btn-soft relative h-8 min-h-8 content-center p-4 focus:cursor-progress"
+                    onclick={() => onDone(task)}
                     title={task.due?.string ? `repeats ${task.due.string}` : "one-time task"}
                     type="button"
                 >
                     <Icon class="h-5 w-5 [&>path]:stroke-3" src={Check} />
+                    <kbd>CTRL+Enter</kbd>
                 </button>
                 <button
                     class="text-md btn btn-secondary relative h-8 min-h-8 content-center p-4"
@@ -114,6 +101,13 @@
             key: "d",
             callback: () => openModal("defer_modal"),
             modifier: false,
+        },
+    }}
+    use:shortcut={{
+        trigger: {
+            key: "Enter",
+            callback: () => onDone(task),
+            modifier: "ctrl",
         },
     }}
 />
