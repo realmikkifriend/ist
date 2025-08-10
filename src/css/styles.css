@@ -89,6 +89,7 @@ kbd {
     font-weight: bold;
     display: none;
     z-index: 999;
+    text-wrap: nowrap;
 }
 
 body.show-kbd kbd {

@@ -87,13 +87,14 @@
 {#if hasItems}
     <div class="mt-2">
         <button
-            class="bg-primary float-left mt-0.5 mr-2 inline-block h-5 w-5 cursor-pointer rounded-sm p-1 pr-5 pb-5"
+            class="comment-focus bg-primary relative float-left mt-0.5 mr-2 inline-block h-5 w-5 cursor-pointer rounded-sm p-1 pr-5 pb-5"
             class:animate-ping={isLoading}
             disabled={isLoading}
             onclick={showNextItem}
             type="button"
         >
             <Icon class="h-4 w-4" src={ArrowUturnDown} />
+            <kbd>z, Enter</kbd>
         </button>
 
         {#key rotationIndex}

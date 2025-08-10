@@ -53,10 +53,10 @@
                 {`${Math.round((countData.current / countData.total) * 100)}%`}
             </small>
         </span>
-        <span class="flex flex-nowrap items-end">
+        <span class="relative flex flex-nowrap items-end">
             {#each options as option, index (index)}
                 <button
-                    class="btn text-primary-content hover:bg-base-100 active:bg-primary ml-1 h-8 min-h-8 px-1 pt-0 pb-1 {countData.current >=
+                    class="btn comment-focus text-primary-content hover:bg-base-100 active:bg-primary relative ml-1 h-8 min-h-8 px-1 pt-0 pb-1 {countData.current >=
                     countData.total
                         ? 'bg-neutral'
                         : 'bg-primary'}"
@@ -66,6 +66,7 @@
                     {option}
                 </button>
             {/each}
+            <kbd>z, Enter</kbd>
         </span>
     </span>
 </span>

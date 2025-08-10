@@ -58,7 +58,7 @@
 
 <div class="mb-2 flex min-h-8 flex-row items-center gap-2">
     <button
-        class="group h-5 w-5 rounded-sm text-white outline-2 outline-blue-500 hover:bg-blue-500/25"
+        class="comment-focus group h-5 w-5 rounded-sm text-white outline-2 outline-blue-500 hover:bg-blue-500/25 focus:bg-white"
         class:bg-blue-500={todayTracked}
         class:hover:bg-blue-300={todayTracked}
         disabled={isLoading}

@@ -49,17 +49,17 @@
     <div class="text-error italic">{errorMessage}</div>
 {:else if checklistItems && currentIndex < checklistItems.length - 1}
     <div class="mt-1">
-        <em class="absolute -top-2 -left-0.5 text-xs text-nowrap opacity-25">
+        <em class="absolute -top-3 -left-0.5 text-xs text-nowrap opacity-25">
             <span class="mr-0.5 inline-block w-7"
                 >{currentIndex + 1}/{checklistItems.length - 1}</span
             >
         </em>
         <button
-            class="border-primary-content float-left mt-1 mr-2 inline-block h-5 w-5 cursor-pointer border-2 transition-colors"
+            class="comment-focus border-primary-content relative float-left mt-1 mr-2 inline-block h-5 w-5 cursor-pointer border-2 transition-colors"
             aria-label="Next item"
             onclick={showNextItem}
-            type="button"
-        ></button>
+            type="button"><kbd>z, Enter</kbd></button
+        >
         <SvelteMarkdown source={checklistItems[currentIndex] ?? ""} />
     </div>
 {:else}

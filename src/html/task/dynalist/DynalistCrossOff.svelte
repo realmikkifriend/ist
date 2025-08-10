@@ -84,9 +84,11 @@
             <span>{checklistItems.length} remaining</span>
         </em>
         <button
-            class="bg-primary float-left mt-0.5 mr-2 inline-block h-5 w-5 cursor-pointer rounded-sm p-1 pr-5 pb-5"
+            class="comment-focus bg-primary relative float-left mt-0.5 mr-2 inline-block h-5 w-5 cursor-pointer rounded-sm p-1 pr-5 pb-5"
             type="button"
-            use:buttonAction><Icon class="h-4 w-4" src={Backspace} /></button
+            use:buttonAction
+            ><Icon class="h-4 w-4" src={Backspace} />
+            <kbd>z, Enter</kbd></button
         >
         {#key checklistItems}
             <SvelteMarkdown
