@@ -164,14 +164,15 @@ export function clearSelectedTask(): void {
 
     if ($firstDueTask?.summoned) {
         window.location.hash = $firstDueTask.summoned as string;
+    }
 
+    if ($firstDueTask?.summoned || selectedContext) {
         firstDueTask.set(null);
         previousFirstDueTask.set(null);
         debounceState.clearDebounceTimeout();
-        void updateFirstDueTask();
-    } else if (selectedContext) {
-        clearSelectedContext();
-        debounceState.clearDebounceTimeout();
+        if (selectedContext) {
+            clearSelectedContext();
+        }
         void updateFirstDueTask();
     }
 }
