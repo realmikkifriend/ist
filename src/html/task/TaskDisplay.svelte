@@ -1,6 +1,7 @@
 <script lang="ts">
     import { DateTime } from "luxon";
     import { Icon, Forward } from "svelte-hero-icons";
+    import { shortcut } from "@svelte-put/shortcut";
     import { skipTask } from "../../services/firstTaskService";
     import { getPriorityBorder } from "../../utils/styleUtils";
     import Comments from "./Comments.svelte";
@@ -47,6 +48,7 @@
                     type="button"
                 >
                     <Icon class="h-5 w-5 stroke-yellow-500 [&>path]:stroke-3" src={Forward} />
+                    <kbd>s</kbd>
                 </button>
             {/if}
             <h2 class="card-title text-center text-3xl">{task.content}</h2>
@@ -63,3 +65,13 @@
 </dialog>
 
 <History activity={task.activity} content={task.content} entityId={task.id} />
+
+<svelte:window
+    use:shortcut={{
+        trigger: {
+            key: "s",
+            callback: () => skipTask(task),
+            modifier: false,
+        },
+    }}
+/>
