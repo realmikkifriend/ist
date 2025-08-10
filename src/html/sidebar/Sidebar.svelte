@@ -1,5 +1,6 @@
 <script lang="ts">
     import { Icon, Bars3, ArrowLeftOnRectangle } from "svelte-hero-icons";
+    import { shortcut } from "@svelte-put/shortcut";
     import Contexts from "./Contexts.svelte";
     import DailyGoal from "../activity/DailyGoal.svelte";
     import Footer from "../interface/Footer.svelte";
@@ -8,18 +9,23 @@
     import type { HashProp } from "../../types/interface";
 
     let { hash }: HashProp = $props();
+    let isDrawerOpen = $state(false);
 </script>
 
 <div class="drawer">
-    <input id="my-drawer" class="drawer-toggle" type="checkbox" />
-    <div class="drawer-content flex flex-row items-center">
+    <input id="my-drawer" class="drawer-toggle" type="checkbox" bind:checked={isDrawerOpen} />
+
+    <div
+        class="drawer-content flex flex-row items-center"
+        class:invisible={isDrawerOpen || hash === "#today" || hash === "#tomorrow"}
+        class:pointer-events-none={isDrawerOpen || hash === "#today" || hash === "#tomorrow"}
+    >
         <label
-            class="btn drawer-button hover:bg-primary mt-0 bg-transparent shadow-none"
+            class="btn drawer-button hover:bg-primary relative mt-0 w-12 bg-transparent p-0 shadow-none"
             for="my-drawer"
         >
-            {#if hash !== "#today" && hash !== "#tomorrow"}
-                <Icon class="h-8 w-8" src={Bars3} />
-            {/if}
+            <Icon class="h-8 w-8" src={Bars3} />
+            <kbd>c</kbd>
         </label>
     </div>
     <div class="drawer-side z-30">
@@ -41,3 +47,17 @@
         </ul>
     </div>
 </div>
+
+<svelte:window
+    use:shortcut={{
+        trigger: [
+            {
+                key: "c",
+                callback: () => {
+                    isDrawerOpen = !isDrawerOpen;
+                },
+                modifier: false,
+            },
+        ],
+    }}
+/>

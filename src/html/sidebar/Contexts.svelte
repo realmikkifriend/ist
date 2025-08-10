@@ -51,7 +51,7 @@
         for="my-drawer"
     >
         <Icon class="h-7 w-8" src={XCircle} />
-        <kbd>ESC</kbd>
+        <kbd>c</kbd>
     </label>
 </div>
 
