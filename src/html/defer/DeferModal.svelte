@@ -99,17 +99,17 @@
 
 <svelte:window
     use:shortcut={{
-        trigger: {
-            key: "ArrowRight",
-            callback: () => selectTab("calendar"),
-            modifier: false,
-        },
-    }}
-    use:shortcut={{
-        trigger: {
-            key: "ArrowLeft",
-            callback: () => selectTab("time"),
-            modifier: false,
-        },
+        trigger: [
+            {
+                key: "ArrowRight",
+                callback: () => selectTab("calendar"),
+                modifier: false,
+            },
+            {
+                key: "ArrowLeft",
+                callback: () => selectTab("time"),
+                modifier: false,
+            },
+        ],
     }}
 />
