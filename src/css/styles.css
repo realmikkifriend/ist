@@ -80,12 +80,12 @@ kbd {
     position: absolute;
     top: -0.5em;
     right: -0.5em;
-    padding: 0.1em 0.5em;
+    padding: 0em 0.4em;
     background-color: var(--color-primary);
     color: var(--color-base-100);
-    border-radius: 2em;
+    border-radius: 0.25em;
     font-family: monospace;
-    font-size: small;
+    font-size: x-small;
     font-weight: bold;
     display: none;
     z-index: 999;
