@@ -20,20 +20,28 @@
 </script>
 
 <div class="drawer">
-    <input id="sidebar-toggle" class="drawer-toggle" type="checkbox" bind:checked={isSidebarOpen} />
+    <input
+        id="sidebar-toggle"
+        class="drawer-toggle"
+        tabindex="-1"
+        type="checkbox"
+        bind:checked={isSidebarOpen}
+    />
 
     <div
         class="drawer-content flex flex-row items-center"
         class:invisible={isSidebarOpen || hash === "#today" || hash === "#tomorrow"}
         class:pointer-events-none={isSidebarOpen || hash === "#today" || hash === "#tomorrow"}
     >
-        <label
+        <button
             class="btn drawer-button hover:bg-primary relative mt-0 w-12 bg-transparent p-0 shadow-none"
-            for="sidebar-toggle"
+            onclick={() => (isSidebarOpen = true)}
+            tabindex={isSidebarOpen || hash === "#today" || hash === "#tomorrow" ? -1 : undefined}
+            type="button"
         >
             <Icon class="h-8 w-8" src={Bars3} />
             <kbd>c</kbd>
-        </label>
+        </button>
     </div>
     <div class="drawer-side z-30">
         <label class="drawer-overlay" aria-label="close sidebar" for="sidebar-toggle"></label>

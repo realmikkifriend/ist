@@ -47,6 +47,7 @@
                 openAgenda("today");
                 onDismiss();
             }}
+            tabindex="-1"
             type="button"
         >
             <Icon class="h-7 w-8" src={Calendar} />
@@ -54,25 +55,33 @@
         </button>
     </div>
     <h1 class="text-2xl font-bold">Contexts</h1>
-    <label
+    <button
         class="btn drawer-button relative bg-transparent px-0 hover:border-transparent hover:bg-transparent"
-        for="sidebar-toggle"
+        onclick={() => {
+            onDismiss();
+        }}
+        tabindex="-1"
+        type="button"
     >
         <Icon class="h-7 w-8" src={XCircle} />
         <kbd>c</kbd>
-    </label>
+    </button>
 </div>
 
-{#each $todoistData.contexts as context, index (index)}
-    {#if dueTasksByContext[context.id] && dueTasksByContext[context.id].total > 0}
-        <button
-            class="bg-secondary text-base-100 tooltip sm:tooltip-right tooltip-bottom mb-2 rounded-lg"
-            class:opacity-25={$userSettings.selectedContext &&
-                $userSettings.selectedContext.id !== context.id}
-            onclick={() => handleContextClick(context.id)}
-            type="button"
-        >
-            <ContextButtonContents {context} tasksForContext={dueTasksByContext[context.id]} />
-        </button>
-    {/if}
-{/each}
+<div class="relative w-full">
+    {#each $todoistData.contexts as context, index (index)}
+        {#if dueTasksByContext[context.id] && dueTasksByContext[context.id].total > 0}
+            <button
+                class="bg-secondary text-base-100 tooltip sm:tooltip-right tooltip-bottom mb-2 w-full rounded-lg"
+                class:opacity-25={$userSettings.selectedContext &&
+                    $userSettings.selectedContext.id !== context.id}
+                onclick={() => handleContextClick(context.id)}
+                tabindex={index + 1}
+                type="button"
+            >
+                <ContextButtonContents {context} tasksForContext={dueTasksByContext[context.id]} />
+            </button>
+        {/if}
+    {/each}
+    <kbd>Tab</kbd>
+</div>

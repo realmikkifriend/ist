@@ -48,12 +48,19 @@
     });
 </script>
 
-<div class="tooltip min-w-32" class:cursor-progress={isLoading}>
+<button
+    class="tooltip min-w-32"
+    class:cursor-progress={isLoading}
+    onblur={(e) => e.currentTarget.classList.remove("tooltip-open")}
+    onfocus={(e) => e.currentTarget.classList.add("tooltip-open")}
+    tabindex="0"
+    type="button"
+>
     <DailyGoalTooltip {dailyGoal} {isLoading} sortedByTime={sortedLists.byTime} />
     <div class="flex w-full min-w-36 flex-row items-center">
         <div
             style:flex-grow={dailyGoal}
-            class="badge badge-outline outline-secondary flex h-3 items-start gap-0 overflow-hidden rounded-full border-0 p-0 whitespace-nowrap outline-1"
+            class="badge badge-outline outline-secondary flex h-3 items-start gap-0 overflow-hidden rounded-full border-0 p-0 whitespace-nowrap outline-1 focus:ring-8 focus:ring-red-500"
             class:rounded-r-none={sortedLists.byContext.length > dailyGoal}
             class:w-full={sortedLists.byContext.length === 0}
         >
@@ -79,7 +86,7 @@
             </div>
         {/if}
     </div>
-</div>
+</button>
 <div class="ml-2 flex w-fit flex-row pb-0.5 text-xs text-nowrap">
     {#if isLoading || !dailyGoal}
         <Icon class="mt-0.5 mr-0.5 h-3.5 w-3.5 animate-spin" src={ArrowPath} />
