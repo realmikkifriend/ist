@@ -90,7 +90,9 @@ export const updateFirstDueTask = (task: Task | null = null): void => {
     }
 
     const selectedContextId: string | null = get(userSettings).selectedContext?.id ?? null;
-    const dueTasks: Task[] = updateDueTasks($todoistData.dueTasks, selectedContextId);
+    const dueTasks: Task[] = task
+        ? [task]
+        : updateDueTasks($todoistData.dueTasks, selectedContextId);
 
     void processDueTaskUpdate(dueTasks, prevTask, selectedContextId);
 
@@ -135,6 +137,7 @@ export function summonTask(
     enableSkip: boolean = false,
 ): void {
     if (!task.firstDue || enableSkip) {
+        debounceState.clearDebounceTimeout();
         if (enableSkip) {
             task.skip = true;
         }
