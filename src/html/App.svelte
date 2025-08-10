@@ -104,7 +104,17 @@
             },
             {
                 key: "a",
-                callback: toggleAgendaHash,
+                callback: () => {
+                    toggleAgendaHash();
+                    window.dispatchEvent(
+                        new KeyboardEvent("keydown", {
+                            key: "c",
+                            bubbles: true,
+                            ctrlKey: true,
+                            shiftKey: true,
+                        }),
+                    );
+                },
                 modifier: false,
             },
         ],

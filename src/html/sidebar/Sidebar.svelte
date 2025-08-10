@@ -73,6 +73,11 @@
                 },
                 modifier: false,
             },
+            {
+                key: "c",
+                callback: () => closeSidebar(),
+                modifier: [["ctrl", "shift"]],
+            },
         ],
     }}
 />
