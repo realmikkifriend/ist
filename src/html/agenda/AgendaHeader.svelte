@@ -1,5 +1,6 @@
 <script lang="ts">
     import { Icon, XCircle, Calendar, BarsArrowUp } from "svelte-hero-icons";
+    import { shortcut } from "@svelte-put/shortcut";
     import { todoistData } from "../../stores/stores";
     import { summonTask } from "../../services/firstTaskService";
     import type { AgendaHeaderProps } from "../../types/agenda";
@@ -48,11 +49,12 @@
         <kbd>a</kbd>
     </button>
     <button
-        class="rounded-full p-1 transition-colors duration-200 hover:bg-blue-800"
+        class="relative rounded-full p-1 transition-colors duration-200 hover:bg-blue-800"
         onclick={viewReverseTaskList}
         type="button"
     >
         <Icon class="h-5 w-6" src={BarsArrowUp} />
+        <kbd>s</kbd>
     </button>
     <div class="mr-6 flex grow cursor-default flex-col items-center">
         <h1 class="flex-1 text-center">{title}</h1>
@@ -76,3 +78,15 @@
         <Icon class="h-5 w-6" src={XCircle} />
     </button>
 </div>
+
+<svelte:window
+    use:shortcut={{
+        trigger: [
+            {
+                key: "s",
+                callback: () => viewReverseTaskList(),
+                modifier: false,
+            },
+        ],
+    }}
+/>
