@@ -50,13 +50,3 @@ export const updateDueTasks = (dueTasks: Task[], contextId: string | null): Task
     }
     return dueTasks;
 };
-
-/**
- * Closes the sidebar drawer by unchecking the drawer checkbox.
- */
-export function closeSidebar(): void {
-    const drawerCheckbox = document.getElementById("my-drawer") as HTMLInputElement | null;
-    if (drawerCheckbox) {
-        drawerCheckbox.checked = false;
-    }
-}

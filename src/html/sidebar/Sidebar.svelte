@@ -9,30 +9,37 @@
     import type { HashProp } from "../../types/interface";
 
     let { hash }: HashProp = $props();
-    let isDrawerOpen = $state(false);
+    let isSidebarOpen = $state(false);
+
+    /**
+     * Closes the sidebar.
+     */
+    function closeSidebar(): void {
+        isSidebarOpen = false;
+    }
 </script>
 
 <div class="drawer">
-    <input id="my-drawer" class="drawer-toggle" type="checkbox" bind:checked={isDrawerOpen} />
+    <input id="sidebar-toggle" class="drawer-toggle" type="checkbox" bind:checked={isSidebarOpen} />
 
     <div
         class="drawer-content flex flex-row items-center"
-        class:invisible={isDrawerOpen || hash === "#today" || hash === "#tomorrow"}
-        class:pointer-events-none={isDrawerOpen || hash === "#today" || hash === "#tomorrow"}
+        class:invisible={isSidebarOpen || hash === "#today" || hash === "#tomorrow"}
+        class:pointer-events-none={isSidebarOpen || hash === "#today" || hash === "#tomorrow"}
     >
         <label
             class="btn drawer-button hover:bg-primary relative mt-0 w-12 bg-transparent p-0 shadow-none"
-            for="my-drawer"
+            for="sidebar-toggle"
         >
             <Icon class="h-8 w-8" src={Bars3} />
             <kbd>c</kbd>
         </label>
     </div>
     <div class="drawer-side z-30">
-        <label class="drawer-overlay" aria-label="close sidebar" for="my-drawer"></label>
+        <label class="drawer-overlay" aria-label="close sidebar" for="sidebar-toggle"></label>
         <ul class="menu bg-base-100 text-base-content min-h-full w-80 px-4 py-2">
             {#if $todoistData.contexts}
-                <Contexts />
+                <Contexts onDismiss={closeSidebar} />
             {/if}
 
             <div class="mt-auto">
@@ -54,7 +61,7 @@
             {
                 key: "c",
                 callback: () => {
-                    isDrawerOpen = !isDrawerOpen;
+                    isSidebarOpen = !isSidebarOpen;
                 },
                 modifier: false,
             },

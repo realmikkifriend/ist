@@ -3,9 +3,10 @@
     import { todoistData, previousFirstDueTask } from "../../stores/stores";
     import { userSettings } from "../../stores/interface";
     import { openAgenda } from "../../services/agendaService";
-    import { closeSidebar } from "../../services/sidebarService";
     import { getTasksGroupedByContext } from "../../utils/filterUtils";
     import ContextButtonContents from "./ContextButtonContents.svelte";
+
+    let { onDismiss }: { onDismiss: () => void } = $props();
 
     /**
      * A derived store grouping due tasks by context.
@@ -33,14 +34,21 @@
         }));
 
         if (newSelectedContext !== null) {
-            closeSidebar();
+            onDismiss();
         }
     }
 </script>
 
 <div class="mb-2 ml-2 flex items-center justify-between">
     <div class="buttons">
-        <button class="relative" onclick={() => openAgenda("today")} type="button">
+        <button
+            class="relative"
+            onclick={() => {
+                openAgenda("today");
+                onDismiss();
+            }}
+            type="button"
+        >
             <Icon class="h-7 w-8" src={Calendar} />
             <kbd>a</kbd>
         </button>
@@ -48,7 +56,7 @@
     <h1 class="text-2xl font-bold">Contexts</h1>
     <label
         class="btn drawer-button relative bg-transparent px-0 hover:border-transparent hover:bg-transparent"
-        for="my-drawer"
+        for="sidebar-toggle"
     >
         <Icon class="h-7 w-8" src={XCircle} />
         <kbd>c</kbd>
