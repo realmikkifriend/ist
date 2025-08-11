@@ -1,6 +1,11 @@
 <script lang="ts">
     import { DateTime } from "luxon";
-    import { todoistData, todoistError, firstDueTask } from "../stores/stores";
+    import {
+        todoistData,
+        todoistError,
+        firstDueTask,
+        previousFirstDueTask,
+    } from "../stores/stores";
     import { skipTask } from "../services/firstTaskService";
     import { error as showError } from "../services/toastService";
     import { handleTaskDone, handleTaskDefer } from "../services/taskHandlerService";
@@ -17,6 +22,7 @@
      */
     const handleDone = async (task: Task): Promise<void> => {
         if (task.summoned) window.location.hash = String(task.summoned);
+        previousFirstDueTask.set(null);
         await handleTaskDone(task);
     };
 
@@ -31,6 +37,7 @@
             window.location.hash = String(detail.task.summoned);
         }
 
+        previousFirstDueTask.set(null);
         const { task, time } = detail;
         const dateTime = DateTime.fromISO(time);
         if (dateTime.isValid) {

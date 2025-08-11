@@ -1,6 +1,5 @@
-import { get } from "svelte/store";
 import { DateTime } from "luxon";
-import { todoistData, previousFirstDueTask, taskActivity } from "../stores/stores";
+import { todoistData, taskActivity } from "../stores/stores";
 import { markTaskDone, deferTasks } from "../services/apiService";
 import { error } from "../services/toastService";
 import { updateFirstDueTask } from "../services/firstTaskService";
@@ -23,18 +22,12 @@ export function updateTaskResources(taskUpdates: TaskUpdates): void {
             const index = $resources.dueTasks.findIndex((task) => task.id === taskID);
             if (index !== -1) {
                 const task = $resources.dueTasks[index];
-                const prevFirstDueTask = get(previousFirstDueTask);
-
                 const newDueDate = new Date(time instanceof DateTime ? time.toJSDate() : time);
                 if (task.due) {
                     task.due.date = newDueDate.toISOString();
                 }
 
                 $resources.dueTasks.splice(index, 1);
-
-                if (prevFirstDueTask && index === 0) {
-                    previousFirstDueTask.set(null);
-                }
 
                 if (newDueDate < new Date()) {
                     const insertIndex = $resources.dueTasks.findIndex(
@@ -59,8 +52,6 @@ export function updateTaskResources(taskUpdates: TaskUpdates): void {
  * @returns Promise&lt;void>
  */
 export async function handleTaskDone(task: Task): Promise<void> {
-    previousFirstDueTask.set(null);
-
     const fiveMinutesFromNow = DateTime.now().plus({ minutes: 5 });
 
     const newActivityEntry: TaskActivity = {
@@ -87,8 +78,6 @@ export async function handleTaskDone(task: Task): Promise<void> {
  * @returns Promise&lt;void>
  */
 export async function handleTaskDefer(taskUpdates: Array<[Task, DateTime]>): Promise<void> {
-    previousFirstDueTask.set(null);
-
     const updatedTaskResources: Array<[string, DateTime]> = taskUpdates.map(([task, dateTime]) => [
         task.id,
         dateTime,
