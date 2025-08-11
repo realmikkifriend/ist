@@ -1,8 +1,9 @@
 <script lang="ts">
     import { Icon, ArrowPath } from "svelte-hero-icons";
-    import { todoistData } from "../../stores/stores";
+    import { todoistData, taskActivity } from "../../stores/stores";
     import { fetchDailyActivity } from "../../services/activityService";
     import { getContextColors } from "../../utils/styleUtils";
+    import { mergeActivity } from "../../utils/activityUtils";
     import DailyGoalTooltip from "./DailyGoalTooltip.svelte";
     import type { TaskActivity } from "../../types/activity";
 
@@ -31,13 +32,9 @@
 
                 if (activity.promise) {
                     isLoading = true;
-                    void (
-                        activity.promise as Promise<{
-                            byContext: TaskActivity[];
-                            byTime: TaskActivity[];
-                        }>
-                    ).then((promisedActivity) => {
-                        sortedLists = promisedActivity;
+                    void activity.promise.then(({ display, newActivities }) => {
+                        sortedLists = display;
+                        $taskActivity = mergeActivity($taskActivity, newActivities);
                         isLoading = false;
                     });
                 } else {

@@ -1,10 +1,47 @@
 import { DateTime } from "luxon";
+import { getEndpoint } from "./apiUtils";
+import type { Task } from "../types/todoist";
 import type {
     TaskActivity,
     TodoistActivity,
     ProcessActivityAccumulationParams,
     ProcessActivityAccumulationResult,
 } from "../types/activity";
+
+/**
+ * Retrieves task activity from Todoist API.
+ * @param {string} accessToken - The access token for the Todoist API.
+ * @param {Task | null} task - Optional task to filter activity by.
+ * @param {string | null} cursor - Optional cursor for pagination.
+ * @returns {Promise<{results: TodoistActivity[]}>} Task activity history data.
+ */
+export async function getNewActivity(
+    accessToken: string,
+    task: Task | null = null,
+    cursor: string | null = null,
+): Promise<{ results: TodoistActivity[] }> {
+    const params: Record<string, string | number> = {
+        limit: 100,
+        object_type: "item",
+        event_type: "completed",
+    };
+
+    if (task?.id) {
+        params.object_id = String(task.id);
+    }
+
+    if (cursor) {
+        params.cursor = cursor;
+    }
+
+    const endpointData = await getEndpoint<{ results: TodoistActivity[] }>(
+        accessToken,
+        "activities",
+        params,
+    );
+
+    return endpointData;
+}
 
 /**
  * Filters activity logs by timeframe.

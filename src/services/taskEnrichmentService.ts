@@ -4,7 +4,6 @@ import { todoistAccessToken } from "../stores/secret";
 import { getActivity } from "./activityService";
 import { loadCommentsForTask } from "../utils/firstTaskUtils";
 import type { TodoistData, Task, InitialCheckOutcome } from "../types/todoist";
-import type { TaskActivity } from "../types/activity";
 
 /**
  * Handles initial checks and early exits for updateFirstDueTask.
@@ -41,13 +40,14 @@ export const handleInitialChecks = (
  * @returns {Task} The task with the activity loaded.
  */
 export const loadActivityForTask = (task: Task): Task => {
-    const activity = getActivity([DateTime.now().minus({ years: 1 }), DateTime.now()], task) as {
-        data: TaskActivity[];
-        promise: Promise<TaskActivity[]>;
-    };
+    const activity = getActivity([DateTime.now().minus({ years: 1 }), DateTime.now()], task);
+
+    const activityPromise = activity.promise
+        ? activity.promise.then(({ relevant }) => relevant)
+        : Promise.resolve(activity.data);
 
     return {
         ...task,
-        activity: activity.promise ?? activity.data,
+        activity: activityPromise,
     };
 };

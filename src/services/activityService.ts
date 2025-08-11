@@ -1,6 +1,9 @@
 import { get } from "svelte/store";
 import { DateTime } from "luxon";
+import { todoistData, taskActivity } from "../stores/stores";
+import { todoistAccessToken } from "../stores/secret";
 import {
+    getNewActivity,
     checkCoverage,
     filterActivityByTimeframe,
     mergeActivity,
@@ -8,10 +11,7 @@ import {
     shouldContinueFetchingActivity,
     processActivityAccumulation,
 } from "../utils/activityUtils";
-import { getEndpoint } from "../utils/apiUtils";
 import { colorClasses } from "../utils/styleUtils";
-import { todoistData, taskActivity } from "../stores/stores";
-import { todoistAccessToken } from "../stores/secret";
 import type { Task, ColorName, GetAllActivityDataParams } from "../types/todoist";
 import type { TaskActivity, TodoistActivity } from "../types/activity";
 
@@ -21,7 +21,10 @@ import type { TaskActivity, TodoistActivity } from "../types/activity";
  */
 export function fetchDailyActivity(): {
     preliminary: { byContext: TaskActivity[]; byTime: TaskActivity[] };
-    promise: Promise<{ byContext: TaskActivity[]; byTime: TaskActivity[] }> | null;
+    promise: Promise<{
+        display: { byContext: TaskActivity[]; byTime: TaskActivity[] };
+        newActivities: TaskActivity[];
+    }> | null;
 } {
     const startOfToday = DateTime.now().startOf("day");
     const endOfToday = DateTime.now().endOf("day");
@@ -46,14 +49,17 @@ export function fetchDailyActivity(): {
     const preliminary = { byContext, byTime };
 
     if (activity.promise) {
-        const promise = activity.promise.then((promisedActivity) => {
-            const combinedActivity = mergeActivity(activity.data, promisedActivity);
+        const promise = activity.promise.then(({ all, relevant }) => {
+            const combinedActivity = mergeActivity(activity.data, relevant);
 
             const promisedByContext = sortActivitiesByColor(combinedActivity);
             const promisedByTime = [...combinedActivity].sort(
                 (a, b) => a.date.toMillis() - b.date.toMillis(),
             );
-            return { byContext: promisedByContext, byTime: promisedByTime };
+            return {
+                display: { byContext: promisedByContext, byTime: promisedByTime },
+                newActivities: all,
+            };
         });
         return { preliminary, promise };
     }
@@ -72,7 +78,7 @@ export function getActivity(
     task: Task | null = null,
 ): {
     data: TaskActivity[];
-    promise: Promise<TaskActivity[]> | null;
+    promise: Promise<{ all: TaskActivity[]; relevant: TaskActivity[] }> | null;
 } {
     const storedActivityData = get(taskActivity).filter(
         (activity) => !task?.id || activity.taskId === task.id,
@@ -103,11 +109,7 @@ export function getActivity(
             endDate,
         );
 
-        const mergedActivityData = mergeActivity(get(taskActivity), allUpdatedActivityData);
-
-        taskActivity.set(mergedActivityData);
-
-        return relevantUpdatedActivity;
+        return { all: allUpdatedActivityData, relevant: relevantUpdatedActivity };
     })();
 
     return { data: relevantActivity, promise };
@@ -127,7 +129,7 @@ const getAllActivityData = async ({
     emptyResponsesCount = 0,
 }: GetAllActivityDataParams): Promise<TaskActivity[]> => {
     const [startDate, endDate] = timeframe;
-    const newActivityData = (await getNewActivity(task, cursor)) as {
+    const newActivityData = (await getNewActivity(get(todoistAccessToken), task, cursor)) as {
         next_cursor: string | null;
         results: TodoistActivity[];
     };
@@ -161,29 +163,3 @@ const getAllActivityData = async ({
 
     return currentAccumulatedData;
 };
-
-/**
- * Retrieves task activity from Todoist API.
- * @param {Task | null} task - Optional task to filter activity by.
- * @param {string | null} cursor - Optional cursor for pagination.
- * @returns Task activity history data.
- */
-export async function getNewActivity(task: Task | null = null, cursor: string | null = null) {
-    const params: Record<string, string | number> = {
-        limit: 100,
-        object_type: "item",
-        event_type: "completed",
-    };
-
-    if (task?.id) {
-        params.object_id = String(task.id);
-    }
-
-    if (cursor) {
-        params.cursor = cursor;
-    }
-
-    const endpointData = await getEndpoint(get(todoistAccessToken), "activities", params);
-
-    return endpointData;
-}
