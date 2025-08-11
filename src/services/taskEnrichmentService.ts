@@ -10,14 +10,12 @@ import { firstDueTask } from "../stores/stores";
  * Handles initial checks and early exits for updateFirstDueTask.
  * @param {Task | null} task - Optional task to set as the first due task.
  * @param {TodoistData} $todoistData - The current Todoist data.
- * @param {Task | null} prevTask - The previously set first due task.
  * @param {ReturnType<typeof setTimeout> | null} debounceTimeoutId - The current debounce timeout ID.
  * @returns {Promise<InitialCheckOutcome>} An object indicating the outcome of the checks.
  */
 export const handleInitialChecks = async (
     task: Task | null,
     $todoistData: TodoistData,
-    prevTask: Task | null,
     debounceTimeoutId: ReturnType<typeof setTimeout> | null,
 ): Promise<InitialCheckOutcome> => {
     if (task) {
@@ -29,10 +27,6 @@ export const handleInitialChecks = async (
             taskToSet: taskWithData,
             showNewTaskToast: false,
         };
-    }
-
-    if (prevTask?.summoned && !task) {
-        return { action: "exit", showNewTaskToast: false };
     }
 
     if (!$todoistData?.dueTasks?.length) {

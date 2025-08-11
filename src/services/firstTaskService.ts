@@ -59,7 +59,6 @@ export const updateFirstDueTask = async (
     const initialCheckResult = await handleInitialChecks(
         task,
         $todoistData,
-        prevTask,
         debounceState.timeoutId,
     );
 
@@ -137,10 +136,8 @@ export async function summonTask(
         task.summoned = currentFirstDueSummoned || window.location.hash;
 
         const result = await updateFirstDueTask(task);
-        window.location.hash = "";
         return { task: result.task, contextCleared: result.contextCleared };
     }
-    window.location.hash = "";
     return { task: get(firstDueTask), contextCleared: false };
 }
 

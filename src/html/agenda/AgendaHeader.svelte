@@ -1,7 +1,7 @@
 <script lang="ts">
     import { Icon, XCircle, Calendar, BarsArrowUp } from "svelte-hero-icons";
     import { shortcut } from "@svelte-put/shortcut";
-    import { todoistData } from "../../stores/stores";
+    import { todoistData, firstDueTask, previousFirstDueTask } from "../../stores/stores";
     import { summonTask } from "../../services/firstTaskService";
     import type { AgendaHeaderProps } from "../../types/agenda";
 
@@ -20,14 +20,17 @@
     /**
      * Summons the first task from the reverse task list for the current view.
      */
-    function viewReverseTaskList(): void {
+    async function viewReverseTaskList(): Promise<void> {
         const reverseTasks =
             title === "Today"
                 ? $todoistData.reverseTasks.today
                 : $todoistData.reverseTasks.tomorrow;
 
         if (reverseTasks && reverseTasks.length > 0) {
-            summonTask(reverseTasks[0], true);
+            const result = await summonTask(reverseTasks[0], true);
+            firstDueTask.set(result.task);
+            previousFirstDueTask.set(result.task);
+            closeAgenda();
         }
     }
 
@@ -84,7 +87,9 @@
         trigger: [
             {
                 key: "s",
-                callback: () => viewReverseTaskList(),
+                callback: () => {
+                    void viewReverseTaskList();
+                },
                 modifier: false,
             },
         ],

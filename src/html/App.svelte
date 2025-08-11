@@ -39,6 +39,7 @@
                         previousFirstDueTask.set(t);
                     }, task);
                 }
+                window.location.hash = "";
             })();
         }
     });

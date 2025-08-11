@@ -29,6 +29,23 @@
     };
 
     /**
+     * Handles skipping the current task.
+     */
+    const handleSkipTask = (): void => {
+        if ($firstDueTask) {
+            void skipTask($firstDueTask).then(({ task, contextCleared }) => {
+                firstDueTask.set(task);
+                if (contextCleared) {
+                    userSettings.update((settings) => ({
+                        ...settings,
+                        selectedContext: null,
+                    }));
+                }
+            });
+        }
+    };
+
+    /**
      * Opens a modal dialog by its ID.
      * @param modalId - The ID of the modal to open.
      */
@@ -45,7 +62,7 @@
             {#if task.skip}
                 <button
                     class="text-md hover:bg-accent btn btn-ghost btn-sm absolute top-0 right-0 h-8 min-h-8 content-center border-0 p-4"
-                    onclick={() => skipTask(task)}
+                    onclick={handleSkipTask}
                     title="skip task"
                     type="button"
                 >
@@ -72,19 +89,7 @@
     use:shortcut={{
         trigger: {
             key: "s",
-            callback: () => {
-                if ($firstDueTask) {
-                    void skipTask($firstDueTask).then(({ task, contextCleared }) => {
-                        firstDueTask.set(task);
-                        if (contextCleared) {
-                            userSettings.update((settings) => ({
-                                ...settings,
-                                selectedContext: null,
-                            }));
-                        }
-                    });
-                }
-            },
+            callback: handleSkipTask,
             modifier: false,
         },
     }}

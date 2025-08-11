@@ -3,6 +3,7 @@
     import { Icon, InboxArrowDown, Inbox } from "svelte-hero-icons";
     import { getPriorityClasses, colorClasses, borderClasses } from "../../utils/styleUtils";
     import { summonTask } from "../../services/firstTaskService";
+    import { firstDueTask, previousFirstDueTask } from "../../stores/stores";
     import type { Priority } from "../../types/todoist";
     import type { AgendaTaskProps } from "../../types/agenda";
 
@@ -24,7 +25,12 @@
 >
     <button
         class={`priority-element relative -left-1.5 mt-0 flex h-fit min-h-2.5 min-w-10 shrink-0 flex-row items-center justify-center rounded-md pr-1 pl-2 text-xs font-bold ${getPriorityClasses(taskPriority)}`}
-        onclick={() => summonTask(task)}
+        onclick={async () => {
+            const result = await summonTask(task);
+            firstDueTask.set(result.task);
+            previousFirstDueTask.set(result.task);
+            window.location.hash = "";
+        }}
         type="button"
     >
         {#if task.due && task.due.date && task.due.date.includes("T")}
