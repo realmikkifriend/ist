@@ -1,7 +1,12 @@
+import type { Writable } from "svelte/store";
 import type { DateTime } from "luxon";
 import type { ListBullet } from "svelte-hero-icons";
 import type { Task } from "./todoist";
 import type { DynalistTaskType } from "./dynalist";
+
+export type ResettableStore<T> = Writable<T> & {
+    reset: () => void;
+};
 
 export interface PromiseProp {
     dataPromise: Promise<void>;

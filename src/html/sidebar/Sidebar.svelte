@@ -4,8 +4,8 @@
     import Contexts from "./Contexts.svelte";
     import DailyGoal from "../activity/DailyGoal.svelte";
     import Footer from "../interface/Footer.svelte";
+    import { resetAllStores } from "../../stores/reset";
     import { todoistData } from "../../stores/stores";
-    import { handleLogout } from "../../services/updateService";
     import type { HashProp } from "../../types/interface";
 
     let { hash }: HashProp = $props();
@@ -55,7 +55,7 @@
                     <DailyGoal />
                 </div>
                 <Footer />
-                <button class="btn btn-secondary w-full" onclick={handleLogout} type="submit">
+                <button class="btn btn-secondary w-full" onclick={resetAllStores} type="button">
                     <Icon class="h-6 w-6" src={ArrowLeftOnRectangle} />Log Out
                 </button>
             </div>

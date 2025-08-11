@@ -1,40 +1,43 @@
-import { writable } from "svelte/store";
-import { persisted } from "svelte-persisted-store";
 import { DateTime } from "luxon";
-import type { Writable } from "svelte/store";
+import { resettablePersisted, resettableWritable, registerStore } from "./reset";
 import type { TodoistData, Task, User } from "../types/todoist";
 import type { TaskActivity } from "../types/activity";
+import type { ResettableStore } from "../types/interface";
 
 /**
  * Stores Todoist data.
  */
-export const todoistData = persisted<TodoistData>("todoist_data", {
+export const todoistData = resettablePersisted<TodoistData>("todoist_data", {
     tasks: [],
     contexts: [],
     dueTasks: [],
     reverseTasks: { tomorrow: [], today: [] },
     user: {} as User,
 });
+registerStore(todoistData);
 
 /**
  * Stores Todoist errors.
  */
-export const todoistError: Writable<string | null> = writable(null);
+export const todoistError: ResettableStore<string | null> = resettableWritable(null);
+registerStore(todoistError);
 
 /**
  * Stores the first due task.
  */
-export const firstDueTask = persisted<Task | null>("firstDueTask", null);
+export const firstDueTask = resettablePersisted<Task | null>("firstDueTask", null);
+registerStore(firstDueTask);
 
 /**
  * Stores the previous first due task.
  */
-export const previousFirstDueTask: Writable<Task | null> = writable(null);
+export const previousFirstDueTask: ResettableStore<Task | null> = resettableWritable(null);
+registerStore(previousFirstDueTask);
 
 /**
  * Stores task activity.
  */
-export const taskActivity = persisted<TaskActivity[]>("task_activity", [], {
+export const taskActivity = resettablePersisted<TaskActivity[]>("task_activity", [], {
     serializer: {
         stringify: (value) =>
             JSON.stringify(
@@ -52,3 +55,4 @@ export const taskActivity = persisted<TaskActivity[]>("task_activity", [], {
             ),
     },
 });
+registerStore(taskActivity);
