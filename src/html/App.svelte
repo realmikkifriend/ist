@@ -22,7 +22,26 @@
 
     let isSpinning = $state(false);
     let hash = $state(window.location.hash);
-    let dataPromise: Promise<void> = $state(Promise.resolve());
+    /**
+     * Refreshes Todoist data and manages the spinning state.
+     * @returns Promise that resolves when data is refreshed and spinning state is updated.
+     */
+    const handleRefresh = async (): Promise<void> => {
+        isSpinning = true;
+        const result = await refreshData();
+        if (result.status === "success") {
+            todoistData.set(result.data);
+        } else {
+            todoistError.set(
+                typeof result.error === "string" ? result.error : result.error.message,
+            );
+        }
+        isSpinning = false;
+    };
+
+    let dataPromise: Promise<void> = $state(
+        $firstDueTask?.summoned ? Promise.resolve() : handleRefresh(),
+    );
 
     $effect(() => {
         if ($userSettings.selectedContext || $todoistData.dueTasks) {
@@ -59,8 +78,6 @@
 
         updateHash();
 
-        void handleRefresh();
-
         const interval = setInterval(() => {
             void handleRefresh();
         }, 300000);
@@ -70,27 +87,6 @@
             window.removeEventListener("hashchange", updateHash);
         };
     });
-
-    /**
-     * Refreshes Todoist data and manages the spinning state.
-     * @returns Promise that resolves when data is refreshed and spinning state is updated.
-     */
-    const handleRefresh = async (): Promise<void> => {
-        isSpinning = true;
-        const result = await refreshData();
-        if (result.status === "error") {
-            todoistError.set(
-                typeof result.error === "string" ? result.error : result.error.message,
-            );
-        }
-        isSpinning = false;
-    };
-
-    if ($firstDueTask?.summoned) {
-        dataPromise = Promise.resolve();
-    } else {
-        dataPromise = handleRefresh();
-    }
 </script>
 
 <div class="flex w-fit items-center">

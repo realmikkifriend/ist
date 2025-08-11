@@ -1,17 +1,18 @@
 import { get } from "svelte/store";
 import { TodoistRequestError } from "@doist/todoist-api-typescript";
-import { todoistData } from "../stores/stores";
 import { todoistAccessToken } from "../stores/secret";
 import { handleOverdueTasks } from "./deferService";
 import { success } from "./toastService";
 import { initializeApi, getEndpoint, processApiResponse, handleApiError } from "../utils/apiUtils";
+import type { TodoistData } from "../types/todoist";
 
 /**
- * Refreshes Todoist data and updates the store.
- * @returns {Promise<{ status: "success"; error: null } | { status: "error"; error: TodoistRequestError | string } | void>} - Results of API refresh.
+ * Refreshes Todoist data.
+ * @returns {Promise<{ status: "success"; data: TodoistData } | { status: "error"; error: TodoistRequestError | string }>} - Results of API refresh.
  */
 export function refreshData(): Promise<
-    { status: "success"; error: null } | { status: "error"; error: TodoistRequestError | string }
+    | { status: "success"; data: TodoistData }
+    | { status: "error"; error: TodoistRequestError | string }
 > {
     const api = initializeApi(get(todoistAccessToken));
     if (!todoistAccessToken || !api) {
@@ -35,9 +36,8 @@ export function refreshData(): Promise<
             handleOverdueTasks(tasks.results || []);
             const todoistDataObj = processApiResponse(tasks, projects, userResponse);
 
-            todoistData.set(todoistDataObj);
             success("Todoist data updated!");
-            return { status: "success", error: null } as const;
+            return { status: "success", data: todoistDataObj } as const;
         })
         .catch((err) => {
             const error = handleApiError(err);
