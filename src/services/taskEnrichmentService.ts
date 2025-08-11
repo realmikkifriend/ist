@@ -7,6 +7,29 @@ import type { TodoistData, Task, InitialCheckOutcome } from "../types/todoist";
 import { firstDueTask } from "../stores/stores";
 
 /**
+ * Enriches a task by loading its comments and activity.
+ * @param {Task} task - The task to enrich.
+ * @param {string} accessToken - The Todoist access token.
+ * @returns {Promise<Task>} The enriched task.
+ */
+export const enrichTask = async (task: Task, accessToken: string): Promise<Task> => {
+    const taskWithComments = await loadCommentsForTask(task, accessToken);
+    const activity = getActivity(
+        [DateTime.now().minus({ years: 1 }), DateTime.now()],
+        taskWithComments,
+    );
+
+    const activityPromise = activity.promise
+        ? activity.promise.then(({ relevant }) => relevant)
+        : Promise.resolve(activity.data);
+
+    return {
+        ...taskWithComments,
+        activity: activityPromise,
+    };
+};
+
+/**
  * Handles initial checks and early exits for updateFirstDueTask.
  * @param {Task | null} task - Optional task to set as the first due task.
  * @param {TodoistData} $todoistData - The current Todoist data.
@@ -19,9 +42,7 @@ export const handleInitialChecks = async (
     debounceTimeoutId: ReturnType<typeof setTimeout> | null,
 ): Promise<InitialCheckOutcome> => {
     if (task) {
-        const taskWithData = await loadActivityForTask(
-            loadCommentsForTask(task, get(todoistAccessToken)),
-        );
+        const taskWithData = await enrichTask(task, get(todoistAccessToken));
         return {
             action: "set_task_and_continue",
             taskToSet: taskWithData,
@@ -38,23 +59,4 @@ export const handleInitialChecks = async (
     }
 
     return { action: "continue", showNewTaskToast: false };
-};
-
-/**
- * Loads activity for a given task.
- * @param {Promise<Task>} taskPromise - The promised task.
- * @returns {Task} The task with the activity loaded.
- */
-export const loadActivityForTask = async (taskPromise: Promise<Task>): Promise<Task> => {
-    const task = await taskPromise;
-    const activity = getActivity([DateTime.now().minus({ years: 1 }), DateTime.now()], task);
-
-    const activityPromise = activity.promise
-        ? activity.promise.then(({ relevant }) => relevant)
-        : Promise.resolve(activity.data);
-
-    return {
-        ...task,
-        activity: activityPromise,
-    };
 };

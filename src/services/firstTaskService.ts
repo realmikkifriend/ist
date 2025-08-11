@@ -2,10 +2,10 @@ import { get } from "svelte/store";
 import { todoistData, firstDueTask, previousFirstDueTask } from "../stores/stores";
 import { userSettings } from "../stores/interface";
 import { todoistAccessToken } from "../stores/secret";
-import { handleInitialChecks, loadActivityForTask } from "./taskEnrichmentService";
+import { handleInitialChecks, enrichTask } from "./taskEnrichmentService";
 import { success } from "../services/toastService";
 import { updateDueTasks } from "../services/sidebarService";
-import { shouldShowNewTaskToast, loadCommentsForTask } from "../utils/firstTaskUtils";
+import { shouldShowNewTaskToast } from "../utils/firstTaskUtils";
 import type { Task, TodoistData } from "../types/todoist";
 import type { UserSettings } from "../types/interface";
 
@@ -83,6 +83,7 @@ export const updateFirstDueTask = async (
         dueTasks,
         prevTask,
         selectedContextId,
+        initialCheckResult.taskToSet,
     );
 
     debounceState.timeoutId = setTimeout(() => {
@@ -97,19 +98,21 @@ export const updateFirstDueTask = async (
  * @param {Task[]} dueTasks - The list of due tasks.
  * @param {Task | null} prevTask - The previously set first due task.
  * @param {string | null} selectedContextId - The ID of the currently selected context.
+ * @param {Task | null} preEnrichedTask - An optional task that has already been enriched.
  * @returns {Promise<{task: Task | null, showNewTaskToast: boolean}>} The processed task and a flag indicating if the new task toast should be shown.
  */
 const processDueTaskUpdate = async (
     dueTasks: Task[],
     prevTask: Task | null,
     selectedContextId: string | null,
+    preEnrichedTask: Task | null = null,
 ): Promise<{ task: Task | null; showNewTaskToast: boolean }> => {
     if (!dueTasks.length) {
         return { task: null, showNewTaskToast: false };
     }
-    const taskWithData = await loadActivityForTask(
-        loadCommentsForTask(dueTasks[0], get(todoistAccessToken)),
-    );
+
+    const taskToProcess = preEnrichedTask || dueTasks[0];
+    const taskWithData = await enrichTask(taskToProcess, get(todoistAccessToken));
 
     const showNewTaskToast = shouldShowNewTaskToast(taskWithData, prevTask, selectedContextId);
 
