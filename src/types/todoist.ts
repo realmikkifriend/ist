@@ -147,6 +147,7 @@ export interface HistoryProps {
 export interface InitialCheckOutcome {
     action: "continue" | "exit" | "set_task_and_exit" | "set_task_and_continue";
     taskToSet?: Task | null;
+    showNewTaskToast?: boolean;
 }
 
 export type GetAllActivityDataParams = {

@@ -1,6 +1,7 @@
 import { DateTime } from "luxon";
 import { toastMessages } from "../stores/interface";
 import type { ToastMessage } from "../types/interface";
+import type { Task } from "../types/todoist";
 
 /**
  * Adds a toast message to the store.
@@ -63,7 +64,10 @@ export function error(message: string): void {
 /**
  * Shows a custom toast with a Svelte component and a click handler.
  * @param {() => void} onClickHandler - Function to call when the component is clicked.
+ * @param {Task} task - The task to be summoned on toast click.
  */
-export function newFirstTask(onClickHandler: () => void): void {
-    addToast("info", "First due task has changed! Click here to update...", 10000, onClickHandler);
+export function newFirstTask(onClickHandler: (task: Task) => void, task: Task): void {
+    addToast("info", "First due task has changed! Click here to update...", 10000, () =>
+        onClickHandler(task),
+    );
 }

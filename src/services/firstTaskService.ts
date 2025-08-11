@@ -3,10 +3,11 @@ import { todoistData, firstDueTask, previousFirstDueTask } from "../stores/store
 import { userSettings } from "../stores/interface";
 import { todoistAccessToken } from "../stores/secret";
 import { handleInitialChecks, loadActivityForTask } from "./taskEnrichmentService";
-import { newFirstTask } from "../services/toastService";
-import { clearSelectedContext, updateDueTasks } from "../services/sidebarService";
+import { success } from "../services/toastService";
+import { updateDueTasks } from "../services/sidebarService";
 import { shouldShowNewTaskToast, loadCommentsForTask } from "../utils/firstTaskUtils";
 import type { Task, TodoistData } from "../types/todoist";
+import type { UserSettings } from "../types/interface";
 
 const debounceState: {
     timeoutId: ReturnType<typeof setTimeout> | null;
@@ -22,29 +23,13 @@ const debounceState: {
 };
 
 /**
- * Sets the firstDueTask and previousFirstDueTask stores.
- * @param {Task | null} task - The task to set in the stores.
- * @returns {void}
- */
-const setDueTaskStores = (task: Task | null | Promise<Task>): void => {
-    const setTask = (t: Task | null) => {
-        firstDueTask.set(t);
-        previousFirstDueTask.set(t);
-    };
-
-    if (task instanceof Promise) {
-        void task.then(setTask);
-    } else {
-        setTask(task);
-    }
-};
-
-/**
  * Skip the current task and summon the next one.
  * @param {Task} task - The task to skip.
- * @returns {void}
+ * @returns {Promise<{task: Task | null, contextCleared: boolean}>} The next task and a flag indicating if the context was cleared.
  */
-export const skipTask = (task: Task): void => {
+export const skipTask = async (
+    task: Task,
+): Promise<{ task: Task | null; contextCleared: boolean }> => {
     const $todoistData: TodoistData = get(todoistData);
     const reverseTasksObj = $todoistData.reverseTasks as unknown as {
         today: Task[];
@@ -55,50 +40,57 @@ export const skipTask = (task: Task): void => {
     const currentIndex = reverseTasks.findIndex((t) => t.id === task.id);
     const nextIndex = currentIndex + 1;
     if (nextIndex < reverseTasks.length) {
-        summonTask(reverseTasks[nextIndex], true);
-    } else {
-        clearSelectedTask();
+        return summonTask(reverseTasks[nextIndex], true);
     }
+    return clearSelectedTask();
 };
 
 /**
  * Update the first due task, loading comments and handling context changes.
  * @param {Task | null} task - Optional task to set as the first due task.
+ * @returns {Promise<{task: Task | null, contextCleared: boolean, showNewTaskToast: boolean}>} The new first due task, a flag indicating if the context was cleared, and a flag indicating if the new task toast should be shown.
  */
-export const updateFirstDueTask = (task: Task | null = null): void => {
+export const updateFirstDueTask = async (
+    task: Task | null = null,
+): Promise<{ task: Task | null; contextCleared: boolean; showNewTaskToast: boolean }> => {
     const $todoistData: TodoistData = get(todoistData);
     const prevTask: Task | null = get(previousFirstDueTask);
 
-    const initialCheckResult = handleInitialChecks(task, $todoistData, prevTask);
+    const initialCheckResult = await handleInitialChecks(
+        task,
+        $todoistData,
+        prevTask,
+        debounceState.timeoutId,
+    );
 
     if (initialCheckResult.action === "exit") {
-        return;
-    }
-
-    if (
-        initialCheckResult.action === "set_task_and_exit" ||
-        initialCheckResult.action === "set_task_and_continue"
-    ) {
-        setDueTaskStores(initialCheckResult.taskToSet!);
-        if (initialCheckResult.action === "set_task_and_exit") {
-            return;
-        }
-    }
-
-    if (debounceState.timeoutId) {
-        return;
+        return {
+            task: initialCheckResult.taskToSet ?? null,
+            contextCleared: false,
+            showNewTaskToast: initialCheckResult.showNewTaskToast ?? false,
+        };
     }
 
     const selectedContextId: string | null = get(userSettings).selectedContext?.id ?? null;
-    const dueTasks: Task[] = task
-        ? [task]
+    const { tasks: dueTasks, contextCleared } = task
+        ? { tasks: [task], contextCleared: false }
         : updateDueTasks($todoistData.dueTasks, selectedContextId);
 
-    void processDueTaskUpdate(dueTasks, prevTask, selectedContextId);
+    if (contextCleared) {
+        success("No more tasks in context! Showing all due tasks...");
+    }
+
+    const { task: newTask, showNewTaskToast } = await processDueTaskUpdate(
+        dueTasks,
+        prevTask,
+        selectedContextId,
+    );
 
     debounceState.timeoutId = setTimeout(() => {
         debounceState.timeoutId = null;
     }, 2000);
+
+    return { task: newTask, contextCleared, showNewTaskToast };
 };
 
 /**
@@ -106,36 +98,35 @@ export const updateFirstDueTask = (task: Task | null = null): void => {
  * @param {Task[]} dueTasks - The list of due tasks.
  * @param {Task | null} prevTask - The previously set first due task.
  * @param {string | null} selectedContextId - The ID of the currently selected context.
+ * @returns {Promise<{task: Task | null, showNewTaskToast: boolean}>} The processed task and a flag indicating if the new task toast should be shown.
  */
-const processDueTaskUpdate = (
+const processDueTaskUpdate = async (
     dueTasks: Task[],
     prevTask: Task | null,
     selectedContextId: string | null,
-): void => {
+): Promise<{ task: Task | null; showNewTaskToast: boolean }> => {
     if (!dueTasks.length) {
-        return;
+        return { task: null, showNewTaskToast: false };
     }
-    const taskWithData = loadActivityForTask(
+    const taskWithData = await loadActivityForTask(
         loadCommentsForTask(dueTasks[0], get(todoistAccessToken)),
     );
 
-    if (shouldShowNewTaskToast(taskWithData, prevTask, selectedContextId)) {
-        newFirstTask(() => setDueTaskStores(taskWithData));
-    } else {
-        setDueTaskStores(taskWithData);
-    }
+    const showNewTaskToast = shouldShowNewTaskToast(taskWithData, prevTask, selectedContextId);
+
+    return { task: taskWithData, showNewTaskToast };
 };
 
 /**
  * Summon a task as the first due task.
  * @param {Task & { firstDue?: boolean; skip?: boolean; summoned?: string | boolean }} task - The task to summon.
  * @param {boolean} enableSkip - Whether to enable skip. Defaults to false.
- * @returns {void}
+ * @returns {Promise<{task: Task | null, contextCleared: boolean}>} The summoned task and a flag indicating if the context was cleared.
  */
-export function summonTask(
+export async function summonTask(
     task: Task & { firstDue?: boolean; skip?: boolean; summoned?: string | boolean },
     enableSkip: boolean = false,
-): void {
+): Promise<{ task: Task | null; contextCleared: boolean }> {
     if (!task.firstDue || enableSkip) {
         debounceState.clearDebounceTimeout();
         if (enableSkip) {
@@ -145,20 +136,19 @@ export function summonTask(
 
         task.summoned = currentFirstDueSummoned || window.location.hash;
 
-        void (() => {
-            updateFirstDueTask(task);
-            window.location.hash = "";
-        })();
-    } else {
+        const result = await updateFirstDueTask(task);
         window.location.hash = "";
+        return { task: result.task, contextCleared: result.contextCleared };
     }
+    window.location.hash = "";
+    return { task: get(firstDueTask), contextCleared: false };
 }
 
 /**
  * Handles the click event on the badge, updating navigation and state as needed.
- * @returns {void}
+ * @returns {Promise<{task: Task | null, contextCleared: boolean}>} The new first due task and a flag indicating if the context was cleared.
  */
-export function clearSelectedTask(): void {
+export async function clearSelectedTask(): Promise<{ task: Task | null; contextCleared: boolean }> {
     const $firstDueTask = get(firstDueTask);
     const selectedContext = get(userSettings).selectedContext;
 
@@ -167,12 +157,16 @@ export function clearSelectedTask(): void {
     }
 
     if ($firstDueTask?.summoned || selectedContext) {
-        firstDueTask.set(null);
-        previousFirstDueTask.set(null);
         debounceState.clearDebounceTimeout();
         if (selectedContext) {
-            clearSelectedContext();
+            userSettings.update((settings: UserSettings) => ({
+                ...settings,
+                selectedContext: null,
+            }));
+            success("No more tasks in context! Showing all due tasks...");
         }
-        void updateFirstDueTask();
+        const result = await updateFirstDueTask();
+        return { task: result.task, contextCleared: result.contextCleared };
     }
+    return { task: $firstDueTask, contextCleared: false };
 }

@@ -3,11 +3,17 @@
     import { on } from "svelte/events";
     import { Icon, ArrowPath } from "svelte-hero-icons";
     import { shortcut } from "@svelte-put/shortcut";
-    import { todoistData, firstDueTask, todoistError } from "../stores/stores";
+    import {
+        todoistData,
+        firstDueTask,
+        todoistError,
+        previousFirstDueTask,
+    } from "../stores/stores";
     import { userSettings } from "../stores/interface";
     import { updateFirstDueTask } from "../services/firstTaskService";
     import { refreshData } from "../services/updateService";
     import { toggleAgendaHash } from "../services/agendaService";
+    import { newFirstTask } from "../services/toastService";
     import AppView from "./AppView.svelte";
     import Sidebar from "./sidebar/Sidebar.svelte";
     import ContextBadge from "./sidebar/ContextBadge.svelte";
@@ -20,7 +26,20 @@
 
     $effect(() => {
         if ($userSettings.selectedContext || $todoistData.dueTasks) {
-            void updateFirstDueTask();
+            void (async () => {
+                const { task, contextCleared, showNewTaskToast } = await updateFirstDueTask();
+                firstDueTask.set(task);
+                previousFirstDueTask.set(task);
+                if (contextCleared) {
+                    userSettings.update((settings) => ({ ...settings, selectedContext: null }));
+                }
+                if (showNewTaskToast && task) {
+                    newFirstTask((t) => {
+                        firstDueTask.set(t);
+                        previousFirstDueTask.set(t);
+                    }, task);
+                }
+            })();
         }
     });
 

@@ -1,11 +1,24 @@
 <script lang="ts">
     import { Icon, XMark } from "svelte-hero-icons";
     import { shortcut } from "@svelte-put/shortcut";
-    import { todoistData, firstDueTask } from "../../stores/stores";
+    import { todoistData, firstDueTask, previousFirstDueTask } from "../../stores/stores";
     import { userSettings } from "../../stores/interface";
     import { getDueTaskCountByContext } from "../../services/sidebarService";
     import { clearSelectedTask } from "../../services/firstTaskService";
     import { getSelectedContextName } from "../../utils/firstTaskUtils";
+
+    /**
+     * Handles the clearing of the selected task.
+     */
+    const handleClearSelectedTask = (): void => {
+        void clearSelectedTask().then(({ task, contextCleared }) => {
+            firstDueTask.set(task);
+            previousFirstDueTask.set(task);
+            if (contextCleared) {
+                userSettings.update((settings) => ({ ...settings, selectedContext: null }));
+            }
+        });
+    };
 </script>
 
 <button
@@ -19,7 +32,7 @@
     class:text-primary={$userSettings.selectedContext}
     class:text-purple-400={$firstDueTask?.summoned}
     class:text-yellow-500={$firstDueTask?.skip}
-    onclick={clearSelectedTask}
+    onclick={handleClearSelectedTask}
     type="reset"
 >
     {#if $firstDueTask?.skip}
@@ -47,7 +60,7 @@
     use:shortcut={{
         trigger: {
             key: "x",
-            callback: () => clearSelectedTask(),
+            callback: handleClearSelectedTask,
             modifier: false,
         },
     }}

@@ -4,42 +4,55 @@ import { todoistAccessToken } from "../stores/secret";
 import { getActivity } from "./activityService";
 import { loadCommentsForTask } from "../utils/firstTaskUtils";
 import type { TodoistData, Task, InitialCheckOutcome } from "../types/todoist";
+import { firstDueTask } from "../stores/stores";
 
 /**
  * Handles initial checks and early exits for updateFirstDueTask.
  * @param {Task | null} task - Optional task to set as the first due task.
  * @param {TodoistData} $todoistData - The current Todoist data.
  * @param {Task | null} prevTask - The previously set first due task.
- * @returns {InitialCheckOutcome} An object indicating the outcome of the checks.
+ * @param {ReturnType<typeof setTimeout> | null} debounceTimeoutId - The current debounce timeout ID.
+ * @returns {Promise<InitialCheckOutcome>} An object indicating the outcome of the checks.
  */
-export const handleInitialChecks = (
+export const handleInitialChecks = async (
     task: Task | null,
     $todoistData: TodoistData,
     prevTask: Task | null,
-): InitialCheckOutcome => {
+    debounceTimeoutId: ReturnType<typeof setTimeout> | null,
+): Promise<InitialCheckOutcome> => {
     if (task) {
-        const taskWithData = loadActivityForTask(
+        const taskWithData = await loadActivityForTask(
             loadCommentsForTask(task, get(todoistAccessToken)),
         );
-        return { action: "set_task_and_continue", taskToSet: taskWithData };
+        return {
+            action: "set_task_and_continue",
+            taskToSet: taskWithData,
+            showNewTaskToast: false,
+        };
     }
 
     if (prevTask?.summoned && !task) {
-        return { action: "exit" };
+        return { action: "exit", showNewTaskToast: false };
     }
 
     if (!$todoistData?.dueTasks?.length) {
-        return { action: "set_task_and_exit", taskToSet: null };
+        return { action: "set_task_and_exit", taskToSet: null, showNewTaskToast: false };
     }
-    return { action: "continue" };
+
+    if (debounceTimeoutId) {
+        return { action: "exit", taskToSet: get(firstDueTask), showNewTaskToast: false };
+    }
+
+    return { action: "continue", showNewTaskToast: false };
 };
 
 /**
  * Loads activity for a given task.
- * @param {Task} task - The task to load activity for.
+ * @param {Promise<Task>} taskPromise - The promised task.
  * @returns {Task} The task with the activity loaded.
  */
-export const loadActivityForTask = (task: Task): Task => {
+export const loadActivityForTask = async (taskPromise: Promise<Task>): Promise<Task> => {
+    const task = await taskPromise;
     const activity = getActivity([DateTime.now().minus({ years: 1 }), DateTime.now()], task);
 
     const activityPromise = activity.promise

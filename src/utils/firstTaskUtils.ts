@@ -1,5 +1,5 @@
 import { getTaskComments } from "./apiUtils";
-import type { Task, Comment, TodoistData } from "../types/todoist";
+import type { Task, TodoistData } from "../types/todoist";
 import type { UserSettings } from "../types/interface";
 
 /**
@@ -62,8 +62,10 @@ export function getSelectedContextName(
  * @param {string} todoistAccessTokenValue - The value of the todoistAccessToken store.
  * @returns The task with a promise for the comments.
  */
-export const loadCommentsForTask = (task: Task, todoistAccessTokenValue: string): Task => {
-    const commentsPromise = getTaskComments(todoistAccessTokenValue, task.id);
-    (task as Task & { comments: Promise<Comment[]> }).comments = commentsPromise;
-    return task;
+export const loadCommentsForTask = async (
+    task: Task,
+    todoistAccessTokenValue: string,
+): Promise<Task> => {
+    const comments = await getTaskComments(todoistAccessTokenValue, task.id);
+    return { ...task, comments };
 };

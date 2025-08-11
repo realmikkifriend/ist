@@ -2,6 +2,8 @@
     import { DateTime } from "luxon";
     import { Icon, Forward } from "svelte-hero-icons";
     import { shortcut } from "@svelte-put/shortcut";
+    import { firstDueTask } from "../../stores/stores";
+    import { userSettings } from "../../stores/interface";
     import { skipTask } from "../../services/firstTaskService";
     import { getPriorityBorder } from "../../utils/styleUtils";
     import Comments from "./Comments.svelte";
@@ -70,7 +72,19 @@
     use:shortcut={{
         trigger: {
             key: "s",
-            callback: () => skipTask(task),
+            callback: () => {
+                if ($firstDueTask) {
+                    void skipTask($firstDueTask).then(({ task, contextCleared }) => {
+                        firstDueTask.set(task);
+                        if (contextCleared) {
+                            userSettings.update((settings) => ({
+                                ...settings,
+                                selectedContext: null,
+                            }));
+                        }
+                    });
+                }
+            },
             modifier: false,
         },
     }}

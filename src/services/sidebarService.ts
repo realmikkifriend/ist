@@ -1,10 +1,7 @@
 import { get } from "svelte/store";
-import { todoistData, previousFirstDueTask } from "../stores/stores";
-import { userSettings } from "../stores/interface";
-import { success } from "../services/toastService";
+import { todoistData } from "../stores/stores";
 import { filterTasksByContext } from "../utils/firstTaskUtils";
 import type { Task } from "../types/todoist";
-import type { UserSettings } from "../types/interface";
 
 /**
  * Gets the count of due tasks for a specific context.
@@ -20,33 +17,21 @@ export function getDueTaskCountByContext(contextId: string): number {
 }
 
 /**
- * Clears the selected context and previous first due task.
- * @returns {void}
- */
-export function clearSelectedContext(): void {
-    previousFirstDueTask.set(null);
-    userSettings.update((settings: UserSettings) => ({ ...settings, selectedContext: null }));
-    success("No more tasks in context! Showing all due tasks...");
-}
-
-/**
  * Update due tasks based on the selected context ID.
  * @param {Task[]} dueTasks - The list of due tasks.
  * @param {string | null} contextId - The selected context ID from settings.
- * @returns {Task[]} The updated list of due tasks.
+ * @returns {{tasks: Task[], contextCleared: boolean}} The updated list of due tasks and a flag indicating if the context was cleared.
  */
-export const updateDueTasks = (dueTasks: Task[], contextId: string | null): Task[] => {
+export const updateDueTasks = (
+    dueTasks: Task[],
+    contextId: string | null,
+): { tasks: Task[]; contextCleared: boolean } => {
     if (contextId) {
         const filteredDueTasks = filterTasksByContext(dueTasks, contextId);
         if (!filteredDueTasks.length) {
-            userSettings.update((settings: UserSettings) => ({
-                ...settings,
-                selectedContext: null,
-            }));
-            success("No more tasks in context! Showing all due tasks...");
-            return dueTasks;
+            return { tasks: dueTasks, contextCleared: true };
         }
-        return filteredDueTasks;
+        return { tasks: filteredDueTasks, contextCleared: false };
     }
-    return dueTasks;
+    return { tasks: dueTasks, contextCleared: false };
 };
