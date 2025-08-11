@@ -4,7 +4,7 @@ import { todoistData, todoistError, firstDueTask, taskActivity } from "../stores
 import { userSettings, toastMessages } from "../stores/interface";
 import { todoistAccessToken, dynalistAccessToken } from "../stores/secret";
 import { handleOverdueTasks } from "./deferService";
-import { setErrorState, success } from "./toastService";
+import { success } from "./toastService";
 import { initializeApi, getEndpoint, processApiResponse, handleApiError } from "../utils/apiUtils";
 import type { User } from "../types/todoist";
 
@@ -13,13 +13,12 @@ import type { User } from "../types/todoist";
  * @returns {Promise<{ status: "success"; error: null } | { status: "error"; error: TodoistRequestError | string } | void>} - Results of API refresh.
  */
 export function refreshData(): Promise<
-    | { status: "success"; error: null }
-    | { status: "error"; error: TodoistRequestError | string }
-    | void
+    { status: "success"; error: null } | { status: "error"; error: TodoistRequestError | string }
 > {
     const api = initializeApi(get(todoistAccessToken));
     if (!todoistAccessToken || !api) {
-        return Promise.resolve(setErrorState(new TodoistRequestError("No access token found.")));
+        const error = new TodoistRequestError("No access token found.");
+        return Promise.resolve({ status: "error", error });
     }
 
     return Promise.all([
@@ -31,7 +30,8 @@ export function refreshData(): Promise<
             const [tasks, projects, userResponse] = apiResult;
 
             if (!tasks || !projects || !userResponse) {
-                return;
+                const error = "Failed to fetch all required data.";
+                return { status: "error", error: error } as const;
             }
 
             handleOverdueTasks(tasks.results || []);
@@ -39,15 +39,11 @@ export function refreshData(): Promise<
 
             todoistData.set(todoistDataObj);
             success("Todoist data updated!");
-            const successResult: { status: "success"; error: null } = {
-                status: "success",
-                error: null,
-            };
-            return successResult;
+            return { status: "success", error: null } as const;
         })
         .catch((err) => {
             const error = handleApiError(err);
-            return setErrorState(error);
+            return { status: "error", error } as const;
         });
 }
 

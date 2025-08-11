@@ -3,7 +3,7 @@
     import { on } from "svelte/events";
     import { Icon, ArrowPath } from "svelte-hero-icons";
     import { shortcut } from "@svelte-put/shortcut";
-    import { todoistData, firstDueTask } from "../stores/stores";
+    import { todoistData, firstDueTask, todoistError } from "../stores/stores";
     import { userSettings } from "../stores/interface";
     import { updateFirstDueTask } from "../services/firstTaskService";
     import { refreshData } from "../services/updateService";
@@ -57,7 +57,12 @@
      */
     const handleRefresh = async (): Promise<void> => {
         isSpinning = true;
-        await refreshData();
+        const result = await refreshData();
+        if (result.status === "error") {
+            todoistError.set(
+                typeof result.error === "string" ? result.error : result.error.message,
+            );
+        }
         isSpinning = false;
     };
 

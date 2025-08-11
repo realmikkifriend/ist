@@ -1,9 +1,9 @@
-import { todoistData, todoistError, previousFirstDueTask, taskActivity } from "../stores/stores";
-import { markTaskDone, deferTasks } from "../services/apiService";
-import { updateFirstDueTask } from "../services/firstTaskService";
 import { get } from "svelte/store";
 import { DateTime } from "luxon";
-import { TodoistRequestError } from "@doist/todoist-api-typescript";
+import { todoistData, previousFirstDueTask, taskActivity } from "../stores/stores";
+import { markTaskDone, deferTasks } from "../services/apiService";
+import { error } from "../services/toastService";
+import { updateFirstDueTask } from "../services/firstTaskService";
 import type { Task, TodoistData, TaskUpdates } from "../types/todoist";
 import type { TaskActivity } from "../types/activity";
 
@@ -74,12 +74,11 @@ export async function handleTaskDone(task: Task): Promise<void> {
 
     updateTaskResources([[task.id, fiveMinutesFromNow]]);
 
-    const result = await markTaskDone(task.id).catch((error: unknown) => {
-        const message = error instanceof TodoistRequestError ? error.message : "Unknown error";
-        todoistError.set(`Failed to mark task done: ${message}`);
-        return null;
-    });
-    if (!result) return;
+    const result = await markTaskDone(task.id);
+    if (result.status === "error") {
+        const message = typeof result.error === "string" ? result.error : result.error.message;
+        error(`Failed to mark task done: ${message}`);
+    }
 }
 
 /**
@@ -96,10 +95,18 @@ export async function handleTaskDefer(taskUpdates: Array<[Task, DateTime]>): Pro
     ]);
     updateTaskResources(updatedTaskResources);
 
-    const result = await deferTasks(taskUpdates).catch((error: unknown) => {
-        const message = error instanceof TodoistRequestError ? error.message : "Unknown error";
-        todoistError.set(`Failed to defer tasks: ${message}`);
-        return null;
-    });
-    if (!result) return;
+    const results = await deferTasks(taskUpdates);
+    const errors = results.filter((result) => result.status === "error");
+
+    if (errors.length > 0) {
+        const errorMessages = errors
+            .map((error) => {
+                if ("error" in error) {
+                    return typeof error.error === "string" ? error.error : error.error.message;
+                }
+                return "Unknown error";
+            })
+            .join(", ");
+        error(`Failed to defer tasks: ${errorMessages}`);
+    }
 }
