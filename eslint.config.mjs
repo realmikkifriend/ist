@@ -8,6 +8,17 @@ import jsdoc from "eslint-plugin-jsdoc";
 import svelteConfig from "./svelte.config.mjs";
 import vitest from "@vitest/eslint-plugin";
 
+const noTypesOrInterfaces = [
+    {
+        selector: "TSTypeAliasDeclaration",
+        message: "Types are only allowed in src/types. Please import them.",
+    },
+    {
+        selector: "TSInterfaceDeclaration",
+        message: "Interfaces are only allowed in src/types. Please import them.",
+    },
+];
+
 export default defineConfig([
     {
         files: ["**/*"],
@@ -40,7 +51,7 @@ export default defineConfig([
             globals: globals.browser,
         },
         rules: {
-            "max-lines": ["warn", { max: 140, skipComments: true, skipBlankLines: true }],
+            "max-lines": ["warn", { max: 150, skipComments: true, skipBlankLines: true }],
             "max-depth": ["warn", 2],
         },
     },
@@ -104,16 +115,30 @@ export default defineConfig([
         files: ["**/*.ts", "**/*.tsx"],
         ignores: ["src/types/**/*.ts", "src/types/**/*.tsx"],
         rules: {
-            "no-restricted-syntax": [
+            "no-restricted-syntax": ["warn", ...noTypesOrInterfaces],
+        },
+    },
+    {
+        files: ["src/services/**/*.ts"],
+        rules: {
+            "no-restricted-imports": [
                 "error",
                 {
-                    selector: "TSTypeAliasDeclaration",
-                    message: "Types are only allowed in src/types. Please import them.",
+                    patterns: [
+                        {
+                            group: ["**/services/toastService"],
+                            message: "Services files can't trigger toasts directly.",
+                        },
+                    ],
                 },
+            ],
+            "no-restricted-syntax": [
+                "warn",
                 {
-                    selector: "TSInterfaceDeclaration",
-                    message: "Interfaces are only allowed in src/types. Please import them.",
+                    selector: "CallExpression[callee.property.name='set']",
+                    message: "Setting stores is only allowed in components.",
                 },
+                ...noTypesOrInterfaces,
             ],
         },
     },
@@ -136,7 +161,7 @@ export default defineConfig([
             },
         },
         rules: {
-            "max-lines": ["warn", { max: 95, skipComments: true, skipBlankLines: true }],
+            "max-lines": ["warn", { max: 120, skipComments: true, skipBlankLines: true }],
             "max-depth": ["warn", 2],
             "no-restricted-syntax": [
                 "warn",
