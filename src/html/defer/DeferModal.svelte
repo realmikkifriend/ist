@@ -7,9 +7,12 @@
     import DatePicker from "./DatePicker.svelte";
     import TimePicker from "./TimePicker.svelte";
     import type { Task } from "../../types/todoist";
-    import type { DeferEventDetail, DeferModalProps } from "../../types/defer";
+    import type { DeferEventDetail } from "../../types/defer";
 
-    let { task, onDeferFinal }: DeferModalProps = $props();
+    let {
+        task,
+        onDeferFinal,
+    }: { task: Task; onDeferFinal: (detail: { task: Task; time: DateTime }) => void } = $props();
 
     let isTimeTabActive: boolean = $derived(Boolean(task.due && task.due.allDay !== 1));
 

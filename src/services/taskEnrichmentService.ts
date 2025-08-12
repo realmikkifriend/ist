@@ -46,7 +46,7 @@ export const handleInitialChecks = async (
         return {
             action: "set_task_and_continue",
             taskToSet: taskWithData,
-            showNewTaskToast: false,
+            showNewTaskToast: true,
         };
     }
 
@@ -58,5 +58,5 @@ export const handleInitialChecks = async (
         return { action: "exit", taskToSet: get(firstDueTask), showNewTaskToast: false };
     }
 
-    return { action: "continue", showNewTaskToast: false };
+    return { action: "continue", showNewTaskToast: true };
 };

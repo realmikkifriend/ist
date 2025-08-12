@@ -33,16 +33,26 @@ export function addToast(
     });
 
     setTimeout(() => {
-        removeToast(id);
+        clearToasts(id);
     }, duration);
 }
 
 /**
- * Removes a toast message from the store.
+ * Clears toast messages from the store based on ID or type.
+ * If no arguments are provided, all toasts are cleared.
  * @param {string} id - The ID of the toast message to remove.
+ * @param {"success" | "error" | "info"} type - The type of toast messages to remove.
  */
-export function removeToast(id: string): void {
-    toastMessages.update((toasts) => toasts.filter((toast) => toast.id !== id));
+export function clearToasts(id?: string, type?: "success" | "error" | "info"): void {
+    toastMessages.update((toasts) => {
+        if (id) {
+            return toasts.filter((toast) => toast.id !== id);
+        }
+        if (type) {
+            return toasts.filter((toast) => toast.type !== type);
+        }
+        return [];
+    });
 }
 
 /**

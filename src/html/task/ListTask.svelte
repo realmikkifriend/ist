@@ -11,7 +11,6 @@
      * @returns The Tailwind classes that correspond to the priority.
      */
     function getPriorityBadgeClass(priorityNum: number): string {
-        // Priority is a number enum, so coerce to Priority
         return getPriorityClasses(priorityNum as Priority);
     }
 </script>

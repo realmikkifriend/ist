@@ -7,14 +7,51 @@
         Clock,
     } from "svelte-hero-icons";
     import { shortcut } from "@svelte-put/shortcut";
+    import { success, error } from "../../services/toastService";
+    import { handleTaskDefer, handleTaskDone } from "../../services/taskHandlerService";
+    import { previousFirstDueTask } from "../../stores/stores";
     import type { Task } from "../../types/todoist";
+    import type { DateTime } from "luxon";
 
     let {
         task,
-        onDone,
         openModal,
-    }: { task: Task; onDone: (task: Task) => void; openModal: (modalId: string) => void } =
-        $props();
+    }: {
+        task: Task;
+        openModal: (modalId: string, props?: Record<string, unknown>) => void;
+    } = $props();
+
+    /**
+     * Handles marking a task as done, calling the service and showing a toast.
+     * @param task - The task to mark as done.
+     */
+    const onDone = async (task: Task): Promise<void> => {
+        previousFirstDueTask.set(null);
+        const doneSuccessful = await handleTaskDone(task);
+        if (doneSuccessful) {
+            success("Task marked done!");
+        } else {
+            error("Failed to mark task done.");
+        }
+    };
+
+    /**
+     * Handles the final defer action, calling the service and showing a toast.
+     * @param detail - The defer event detail containing the task and new time.
+     * @param detail.task - The task being deferred.
+     * @param detail.time - The new due time for the task.
+     */
+    const onDeferFinal = async (detail: { task: Task; time: DateTime }): Promise<void> => {
+        const { task: deferredTask, time } = detail;
+        previousFirstDueTask.set(null);
+        const deferSuccessful = await handleTaskDefer([[deferredTask, time]]);
+
+        if (deferSuccessful) {
+            success("Task deferred successfully!");
+        } else {
+            error("Failed to defer task.");
+        }
+    };
 </script>
 
 <div class="card-actions relative -right-5 justify-center">
@@ -29,7 +66,7 @@
     </button>
     <button
         class="text-md btn btn-secondary relative h-8 min-h-8 content-center p-4"
-        onclick={() => openModal("defer_modal")}
+        onclick={() => openModal("defer_modal", { onDeferFinal })}
         type="button"
     >
         {#if task.due?.allDay === 1}
@@ -60,7 +97,9 @@
             },
             {
                 key: "Enter",
-                callback: () => onDone(task),
+                callback: () => {
+                    void onDone(task);
+                },
                 modifier: "ctrl",
             },
             {

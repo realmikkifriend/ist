@@ -6,6 +6,7 @@
     import { getDueTaskCountByContext } from "../../services/sidebarService";
     import { clearSelectedTask } from "../../services/firstTaskService";
     import { getSelectedContextName } from "../../utils/firstTaskUtils";
+    import { success } from "../../services/toastService";
 
     /**
      * Handles the clearing of the selected task.
@@ -15,6 +16,7 @@
             firstDueTask.set(task);
             previousFirstDueTask.set(task);
             if (contextCleared) {
+                success("No more tasks in context! Showing all due tasks...");
                 userSettings.update((settings) => ({ ...settings, selectedContext: null }));
             }
         });

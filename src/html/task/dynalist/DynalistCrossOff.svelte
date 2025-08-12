@@ -64,7 +64,7 @@
      */
     const buttonAction = (node: HTMLButtonElement) => {
         const handleClick = createShowNextItemHandler(node);
-        // Wrap the async handler to avoid returning a Promise to the event system
+
         const syncHandler = () => {
             void handleClick();
         };

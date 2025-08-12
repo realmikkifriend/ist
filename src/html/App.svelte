@@ -13,7 +13,7 @@
     import { updateFirstDueTask } from "../services/firstTaskService";
     import { refreshData } from "../services/updateService";
     import { toggleAgendaHash } from "../services/agendaService";
-    import { newFirstTask } from "../services/toastService";
+    import { newFirstTask, clearToasts, success } from "../services/toastService";
     import AppView from "./AppView.svelte";
     import Sidebar from "./sidebar/Sidebar.svelte";
     import ContextBadge from "./sidebar/ContextBadge.svelte";
@@ -47,16 +47,22 @@
         if ($userSettings.selectedContext || $todoistData.dueTasks) {
             void (async () => {
                 const { task, contextCleared, showNewTaskToast } = await updateFirstDueTask();
-                firstDueTask.set(task);
-                previousFirstDueTask.set(task);
-                if (contextCleared) {
-                    userSettings.update((settings) => ({ ...settings, selectedContext: null }));
+                if (task) {
+                    if (showNewTaskToast && task?.id !== $firstDueTask?.id) {
+                        newFirstTask((t) => {
+                            firstDueTask.set(t);
+                            previousFirstDueTask.set(t);
+                        }, task);
+                    } else {
+                        firstDueTask.set(task);
+                        previousFirstDueTask.set(task);
+
+                        clearToasts(undefined, "info");
+                    }
                 }
-                if (showNewTaskToast && task) {
-                    newFirstTask((t) => {
-                        firstDueTask.set(t);
-                        previousFirstDueTask.set(t);
-                    }, task);
+                if (contextCleared) {
+                    success("No more tasks in context! Showing all due tasks...");
+                    userSettings.update((settings) => ({ ...settings, selectedContext: null }));
                 }
                 window.location.hash = "";
             })();
@@ -116,13 +122,6 @@
 <svelte:window
     use:shortcut={{
         trigger: [
-            {
-                key: "?",
-                callback: () => {
-                    document.body.classList.toggle("show-kbd");
-                },
-                modifier: "shift",
-            },
             {
                 key: "a",
                 callback: () => {

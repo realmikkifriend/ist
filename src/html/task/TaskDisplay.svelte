@@ -11,9 +11,9 @@
     import History from "../interface/History.svelte";
     import TaskActions from "./TaskActions.svelte";
     import type { Task, Priority } from "../../types/todoist";
-    import type { TaskDisplayProps } from "../../types/defer";
+    import type { DynamicModalProps, TaskDisplayProps } from "../../types/interface";
 
-    let { task, onDone, onDefer }: TaskDisplayProps = $props();
+    let { task, onDefer }: TaskDisplayProps = $props();
 
     const priorityBorderClass = getPriorityBorder(task.priority as Priority);
 
@@ -45,11 +45,14 @@
         }
     };
 
+    let modalProps = $state<DynamicModalProps>({});
     /**
-     * Opens a modal dialog by its ID.
+     * Opens a modal dialog by its ID and passes props to it.
      * @param modalId - The ID of the modal to open.
+     * @param props - Optional props to pass to the modal component.
      */
-    const openModal = (modalId: string): void => {
+    const openModal = (modalId: string, props: DynamicModalProps = {}): void => {
+        modalProps = props;
         (document.getElementById(modalId) as HTMLDialogElement | null)?.showModal();
     };
 </script>
@@ -71,7 +74,7 @@
                 </button>
             {/if}
             <h2 class="card-title text-center text-3xl">{task.content}</h2>
-            <TaskActions {onDone} {openModal} {task} />
+            <TaskActions {openModal} {task} />
         </div>
     </div>
     {#if task.comments}
@@ -80,7 +83,7 @@
 </div>
 
 <dialog id="defer_modal" class="modal">
-    <DeferModal onDeferFinal={handleDefer} {task} />
+    <DeferModal onDeferFinal={handleDefer} {task} {...modalProps} />
 </dialog>
 
 <History activity={task.activity} content={task.content} entityId={task.id} />

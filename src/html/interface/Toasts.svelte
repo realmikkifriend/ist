@@ -2,7 +2,7 @@
     import { toastMessages } from "../../stores/interface";
     import { fly } from "svelte/transition";
     import type { ToastMessage } from "../../types/interface";
-    import { removeToast } from "../../services/toastService";
+    import { clearToasts } from "../../services/toastService";
 
     const alertClasses: Record<ToastMessage["type"], string> = {
         info: "alert-info",
@@ -20,7 +20,7 @@
                 if (toast.action) {
                     toast.action();
                 }
-                removeToast(toast.id);
+                clearToasts(toast.id);
             }}
             type="button"
             in:fly={{ x: 200, duration: 300 }}

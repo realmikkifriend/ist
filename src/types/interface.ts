@@ -50,3 +50,14 @@ export interface CalendarHeaderProps {
     displayDate: DateTime;
     onchangeMonth: (date: DateTime) => void;
 }
+
+export type DynamicModalProps = {
+    onDeferFinal?: (detail: { task: Task; time: DateTime }) => void;
+    title?: string;
+};
+
+export interface TaskDisplayProps {
+    task: Task;
+    onDone: (task: Task) => void;
+    onDefer: (detail: { task: Task; time: string }) => void;
+}

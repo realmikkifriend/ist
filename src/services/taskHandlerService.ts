@@ -1,7 +1,6 @@
 import { DateTime } from "luxon";
 import { todoistData, taskActivity } from "../stores/stores";
 import { markTaskDone, deferTasks } from "../services/apiService";
-import { error } from "../services/toastService";
 import { updateFirstDueTask } from "../services/firstTaskService";
 import type { Task, TodoistData, TaskUpdates } from "../types/todoist";
 import type { TaskActivity } from "../types/activity";
@@ -49,9 +48,9 @@ export function updateTaskResources(taskUpdates: TaskUpdates): void {
 /**
  * Marks a task as done and updates the resources accordingly.
  * @param {Task} task - The task to mark as done.
- * @returns Promise&lt;void>
+ * @returns Promise&lt;boolean> - True if the task was marked done successfully, false otherwise.
  */
-export async function handleTaskDone(task: Task): Promise<void> {
+export async function handleTaskDone(task: Task): Promise<boolean> {
     const fiveMinutesFromNow = DateTime.now().plus({ minutes: 5 });
 
     const newActivityEntry: TaskActivity = {
@@ -66,18 +65,15 @@ export async function handleTaskDone(task: Task): Promise<void> {
     updateTaskResources([[task.id, fiveMinutesFromNow]]);
 
     const result = await markTaskDone(task.id);
-    if (result.status === "error") {
-        const message = typeof result.error === "string" ? result.error : result.error.message;
-        error(`Failed to mark task done: ${message}`);
-    }
+    return result.status === "success";
 }
 
 /**
  * Defers multiple tasks and updates the resources accordingly.
  * @param {Array<[Task, DateTime]>} taskUpdates - An array of [Task, DateTime] tuples.
- * @returns Promise&lt;void>
+ * @returns Promise&lt;boolean> - True if all tasks were deferred successfully, false otherwise.
  */
-export async function handleTaskDefer(taskUpdates: Array<[Task, DateTime]>): Promise<void> {
+export async function handleTaskDefer(taskUpdates: Array<[Task, DateTime]>): Promise<boolean> {
     const updatedTaskResources: Array<[string, DateTime]> = taskUpdates.map(([task, dateTime]) => [
         task.id,
         dateTime,
@@ -87,15 +83,5 @@ export async function handleTaskDefer(taskUpdates: Array<[Task, DateTime]>): Pro
     const results = await deferTasks(taskUpdates);
     const errors = results.filter((result) => result.status === "error");
 
-    if (errors.length > 0) {
-        const errorMessages = errors
-            .map((error) => {
-                if ("error" in error) {
-                    return typeof error.error === "string" ? error.error : error.error.message;
-                }
-                return "Unknown error";
-            })
-            .join(", ");
-        error(`Failed to defer tasks: ${errorMessages}`);
-    }
+    return errors.length === 0;
 }

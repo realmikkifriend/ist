@@ -1,5 +1,6 @@
 <script lang="ts">
     import { DateTime } from "luxon";
+    import { shortcut } from "@svelte-put/shortcut";
     import {
         todoistData,
         todoistError,
@@ -7,7 +8,7 @@
         previousFirstDueTask,
     } from "../stores/stores";
     import { skipTask } from "../services/firstTaskService";
-    import { error as showError } from "../services/toastService";
+    import { error as showError, success } from "../services/toastService";
     import { handleTaskDone, handleTaskDefer } from "../services/taskHandlerService";
     import NoTasks from "./NoTasks.svelte";
     import TaskDisplay from "./task/TaskDisplay.svelte";
@@ -23,7 +24,12 @@
     const handleDone = async (task: Task): Promise<void> => {
         if (task.summoned) window.location.hash = String(task.summoned);
         previousFirstDueTask.set(null);
-        await handleTaskDone(task);
+        const doneSuccessful = await handleTaskDone(task);
+        if (doneSuccessful) {
+            success("Task marked done!");
+        } else {
+            showError("Failed to mark task done.");
+        }
     };
 
     /**
@@ -41,7 +47,12 @@
         const { task, time } = detail;
         const dateTime = DateTime.fromISO(time);
         if (dateTime.isValid) {
-            await handleTaskDefer([[task, dateTime]]);
+            const deferSuccessful = await handleTaskDefer([[task, dateTime]]);
+            if (deferSuccessful) {
+                success("Task deferred successfully!");
+            } else {
+                showError("Failed to defer task.");
+            }
         } else {
             showError("Received unexpected type of date...");
         }
@@ -73,3 +84,17 @@
 {#if $todoistError}
     {showError($todoistError)}
 {/if}
+
+<svelte:window
+    use:shortcut={{
+        trigger: [
+            {
+                key: "?",
+                callback: () => {
+                    document.body.classList.toggle("show-kbd");
+                },
+                modifier: "shift",
+            },
+        ],
+    }}
+/>

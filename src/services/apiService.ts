@@ -1,7 +1,6 @@
 import { get } from "svelte/store";
 import { TodoistRequestError } from "@doist/todoist-api-typescript";
 import { todoistAccessToken } from "../stores/secret";
-import { success } from "../services/toastService";
 import { formatTaskDate } from "../utils/timeUtils";
 import { initializeApi } from "../utils/apiUtils";
 import type { DateTime } from "luxon";
@@ -27,7 +26,6 @@ export function markTaskDone(
     return api
         .closeTask(taskID)
         .then(() => {
-            success("Task marked as done!");
             return { status: "success" } as const;
         })
         .catch((error: unknown) => {

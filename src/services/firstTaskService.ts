@@ -3,7 +3,6 @@ import { todoistData, firstDueTask, previousFirstDueTask } from "../stores/store
 import { userSettings } from "../stores/interface";
 import { todoistAccessToken } from "../stores/secret";
 import { handleInitialChecks, enrichTask } from "./taskEnrichmentService";
-import { success } from "../services/toastService";
 import { updateDueTasks } from "../services/sidebarService";
 import { shouldShowNewTaskToast } from "../utils/firstTaskUtils";
 import type { Task, TodoistData } from "../types/todoist";
@@ -74,10 +73,6 @@ export const updateFirstDueTask = async (
     const { tasks: dueTasks, contextCleared } = task
         ? { tasks: [task], contextCleared: false }
         : updateDueTasks($todoistData.dueTasks, selectedContextId);
-
-    if (contextCleared) {
-        success("No more tasks in context! Showing all due tasks...");
-    }
 
     const { task: newTask, showNewTaskToast } = await processDueTaskUpdate(
         dueTasks,
@@ -163,7 +158,6 @@ export async function clearSelectedTask(): Promise<{ task: Task | null; contextC
                 ...settings,
                 selectedContext: null,
             }));
-            success("No more tasks in context! Showing all due tasks...");
         }
         const result = await updateFirstDueTask();
         return { task: result.task, contextCleared: result.contextCleared };

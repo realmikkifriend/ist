@@ -4,17 +4,6 @@
     import type { Priority, ContextButtonProps } from "../../types/todoist";
 
     let { context, tasksForContext }: ContextButtonProps = $props();
-
-    /**
-     * Returns the CSS class for a given priority.
-     * Necessary because Svelte 4 templates can't include type assertions.
-     * @param priorityNum - The given priority.
-     * @returns The Tailwind classes that correspond to the priority.
-     */
-    function getPriorityBadgeClass(priorityNum: number): string {
-        // Priority is a number enum, so coerce to Priority
-        return getPriorityClasses(priorityNum as Priority);
-    }
 </script>
 
 <div class="tooltip-content w-70 text-left">
@@ -33,8 +22,8 @@
             <div class="flex flex-row items-start space-x-1 py-1">
                 {#each Array.from( { length: tasksForContext.priorities[+priorityStr] }, ) as _, badgeIndex (badgeIndex)}
                     <div
-                        class="h-1 w-0.5 max-w-0.5 rounded-sm border-none p-1 {getPriorityBadgeClass(
-                            +priorityStr,
+                        class="h-1 w-0.5 max-w-0.5 rounded-sm border-none p-1 {getPriorityClasses(
+                            +priorityStr as Priority,
                         )}"
                     ></div>
                 {/each}

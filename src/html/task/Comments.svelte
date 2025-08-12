@@ -49,12 +49,11 @@
                 : focusableCommentElements[activeElementIndex + 1];
 
         if (nextElementToFocus) {
-            // Reset tabIndex for all focusable comment elements
             focusableCommentElements.forEach((el) => {
                 el.tabIndex = -1;
             });
 
-            nextElementToFocus.tabIndex = 0; // Make the target element tabbable
+            nextElementToFocus.tabIndex = 0;
             nextElementToFocus.focus();
         }
     }

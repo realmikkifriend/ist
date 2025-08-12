@@ -63,14 +63,3 @@ export interface TimePickerProps {
     tasks: Task[];
     onDefer: (detail: DeferEventDetail) => void;
 }
-
-export interface DeferModalProps {
-    task: Task;
-    onDeferFinal: (detail: { task: Task; time: DateTime }) => void;
-}
-
-export interface TaskDisplayProps {
-    task: Task;
-    onDone: (task: Task) => void;
-    onDefer: (detail: { task: Task; time: string }) => void;
-}
