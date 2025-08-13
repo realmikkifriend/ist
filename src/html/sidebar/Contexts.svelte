@@ -1,15 +1,16 @@
 <script lang="ts">
+    import { getContext } from "svelte";
     import { Icon, XCircle, Calendar } from "svelte-hero-icons";
     import { todoistData } from "../../stores/stores";
     import { userSettings } from "../../stores/interface";
     import { openAgenda } from "../../services/agendaService";
     import { getTasksGroupedByContext } from "../../utils/filterUtils";
     import ContextButtonContents from "./ContextButtonContents.svelte";
+    import type { MethodsContext } from "../../types/interface";
 
-    let {
-        closeSidebar,
-        handleContextChange,
-    }: { closeSidebar: () => void; handleContextChange: (contextId: string) => void } = $props();
+    let { closeSidebar }: { closeSidebar: () => void } = $props();
+
+    const { handleContextChange } = getContext<MethodsContext>("methods");
 
     /**
      * A derived store grouping due tasks by context.

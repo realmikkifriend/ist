@@ -1,16 +1,14 @@
 <script lang="ts">
-    import { Icon, Bars3, ArrowLeftOnRectangle } from "svelte-hero-icons";
     import { shortcut } from "@svelte-put/shortcut";
+    import { Icon, Bars3, ArrowLeftOnRectangle } from "svelte-hero-icons";
+    import { resetAllStores } from "../../stores/reset";
+    import { todoistData } from "../../stores/stores";
     import Contexts from "./Contexts.svelte";
     import DailyGoal from "../activity/DailyGoal.svelte";
     import Footer from "../interface/Footer.svelte";
-    import { resetAllStores } from "../../stores/reset";
-    import { todoistData } from "../../stores/stores";
 
-    let {
-        hash,
-        handleContextChange,
-    }: { hash: string; handleContextChange: (contextId: string) => void } = $props();
+    let { hash }: { hash: string } = $props();
+
     let isSidebarOpen = $state(false);
 
     /**
@@ -49,7 +47,7 @@
         <label class="drawer-overlay" aria-label="close sidebar" for="sidebar-toggle"></label>
         <ul class="menu bg-base-100 text-base-content min-h-full w-80 px-4 py-2">
             {#if $todoistData.contexts}
-                <Contexts {closeSidebar} {handleContextChange} />
+                <Contexts {closeSidebar} />
             {/if}
 
             <div class="mt-auto">

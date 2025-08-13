@@ -6,7 +6,7 @@
     import TaskDisplay from "./task/TaskDisplay.svelte";
     import type { PromiseProp } from "../types/interface";
 
-    let { dataPromise, updateDisplayedTask, handleRefresh }: PromiseProp = $props();
+    let { dataPromise }: PromiseProp = $props();
 
     $effect(() => {
         if ($todoistError) {
@@ -21,7 +21,7 @@
     {#if $todoistData.tasks}
         {#if $firstDueTask}
             {#key $firstDueTask.id}
-                <TaskDisplay {handleRefresh} task={$firstDueTask} {updateDisplayedTask} />
+                <TaskDisplay task={$firstDueTask} />
             {/key}
         {:else}
             <NoTasks />

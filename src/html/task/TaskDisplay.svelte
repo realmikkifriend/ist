@@ -1,32 +1,21 @@
 <script lang="ts">
+    import { getContext } from "svelte";
     import { DateTime } from "luxon";
     import { Icon, Forward } from "svelte-hero-icons";
     import { shortcut } from "@svelte-put/shortcut";
-    import { firstDueTask } from "../../stores/stores";
-    import { skipTask } from "../../services/firstTaskService";
     import { getPriorityBorder } from "../../utils/styleUtils";
     import Comments from "./Comments.svelte";
     import DeferModal from "../defer/DeferModal.svelte";
     import History from "../interface/History.svelte";
     import TaskActions from "./TaskActions.svelte";
     import type { Task, Priority } from "../../types/todoist";
-    import type { DynamicModalProps, TaskDisplayProps } from "../../types/interface";
+    import type { DynamicModalProps, MethodsContext } from "../../types/interface";
 
-    let { task, updateDisplayedTask, handleRefresh }: TaskDisplayProps = $props();
+    let { task }: { task: Task } = $props();
+
+    const { handleSkipTask } = getContext<MethodsContext>("methods");
 
     const priorityBorderClass = getPriorityBorder(task.priority as Priority);
-
-    /**
-     * Handles skipping the current task.
-     */
-    const handleSkipTask = (): void => {
-        if ($firstDueTask) {
-            void skipTask($firstDueTask).then(() => {
-                // After skipping, trigger a full refresh and update of the displayed task
-                void updateDisplayedTask();
-            });
-        }
-    };
 
     let modalProps = $state<DynamicModalProps>({});
     /**
@@ -71,7 +60,7 @@
                 </button>
             {/if}
             <h2 class="card-title text-center text-3xl">{task.content}</h2>
-            <TaskActions {handleRefresh} {openModal} {task} {updateDisplayedTask} />
+            <TaskActions {openModal} {task} />
         </div>
     </div>
     {#if task.comments}
@@ -89,7 +78,7 @@
     use:shortcut={{
         trigger: {
             key: "s",
-            callback: handleSkipTask,
+            callback: () => handleSkipTask,
             modifier: false,
         },
     }}

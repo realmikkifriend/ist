@@ -1,5 +1,5 @@
 import { get } from "svelte/store";
-import { todoistData, firstDueTask, previousFirstDueTask } from "../stores/stores";
+import { todoistData, previousFirstDueTask } from "../stores/stores";
 import { userSettings } from "../stores/interface";
 import { todoistAccessToken } from "../stores/secret";
 import { handleInitialChecks, enrichTask } from "./taskEnrichmentService";
@@ -19,12 +19,14 @@ const debounceState: {
     },
 };
 
+export { debounceState };
+
 /**
  * Skip the current task and summon the next one.
  * @param {Task} task - The task to skip.
  * @returns {Promise<{task: Task | null, showNewTaskToast: boolean, contextCleared: boolean}>} The next task and related flags.
  */
-export const skipTask = async (task: Task): Promise<UpdateFirstDueTaskResult> => {
+export const skipTask = (task: Task): Promise<UpdateFirstDueTaskResult> => {
     const $todoistData: TodoistData = get(todoistData);
     const reverseTasksObj = $todoistData.reverseTasks as unknown as {
         today: Task[];
@@ -35,15 +37,19 @@ export const skipTask = async (task: Task): Promise<UpdateFirstDueTaskResult> =>
     const currentIndex = reverseTasks.findIndex((t) => t.id === task.id);
     const nextIndex = currentIndex + 1;
     if (nextIndex < reverseTasks.length) {
-        const result = await summonTask(reverseTasks[nextIndex], true);
-        return result;
+        return Promise.resolve({
+            task: reverseTasks[nextIndex],
+            showNewTaskToast: false,
+            contextCleared: false,
+            dueTasks: get(todoistData).dueTasks,
+        });
     }
-    return {
+    return Promise.resolve({
         task: null,
         showNewTaskToast: false,
         contextCleared: false,
         dueTasks: get(todoistData).dueTasks,
-    };
+    });
 };
 
 /**
@@ -74,7 +80,7 @@ export const updateFirstDueTask = async (
 
     const selectedContextId: string | null = get(userSettings).selectedContext?.id ?? null;
 
-    const currentDueTasks = $todoistData.dueTasks; // Start with the already updated dueTasks from the store
+    const currentDueTasks = $todoistData.dueTasks;
 
     const filteredByContext = selectedContextId
         ? currentDueTasks.filter((t) => t.contextId === selectedContextId)
@@ -126,33 +132,3 @@ const processDueTaskUpdate = async (
 
     return { task: taskWithData, showNewTaskToast };
 };
-
-/**
- * Summon a task as the first due task.
- * @param {Task & { firstDue?: boolean; skip?: boolean; summoned?: string | boolean }} task - The task to summon.
- * @param {boolean} enableSkip - Whether to enable skip. Defaults to false.
- * @returns {Promise<{task: Task | null}>} The summoned task.
- */
-export async function summonTask(
-    task: Task & { firstDue?: boolean; skip?: boolean; summoned?: string | boolean },
-    enableSkip: boolean = false,
-): Promise<UpdateFirstDueTaskResult> {
-    if (!task.firstDue || enableSkip) {
-        debounceState.clearDebounceTimeout();
-        if (enableSkip) {
-            task.skip = true;
-        }
-        const currentFirstDueSummoned = get(firstDueTask)?.summoned;
-
-        task.summoned = currentFirstDueSummoned || window.location.hash;
-
-        const result = await updateFirstDueTask(task);
-        return result;
-    }
-    return {
-        task: get(firstDueTask),
-        showNewTaskToast: false,
-        contextCleared: false,
-        dueTasks: get(todoistData).dueTasks,
-    };
-}

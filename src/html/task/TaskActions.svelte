@@ -1,4 +1,7 @@
 <script lang="ts">
+    import { getContext } from "svelte";
+    import { shortcut } from "@svelte-put/shortcut";
+    import { DateTime } from "luxon";
     import {
         Icon,
         CalendarDateRange,
@@ -6,30 +9,27 @@
         Calendar as CalendarIcon,
         Clock,
     } from "svelte-hero-icons";
-    import { shortcut } from "@svelte-put/shortcut";
+    import { previousFirstDueTask, todoistData, taskActivity } from "../../stores/stores";
     import { success, error } from "../../services/toastService";
     import {
         calculateUpdatedTaskResources,
         handleTaskDefer,
         handleTaskDone,
     } from "../../services/taskHandlerService";
-    import { previousFirstDueTask, todoistData, taskActivity } from "../../stores/stores";
-    import { skipTask } from "../../services/firstTaskService";
     import type { Task } from "../../types/todoist";
-    import { DateTime } from "luxon";
     import type { TaskActivity } from "../../types/activity";
+    import type { MethodsContext } from "../../types/interface";
 
     let {
         task,
         openModal,
-        updateDisplayedTask,
-        handleRefresh,
     }: {
         task: Task;
         openModal: (modalId: string, props?: Record<string, unknown>) => void;
-        updateDisplayedTask: () => Promise<void>;
-        handleRefresh: () => Promise<void>;
     } = $props();
+
+    const { handleRefresh, updateDisplayedTask, handleSkipTask } =
+        getContext<MethodsContext>("methods");
 
     /**
      * Handles marking a task as done, calling the service and showing a toast.
@@ -54,7 +54,7 @@
             taskActivity.update((activities) => [...activities, newActivityEntry]);
 
             success("Task marked done.");
-            await handleRefresh(); // Refresh data after task is done
+            await handleRefresh();
             await updateDisplayedTask();
         } else {
             error("Failed to mark task done.");
@@ -88,7 +88,7 @@
         }
 
         if (deferredTask.skip) {
-            await skipTask(deferredTask);
+            await handleSkipTask();
         }
     };
 </script>

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { onMount } from "svelte";
+    import { onMount, setContext } from "svelte";
     import { get } from "svelte/store";
     import { on } from "svelte/events";
     import { Icon, ArrowPath } from "svelte-hero-icons";
@@ -11,7 +11,8 @@
         previousFirstDueTask,
     } from "../stores/stores";
     import { userSettings } from "../stores/interface";
-    import { updateFirstDueTask } from "../services/firstTaskService";
+    import { debounceState } from "../services/firstTaskService";
+    import { updateFirstDueTask, skipTask } from "../services/firstTaskService";
     import { refreshData } from "../services/updateService";
     import { toggleAgendaHash } from "../services/agendaService";
     import { newFirstTask, clearToasts, success } from "../services/toastService";
@@ -20,9 +21,17 @@
     import ContextBadge from "./sidebar/ContextBadge.svelte";
     import Agenda from "./agenda/Agenda.svelte";
     import Toasts from "./interface/Toasts.svelte";
+    import type { Task, UpdateFirstDueTaskResult } from "../types/todoist";
 
     let isSpinning = $state(false);
     let hash = $state(window.location.hash);
+
+    $effect(() => {
+        if ($userSettings.selectedContext || $todoistData.dueTasks) {
+            void updateDisplayedTask();
+        }
+    });
+
     /**
      * Refreshes Todoist data and manages the spinning state.
      * @returns Promise that resolves when data is refreshed and spinning state is updated.
@@ -124,10 +133,61 @@
         }));
     }
 
-    $effect(() => {
-        if ($userSettings.selectedContext || $todoistData.dueTasks) {
-            void updateDisplayedTask();
+    /**
+     * Handles skipping the current task.
+     */
+    const handleSkipTask = (): void => {
+        if ($firstDueTask) {
+            void skipTask($firstDueTask).then(async (skipResult) => {
+                if (skipResult.task) {
+                    await summonTask(skipResult.task, true);
+                    void updateDisplayedTask();
+                } else {
+                    void updateDisplayedTask();
+                }
+            });
         }
+    };
+
+    /**
+     * Summon a task as the first due task.
+     * @param task - The task to summon.
+     * @param enableSkip - Whether to enable skip. Defaults to false.
+     * @returns The summoned task.
+     */
+    export async function summonTask(
+        task: Task & { firstDue?: boolean; skip?: boolean; summoned?: string | boolean },
+        enableSkip: boolean = false,
+    ): Promise<UpdateFirstDueTaskResult> {
+        if (!task.firstDue || enableSkip) {
+            debounceState.clearDebounceTimeout();
+            if (enableSkip) {
+                task.skip = true;
+            }
+            const currentFirstDueSummoned = get(firstDueTask)?.summoned;
+
+            task.summoned = currentFirstDueSummoned || window.location.hash;
+
+            const result = await updateFirstDueTask(task);
+            firstDueTask.set(result.task);
+            previousFirstDueTask.set(result.task);
+            return result;
+        }
+        return {
+            task: get(firstDueTask),
+            showNewTaskToast: false,
+            contextCleared: false,
+            dueTasks: get(todoistData).dueTasks,
+        };
+    }
+
+    setContext("methods", {
+        handleRefresh,
+        handleClearSelectedTask,
+        handleContextChange,
+        updateDisplayedTask,
+        handleSkipTask,
+        summonTask,
     });
 
     /**
@@ -157,11 +217,11 @@
 </script>
 
 <div class="flex w-fit items-center">
-    <Sidebar {handleContextChange} {hash} />
+    <Sidebar {hash} />
 
     {#if $firstDueTask && hash !== "#today" && hash !== "#tomorrow"}
         {#key $firstDueTask.id}
-            <ContextBadge {handleClearSelectedTask} {handleContextChange} />
+            <ContextBadge />
         {/key}
     {/if}
 </div>
@@ -169,7 +229,7 @@
 {#if hash === "#today" || hash === "#tomorrow"}
     <Agenda />
 {:else}
-    <AppView {dataPromise} {handleRefresh} {updateDisplayedTask} />
+    <AppView {dataPromise} />
 {/if}
 
 <div class="fixed right-2 bottom-2 z-10">

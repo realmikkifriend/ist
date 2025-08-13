@@ -1,18 +1,14 @@
 <script lang="ts">
-    import { Icon, XMark } from "svelte-hero-icons";
+    import { getContext } from "svelte";
     import { shortcut } from "@svelte-put/shortcut";
+    import { Icon, XMark } from "svelte-hero-icons";
     import { todoistData, firstDueTask } from "../../stores/stores";
     import { userSettings } from "../../stores/interface";
     import { getDueTaskCountByContext } from "../../services/sidebarService";
     import { getSelectedContextName } from "../../utils/firstTaskUtils";
+    import type { MethodsContext } from "../../types/interface";
 
-    let {
-        handleClearSelectedTask,
-        handleContextChange,
-    }: {
-        handleClearSelectedTask: () => void;
-        handleContextChange: (contextId: string | null) => void;
-    } = $props();
+    const { handleClearSelectedTask, handleContextChange } = getContext<MethodsContext>("methods");
 
     const dueTaskCount = $derived(
         getDueTaskCountByContext($todoistData.dueTasks, $firstDueTask ?? null, $userSettings),
@@ -56,7 +52,9 @@
     use:shortcut={{
         trigger: {
             key: "x",
-            callback: handleClearSelectedTask,
+            callback: () => {
+                void handleClearSelectedTask();
+            },
             modifier: false,
         },
     }}

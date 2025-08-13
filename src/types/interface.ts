@@ -1,7 +1,7 @@
 import type { Writable } from "svelte/store";
 import type { DateTime } from "luxon";
 import type { ListBullet } from "svelte-hero-icons";
-import type { Task } from "./todoist";
+import type { Task, UpdateFirstDueTaskResult } from "./todoist";
 import type { DynalistTaskType } from "./dynalist";
 
 export type ResettableStore<T> = Writable<T> & {
@@ -10,8 +10,6 @@ export type ResettableStore<T> = Writable<T> & {
 
 export interface PromiseProp {
     dataPromise: Promise<void>;
-    updateDisplayedTask: () => Promise<void>;
-    handleRefresh: () => Promise<void>;
 }
 
 export interface UserSettings {
@@ -54,8 +52,14 @@ export type DynamicModalProps = {
     title?: string;
 };
 
-export interface TaskDisplayProps {
-    task: Task;
-    updateDisplayedTask: () => Promise<void>;
+export interface MethodsContext {
     handleRefresh: () => Promise<void>;
+    handleClearSelectedTask: () => Promise<void>;
+    handleContextChange: (contextId: string | null) => void;
+    updateDisplayedTask: () => Promise<void>;
+    handleSkipTask: () => Promise<void>;
+    summonTask: (
+        task: Task & { firstDue?: boolean; skip?: boolean; summoned?: string | boolean },
+        enableSkip?: boolean,
+    ) => Promise<UpdateFirstDueTaskResult>;
 }

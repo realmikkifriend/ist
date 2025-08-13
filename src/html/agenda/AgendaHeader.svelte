@@ -1,11 +1,14 @@
 <script lang="ts">
+    import { getContext } from "svelte";
     import { Icon, XCircle, Calendar, BarsArrowUp } from "svelte-hero-icons";
     import { shortcut } from "@svelte-put/shortcut";
-    import { todoistData, firstDueTask, previousFirstDueTask } from "../../stores/stores";
-    import { summonTask } from "../../services/firstTaskService";
+    import { todoistData } from "../../stores/stores";
     import type { AgendaHeaderProps } from "../../types/agenda";
+    import type { MethodsContext } from "../../types/interface";
 
     let { agendaData, displayData }: AgendaHeaderProps = $props();
+
+    const { summonTask } = getContext<MethodsContext>("methods");
 
     let { tasks, tasksWithNoTime, todayTasks } = $derived(agendaData);
     let { title, headerGradientColor } = $derived(displayData);
@@ -27,9 +30,7 @@
                 : $todoistData.reverseTasks.tomorrow;
 
         if (reverseTasks && reverseTasks.length > 0) {
-            const result = await summonTask(reverseTasks[0], true);
-            firstDueTask.set(result.task);
-            previousFirstDueTask.set(result.task);
+            await summonTask(reverseTasks[0], true);
             closeAgenda();
         }
     }
