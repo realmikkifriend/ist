@@ -1,5 +1,6 @@
 <script lang="ts">
     import { onMount } from "svelte";
+    import { get } from "svelte/store";
     import { on } from "svelte/events";
     import { Icon, ArrowPath } from "svelte-hero-icons";
     import { shortcut } from "@svelte-put/shortcut";
@@ -43,29 +44,57 @@
         $firstDueTask?.summoned ? Promise.resolve() : handleRefresh(),
     );
 
+    const handleClearSelectedTask = async (): Promise<void> => {
+        const selectedContext = get(userSettings).selectedContext;
+
+        if ($firstDueTask?.summoned) {
+            window.location.hash = $firstDueTask.summoned as string;
+        }
+
+        if ($firstDueTask?.summoned || selectedContext) {
+            if (selectedContext) {
+                clearSelectedContext();
+                success("No more tasks in context! Showing all due tasks...");
+            }
+            await updateDisplayedTask(false);
+        }
+    };
+
+    /**
+     * Clears the selected context in user settings.
+     */
+    const clearSelectedContext = (): void => {
+        userSettings.update((settings) => ({ ...settings, selectedContext: null }));
+    };
+
+    /**
+     * Updates the displayed task.
+     * @param prompt - Whether to prompt the user to update the task.
+     * @returns Promise that resolves when the task is updated.
+     */
+    const updateDisplayedTask = async (prompt: boolean = true): Promise<void> => {
+        const { task, showNewTaskToast } = await updateFirstDueTask();
+        if (task) {
+            if (showNewTaskToast && task?.id !== $firstDueTask?.id && prompt) {
+                newFirstTask((t) => {
+                    firstDueTask.set(t);
+                    previousFirstDueTask.set(t);
+                }, task);
+            } else {
+                firstDueTask.set(task);
+                previousFirstDueTask.set(task);
+
+                clearToasts(undefined, "info");
+            }
+        } else {
+            firstDueTask.set(null);
+            previousFirstDueTask.set(null);
+        }
+    };
+
     $effect(() => {
         if ($userSettings.selectedContext || $todoistData.dueTasks) {
-            void (async () => {
-                const { task, contextCleared, showNewTaskToast } = await updateFirstDueTask();
-                if (task) {
-                    if (showNewTaskToast && task?.id !== $firstDueTask?.id) {
-                        newFirstTask((t) => {
-                            firstDueTask.set(t);
-                            previousFirstDueTask.set(t);
-                        }, task);
-                    } else {
-                        firstDueTask.set(task);
-                        previousFirstDueTask.set(task);
-
-                        clearToasts(undefined, "info");
-                    }
-                }
-                if (contextCleared) {
-                    success("No more tasks in context! Showing all due tasks...");
-                    userSettings.update((settings) => ({ ...settings, selectedContext: null }));
-                }
-                window.location.hash = "";
-            })();
+            void updateDisplayedTask();
         }
     });
 
@@ -100,7 +129,7 @@
 
     {#if $firstDueTask && hash !== "#today" && hash !== "#tomorrow"}
         {#key $firstDueTask.id}
-            <ContextBadge />
+            <ContextBadge {handleClearSelectedTask} />
         {/key}
     {/if}
 </div>
@@ -108,7 +137,7 @@
 {#if hash === "#today" || hash === "#tomorrow"}
     <Agenda />
 {:else}
-    <AppView {dataPromise} />
+    <AppView {dataPromise} {updateDisplayedTask} />
 {/if}
 
 <div class="fixed right-2 bottom-2 z-10">

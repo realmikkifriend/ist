@@ -6,7 +6,6 @@ import { handleInitialChecks, enrichTask } from "./taskEnrichmentService";
 import { updateDueTasks } from "../services/sidebarService";
 import { shouldShowNewTaskToast } from "../utils/firstTaskUtils";
 import type { Task, TodoistData } from "../types/todoist";
-import type { UserSettings } from "../types/interface";
 
 const debounceState: {
     timeoutId: ReturnType<typeof setTimeout> | null;
@@ -24,11 +23,11 @@ const debounceState: {
 /**
  * Skip the current task and summon the next one.
  * @param {Task} task - The task to skip.
- * @returns {Promise<{task: Task | null, contextCleared: boolean}>} The next task and a flag indicating if the context was cleared.
+ * @returns {Promise<{task: Task | null, showNewTaskToast: boolean, contextCleared: boolean}>} The next task and related flags.
  */
 export const skipTask = async (
     task: Task,
-): Promise<{ task: Task | null; contextCleared: boolean }> => {
+): Promise<{ task: Task | null; showNewTaskToast: boolean; contextCleared: boolean }> => {
     const $todoistData: TodoistData = get(todoistData);
     const reverseTasksObj = $todoistData.reverseTasks as unknown as {
         today: Task[];
@@ -39,19 +38,20 @@ export const skipTask = async (
     const currentIndex = reverseTasks.findIndex((t) => t.id === task.id);
     const nextIndex = currentIndex + 1;
     if (nextIndex < reverseTasks.length) {
-        return summonTask(reverseTasks[nextIndex], true);
+        const result = await summonTask(reverseTasks[nextIndex], true);
+        return result;
     }
-    return clearSelectedTask();
+    return { task: null, showNewTaskToast: false, contextCleared: false };
 };
 
 /**
  * Update the first due task, loading comments and handling context changes.
  * @param {Task | null} task - Optional task to set as the first due task.
- * @returns {Promise<{task: Task | null, contextCleared: boolean, showNewTaskToast: boolean}>} The new first due task, a flag indicating if the context was cleared, and a flag indicating if the new task toast should be shown.
+ * @returns {Promise<{task: Task | null, showNewTaskToast: boolean}>} The new first due task and a flag indicating if the new task toast should be shown.
  */
 export const updateFirstDueTask = async (
     task: Task | null = null,
-): Promise<{ task: Task | null; contextCleared: boolean; showNewTaskToast: boolean }> => {
+): Promise<{ task: Task | null; showNewTaskToast: boolean; contextCleared: boolean }> => {
     const $todoistData: TodoistData = get(todoistData);
     const prevTask: Task | null = get(previousFirstDueTask);
 
@@ -64,8 +64,8 @@ export const updateFirstDueTask = async (
     if (initialCheckResult.action === "exit") {
         return {
             task: initialCheckResult.taskToSet ?? null,
-            contextCleared: false,
             showNewTaskToast: initialCheckResult.showNewTaskToast ?? false,
+            contextCleared: false,
         };
     }
 
@@ -85,7 +85,7 @@ export const updateFirstDueTask = async (
         debounceState.timeoutId = null;
     }, 2000);
 
-    return { task: newTask, contextCleared, showNewTaskToast };
+    return { task: newTask, showNewTaskToast, contextCleared };
 };
 
 /**
@@ -118,12 +118,12 @@ const processDueTaskUpdate = async (
  * Summon a task as the first due task.
  * @param {Task & { firstDue?: boolean; skip?: boolean; summoned?: string | boolean }} task - The task to summon.
  * @param {boolean} enableSkip - Whether to enable skip. Defaults to false.
- * @returns {Promise<{task: Task | null, contextCleared: boolean}>} The summoned task and a flag indicating if the context was cleared.
+ * @returns {Promise<{task: Task | null}>} The summoned task.
  */
 export async function summonTask(
     task: Task & { firstDue?: boolean; skip?: boolean; summoned?: string | boolean },
     enableSkip: boolean = false,
-): Promise<{ task: Task | null; contextCleared: boolean }> {
+): Promise<{ task: Task | null; showNewTaskToast: boolean; contextCleared: boolean }> {
     if (!task.firstDue || enableSkip) {
         debounceState.clearDebounceTimeout();
         if (enableSkip) {
@@ -134,33 +134,7 @@ export async function summonTask(
         task.summoned = currentFirstDueSummoned || window.location.hash;
 
         const result = await updateFirstDueTask(task);
-        return { task: result.task, contextCleared: result.contextCleared };
+        return result;
     }
-    return { task: get(firstDueTask), contextCleared: false };
-}
-
-/**
- * Handles the click event on the badge, updating navigation and state as needed.
- * @returns {Promise<{task: Task | null, contextCleared: boolean}>} The new first due task and a flag indicating if the context was cleared.
- */
-export async function clearSelectedTask(): Promise<{ task: Task | null; contextCleared: boolean }> {
-    const $firstDueTask = get(firstDueTask);
-    const selectedContext = get(userSettings).selectedContext;
-
-    if ($firstDueTask?.summoned) {
-        window.location.hash = $firstDueTask.summoned as string;
-    }
-
-    if ($firstDueTask?.summoned || selectedContext) {
-        debounceState.clearDebounceTimeout();
-        if (selectedContext) {
-            userSettings.update((settings: UserSettings) => ({
-                ...settings,
-                selectedContext: null,
-            }));
-        }
-        const result = await updateFirstDueTask();
-        return { task: result.task, contextCleared: result.contextCleared };
-    }
-    return { task: $firstDueTask, contextCleared: false };
+    return { task: get(firstDueTask), showNewTaskToast: false, contextCleared: false };
 }

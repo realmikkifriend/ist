@@ -29,7 +29,7 @@ export const updateDueTasks = (
     if (contextId) {
         const filteredDueTasks = filterTasksByContext(dueTasks, contextId);
         if (!filteredDueTasks.length) {
-            return { tasks: dueTasks, contextCleared: true };
+            return { tasks: [], contextCleared: true };
         }
         return { tasks: filteredDueTasks, contextCleared: false };
     }

@@ -1,10 +1,10 @@
 import { get } from "svelte/store";
 import { DateTime } from "luxon";
+import { firstDueTask } from "../stores/stores";
 import { todoistAccessToken } from "../stores/secret";
 import { getActivity } from "./activityService";
 import { loadCommentsForTask } from "../utils/firstTaskUtils";
 import type { TodoistData, Task, InitialCheckOutcome } from "../types/todoist";
-import { firstDueTask } from "../stores/stores";
 
 /**
  * Enriches a task by loading its comments and activity.

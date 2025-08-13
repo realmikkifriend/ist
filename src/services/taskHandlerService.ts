@@ -1,71 +1,62 @@
 import { DateTime } from "luxon";
-import { todoistData, taskActivity } from "../stores/stores";
 import { markTaskDone, deferTasks } from "../services/apiService";
-import { updateFirstDueTask } from "../services/firstTaskService";
 import type { Task, TodoistData, TaskUpdates } from "../types/todoist";
-import type { TaskActivity } from "../types/activity";
 
 /**
- * Updates the dueTasks resource in the todoistData store based on the provided task updates.
- * @param {TaskUpdates} taskUpdates - Task updates as an array of [taskID, newDueDate] tuples. newDueDate can be a Date, DateTime, or string.
- * @returns {void}
+ * Calculates the updated TodoistData based on the provided task updates.
+ * @param {TodoistData} currentResources - The current TodoistData from the store.
+ * @param {TaskUpdates} taskUpdates - Task updates as an array of [taskID, newDueDate] tuples. NewDueDate can be a Date, DateTime, or string.
+ * @returns {TodoistData} - The updated TodoistData.
  */
-export function updateTaskResources(taskUpdates: TaskUpdates): void {
-    todoistData.update(($resources: TodoistData) => {
-        taskUpdates.sort(
-            ([, timeA], [, timeB]) =>
-                new Date(timeA as Date).getTime() - new Date(timeB as Date).getTime(),
-        );
+export function calculateUpdatedTaskResources(
+    currentResources: TodoistData,
+    taskUpdates: TaskUpdates,
+): TodoistData {
+    const newResources = { ...currentResources, dueTasks: [...currentResources.dueTasks] }; // Create a mutable copy
 
-        taskUpdates.forEach(([taskID, time]) => {
-            const index = $resources.dueTasks.findIndex((task) => task.id === taskID);
-            if (index !== -1) {
-                const task = $resources.dueTasks[index];
-                const newDueDate = new Date(time instanceof DateTime ? time.toJSDate() : time);
-                if (task.due) {
-                    task.due.date = newDueDate.toISOString();
-                }
+    taskUpdates.sort(
+        ([, timeA], [, timeB]) =>
+            new Date(timeA as Date).getTime() - new Date(timeB as Date).getTime(),
+    );
 
-                $resources.dueTasks.splice(index, 1);
-
-                if (newDueDate < new Date()) {
-                    const insertIndex = $resources.dueTasks.findIndex(
-                        (t) => t.due && new Date(t.due.date) > newDueDate,
-                    );
-                    const actualInsertIndex =
-                        insertIndex === -1 ? $resources.dueTasks.length : insertIndex;
-                    $resources.dueTasks.splice(actualInsertIndex, 0, task);
-                }
+    taskUpdates.forEach(([taskID, time]) => {
+        const index = newResources.dueTasks.findIndex((task) => task.id === taskID);
+        if (index !== -1) {
+            const task = { ...newResources.dueTasks[index] }; // Create a mutable copy of the task
+            const newDueDate = new Date(time instanceof DateTime ? time.toJSDate() : time);
+            if (task.due) {
+                task.due = { ...task.due, date: newDueDate.toISOString() }; // Create a mutable copy of due
             }
-        });
 
-        return $resources;
+            newResources.dueTasks.splice(index, 1);
+
+            const insertIndex = newResources.dueTasks.findIndex(
+                (t) => t.due && new Date(t.due.date) > newDueDate,
+            );
+
+            const actualInsertIndex =
+                insertIndex === -1 ? newResources.dueTasks.length : insertIndex;
+
+            newResources.dueTasks.splice(actualInsertIndex, 0, task);
+        }
     });
 
-    void updateFirstDueTask();
+    return newResources;
 }
 
 /**
- * Marks a task as done and updates the resources accordingly.
+ * Marks a task as done and returns the updates needed for the store.
  * @param {Task} task - The task to mark as done.
- * @returns Promise&lt;boolean> - True if the task was marked done successfully, false otherwise.
+ * @returns Promise&lt;{ success: boolean, taskUpdates: TaskUpdates }> - Object containing success status and task updates.
  */
-export async function handleTaskDone(task: Task): Promise<boolean> {
+export async function handleTaskDone(
+    task: Task,
+): Promise<{ success: boolean; taskUpdates: TaskUpdates }> {
     const fiveMinutesFromNow = DateTime.now().plus({ minutes: 5 });
-
-    const newActivityEntry: TaskActivity = {
-        date: DateTime.now(),
-        taskId: task.id,
-        contextId: task.contextId || "inbox",
-        title: task.content,
-        temporary: true,
-    };
-    taskActivity.update((activities) => [...activities, newActivityEntry]);
-
-    updateTaskResources([[task.id, fiveMinutesFromNow]]);
+    const taskUpdates: TaskUpdates = [[task.id, fiveMinutesFromNow]];
 
     const result = await markTaskDone(task.id);
-    return result.status === "success";
+    return { success: result.status === "success", taskUpdates };
 }
 
 /**
@@ -73,15 +64,15 @@ export async function handleTaskDone(task: Task): Promise<boolean> {
  * @param {Array<[Task, DateTime]>} taskUpdates - An array of [Task, DateTime] tuples.
  * @returns Promise&lt;boolean> - True if all tasks were deferred successfully, false otherwise.
  */
-export async function handleTaskDefer(taskUpdates: Array<[Task, DateTime]>): Promise<boolean> {
+export async function handleTaskDefer(
+    taskUpdates: Array<[Task, DateTime]>,
+): Promise<{ success: boolean; taskUpdates: TaskUpdates }> {
     const updatedTaskResources: Array<[string, DateTime]> = taskUpdates.map(([task, dateTime]) => [
         task.id,
         dateTime,
     ]);
-    updateTaskResources(updatedTaskResources);
-
     const results = await deferTasks(taskUpdates);
     const errors = results.filter((result) => result.status === "error");
 
-    return errors.length === 0;
+    return { success: errors.length === 0, taskUpdates: updatedTaskResources };
 }

@@ -8,17 +8,29 @@
     } from "svelte-hero-icons";
     import { shortcut } from "@svelte-put/shortcut";
     import { success, error } from "../../services/toastService";
-    import { handleTaskDefer, handleTaskDone } from "../../services/taskHandlerService";
-    import { previousFirstDueTask } from "../../stores/stores";
-    import type { Task } from "../../types/todoist";
-    import type { DateTime } from "luxon";
+    import {
+        calculateUpdatedTaskResources,
+        handleTaskDefer,
+        handleTaskDone,
+    } from "../../services/taskHandlerService";
+    import { previousFirstDueTask, todoistData, taskActivity } from "../../stores/stores";
+    import { skipTask } from "../../services/firstTaskService";
+    import type { Task, TodoistData } from "../../types/todoist";
+    import { DateTime } from "luxon";
+    import type { TaskActivity } from "../../types/activity";
+
+    import { userSettings } from "../../stores/interface";
 
     let {
         task,
         openModal,
+        updateDisplayedTask,
     }: {
         task: Task;
         openModal: (modalId: string, props?: Record<string, unknown>) => void;
+        updateDisplayedTask: (
+            task: Task | null,
+        ) => Promise<{ task: Task | null; showNewTaskToast: boolean; contextCleared: boolean }>;
     } = $props();
 
     /**
@@ -26,10 +38,30 @@
      * @param task - The task to mark as done.
      */
     const onDone = async (task: Task): Promise<void> => {
+        if (task.summoned) window.location.hash = String(task.summoned);
         previousFirstDueTask.set(null);
-        const doneSuccessful = await handleTaskDone(task);
+
+        const { success: doneSuccessful, taskUpdates } = await handleTaskDone(task);
+
         if (doneSuccessful) {
-            success("Task marked done!");
+            todoistData.update(($resources: TodoistData) =>
+                calculateUpdatedTaskResources($resources, taskUpdates),
+            );
+
+            const newActivityEntry: TaskActivity = {
+                date: DateTime.now(),
+                taskId: task.id,
+                contextId: task.contextId || "inbox",
+                title: task.content,
+                temporary: true,
+            };
+            taskActivity.update((activities) => [...activities, newActivityEntry]);
+
+            success("Task marked done.");
+            const { contextCleared } = await updateDisplayedTask(null);
+            if (contextCleared) {
+                userSettings.update((settings) => ({ ...settings, selectedContext: null }));
+            }
         } else {
             error("Failed to mark task done.");
         }
@@ -43,13 +75,30 @@
      */
     const onDeferFinal = async (detail: { task: Task; time: DateTime }): Promise<void> => {
         const { task: deferredTask, time } = detail;
+
+        if (deferredTask.summoned && !deferredTask.skip) {
+            window.location.hash = String(deferredTask.summoned);
+        }
+
         previousFirstDueTask.set(null);
-        const deferSuccessful = await handleTaskDefer([[deferredTask, time]]);
+        const { success: deferSuccessful, taskUpdates: deferredTaskUpdates } =
+            await handleTaskDefer([[deferredTask, time]]);
 
         if (deferSuccessful) {
-            success("Task deferred successfully!");
+            todoistData.update(($resources: TodoistData) =>
+                calculateUpdatedTaskResources($resources, deferredTaskUpdates),
+            );
+            success("Task deferred successfully.");
+            const { contextCleared } = await updateDisplayedTask(null);
+            if (contextCleared) {
+                userSettings.update((settings) => ({ ...settings, selectedContext: null }));
+            }
         } else {
             error("Failed to defer task.");
+        }
+
+        if (deferredTask.skip) {
+            await skipTask(deferredTask);
         }
     };
 </script>

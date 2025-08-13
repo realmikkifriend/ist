@@ -1,26 +1,16 @@
 <script lang="ts">
     import { Icon, XMark } from "svelte-hero-icons";
     import { shortcut } from "@svelte-put/shortcut";
-    import { todoistData, firstDueTask, previousFirstDueTask } from "../../stores/stores";
+    import { todoistData, firstDueTask } from "../../stores/stores";
     import { userSettings } from "../../stores/interface";
     import { getDueTaskCountByContext } from "../../services/sidebarService";
-    import { clearSelectedTask } from "../../services/firstTaskService";
     import { getSelectedContextName } from "../../utils/firstTaskUtils";
-    import { success } from "../../services/toastService";
 
-    /**
-     * Handles the clearing of the selected task.
-     */
-    const handleClearSelectedTask = (): void => {
-        void clearSelectedTask().then(({ task, contextCleared }) => {
-            firstDueTask.set(task);
-            previousFirstDueTask.set(task);
-            if (contextCleared) {
-                success("No more tasks in context! Showing all due tasks...");
-                userSettings.update((settings) => ({ ...settings, selectedContext: null }));
-            }
-        });
-    };
+    let {
+        handleClearSelectedTask,
+    }: {
+        handleClearSelectedTask: () => void;
+    } = $props();
 </script>
 
 <button

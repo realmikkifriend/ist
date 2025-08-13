@@ -12,7 +12,7 @@
     let {
         task,
         onDeferFinal,
-    }: { task: Task; onDeferFinal: (detail: { task: Task; time: DateTime }) => void } = $props();
+    }: { task: Task; onDeferFinal?: (detail: { task: Task; time: DateTime }) => void } = $props();
 
     let isTimeTabActive: boolean = $derived(Boolean(task.due && task.due.allDay !== 1));
 
@@ -55,7 +55,9 @@
                       }
                   })();
 
-        onDeferFinal({ task, time });
+        if (onDeferFinal) {
+            onDeferFinal({ task, time });
+        }
     }
 </script>
 

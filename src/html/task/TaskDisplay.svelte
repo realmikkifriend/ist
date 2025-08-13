@@ -13,19 +13,23 @@
     import type { Task, Priority } from "../../types/todoist";
     import type { DynamicModalProps, TaskDisplayProps } from "../../types/interface";
 
-    let { task, onDefer }: TaskDisplayProps = $props();
+    import { updateFirstDueTask } from "../../services/firstTaskService";
+
+    let { task }: TaskDisplayProps = $props();
 
     const priorityBorderClass = getPriorityBorder(task.priority as Priority);
 
     /**
-     * Handles deferring the task, closes the modal, and calls the onDefer prop.
-     * @param detail - The deferred task and time (as DateTime).
-     * @param detail.task - The deferred task.
-     * @param detail.time - The time (as DateTime).
+     * Updates the displayed task, handling context clearing if necessary.
+     * @param task - The task to set as the first due task, or null to fetch the next due task.
+     * @returns The updated task and related flags.
      */
-    const handleDefer = (detail: { task: Task; time: DateTime }): void => {
-        (document.getElementById("defer_modal") as HTMLDialogElement | null)?.close();
-        onDefer({ task: detail.task, time: detail.time.toISO() ?? "" });
+    const updateDisplayedTask = async (
+        task: Task | null,
+    ): Promise<{ task: Task | null; showNewTaskToast: boolean; contextCleared: boolean }> => {
+        const result = await updateFirstDueTask(task);
+        firstDueTask.set(result.task);
+        return result;
     };
 
     /**
@@ -33,9 +37,9 @@
      */
     const handleSkipTask = (): void => {
         if ($firstDueTask) {
-            void skipTask($firstDueTask).then(({ task, contextCleared }) => {
-                firstDueTask.set(task);
-                if (contextCleared) {
+            void skipTask($firstDueTask).then((result) => {
+                firstDueTask.set(result.task);
+                if (result.contextCleared) {
                     userSettings.update((settings) => ({
                         ...settings,
                         selectedContext: null,
@@ -52,8 +56,22 @@
      * @param props - Optional props to pass to the modal component.
      */
     const openModal = (modalId: string, props: DynamicModalProps = {}): void => {
-        modalProps = props;
+        modalProps = { ...props };
+        if (modalProps.onDeferFinal) {
+            const originalOnDeferFinal = modalProps.onDeferFinal as (detail: {
+                task: Task;
+                time: DateTime;
+            }) => void;
+            modalProps.onDeferFinal = (detail: { task: Task; time: DateTime }) => {
+                originalOnDeferFinal(detail);
+                closeModal(modalId);
+            };
+        }
         (document.getElementById(modalId) as HTMLDialogElement | null)?.showModal();
+    };
+
+    const closeModal = (modalId: string): void => {
+        (document.getElementById(modalId) as HTMLDialogElement | null)?.close();
     };
 </script>
 
@@ -74,7 +92,7 @@
                 </button>
             {/if}
             <h2 class="card-title text-center text-3xl">{task.content}</h2>
-            <TaskActions {openModal} {task} />
+            <TaskActions {openModal} {task} {updateDisplayedTask} />
         </div>
     </div>
     {#if task.comments}
@@ -83,7 +101,7 @@
 </div>
 
 <dialog id="defer_modal" class="modal">
-    <DeferModal onDeferFinal={handleDefer} {task} {...modalProps} />
+    <DeferModal onDeferFinal={() => closeModal("defer_modal")} {task} {...modalProps} />
 </dialog>
 
 <History activity={task.activity} content={task.content} entityId={task.id} />
