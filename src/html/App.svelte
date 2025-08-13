@@ -54,6 +54,7 @@
     );
 
     const handleClearSelectedTask = async (): Promise<void> => {
+        debounceState.clearDebounceTimeout();
         const selectedContext = get(userSettings).selectedContext;
 
         if ($firstDueTask?.summoned) {
@@ -116,6 +117,8 @@
      * @param contextId - The ID of the context that was clicked.
      */
     function handleContextChange(contextId: string | null): void {
+        debounceState.clearDebounceTimeout();
+
         previousFirstDueTask.set(null);
         const isCurrentlySelected = $userSettings.selectedContext?.id === contextId;
         let newSelectedContext = isCurrentlySelected
