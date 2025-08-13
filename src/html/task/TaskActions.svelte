@@ -15,22 +15,20 @@
     } from "../../services/taskHandlerService";
     import { previousFirstDueTask, todoistData, taskActivity } from "../../stores/stores";
     import { skipTask } from "../../services/firstTaskService";
-    import type { Task, TodoistData } from "../../types/todoist";
+    import type { Task } from "../../types/todoist";
     import { DateTime } from "luxon";
     import type { TaskActivity } from "../../types/activity";
-
-    import { userSettings } from "../../stores/interface";
 
     let {
         task,
         openModal,
         updateDisplayedTask,
+        handleRefresh,
     }: {
         task: Task;
         openModal: (modalId: string, props?: Record<string, unknown>) => void;
-        updateDisplayedTask: (
-            task: Task | null,
-        ) => Promise<{ task: Task | null; showNewTaskToast: boolean; contextCleared: boolean }>;
+        updateDisplayedTask: () => Promise<void>;
+        handleRefresh: () => Promise<void>;
     } = $props();
 
     /**
@@ -41,12 +39,10 @@
         if (task.summoned) window.location.hash = String(task.summoned);
         previousFirstDueTask.set(null);
 
-        const { success: doneSuccessful, taskUpdates } = await handleTaskDone(task);
+        const { success: doneSuccessful, taskId } = await handleTaskDone(task);
 
         if (doneSuccessful) {
-            todoistData.update(($resources: TodoistData) =>
-                calculateUpdatedTaskResources($resources, taskUpdates),
-            );
+            todoistData.set(calculateUpdatedTaskResources($todoistData, [], [taskId]));
 
             const newActivityEntry: TaskActivity = {
                 date: DateTime.now(),
@@ -58,10 +54,8 @@
             taskActivity.update((activities) => [...activities, newActivityEntry]);
 
             success("Task marked done.");
-            const { contextCleared } = await updateDisplayedTask(null);
-            if (contextCleared) {
-                userSettings.update((settings) => ({ ...settings, selectedContext: null }));
-            }
+            await handleRefresh(); // Refresh data after task is done
+            await updateDisplayedTask();
         } else {
             error("Failed to mark task done.");
         }
@@ -85,14 +79,10 @@
             await handleTaskDefer([[deferredTask, time]]);
 
         if (deferSuccessful) {
-            todoistData.update(($resources: TodoistData) =>
-                calculateUpdatedTaskResources($resources, deferredTaskUpdates),
-            );
+            todoistData.set(calculateUpdatedTaskResources($todoistData, deferredTaskUpdates));
             success("Task deferred successfully.");
-            const { contextCleared } = await updateDisplayedTask(null);
-            if (contextCleared) {
-                userSettings.update((settings) => ({ ...settings, selectedContext: null }));
-            }
+            await handleRefresh(); // Refresh data after task is deferred
+            await updateDisplayedTask();
         } else {
             error("Failed to defer task.");
         }

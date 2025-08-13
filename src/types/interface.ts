@@ -11,6 +11,7 @@ export type ResettableStore<T> = Writable<T> & {
 export interface PromiseProp {
     dataPromise: Promise<void>;
     updateDisplayedTask: () => Promise<void>;
+    handleRefresh: () => Promise<void>;
 }
 
 export interface UserSettings {
@@ -60,4 +61,5 @@ export type DynamicModalProps = {
 export interface TaskDisplayProps {
     task: Task;
     updateDisplayedTask: () => Promise<void>;
+    handleRefresh: () => Promise<void>;
 }

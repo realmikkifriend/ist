@@ -140,9 +140,9 @@ export const mergeActivity = (
                 );
 
             if (shouldReplace) {
-                const updatedAccumulated = [...accumulated];
-                updatedAccumulated[duplicateIndex] = newActivity;
-                return updatedAccumulated;
+                return accumulated.map((activity, index) =>
+                    index === duplicateIndex ? { ...newActivity } : activity,
+                );
             }
 
             if (shouldAddNew) {

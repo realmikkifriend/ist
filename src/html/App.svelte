@@ -56,7 +56,7 @@
                 clearSelectedContext();
                 success("No more tasks in context! Showing all due tasks...");
             }
-            await updateDisplayedTask(false);
+            await updateDisplayedTask();
         }
     };
 
@@ -69,13 +69,18 @@
 
     /**
      * Updates the displayed task.
-     * @param prompt - Whether to prompt the user to update the task.
      * @returns Promise that resolves when the task is updated.
      */
-    const updateDisplayedTask = async (prompt: boolean = true): Promise<void> => {
-        const { task, showNewTaskToast } = await updateFirstDueTask();
+    const updateDisplayedTask = async (): Promise<void> => {
+        const { task, showNewTaskToast, contextCleared, updatedTodoistData } =
+            await updateFirstDueTask();
+
+        if (updatedTodoistData) {
+            todoistData.set(updatedTodoistData);
+        }
+
         if (task) {
-            if (showNewTaskToast && task?.id !== $firstDueTask?.id && prompt) {
+            if (showNewTaskToast && task?.id !== $firstDueTask?.id) {
                 newFirstTask((t) => {
                     firstDueTask.set(t);
                     previousFirstDueTask.set(t);
@@ -89,6 +94,10 @@
         } else {
             firstDueTask.set(null);
             previousFirstDueTask.set(null);
+        }
+
+        if (contextCleared) {
+            userSettings.update((settings) => ({ ...settings, selectedContext: null }));
         }
     };
 
@@ -137,7 +146,7 @@
 {#if hash === "#today" || hash === "#tomorrow"}
     <Agenda />
 {:else}
-    <AppView {dataPromise} {updateDisplayedTask} />
+    <AppView {dataPromise} {handleRefresh} {updateDisplayedTask} />
 {/if}
 
 <div class="fixed right-2 bottom-2 z-10">

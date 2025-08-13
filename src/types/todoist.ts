@@ -133,6 +133,15 @@ export interface CommentsProps {
 export interface ListTaskProps {
     task: Task;
 }
+
+export interface UpdateFirstDueTaskResult {
+    task: Task | null;
+    showNewTaskToast: boolean;
+    contextCleared: boolean;
+    dueTasks: Task[];
+    updatedTodoistData?: TodoistData;
+}
+
 export interface HistoryProps {
     entityId: string;
     content: string;

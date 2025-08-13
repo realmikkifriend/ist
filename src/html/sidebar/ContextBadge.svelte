@@ -11,6 +11,10 @@
     }: {
         handleClearSelectedTask: () => void;
     } = $props();
+
+    const dueTaskCount = $derived(
+        getDueTaskCountByContext($todoistData.dueTasks, $firstDueTask ?? null, $userSettings),
+    );
 </script>
 
 <button
@@ -34,11 +38,7 @@
         summoned task
         <kbd>x</kbd>
     {:else}
-        {getDueTaskCountByContext($firstDueTask?.contextId ?? "")} left in {getSelectedContextName(
-            $todoistData,
-            $userSettings,
-            $firstDueTask,
-        )}
+        {dueTaskCount} left in {getSelectedContextName($todoistData, $userSettings, $firstDueTask)}
     {/if}
     {#if $userSettings.selectedContext || $firstDueTask?.summoned}
         <p class="block sm:hidden sm:group-hover:block">

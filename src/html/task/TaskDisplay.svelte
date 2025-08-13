@@ -3,7 +3,6 @@
     import { Icon, Forward } from "svelte-hero-icons";
     import { shortcut } from "@svelte-put/shortcut";
     import { firstDueTask } from "../../stores/stores";
-    import { userSettings } from "../../stores/interface";
     import { skipTask } from "../../services/firstTaskService";
     import { getPriorityBorder } from "../../utils/styleUtils";
     import Comments from "./Comments.svelte";
@@ -13,38 +12,18 @@
     import type { Task, Priority } from "../../types/todoist";
     import type { DynamicModalProps, TaskDisplayProps } from "../../types/interface";
 
-    import { updateFirstDueTask } from "../../services/firstTaskService";
-
-    let { task }: TaskDisplayProps = $props();
+    let { task, updateDisplayedTask, handleRefresh }: TaskDisplayProps = $props();
 
     const priorityBorderClass = getPriorityBorder(task.priority as Priority);
-
-    /**
-     * Updates the displayed task, handling context clearing if necessary.
-     * @param task - The task to set as the first due task, or null to fetch the next due task.
-     * @returns The updated task and related flags.
-     */
-    const updateDisplayedTask = async (
-        task: Task | null,
-    ): Promise<{ task: Task | null; showNewTaskToast: boolean; contextCleared: boolean }> => {
-        const result = await updateFirstDueTask(task);
-        firstDueTask.set(result.task);
-        return result;
-    };
 
     /**
      * Handles skipping the current task.
      */
     const handleSkipTask = (): void => {
         if ($firstDueTask) {
-            void skipTask($firstDueTask).then((result) => {
-                firstDueTask.set(result.task);
-                if (result.contextCleared) {
-                    userSettings.update((settings) => ({
-                        ...settings,
-                        selectedContext: null,
-                    }));
-                }
+            void skipTask($firstDueTask).then(() => {
+                // After skipping, trigger a full refresh and update of the displayed task
+                void updateDisplayedTask();
             });
         }
     };
@@ -92,7 +71,7 @@
                 </button>
             {/if}
             <h2 class="card-title text-center text-3xl">{task.content}</h2>
-            <TaskActions {openModal} {task} {updateDisplayedTask} />
+            <TaskActions {handleRefresh} {openModal} {task} {updateDisplayedTask} />
         </div>
     </div>
     {#if task.comments}

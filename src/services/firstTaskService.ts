@@ -3,9 +3,8 @@ import { todoistData, firstDueTask, previousFirstDueTask } from "../stores/store
 import { userSettings } from "../stores/interface";
 import { todoistAccessToken } from "../stores/secret";
 import { handleInitialChecks, enrichTask } from "./taskEnrichmentService";
-import { updateDueTasks } from "../services/sidebarService";
 import { shouldShowNewTaskToast } from "../utils/firstTaskUtils";
-import type { Task, TodoistData } from "../types/todoist";
+import type { Task, TodoistData, UpdateFirstDueTaskResult } from "../types/todoist";
 
 const debounceState: {
     timeoutId: ReturnType<typeof setTimeout> | null;
@@ -25,9 +24,7 @@ const debounceState: {
  * @param {Task} task - The task to skip.
  * @returns {Promise<{task: Task | null, showNewTaskToast: boolean, contextCleared: boolean}>} The next task and related flags.
  */
-export const skipTask = async (
-    task: Task,
-): Promise<{ task: Task | null; showNewTaskToast: boolean; contextCleared: boolean }> => {
+export const skipTask = async (task: Task): Promise<UpdateFirstDueTaskResult> => {
     const $todoistData: TodoistData = get(todoistData);
     const reverseTasksObj = $todoistData.reverseTasks as unknown as {
         today: Task[];
@@ -41,7 +38,12 @@ export const skipTask = async (
         const result = await summonTask(reverseTasks[nextIndex], true);
         return result;
     }
-    return { task: null, showNewTaskToast: false, contextCleared: false };
+    return {
+        task: null,
+        showNewTaskToast: false,
+        contextCleared: false,
+        dueTasks: get(todoistData).dueTasks,
+    };
 };
 
 /**
@@ -51,7 +53,7 @@ export const skipTask = async (
  */
 export const updateFirstDueTask = async (
     task: Task | null = null,
-): Promise<{ task: Task | null; showNewTaskToast: boolean; contextCleared: boolean }> => {
+): Promise<UpdateFirstDueTaskResult> => {
     const $todoistData: TodoistData = get(todoistData);
     const prevTask: Task | null = get(previousFirstDueTask);
 
@@ -66,26 +68,48 @@ export const updateFirstDueTask = async (
             task: initialCheckResult.taskToSet ?? null,
             showNewTaskToast: initialCheckResult.showNewTaskToast ?? false,
             contextCleared: false,
+            dueTasks: $todoistData.dueTasks,
         };
     }
 
     const selectedContextId: string | null = get(userSettings).selectedContext?.id ?? null;
-    const { tasks: dueTasks, contextCleared } = task
-        ? { tasks: [task], contextCleared: false }
-        : updateDueTasks($todoistData.dueTasks, selectedContextId);
+
+    let contextCleared = false;
+    let currentDueTasks = $todoistData.dueTasks; // Start with the already updated dueTasks from the store
+
+    if (selectedContextId) {
+        const filteredByContext = currentDueTasks.filter((t) => t.contextId === selectedContextId);
+        if (filteredByContext.length === 0) {
+            currentDueTasks = [];
+            contextCleared = true;
+        } else {
+            currentDueTasks = filteredByContext;
+        }
+    }
+
+    // If a specific task is provided, it overrides the filtered list for the purpose of processing
+    const tasksToProcess = task ? [task] : currentDueTasks;
 
     const { task: newTask, showNewTaskToast } = await processDueTaskUpdate(
-        dueTasks,
+        tasksToProcess,
         prevTask,
         selectedContextId,
         initialCheckResult.taskToSet,
     );
 
+    const updatedTodoistData = { ...$todoistData, dueTasks: currentDueTasks }; // Ensure dueTasks in updatedTodoistData reflects the filtered list
+
     debounceState.timeoutId = setTimeout(() => {
         debounceState.timeoutId = null;
     }, 2000);
 
-    return { task: newTask, showNewTaskToast, contextCleared };
+    return {
+        task: newTask,
+        showNewTaskToast,
+        contextCleared,
+        dueTasks: currentDueTasks,
+        updatedTodoistData,
+    };
 };
 
 /**
@@ -123,7 +147,7 @@ const processDueTaskUpdate = async (
 export async function summonTask(
     task: Task & { firstDue?: boolean; skip?: boolean; summoned?: string | boolean },
     enableSkip: boolean = false,
-): Promise<{ task: Task | null; showNewTaskToast: boolean; contextCleared: boolean }> {
+): Promise<UpdateFirstDueTaskResult> {
     if (!task.firstDue || enableSkip) {
         debounceState.clearDebounceTimeout();
         if (enableSkip) {
@@ -136,5 +160,10 @@ export async function summonTask(
         const result = await updateFirstDueTask(task);
         return result;
     }
-    return { task: get(firstDueTask), showNewTaskToast: false, contextCleared: false };
+    return {
+        task: get(firstDueTask),
+        showNewTaskToast: false,
+        contextCleared: false,
+        dueTasks: get(todoistData).dueTasks,
+    };
 }

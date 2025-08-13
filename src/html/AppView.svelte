@@ -6,7 +6,13 @@
     import TaskDisplay from "./task/TaskDisplay.svelte";
     import type { PromiseProp } from "../types/interface";
 
-    let { dataPromise, updateDisplayedTask }: PromiseProp = $props();
+    let { dataPromise, updateDisplayedTask, handleRefresh }: PromiseProp = $props();
+
+    $effect(() => {
+        if ($todoistError) {
+            showError($todoistError);
+        }
+    });
 </script>
 
 {#await dataPromise}
@@ -15,7 +21,7 @@
     {#if $todoistData.tasks}
         {#if $firstDueTask}
             {#key $firstDueTask.id}
-                <TaskDisplay task={$firstDueTask} {updateDisplayedTask} />
+                <TaskDisplay {handleRefresh} task={$firstDueTask} {updateDisplayedTask} />
             {/key}
         {:else}
             <NoTasks />
@@ -26,10 +32,6 @@
 {:catch error}
     <div class="hero">Error loading Todoist data: {error.message}</div>
 {/await}
-
-{#if $todoistError}
-    {showError($todoistError)}
-{/if}
 
 <svelte:window
     use:shortcut={{
