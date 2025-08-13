@@ -1,6 +1,7 @@
 import { DateTime } from "luxon";
 import { markTaskDone, deferTasks } from "../services/apiService";
 import type { Task, TodoistData, TaskUpdates } from "../types/todoist";
+import { getDueTasks } from "../utils/filterUtils";
 
 /**
  * Calculates the updated TodoistData based on the provided task updates.
@@ -14,44 +15,31 @@ export function calculateUpdatedTaskResources(
     taskUpdates: TaskUpdates,
     removedTaskIds: string[] = [],
 ): TodoistData {
-    const today = DateTime.now().startOf("day");
-
-    const updatedDueDates = new Map<string, DateTime>(
-        taskUpdates.map(([taskId, newTime]) => [
-            taskId,
-            newTime instanceof DateTime
-                ? newTime
-                : newTime instanceof Date
-                  ? DateTime.fromJSDate(newTime)
-                  : DateTime.fromISO(newTime),
-        ]),
-    );
-
-    const newDueTasks = currentResources.dueTasks
+    const updatedTasks = currentResources.tasks
         .filter((task) => !removedTaskIds.includes(task.id))
         .map((task) => {
-            if (updatedDueDates.has(task.id)) {
-                const newDueDate = updatedDueDates.get(task.id)!;
-                if (newDueDate.startOf("day") > today) {
-                    return null;
+            const updatedDueDate = taskUpdates.find(([taskId]) => taskId === task.id)?.[1];
+            if (updatedDueDate) {
+                const newDueDate =
+                    updatedDueDate instanceof DateTime
+                        ? updatedDueDate
+                        : updatedDueDate instanceof Date
+                          ? DateTime.fromJSDate(updatedDueDate)
+                          : DateTime.fromISO(updatedDueDate);
+
+                if (newDueDate.startOf("day") > DateTime.now().startOf("day")) {
+                    return null; // Task is deferred beyond today, remove it from active tasks
                 }
-                const updatedTask = { ...task };
-                if (updatedTask.due) {
-                    updatedTask.due = { ...updatedTask.due, date: newDueDate.toISO()! };
-                }
-                return updatedTask;
+                return { ...task, due: { ...task.due, date: newDueDate.toISO()! } };
             }
             return task;
         })
-        .filter((task) => task !== null);
+        .filter((task) => task !== null) as Task[];
 
-    newDueTasks.sort((a, b) => {
-        const dateA = a.due ? new Date(a.due.date).getTime() : Infinity;
-        const dateB = b.due ? new Date(b.due.date).getTime() : Infinity;
-        return dateA - dateB;
-    });
+    const updatedTodoistData = { ...currentResources, tasks: updatedTasks };
+    const newDueTasks = getDueTasks(updatedTodoistData);
 
-    return { ...currentResources, dueTasks: newDueTasks };
+    return { ...updatedTodoistData, dueTasks: newDueTasks };
 }
 
 /**
