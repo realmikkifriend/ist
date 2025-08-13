@@ -61,9 +61,9 @@
 </script>
 
 <div class="dynalistPrompt w-full">
-    <div class="mb-1 flex items-center space-x-1">
+    <div class="mb-2 flex flex-row items-center space-x-1">
         <Logo size={8} type="dynalist" />
-        <div class="overflow-x-hidden text-nowrap">
+        <div class="h-6 overflow-x-hidden text-nowrap">
             Provide <a
                 class="href text-blue-500 hover:underline"
                 href="https://dynalist.io/developer">Dynalist access</a
@@ -71,7 +71,7 @@
             <p class="invalid-token invisible text-red-500">Invalid token</p>
         </div>
     </div>
-    <form class="flex gap-2" onsubmit={handleToken}>
+    <form class="mb-4 flex gap-2" onsubmit={handleToken}>
         <input name="token" class="input min-w-4 grow" placeholder="Enter your token" type="text" />
         <span class="submit-content flex">
             <button
