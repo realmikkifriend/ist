@@ -26,38 +26,6 @@ module.exports = {
             to: {},
         },
         {
-            name: "no-deprecated-core",
-            comment:
-                "A module depends on a node core module that has been deprecated. Find an alternative.",
-            severity: "warn",
-            from: {},
-            to: {
-                dependencyTypes: ["core"],
-                path: [
-                    "^v8/tools/codemap$",
-                    "^v8/tools/consarray$",
-                    "^v8/tools/csvparser$",
-                    "^v8/tools/logreader$",
-                    "^v8/tools/profile_view$",
-                    "^v8/tools/profile$",
-                    "^v8/tools/SourceMap$",
-                    "^v8/tools/splaytree$",
-                    "^v8/tools/tickprocessor-driver$",
-                    "^v8/tools/tickprocessor$",
-                    "^node-inspect/lib/_inspect$",
-                    "^node-inspect/lib/internal/inspect_client$",
-                    "^node-inspect/lib/internal/inspect_repl$",
-                    "^async_hooks$",
-                    "^punycode$",
-                    "^domain$",
-                    "^constants$",
-                    "^sys$",
-                    "^_linklist$",
-                    "^_stream_wrap$",
-                ],
-            },
-        },
-        {
             name: "not-to-deprecated",
             comment:
                 "This module uses a (version of an) npm module that has been deprecated. Either upgrade to a later " +
@@ -393,6 +361,84 @@ module.exports = {
                 //     splines: "true"
                 //   },
                 // }
+                theme: {
+                    // https://graphviz.gitlab.io/doc/info/shapes.html
+                    replace: false,
+                    graph: {
+                        bgcolor: "oklch(0.2264 0 0)", // background on hover
+                        fillcolor: "oklch(0.2264 0 0)", // background
+                        color: "cyan", // folder boundaries
+                        fontcolor: "white",
+                        // https://graphviz.gitlab.io/docs/attrs/splines/
+                        splines: "ortho",
+                        concentrate: true,
+                    },
+                    node: {
+                        color: "navy",
+                        fillcolor: "red",
+                        fontcolor: "navy",
+                    },
+                    edge: {
+                        // lines between nodes
+                        arrowhead: "vee",
+                        arrowsize: "0.5",
+                        penwidth: "1.0",
+                        color: "white",
+                        fontcolor: "white",
+                    },
+                    modules: [
+                        {
+                            criteria: { source: "^src/stores/.*\\.ts$" },
+                            attributes: {
+                                colorscheme: "blues9",
+                                shape: "cylinder",
+                                fontcolor: "white",
+                                fillcolor: "8:9",
+                            },
+                        },
+                        {
+                            criteria: { source: "^src/html/.*\\.svelte$" },
+                            attributes: {
+                                colorscheme: "blues9",
+                                shape: "component",
+                                fillcolor: "5:7",
+                            },
+                        },
+                        {
+                            criteria: { source: "^src/css/.*\\.css$" },
+                            attributes: {
+                                fillcolor: "navy",
+                                fontcolor: "white",
+                            },
+                        },
+                    ],
+                    dependencies: [
+                        {
+                            criteria: { resolved: ".svelte" },
+                            attributes: { color: "orangered", style: "dashed", arrowhead: "crow" },
+                        },
+                        {
+                            criteria: { resolved: "^src/services/.*\\.ts$" },
+                            attributes: { color: "fuschia", arrowhead: "diamond" },
+                        },
+                        {
+                            criteria: { resolved: "^src/utils/.*\\.ts$" },
+                            attributes: { color: "green", arrowhead: "diamond" },
+                        },
+                        {
+                            criteria: { resolved: "^src/types/.*\\.ts$" },
+                            attributes: { color: "purple", arrowhead: "icurve" },
+                        },
+                        {
+                            criteria: { resolved: "^src/stores/.*\\.ts$" },
+                            attributes: {
+                                color: "yellow",
+                                style: "dashed",
+                                arrowhead: "diamond",
+                            },
+                        },
+                    ],
+                },
             },
             archi: {
                 /* pattern of modules that can be consolidated in the high level
