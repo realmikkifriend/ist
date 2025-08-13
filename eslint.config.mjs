@@ -120,6 +120,24 @@ export default defineConfig([
     },
     {
         files: ["src/services/**/*.ts"],
+        ignores: ["src/services/toastService.ts"],
+        rules: {
+            "no-restricted-syntax": [
+                "warn",
+                {
+                    selector: "CallExpression[callee.property.name='set']",
+                    message: "Setting stores is only allowed in components.",
+                },
+                {
+                    selector: "CallExpression[callee.property.name='update']",
+                    message: "Updating stores is only allowed in components.",
+                },
+                ...noTypesOrInterfaces,
+            ],
+        },
+    },
+    {
+        files: ["src/services/**/*.ts"],
         rules: {
             "no-restricted-imports": [
                 "error",
@@ -131,14 +149,6 @@ export default defineConfig([
                         },
                     ],
                 },
-            ],
-            "no-restricted-syntax": [
-                "warn",
-                {
-                    selector: "CallExpression[callee.property.name='set']",
-                    message: "Setting stores is only allowed in components.",
-                },
-                ...noTypesOrInterfaces,
             ],
         },
     },
@@ -161,7 +171,7 @@ export default defineConfig([
             },
         },
         rules: {
-            "max-lines": ["warn", { max: 120, skipComments: true, skipBlankLines: true }],
+            "max-lines": ["warn", { max: 160, skipComments: true, skipBlankLines: true }],
             "max-depth": ["warn", 2],
             "no-restricted-syntax": [
                 "warn",

@@ -18,10 +18,6 @@ export interface UserSettings {
     selectedContext: { id: string; name: string } | null;
 }
 
-export interface HashProp {
-    hash: string;
-}
-
 export interface ToastMessage {
     id: string;
     type: "success" | "error" | "info";

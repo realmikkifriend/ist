@@ -74,21 +74,13 @@ export const updateFirstDueTask = async (
 
     const selectedContextId: string | null = get(userSettings).selectedContext?.id ?? null;
 
-    let contextCleared = false;
-    let currentDueTasks = $todoistData.dueTasks; // Start with the already updated dueTasks from the store
+    const currentDueTasks = $todoistData.dueTasks; // Start with the already updated dueTasks from the store
 
-    if (selectedContextId) {
-        const filteredByContext = currentDueTasks.filter((t) => t.contextId === selectedContextId);
-        if (filteredByContext.length === 0) {
-            currentDueTasks = [];
-            contextCleared = true;
-        } else {
-            currentDueTasks = filteredByContext;
-        }
-    }
+    const filteredByContext = selectedContextId
+        ? currentDueTasks.filter((t) => t.contextId === selectedContextId)
+        : currentDueTasks;
 
-    // If a specific task is provided, it overrides the filtered list for the purpose of processing
-    const tasksToProcess = task ? [task] : currentDueTasks;
+    const tasksToProcess = task ? [task] : filteredByContext;
 
     const { task: newTask, showNewTaskToast } = await processDueTaskUpdate(
         tasksToProcess,
@@ -97,8 +89,6 @@ export const updateFirstDueTask = async (
         initialCheckResult.taskToSet,
     );
 
-    const updatedTodoistData = { ...$todoistData, dueTasks: $todoistData.dueTasks };
-
     debounceState.timeoutId = setTimeout(() => {
         debounceState.timeoutId = null;
     }, 2000);
@@ -106,9 +96,8 @@ export const updateFirstDueTask = async (
     return {
         task: newTask,
         showNewTaskToast,
-        contextCleared,
-        dueTasks: currentDueTasks,
-        updatedTodoistData,
+        contextCleared: Boolean(selectedContextId && filteredByContext.length === 0),
+        dueTasks: filteredByContext,
     };
 };
 
