@@ -6,9 +6,11 @@
     import Footer from "../interface/Footer.svelte";
     import { resetAllStores } from "../../stores/reset";
     import { todoistData } from "../../stores/stores";
-    import type { HashProp } from "../../types/interface";
 
-    let { hash }: HashProp = $props();
+    let {
+        hash,
+        handleContextChange,
+    }: { hash: string; handleContextChange: (contextId: string) => void } = $props();
     let isSidebarOpen = $state(false);
 
     /**
@@ -47,7 +49,7 @@
         <label class="drawer-overlay" aria-label="close sidebar" for="sidebar-toggle"></label>
         <ul class="menu bg-base-100 text-base-content min-h-full w-80 px-4 py-2">
             {#if $todoistData.contexts}
-                <Contexts onDismiss={closeSidebar} />
+                <Contexts {closeSidebar} {handleContextChange} />
             {/if}
 
             <div class="mt-auto">

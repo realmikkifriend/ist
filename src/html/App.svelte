@@ -101,6 +101,29 @@
         }
     };
 
+    /**
+     * Handles clicking on a context button.
+     * Updates the selected context in user settings.
+     * @param contextId - The ID of the context that was clicked.
+     */
+    function handleContextChange(contextId: string | null): void {
+        previousFirstDueTask.set(null);
+        const isCurrentlySelected = $userSettings.selectedContext?.id === contextId;
+        let newSelectedContext = isCurrentlySelected
+            ? null
+            : contextId
+              ? {
+                    id: contextId,
+                    name: $todoistData.contexts.find((c) => c.id === contextId)?.name || "",
+                }
+              : null;
+
+        userSettings.update((settings) => ({
+            ...settings,
+            selectedContext: newSelectedContext,
+        }));
+    }
+
     $effect(() => {
         if ($userSettings.selectedContext || $todoistData.dueTasks) {
             void updateDisplayedTask();
@@ -134,11 +157,11 @@
 </script>
 
 <div class="flex w-fit items-center">
-    <Sidebar {hash} />
+    <Sidebar {handleContextChange} {hash} />
 
     {#if $firstDueTask && hash !== "#today" && hash !== "#tomorrow"}
         {#key $firstDueTask.id}
-            <ContextBadge {handleClearSelectedTask} />
+            <ContextBadge {handleClearSelectedTask} {handleContextChange} />
         {/key}
     {/if}
 </div>

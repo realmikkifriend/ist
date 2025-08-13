@@ -1,42 +1,20 @@
 <script lang="ts">
     import { Icon, XCircle, Calendar } from "svelte-hero-icons";
-    import { todoistData, previousFirstDueTask } from "../../stores/stores";
+    import { todoistData } from "../../stores/stores";
     import { userSettings } from "../../stores/interface";
     import { openAgenda } from "../../services/agendaService";
     import { getTasksGroupedByContext } from "../../utils/filterUtils";
     import ContextButtonContents from "./ContextButtonContents.svelte";
 
-    let { onDismiss }: { onDismiss: () => void } = $props();
+    let {
+        closeSidebar,
+        handleContextChange,
+    }: { closeSidebar: () => void; handleContextChange: (contextId: string) => void } = $props();
 
     /**
      * A derived store grouping due tasks by context.
      */
     const dueTasksByContext = $derived(getTasksGroupedByContext($todoistData.dueTasks));
-
-    /**
-     * Handles clicking on a context button.
-     * Updates the selected context in user settings and closes the drawer if a new context is selected.
-     * @param contextId - The ID of the context that was clicked.
-     */
-    function handleContextClick(contextId: string): void {
-        previousFirstDueTask.set(null);
-        const isCurrentlySelected = $userSettings.selectedContext?.id === contextId;
-        const newSelectedContext = isCurrentlySelected
-            ? null
-            : {
-                  id: contextId,
-                  name: $todoistData.contexts.find((c) => c.id === contextId)?.name || "",
-              };
-
-        userSettings.update((settings) => ({
-            ...settings,
-            selectedContext: newSelectedContext,
-        }));
-
-        if (newSelectedContext !== null) {
-            onDismiss();
-        }
-    }
 </script>
 
 <div class="mb-2 ml-2 flex items-center justify-between">
@@ -45,7 +23,7 @@
             class="relative"
             onclick={() => {
                 openAgenda("today");
-                onDismiss();
+                closeSidebar();
             }}
             tabindex="-1"
             type="button"
@@ -58,7 +36,7 @@
     <button
         class="btn drawer-button relative bg-transparent px-0 hover:border-transparent hover:bg-transparent"
         onclick={() => {
-            onDismiss();
+            closeSidebar();
         }}
         tabindex="-1"
         type="button"
@@ -75,7 +53,10 @@
                 class="bg-secondary text-base-100 tooltip sm:tooltip-right tooltip-bottom mb-2 w-full rounded-lg"
                 class:opacity-25={$userSettings.selectedContext &&
                     $userSettings.selectedContext.id !== context.id}
-                onclick={() => handleContextClick(context.id)}
+                onclick={() => {
+                    handleContextChange(context.id);
+                    closeSidebar();
+                }}
                 tabindex={index + 1}
                 type="button"
             >

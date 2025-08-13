@@ -8,8 +8,10 @@
 
     let {
         handleClearSelectedTask,
+        handleContextChange,
     }: {
         handleClearSelectedTask: () => void;
+        handleContextChange: (contextId: string | null) => void;
     } = $props();
 
     const dueTaskCount = $derived(
@@ -28,7 +30,9 @@
     class:text-primary={$userSettings.selectedContext}
     class:text-purple-400={$firstDueTask?.summoned}
     class:text-yellow-500={$firstDueTask?.skip}
-    onclick={handleClearSelectedTask}
+    onclick={() => {
+        handleContextChange(null);
+    }}
     type="reset"
 >
     {#if $firstDueTask?.skip}

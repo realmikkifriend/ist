@@ -97,7 +97,7 @@ export const updateFirstDueTask = async (
         initialCheckResult.taskToSet,
     );
 
-    const updatedTodoistData = { ...$todoistData, dueTasks: currentDueTasks }; // Ensure dueTasks in updatedTodoistData reflects the filtered list
+    const updatedTodoistData = { ...$todoistData, dueTasks: $todoistData.dueTasks };
 
     debounceState.timeoutId = setTimeout(() => {
         debounceState.timeoutId = null;
