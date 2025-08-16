@@ -1,8 +1,8 @@
 <script lang="ts">
     import SvelteMarkdown from "@humanspeak/svelte-markdown";
     import { Icon, Backward } from "svelte-hero-icons";
-    import { hasError } from "../../../utils/dynalistUtils";
-    import { parseList } from "../../../utils/dynalistProcessUtils";
+    import { hasError } from "../../../../utils/dynalistUtils";
+    import { parseList } from "../../../../utils/dynalistProcessUtils";
 
     let { content }: { content: string } = $props();
 

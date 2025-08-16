@@ -1,10 +1,10 @@
 <script lang="ts">
     import { DateTime } from "luxon";
     import { Icon, CalendarDateRange, Check, XMark, ArrowPath } from "svelte-hero-icons";
-    import { handleDynalistTrackingClick } from "../../../services/dynalistService";
-    import History from "../../interface/History.svelte";
-    import type { Task } from "../../../types/todoist";
-    import type { DynalistNode } from "../../../types/dynalist";
+    import { handleDynalistTrackingClick } from "../../../../services/dynalistService";
+    import History from "../../../interface/History.svelte";
+    import type { Task } from "../../../../types/todoist";
+    import type { DynalistNode } from "../../../../types/dynalist";
 
     let { dynalistObject: content = $bindable() }: { dynalistObject?: DynalistNode } = $props();
     let isLoading = $state(false);

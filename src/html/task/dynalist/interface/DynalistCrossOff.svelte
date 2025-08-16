@@ -2,10 +2,10 @@
     import { on } from "svelte/events";
     import { Icon, Backspace } from "svelte-hero-icons";
     import SvelteMarkdown from "@humanspeak/svelte-markdown";
-    import { generateDynalistComment } from "../../../utils/dynalistProcessUtils";
-    import { updateDynalistWithToken } from "../../../services/dynalistService";
-    import { success } from "../../../services/toastService";
-    import type { DynalistNode, DynalistViewProps } from "../../../types/dynalist";
+    import { generateDynalistComment } from "../../../../utils/dynalistProcessUtils";
+    import { updateDynalistWithToken } from "../../../../services/dynalistService";
+    import { success } from "../../../../services/toastService";
+    import type { DynalistNode, DynalistViewProps } from "../../../../types/dynalist";
 
     let { dynalistObject }: DynalistViewProps = $props();
 

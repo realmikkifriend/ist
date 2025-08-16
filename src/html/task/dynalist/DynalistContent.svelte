@@ -1,10 +1,10 @@
 <script lang="ts">
     import SvelteMarkdown from "@humanspeak/svelte-markdown";
-    import DynalistChecklist from "./DynalistChecklist.svelte";
-    import DynalistCount from "./DynalistCount.svelte";
-    import DynalistRotating from "./DynalistRotating.svelte";
-    import DynalistCrossOff from "./DynalistCrossOff.svelte";
-    import DynalistTracking from "./DynalistTracking.svelte";
+    import DynalistChecklist from "./interface/DynalistChecklist.svelte";
+    import DynalistCount from "./interface/DynalistCount.svelte";
+    import DynalistRotating from "./interface/DynalistRotating.svelte";
+    import DynalistCrossOff from "./interface/DynalistCrossOff.svelte";
+    import DynalistTracking from "./interface/DynalistTracking.svelte";
     import DynalistTypeMenu from "./DynalistTypeMenu.svelte";
     import { generateDynalistComment } from "../../../utils/dynalistProcessUtils";
     import type { DynalistTaskType, DynalistViewProps } from "../../../types/dynalist";
