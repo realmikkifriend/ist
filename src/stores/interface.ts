@@ -14,3 +14,9 @@ registerStore(userSettings);
  */
 export const toastMessages = resettableWritable<ToastMessage[]>([]);
 registerStore(toastMessages);
+
+/**
+ * Stores the current URL hash.
+ */
+export const hashStore = resettableWritable<string>("");
+registerStore(hashStore);

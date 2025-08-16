@@ -36,17 +36,19 @@ export const toggleAgendaHash = (): void => {
 
 /**
  * Returns the current agenda title based on the window hash.
+ * @param {string} hash - The current URL hash.
  * @returns Agenda title to display.
  */
-export const getTitle = (): string => {
-    return window.location.hash.replace("#", "").replace(/^./, (c) => c.toUpperCase());
+export const getTitle = (hash: string): string => {
+    return hash.replace("#", "").replace(/^./, (c) => c.toUpperCase());
 };
 
 /**
  * Updates the agenda page data based on the current hash and todoist data.
+ * @param {string} hash - The current URL hash.
  * @returns {AgendaData} Data to be displayed in agenda component.
  */
-export const updateAgenda = (): AgendaData => {
+export const updateAgenda = (hash: string): AgendaData => {
     const currentData = get(todoistData);
     const now = DateTime.now();
 
@@ -54,7 +56,7 @@ export const updateAgenda = (): AgendaData => {
     const sortedTasks = getSortedTasksForDate(targetDate, currentData);
 
     const tasksForTomorrow =
-        window.location.hash === "#tomorrow"
+        hash === "#tomorrow"
             ? sortAgendaTasks(
                   getTasksInTimeRange(currentData.tasks, now.startOf("day"), now.endOf("day")),
               )

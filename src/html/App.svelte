@@ -10,7 +10,7 @@
         todoistError,
         previousFirstDueTask,
     } from "../stores/stores";
-    import { userSettings } from "../stores/interface";
+    import { userSettings, hashStore } from "../stores/interface";
     import { debounceState } from "../services/firstTaskService";
     import { updateFirstDueTask, skipTask } from "../services/firstTaskService";
     import { refreshData } from "../services/updateService";
@@ -24,7 +24,6 @@
     import type { Task, UpdateFirstDueTaskResult } from "../types/todoist";
 
     let isSpinning = $state(false);
-    let hash = $state(window.location.hash);
 
     $effect(() => {
         if ($userSettings.selectedContext || $todoistData.dueTasks) {
@@ -238,7 +237,7 @@
          * Updates the hash store with the current window location hash.
          * @returns Current browser location.
          */
-        const updateHash = () => (hash = window.location.hash);
+        const updateHash = () => hashStore.set(window.location.hash);
 
         on(window, "hashchange", updateHash);
 
@@ -256,16 +255,16 @@
 </script>
 
 <div class="flex w-fit items-center">
-    <Sidebar {hash} />
+    <Sidebar hash={$hashStore} />
 
-    {#if $firstDueTask && hash !== "#today" && hash !== "#tomorrow"}
+    {#if $firstDueTask && $hashStore !== "#today" && $hashStore !== "#tomorrow"}
         {#key $firstDueTask.id}
             <ContextBadge />
         {/key}
     {/if}
 </div>
 
-{#if hash === "#today" || hash === "#tomorrow"}
+{#if $hashStore === "#today" || $hashStore === "#tomorrow"}
     <Agenda />
 {:else}
     <AppView {dataPromise} />

@@ -1,8 +1,7 @@
 <script lang="ts">
-    import { onMount, onDestroy } from "svelte";
-    import { on } from "svelte/events";
     import { DateTime } from "luxon";
     import { todoistData } from "../../stores/stores";
+    import { hashStore } from "../../stores/interface";
     import { updateAgenda, getTitle } from "../../services/agendaService";
     import { computeHeaderGradientColor, getDisplayHours } from "../../utils/agendaDisplayUtils";
     import { getTaskColor } from "../../styles/styleUtils";
@@ -10,40 +9,10 @@
     import AgendaHour from "./AgendaHour.svelte";
     import AgendaTask from "./AgendaTask.svelte";
     import type { AgendaData } from "../../types/agenda";
-    import type { Task } from "../../types/todoist";
 
-    let agendaStore = $state<AgendaData>({
-        tasks: [],
-        tasksForDate: [],
-        tasksWithNoTime: [],
-        todayTasks: [],
-    });
+    let agendaStore: AgendaData = $derived(updateAgenda($hashStore));
 
     const hourSlots: number[] = Array.from({ length: 18 }, (_, i) => i + 6);
-
-    const setAgendaData = () => (agendaStore = updateAgenda());
-
-    $effect(() => {
-        if ($todoistData) {
-            setAgendaData();
-        }
-    });
-
-    onMount(() => {
-        if ($todoistData.tasks) {
-            $todoistData.tasks.forEach((task: Task) => {
-                delete task.summoned;
-                delete task.firstDue;
-            });
-        }
-
-        setAgendaData();
-        on(window, "hashchange", setAgendaData);
-    });
-
-    onDestroy(() => {
-        window.removeEventListener("hashchange", setAgendaData);
-    });
 </script>
 
 {#key agendaStore.tasks}
@@ -51,8 +20,8 @@
         <AgendaHeader
             agendaData={agendaStore}
             displayData={{
-                title: getTitle(),
-                headerGradientColor: computeHeaderGradientColor(agendaStore, getTitle()),
+                title: getTitle($hashStore),
+                headerGradientColor: computeHeaderGradientColor(agendaStore, getTitle($hashStore)),
             }}
         />
 
@@ -71,14 +40,14 @@
         <div class="w-[99%] overflow-hidden pr-1">
             {#key (DateTime.now().hour, agendaStore.tasks)}
                 {#each hourSlots as hour (hour)}
-                    {#if getDisplayHours(agendaStore, DateTime.now(), hourSlots, getTitle())[hour]}
+                    {#if getDisplayHours(agendaStore, DateTime.now(), hourSlots, getTitle($hashStore))[hour]}
                         <AgendaHour
                             {hour}
                             now={DateTime.now()}
                             tasks={agendaStore.tasks.filter(
                                 (task) => DateTime.fromISO(task.due?.date ?? "").hour === hour,
                             )}
-                            title={getTitle()}
+                            title={getTitle($hashStore)}
                         />
                     {/if}
                 {/each}
