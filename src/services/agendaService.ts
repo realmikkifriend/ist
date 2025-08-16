@@ -1,7 +1,6 @@
 import { get } from "svelte/store";
 import { DateTime } from "luxon";
 import { todoistData, firstDueTask } from "../stores/stores";
-import { getGradientColor } from "../utils/styleUtils";
 import {
     getTasksForDate,
     sortAgendaTasks,
@@ -11,6 +10,7 @@ import {
     getTodayTasksForAgenda,
     getAgendaTaskCount,
 } from "../utils/agendaUtils";
+import { getGradientColor } from "../styles/styleUtils";
 import type { Task } from "../types/todoist";
 import type { AgendaData } from "../types/agenda";
 

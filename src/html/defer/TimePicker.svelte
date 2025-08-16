@@ -2,8 +2,8 @@
     import { onDestroy } from "svelte";
     import { shortcut } from "@svelte-put/shortcut";
     import { updateMilliseconds } from "../../utils/deferModalUtils";
-    import { getPriorityClasses } from "../../utils/styleUtils";
     import { getShiftedSymbol } from "../../utils/deferTimeConfigs";
+    import { getPriorityClasses } from "../../styles/styleUtils";
     import ListTask from "../task/ListTask.svelte";
     import type { ShortcutModifierDefinition } from "@svelte-put/shortcut";
     import type { TimePickerProps } from "../../types/defer";

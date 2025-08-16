@@ -2,7 +2,7 @@
     import { getContext } from "svelte";
     import { DateTime } from "luxon";
     import { Icon, InboxArrowDown, Inbox } from "svelte-hero-icons";
-    import { getPriorityClasses, colorClasses, borderClasses } from "../../utils/styleUtils";
+    import { getPriorityClasses, colorClasses, borderClasses } from "../../styles/styleUtils";
     import type { Priority } from "../../types/todoist";
     import type { AgendaTaskProps } from "../../types/agenda";
     import type { MethodsContext } from "../../types/interface";

@@ -11,7 +11,7 @@ import {
     shouldContinueFetchingActivity,
     processActivityAccumulation,
 } from "../utils/activityUtils";
-import { colorClasses } from "../utils/styleUtils";
+import { colorClasses } from "../styles/styleUtils";
 import type { Task, ColorName, GetAllActivityDataParams } from "../types/todoist";
 import type { TaskActivity, TodoistActivity } from "../types/activity";
 

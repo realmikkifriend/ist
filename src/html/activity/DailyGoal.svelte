@@ -2,8 +2,8 @@
     import { Icon, ArrowPath } from "svelte-hero-icons";
     import { todoistData, taskActivity } from "../../stores/stores";
     import { fetchDailyActivity } from "../../services/activityService";
-    import { getContextColors } from "../../utils/styleUtils";
     import { mergeActivity } from "../../utils/activityUtils";
+    import { getContextColors } from "../../styles/styleUtils";
     import DailyGoalTooltip from "./DailyGoalTooltip.svelte";
     import type { TaskActivity } from "../../types/activity";
 

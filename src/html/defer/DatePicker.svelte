@@ -1,8 +1,8 @@
 <script lang="ts">
     import { DateTime } from "luxon";
     import { getTasksForMonth } from "../../utils/deferDateUtils";
-    import { getPriorityClasses } from "../../utils/styleUtils";
     import { compareByPriority } from "../../utils/comparisonUtils";
+    import { getPriorityClasses } from "../../styles/styleUtils";
     import Calendar from "../interface/Calendar.svelte";
     import type { Task, Priority } from "../../types/todoist";
     import type { DatePickerProps } from "../../types/defer";

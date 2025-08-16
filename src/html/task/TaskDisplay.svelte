@@ -3,7 +3,7 @@
     import { DateTime } from "luxon";
     import { Icon, Forward } from "svelte-hero-icons";
     import { shortcut } from "@svelte-put/shortcut";
-    import { getPriorityBorder } from "../../utils/styleUtils";
+    import { getPriorityBorder } from "../../styles/styleUtils";
     import Comments from "./Comments.svelte";
     import DeferModal from "../defer/DeferModal.svelte";
     import History from "../interface/History.svelte";

@@ -9,7 +9,7 @@
         getTitle,
         computeHeaderGradientColor,
     } from "../../services/agendaService";
-    import { getTaskColor } from "../../utils/styleUtils";
+    import { getTaskColor } from "../../styles/styleUtils";
     import AgendaHeader from "./AgendaHeader.svelte";
     import AgendaHour from "./AgendaHour.svelte";
     import AgendaTask from "./AgendaTask.svelte";

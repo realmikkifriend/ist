@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { getPriorityClasses } from "../../utils/styleUtils";
+    import { getPriorityClasses } from "../../styles/styleUtils";
     import ListTask from "../task/ListTask.svelte";
     import type { Priority, ContextButtonProps } from "../../types/todoist";
 

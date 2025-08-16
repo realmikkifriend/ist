@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { getPriorityClasses } from "../../utils/styleUtils";
+    import { getPriorityClasses } from "../../styles/styleUtils";
     import type { Priority, ListTaskProps } from "../../types/todoist";
 
     let { task }: ListTaskProps = $props();
