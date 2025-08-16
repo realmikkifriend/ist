@@ -51,7 +51,8 @@
     const handleClick = async () => {
         if (isLoading || !content) return;
         isLoading = true;
-        content.children = await handleDynalistTrackingClick(content, todayTracked);
+        const newChildren = await handleDynalistTrackingClick(content, todayTracked);
+        content = { ...content, children: newChildren };
         isLoading = false;
     };
 </script>

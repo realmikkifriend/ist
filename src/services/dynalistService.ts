@@ -78,21 +78,26 @@ export async function handleDynalistTrackingClick(
     todayTracked: boolean,
 ): Promise<DynalistNode["children"]> {
     const today = DateTime.now().toISODate();
-    const changeAction = todayTracked
-        ? {
-              action: "delete" as const,
-              node_id: (
-                  content.children?.find(
-                      (c) => typeof c !== "string" && c.content === today,
-                  ) as DynalistNode
-              )?.id,
-          }
-        : {
-              action: "insert" as const,
-              parent_id: content.id,
-              index: 0,
-              content: today,
-          };
+
+    const getChangeAction = () => {
+        return todayTracked
+            ? {
+                  action: "delete" as const,
+                  node_id: (
+                      content.children?.find(
+                          (c) => typeof c !== "string" && c.content === today,
+                      ) as DynalistNode
+                  )?.id,
+              }
+            : {
+                  action: "insert" as const,
+                  parent_id: content.id,
+                  index: 0,
+                  content: today,
+              };
+    };
+
+    const changeAction = getChangeAction();
 
     if (changeAction.action === "delete" && !changeAction.node_id) {
         return content.children;
@@ -104,10 +109,12 @@ export async function handleDynalistTrackingClick(
         (c): c is DynalistNode => typeof c !== "string",
     );
 
-    if (changeAction.action === "delete") {
+    const handleDeleteAction = () => {
         success("Removed date from Dynalist!");
         return existingNodes.filter((c) => c.content !== today);
-    } else {
+    };
+
+    const handleInsertAction = () => {
         success("Added date to Dynalist!");
         const newNode: DynalistNode = {
             id: result.new_node_ids?.[0] || "temp-id",
@@ -116,5 +123,7 @@ export async function handleDynalistTrackingClick(
             children: [],
         };
         return [...existingNodes, newNode];
-    }
+    };
+
+    return changeAction.action === "delete" ? handleDeleteAction() : handleInsertAction();
 }
