@@ -16,8 +16,7 @@ export function refreshData(): Promise<
 > {
     const api = initializeApi(get(todoistAccessToken));
     if (!todoistAccessToken || !api) {
-        const error = new TodoistRequestError("No access token found.");
-        return Promise.resolve({ status: "error", error });
+        return Promise.resolve(handleApiError("No access token found."));
     }
 
     return Promise.all([
@@ -39,8 +38,5 @@ export function refreshData(): Promise<
             success("Todoist data updated!");
             return { status: "success", data: todoistDataObj } as const;
         })
-        .catch((err) => {
-            const error = handleApiError(err);
-            return { status: "error", error } as const;
-        });
+        .catch(handleApiError);
 }

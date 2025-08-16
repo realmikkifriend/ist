@@ -15,22 +15,23 @@ export function initializeApi(accessToken: string): TodoistApi | null {
 }
 
 /**
- * Handles errors returned by the API.
+ * Handles errors returned by the API and formats them for consistent error responses.
  * @param {unknown} err - Error to be handled.
- * @returns {TodoistRequestError} - Formatted error.
+ * @returns {{ status: "error"; error: TodoistRequestError }} - Formatted error object.
  */
-export function handleApiError(err: unknown): TodoistRequestError {
-    console.error("Error during API operation:", err);
+export function handleApiError(err: unknown): { status: "error"; error: TodoistRequestError } {
+    console.error("Error during API operation:", err); 
+
     if (err instanceof TodoistRequestError) {
-        return err;
+        return { status: "error", error: err };
     }
     if (err instanceof Error) {
-        return new TodoistRequestError(err.message);
+        return { status: "error", error: new TodoistRequestError(err.message) };
     }
     if (typeof err === "string") {
-        return new TodoistRequestError(err);
+        return { status: "error", error: new TodoistRequestError(err) };
     }
-    return new TodoistRequestError("An unknown error occurred");
+    return { status: "error", error: new TodoistRequestError("An unknown error occurred") };
 }
 
 /**

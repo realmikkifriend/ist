@@ -2,7 +2,7 @@ import { get } from "svelte/store";
 import { TodoistRequestError } from "@doist/todoist-api-typescript";
 import { todoistAccessToken } from "../stores/secret";
 import { formatTaskDate } from "../utils/timeUtils";
-import { initializeApi } from "../utils/apiUtils";
+import { initializeApi, handleApiError } from "../utils/apiUtils";
 import type { DateTime } from "luxon";
 import type { UpdateTaskArgs } from "@doist/todoist-api-typescript";
 import type { Task } from "../types/todoist";
@@ -14,32 +14,16 @@ import type { Task } from "../types/todoist";
  */
 export function markTaskDone(
     taskID: string,
-): Promise<{ status: "success" } | { status: "error"; error: TodoistRequestError | string }> {
+): Promise<{ status: "success" } | { status: "error"; error: TodoistRequestError }> {
     const api = initializeApi(get(todoistAccessToken));
     if (!api) {
-        return Promise.resolve({
-            status: "error",
-            error: new TodoistRequestError("No access token found."),
-        });
+        return Promise.resolve(handleApiError("No access token found."));
     }
 
     return api
         .closeTask(taskID)
-        .then(() => {
-            return { status: "success" } as const;
-        })
-        .catch((error: unknown) => {
-            if (error instanceof TodoistRequestError) {
-                return { status: "error", error };
-            }
-            if (error instanceof Error) {
-                return { status: "error", error: new TodoistRequestError(error.message) };
-            }
-            if (typeof error === "string") {
-                return { status: "error", error: new TodoistRequestError(error) };
-            }
-            return { status: "error", error: new TodoistRequestError("Unknown error") };
-        });
+        .then(() => ({ status: "success" }) as const)
+        .catch(handleApiError);
 }
 
 /**
@@ -49,12 +33,10 @@ export function markTaskDone(
  */
 export function deferTasks(
     taskTimePairs: [Task, DateTime][],
-): Promise<({ status: "success" } | { status: "error"; error: TodoistRequestError | string })[]> {
+): Promise<({ status: "success" } | { status: "error"; error: TodoistRequestError })[]> {
     const api = initializeApi(get(todoistAccessToken));
     if (!api) {
-        return Promise.resolve([
-            { status: "error", error: new TodoistRequestError("No access token found.") },
-        ]);
+        return Promise.resolve([handleApiError("No access token found.")]);
     }
 
     const updatePromises = taskTimePairs.map(([task, time]) => {
@@ -70,21 +52,7 @@ export function deferTasks(
         return api
             .updateTask(task.id, updateObj as UpdateTaskArgs)
             .then(() => ({ status: "success" }) as const)
-            .catch((error: unknown): { status: "error"; error: TodoistRequestError | string } => {
-                if (error instanceof TodoistRequestError) {
-                    return { status: "error", error };
-                }
-                if (error instanceof Error) {
-                    return {
-                        status: "error",
-                        error: new TodoistRequestError(error.message),
-                    };
-                }
-                if (typeof error === "string") {
-                    return { status: "error", error: new TodoistRequestError(error) };
-                }
-                return { status: "error", error: new TodoistRequestError("Unknown error") };
-            });
+            .catch(handleApiError);
     });
 
     return Promise.all(updatePromises);
