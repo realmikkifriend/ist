@@ -1,6 +1,7 @@
 import { DateTime } from "luxon";
-import type { Task, TodoistData } from "../types/todoist";
-import type { AgendaData } from "../types/agenda";
+import type { Task, TodoistData, Context } from "../types/todoist";
+import { filterAndSortTasks } from "../utils/filterUtils";
+import { compareByPriority } from "../utils/comparisonUtils";
 
 /**
  * Get all tasks for a specific date.
@@ -28,27 +29,82 @@ export const getTasksForDate = (date: DateTime, todoistData: TodoistData): Task[
  * @param {Task[]} tasks - The tasks to sort.
  * @returns {AgendaData} Sorted and grouped tasks.
  */
-export const sortAgendaTasks = (tasks: Task[]): AgendaData => {
-    return tasks
-        .sort((a, b) => {
-            const timeA = DateTime.fromISO(a.due?.date ?? "").toMillis();
-            const timeB = DateTime.fromISO(b.due?.date ?? "").toMillis();
-            if (timeA === timeB) {
-                return (b.priority || 0) - (a.priority || 0);
-            }
-            return timeA - timeB;
-        })
-        .reduce<AgendaData>(
-            (acc, task) => {
-                if (task.due?.date && task.due.date.includes("T")) {
-                    acc.tasks.push(task);
-                } else {
-                    acc.tasksWithNoTime.push(task);
-                }
-                return acc;
-            },
-            { tasksWithNoTime: [], tasks: [], todayTasks: [], tasksForDate: [] },
-        );
+export const sortAgendaTasks = (tasks: Task[]): { tasksWithNoTime: Task[]; tasks: Task[] } => {
+    const sorted = tasks.sort((a, b) => {
+        const timeA = DateTime.fromISO(a.due?.date ?? "").toMillis();
+        const timeB = DateTime.fromISO(b.due?.date ?? "").toMillis();
+
+        if (timeA === timeB) {
+            return compareByPriority(a, b);
+        }
+        return timeA - timeB;
+    });
+
+    const tasksWithTime = sorted.filter((task) => task.due?.date && task.due.date.includes("T"));
+    const tasksWithNoTime = sorted.filter(
+        (task) => !task.due?.date || !task.due.date.includes("T"),
+    );
+
+    return { tasksWithNoTime, tasks: tasksWithTime };
+};
+
+/**
+ * Determines the target date based on the current window hash.
+ * @param {DateTime} now - Current date-time object.
+ * @returns {DateTime | null} The target date or null if no specific date is targeted.
+ */
+export const getTargetDate = (now: DateTime): DateTime | null => {
+    if (window.location.hash === "#today") {
+        return now;
+    }
+    if (window.location.hash === "#tomorrow") {
+        return now.plus({ days: 1 });
+    }
+    return null;
+};
+
+/**
+ * Retrieves and sorts tasks for a given date.
+ * @param {DateTime | null} targetDate - The date to get tasks for.
+ * @param {TodoistData} currentData - The current Todoist data.
+ * @returns An object containing sorted tasks.
+ */
+export const getSortedTasksForDate = (
+    targetDate: DateTime | null,
+    currentData: TodoistData,
+): { tasksWithNoTime: Task[]; tasks: Task[] } => {
+    if (targetDate) {
+        const tasksForDate = getTasksForDate(targetDate, currentData);
+        return sortAgendaTasks(tasksForDate);
+    }
+    return { tasksWithNoTime: [], tasks: [] };
+};
+
+/**
+ * Filters and sorts tasks with no time.
+ * @param {Task[]} tasksNoTime - Tasks without a specific time.
+ * @param {Context[]} contexts - User contexts for filtering.
+ * @returns {Task[]} Filtered and sorted tasks.
+ */
+export const getFilteredTasksWithNoTime = (tasksNoTime: Task[], contexts: Context[]): Task[] => {
+    return tasksNoTime.length > 2 ? filterAndSortTasks(tasksNoTime, contexts) : tasksNoTime;
+};
+
+/**
+ * Computes today's tasks for the agenda, specifically when viewing tomorrow's agenda.
+ * @param {{ tasksWithNoTime: Task[]; tasks: Task[] }} tasksForTomorrow - Sorted tasks for tomorrow.
+ * @param { Task[] } tasksForTomorrow.tasksWithNoTime - The tasks with no set time.
+ * @param { Task[] } tasksForTomorrow.tasks - The other tasks.
+ * @returns {Task[]} Tasks filtered by day.
+ */
+export const getTodayTasksForAgenda = (tasksForTomorrow: {
+    tasksWithNoTime: Task[];
+    tasks: Task[];
+}): Task[] => {
+    if (window.location.hash === "#tomorrow") {
+        return [...tasksForTomorrow.tasksWithNoTime, ...tasksForTomorrow.tasks];
+    }
+    return [];
 };
 
 const getPositionForFirstTask = (taskDateTime: DateTime): number => {

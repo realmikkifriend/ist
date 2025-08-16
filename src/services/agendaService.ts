@@ -2,8 +2,14 @@ import { get } from "svelte/store";
 import { DateTime } from "luxon";
 import { todoistData, firstDueTask } from "../stores/stores";
 import { getGradientColor } from "../utils/styleUtils";
-import { getTasksForDate, sortAgendaTasks } from "../utils/agendaUtils";
-import { filterAndSortTasks } from "../utils/filterUtils";
+import {
+    getTasksForDate,
+    sortAgendaTasks,
+    getTargetDate,
+    getSortedTasksForDate,
+    getFilteredTasksWithNoTime,
+    getTodayTasksForAgenda,
+} from "../utils/agendaUtils";
 import type { Task } from "../types/todoist";
 import type { AgendaData } from "../types/agenda";
 
@@ -102,17 +108,29 @@ export const getTitle = (): string => {
 };
 
 /**
+ * Gets the total tasks for the agenda, considering the current hash.
+ * @param {AgendaData} agendaData - Information on tasks for calculations.
+ * @param {string} currentHash - The agenda page being displayed.
+ * @returns The total number of tasks.
+ */
+function getAdditionalTasksForHash(agendaData: AgendaData, currentHash: string): number {
+    return currentHash === "#tomorrow" ? agendaData.todayTasks?.length || 0 : 0;
+}
+function getTotalAgendaTasks(agendaData: AgendaData, currentHash: string): number {
+    const baseTotal = (agendaData.tasks?.length || 0) + (agendaData.tasksWithNoTime?.length || 0);
+    const additionalTasks = getAdditionalTasksForHash(agendaData, currentHash);
+    return baseTotal + additionalTasks;
+}
+
+/**
  * Computes the header gradient color based on the number of tasks and the current hash.
  * @param {AgendaData} agendaData - Information on tasks for calculations.
  * @returns Tailwind classes of header gradient.
  */
 export function computeHeaderGradientColor(agendaData: AgendaData): string {
-    const totalTasks =
-        (agendaData.tasks?.length || 0) +
-        (agendaData.tasksWithNoTime?.length || 0) +
-        (window.location.hash === "#tomorrow" ? agendaData.todayTasks?.length || 0 : 0);
-
-    return getGradientColor(totalTasks, window.location.hash ?? "") ?? "";
+    const currentHash = window.location.hash;
+    const totalTasks = getTotalAgendaTasks(agendaData, currentHash);
+    return getGradientColor(totalTasks, currentHash ?? "") ?? "";
 }
 
 /**
@@ -123,37 +141,24 @@ export const updateAgenda = (): AgendaData => {
     const currentData = get(todoistData);
     const now = DateTime.now();
 
-    const targetDate =
-        window.location.hash === "#today"
-            ? now
-            : window.location.hash === "#tomorrow"
-              ? now.plus({ days: 1 })
-              : null;
-
-    const tasksForDate: Task[] = targetDate ? getTasksForDate(targetDate, currentData) : [];
-    const sortedTasks = targetDate
-        ? sortAgendaTasks(tasksForDate)
-        : { tasksWithNoTime: [], tasks: [] };
+    const targetDate = getTargetDate(now);
+    const sortedTasks = getSortedTasksForDate(targetDate, currentData);
 
     const tasksForTomorrow =
         window.location.hash === "#tomorrow"
             ? sortAgendaTasks(getTasksForDate(now, currentData))
             : { tasksWithNoTime: [], tasks: [] };
 
-    const tasksWithNoTime: Task[] =
-        sortedTasks.tasksWithNoTime.length > 2
-            ? filterAndSortTasks(sortedTasks.tasksWithNoTime, currentData.contexts)
-            : sortedTasks.tasksWithNoTime;
-
-    const tasks: Task[] = sortedTasks.tasks;
-    const todayTasks: Task[] =
-        window.location.hash === "#tomorrow"
-            ? [...tasksForTomorrow.tasksWithNoTime, ...tasksForTomorrow.tasks]
-            : [];
+    const tasksWithNoTime = getFilteredTasksWithNoTime(
+        sortedTasks.tasksWithNoTime,
+        currentData.contexts,
+    );
+    const tasks = sortedTasks.tasks;
+    const todayTasks = getTodayTasksForAgenda(tasksForTomorrow);
 
     const newAgendaData: AgendaData = {
         tasks,
-        tasksForDate: tasksForDate,
+        tasksForDate: targetDate ? getTasksForDate(targetDate, currentData) : [],
         tasksWithNoTime,
         todayTasks,
     };

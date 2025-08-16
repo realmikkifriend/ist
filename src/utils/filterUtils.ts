@@ -1,6 +1,7 @@
 import { DateTime } from "luxon";
 import { getTaskTime } from "./timeUtils";
 import { compareTasks } from "./comparisonUtils";
+import type { GetProjectsResponse } from "@doist/todoist-api-typescript";
 import type { Task, Context, DueTasksData, TasksGroupedByContext } from "../types/todoist";
 
 /**
@@ -149,4 +150,19 @@ export function getTasksInTimeRange(
         const isBeforeNext = nextTime ? dueDateTime.toMillis() < nextTime.toMillis() : true;
         return isAfterCurrent && isBeforeNext;
     });
+}
+
+/**
+ * Filters contexts from GetProjectsResponse.
+ * @param {GetProjectsResponse} projects - Projects retrieved from API.
+ * @returns {Context[]} Filtered contexts.
+ */
+export function filterContexts(projects: GetProjectsResponse): Context[] {
+    return (projects.results || []).filter(
+        (context): context is Context =>
+            !!context &&
+            typeof context === "object" &&
+            "inboxProject" in context &&
+            "parentId" in context,
+    );
 }

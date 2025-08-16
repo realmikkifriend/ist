@@ -24,6 +24,25 @@ export const shouldShowNewTaskToast = (
 };
 
 /**
+ * Get the context name from provided data.
+ * @param {TodoistData | null | undefined} todoistDataValue - The value of the todoistData store.
+ * @param {Task | null} firstDueTaskValue - The value of the firstDueTask store.
+ * @returns - The context name, or an empty string if not found.
+ */
+function findContextNameFromTodoistData(
+    todoistDataValue: TodoistData | null | undefined,
+    firstDueTaskValue: Task | null,
+): string | null {
+    if (todoistDataValue?.contexts && firstDueTaskValue?.contextId) {
+        const context = todoistDataValue.contexts.find((c) => c.id === firstDueTaskValue.contextId);
+        if (context && typeof context.name === "string") {
+            return context.name;
+        }
+    }
+    return null;
+}
+
+/**
  * Get the name of the current context, either from user settings or from the first due task's context.
  * @param {TodoistData | null | undefined} todoistDataValue - The value of the todoistData store.
  * @param {UserSettings | null | undefined} userSettingsValue - The value of the userSettings store.
@@ -38,12 +57,16 @@ export function getSelectedContextName(
     if (userSettingsValue?.selectedContext?.name) {
         return userSettingsValue.selectedContext.name;
     }
-    if (todoistDataValue?.contexts) {
-        const context = todoistDataValue.contexts.find(
-            (c) => c.id === firstDueTaskValue?.contextId,
-        );
-        if (context && typeof context.name === "string") return context.name;
+
+    const contextNameFromTodoist = findContextNameFromTodoistData(
+        todoistDataValue,
+        firstDueTaskValue,
+    );
+
+    if (contextNameFromTodoist) {
+        return contextNameFromTodoist;
     }
+
     return "";
 }
 
