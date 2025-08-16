@@ -123,8 +123,11 @@ export function setupTomorrowButton(buttons: DateButtonConfig[], task: Task): vo
     const result = createDateWithTime(task.due?.string ?? "", tomorrowDate);
 
     if (result.newDate === null) {
-        buttons[0].text = "";
-        buttons[0].ms = 0;
+        const tomorrowSixAM = tomorrowDate.set({ hour: 6, minute: 0, second: 0, millisecond: 0 });
+        const tomorrowInMS = tomorrowSixAM.diff(now).milliseconds;
+
+        buttons[0].text = `tomorrow 6 AM`;
+        buttons[0].ms = tomorrowInMS;
     } else {
         const tomorrowInMS = result.newDate.diff(now).milliseconds;
         buttons[0].text = `tomorrow ${result.extractedTime}`;
