@@ -23,6 +23,23 @@
     });
 
     /**
+     * Extracts the access token from a JSON object.
+     * @param json - The JSON object to extract the token from.
+     * @returns The access token, or undefined if it's not found or invalid.
+     */
+    function getAccessToken(json: unknown): string | undefined {
+        if (
+            typeof json === "object" &&
+            json !== null &&
+            "access_token" in json &&
+            typeof json.access_token === "string"
+        ) {
+            return json.access_token;
+        }
+        return undefined;
+    }
+
+    /**
      * Exchanges the authorization code for a Todoist access token and stores it.
      * @param code - The authorization code from the OAuth callback.
      */
@@ -49,12 +66,8 @@
         }
 
         const json: unknown = await response.json();
-        let accessToken: string | undefined;
-        if (typeof json === "object" && json !== null) {
-            if (typeof (json as { access_token?: unknown }).access_token === "string") {
-                accessToken = (json as { access_token: string }).access_token;
-            }
-        }
+        const accessToken = getAccessToken(json);
+
         if (accessToken) {
             todoistAccessToken.set(accessToken);
         } else {

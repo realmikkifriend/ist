@@ -101,12 +101,43 @@ export const updateFirstDueTask = async (
 };
 
 /**
+ * Determines the next set of tasks to consider based on context and current task.
+ * @param {boolean} doClearContext - Flag to clear context.
+ * @param {Task[]} currentDueTasks - All current due tasks.
+ * @param {Task | null} task - The current task.
+ * @param {Task[]} filteredByContext - Tasks filtered by the current context.
+ * @returns {Task[]} The tasks to consider for the next action.
+ */
+const determineTasksToConsider = (
+    doClearContext: boolean,
+    currentDueTasks: Task[],
+    task: Task | null,
+    filteredByContext: Task[],
+): Task[] => {
+    if (doClearContext && currentDueTasks.length > 0) {
+        return currentDueTasks;
+    }
+    if (task) {
+        return [task];
+    }
+    return filteredByContext;
+};
+
+/**
  * Helper function to get task context data.
  * @param {Task | null} task - Optional task to set as the first due task.
  * @param {TodoistData} todoistData - The current Todoist data.
  * @returns {{selectedContextId: string | null, filteredByContext: Task[], doClearContext: boolean, tasksToConsiderForNext: Task[]}} Tasks processed by context.
  */
-const getTaskContextData = (task: Task | null, todoistData: TodoistData) => {
+const getTaskContextData = (
+    task: Task | null,
+    todoistData: TodoistData,
+): {
+    selectedContextId: string | null;
+    filteredByContext: Task[];
+    doClearContext: boolean;
+    tasksToConsiderForNext: Task[];
+} => {
     const selectedContextId: string | null = get(userSettings).selectedContext?.id ?? null;
     const currentDueTasks = todoistData.dueTasks;
 
@@ -116,12 +147,12 @@ const getTaskContextData = (task: Task | null, todoistData: TodoistData) => {
 
     const doClearContext = Boolean(selectedContextId && filteredByContext.length === 0);
 
-    const tasksToConsiderForNext =
-        doClearContext && currentDueTasks.length > 0
-            ? currentDueTasks
-            : task
-              ? [task]
-              : filteredByContext;
+    const tasksToConsiderForNext = determineTasksToConsider(
+        doClearContext,
+        currentDueTasks,
+        task,
+        filteredByContext,
+    );
 
     return { selectedContextId, filteredByContext, doClearContext, tasksToConsiderForNext };
 };

@@ -56,14 +56,15 @@
     const handleClearSelectedTask = async (): Promise<void> => {
         debounceState.clearDebounceTimeout();
         const selectedContext = get(userSettings).selectedContext;
+        const summoned = $firstDueTask?.summoned;
 
-        if ($firstDueTask?.summoned) {
-            window.location.hash = $firstDueTask.summoned as string;
+        if (summoned) {
+            window.location.hash = summoned as string;
         }
 
-        if ($firstDueTask?.summoned || selectedContext) {
+        if (summoned || selectedContext) {
             if (selectedContext) {
-                clearSelectedContext();
+                changeSelectedContext(null);
                 success("No more tasks in context! Showing all due tasks...");
             }
             await updateDisplayedTask();
@@ -71,10 +72,57 @@
     };
 
     /**
-     * Clears the selected context in user settings.
+     * Changes the selected context in user settings.
+     * @param context - The context to set, or null to clear.
      */
-    const clearSelectedContext = (): void => {
-        userSettings.update((settings) => ({ ...settings, selectedContext: null }));
+    const changeSelectedContext = (context: { id: string; name: string } | null): void => {
+        userSettings.update((settings) => ({ ...settings, selectedContext: context }));
+    };
+
+    /**
+     * Sets the first due task and the previous first due task.
+     * @param task - The task to set.
+     */
+    const setTask = (task: Task | null): void => {
+        firstDueTask.set(task);
+        previousFirstDueTask.set(task);
+    };
+
+    /**
+     * Handles data updates from fetching the first due task.
+     * @param updatedTodoistData - The data to be updated.
+     * @param doClearContext - Whether to clear the selected context.
+     */
+    const handleDataUpdates = (
+        updatedTodoistData: UpdateFirstDueTaskResult["updatedTodoistData"],
+        doClearContext: boolean,
+    ): void => {
+        if (updatedTodoistData) {
+            todoistData.set(updatedTodoistData);
+        }
+
+        if (doClearContext) {
+            changeSelectedContext(null);
+        }
+    };
+
+    /**
+     * Handles displaying the task.
+     * @param task - The task to display.
+     * @param showNewTaskToast - Whether to show a new task toast.
+     */
+    const handleTaskDisplay = (task: Task | null, showNewTaskToast: boolean): void => {
+        if (!task) {
+            setTask(null);
+            return;
+        }
+
+        if (showNewTaskToast && task.id !== $firstDueTask?.id) {
+            newFirstTask((t) => setTask(t), task);
+        } else {
+            setTask(task);
+            clearToasts(undefined, "info");
+        }
     };
 
     /**
@@ -85,30 +133,8 @@
         const { task, showNewTaskToast, doClearContext, updatedTodoistData } =
             await updateFirstDueTask();
 
-        if (updatedTodoistData) {
-            todoistData.set(updatedTodoistData);
-        }
-
-        if (doClearContext) {
-            userSettings.update((settings) => ({ ...settings, selectedContext: null }));
-        }
-
-        if (task) {
-            if (showNewTaskToast && task?.id !== $firstDueTask?.id) {
-                newFirstTask((t) => {
-                    firstDueTask.set(t);
-                    previousFirstDueTask.set(t);
-                }, task);
-            } else {
-                firstDueTask.set(task);
-                previousFirstDueTask.set(task);
-
-                clearToasts(undefined, "info");
-            }
-        } else {
-            firstDueTask.set(null);
-            previousFirstDueTask.set(null);
-        }
+        handleDataUpdates(updatedTodoistData, doClearContext);
+        handleTaskDisplay(task, showNewTaskToast);
     };
 
     /**
@@ -121,7 +147,7 @@
 
         previousFirstDueTask.set(null);
         const isCurrentlySelected = $userSettings.selectedContext?.id === contextId;
-        let newSelectedContext = isCurrentlySelected
+        const newSelectedContext = isCurrentlySelected
             ? null
             : contextId
               ? {
@@ -130,10 +156,7 @@
                 }
               : null;
 
-        userSettings.update((settings) => ({
-            ...settings,
-            selectedContext: newSelectedContext,
-        }));
+        changeSelectedContext(newSelectedContext);
     }
 
     /**
@@ -153,6 +176,30 @@
     };
 
     /**
+     * Performs the summon action for a task.
+     * @param task - The task to summon.
+     * @param enableSkip - Whether to enable skip.
+     * @returns The result of updating the first due task.
+     */
+    async function performSummon(
+        task: Task & { firstDue?: boolean; skip?: boolean; summoned?: string | boolean },
+        enableSkip: boolean,
+    ): Promise<UpdateFirstDueTaskResult> {
+        debounceState.clearDebounceTimeout();
+        if (enableSkip) {
+            task.skip = true;
+        }
+        const currentFirstDueSummoned = get(firstDueTask)?.summoned;
+
+        task.summoned = currentFirstDueSummoned || window.location.hash;
+
+        const result = await updateFirstDueTask(task);
+        firstDueTask.set(result.task);
+        previousFirstDueTask.set(result.task);
+        return result;
+    }
+
+    /**
      * Summon a task as the first due task.
      * @param task - The task to summon.
      * @param enableSkip - Whether to enable skip. Defaults to false.
@@ -163,18 +210,7 @@
         enableSkip: boolean = false,
     ): Promise<UpdateFirstDueTaskResult> {
         if (!task.firstDue || enableSkip) {
-            debounceState.clearDebounceTimeout();
-            if (enableSkip) {
-                task.skip = true;
-            }
-            const currentFirstDueSummoned = get(firstDueTask)?.summoned;
-
-            task.summoned = currentFirstDueSummoned || window.location.hash;
-
-            const result = await updateFirstDueTask(task);
-            firstDueTask.set(result.task);
-            previousFirstDueTask.set(result.task);
-            return result;
+            return performSummon(task, enableSkip);
         }
         return {
             task: get(firstDueTask),

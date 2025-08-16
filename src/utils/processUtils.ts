@@ -1,4 +1,10 @@
-import type { Context, User, CleanableTodoistData, Task } from "../types/todoist";
+import {
+    CONTEXT_PROPS_TO_REMOVE,
+    TASK_PROPS_TO_REMOVE,
+    TASK_RENAME_MAP,
+    USER_PROPS_TO_REMOVE,
+} from "./dataCleaningConstants";
+import type { CleanableTodoistData, Context, Task, User } from "../types/todoist";
 
 /**
  * Removes specified properties from each object in the array and optionally renames properties.
@@ -36,105 +42,22 @@ function cleanDataArray<T extends object>(
  */
 export function cleanTodoistData(data: CleanableTodoistData): CleanableTodoistData {
     if (data.tasks) {
-        const taskPropsToRemove = [
-            "userId",
-            "sectionId",
-            "parentId",
-            "addedByUid",
-            "assignedByUid",
-            "responsibleUid",
-            "deadline",
-            "checked",
-            "description",
-            "isDeleted",
-            "addedAt",
-            "completedAt",
-            "updatedAt",
-            "noteCount",
-            "isCollapsed",
-            "dayOrder",
-            "projectId",
-        ];
-        const taskRenameMap = {
-            projectId: "contextId",
-        };
         data.tasks = cleanDataArray(
             data.tasks,
-            taskPropsToRemove,
-            taskRenameMap,
+            TASK_PROPS_TO_REMOVE,
+            TASK_RENAME_MAP,
         ) as unknown as Task[];
     }
 
     if (data.contexts) {
-        const contextPropsToRemove = [
-            "canAssignTasks",
-            "createdAt",
-            "isArchived",
-            "isDeleted",
-            "isFavorite",
-            "isFrozen",
-            "updatedAt",
-            "viewStyle",
-            "defaultOrder",
-            "description",
-            "isCollapsed",
-            "isShared",
-            "parentId",
-        ];
-        data.contexts = cleanDataArray(data.contexts, contextPropsToRemove) as unknown as Context[];
+        data.contexts = cleanDataArray(
+            data.contexts,
+            CONTEXT_PROPS_TO_REMOVE,
+        ) as unknown as Context[];
     }
 
     if (data.user) {
-        const userPropsToRemove = [
-            "activated_user",
-            "auto_reminder",
-            "avatar_big",
-            "avatar_medium",
-            "avatar_s640",
-            "avatar_small",
-            "business_account_id",
-            "completed_count",
-            "date_format",
-            "deleted_at",
-            "feature_identifier",
-            "features",
-            "has_magic_number",
-            "has_password",
-            "has_started_a_trial",
-            "image_id",
-            "id",
-            "inbox_project_id",
-            "is_celebrations_enabled",
-            "is_deleted",
-            "is_premium",
-            "joinable_workspace",
-            "joined_at",
-            "karma",
-            "karma_trend",
-            "lang",
-            "mfa_enabled",
-            "onboarding_level",
-            "onboarding_persona",
-            "onboarding_role",
-            "onboarding_started",
-            "onboarding_team_mode",
-            "onboarding_use_cases",
-            "premium_status",
-            "premium_until",
-            "shard_id",
-            "share_limit",
-            "sort_order",
-            "start_day",
-            "start_page",
-            "theme_id",
-            "time_format",
-            "unique_prefix",
-            "verification_status",
-            "websocket_url",
-            "weekend_start_day",
-        ];
-
-        data.user = cleanDataArray([data.user], userPropsToRemove)[0] as unknown as User;
+        data.user = cleanDataArray([data.user], USER_PROPS_TO_REMOVE)[0] as unknown as User;
     }
 
     return data;
