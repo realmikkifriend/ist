@@ -1,29 +1,8 @@
 import { DateTime } from "luxon";
-import { filterAndSortTasks } from "../utils/filterUtils";
+import { filterAndSortTasks, getTasksInTimeRange } from "../utils/filterUtils";
 import { compareByPriority } from "../utils/comparisonUtils";
 import type { Task, TodoistData, Context } from "../types/todoist";
 import type { AgendaData } from "../types/agenda";
-
-/**
- * Get all tasks for a specific date.
- * @param {DateTime} date - The date to filter tasks for.
- * @param {TodoistData} todoistData - The Todoist data containing tasks.
- * @returns {Task[]} Array of tasks for the given date.
- */
-export const getTasksForDate = (date: DateTime, todoistData: TodoistData): Task[] => {
-    const startOfDay = date.startOf("day");
-    const endOfDay = date.plus({ days: 1 }).startOf("day");
-
-    return todoistData.tasks.filter((task: Task) => {
-        if (!task.due) return false;
-        const taskDate = DateTime.fromISO(task.due.date);
-        return (
-            task.due &&
-            taskDate.toMillis() >= startOfDay.toMillis() &&
-            taskDate.toMillis() < endOfDay.toMillis()
-        );
-    });
-};
 
 /**
  * Sort agenda tasks by due date and priority, and group by time presence.
@@ -75,7 +54,9 @@ export const getSortedTasksForDate = (
     currentData: TodoistData,
 ): { tasksWithNoTime: Task[]; tasks: Task[] } => {
     if (targetDate) {
-        const tasksForDate = getTasksForDate(targetDate, currentData);
+        const startOfDay = targetDate.startOf("day");
+        const endOfDay = targetDate.plus({ days: 1 }).startOf("day");
+        const tasksForDate = getTasksInTimeRange(currentData.tasks, startOfDay, endOfDay);
         return sortAgendaTasks(tasksForDate);
     }
     return { tasksWithNoTime: [], tasks: [] };

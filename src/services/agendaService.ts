@@ -2,13 +2,13 @@ import { get } from "svelte/store";
 import { DateTime } from "luxon";
 import { todoistData } from "../stores/stores";
 import {
-    getTasksForDate,
     sortAgendaTasks,
     getTargetDate,
     getSortedTasksForDate,
     getFilteredTasksWithNoTime,
     getTodayTasksForAgenda,
 } from "../utils/agendaUtils";
+import { getTasksInTimeRange } from "../utils/filterUtils";
 import type { AgendaData } from "../types/agenda";
 
 /**
@@ -55,7 +55,9 @@ export const updateAgenda = (): AgendaData => {
 
     const tasksForTomorrow =
         window.location.hash === "#tomorrow"
-            ? sortAgendaTasks(getTasksForDate(now, currentData))
+            ? sortAgendaTasks(
+                  getTasksInTimeRange(currentData.tasks, now.startOf("day"), now.endOf("day")),
+              )
             : { tasksWithNoTime: [], tasks: [] };
 
     const tasksWithNoTime = getFilteredTasksWithNoTime(
@@ -67,7 +69,13 @@ export const updateAgenda = (): AgendaData => {
 
     const newAgendaData: AgendaData = {
         tasks,
-        tasksForDate: targetDate ? getTasksForDate(targetDate, currentData) : [],
+        tasksForDate: targetDate
+            ? getTasksInTimeRange(
+                  currentData.tasks,
+                  targetDate.startOf("day"),
+                  targetDate.endOf("day"),
+              )
+            : [],
         tasksWithNoTime,
         todayTasks,
     };
