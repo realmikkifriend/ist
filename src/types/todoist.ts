@@ -114,6 +114,7 @@ export interface TasksGroupedByContext {
 export interface ContextButtonProps {
     context: Context;
     tasksForContext: TasksGroupedByContext[string];
+    isDisabled?: boolean;
 }
 
 export interface DueTasksData {

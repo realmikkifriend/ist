@@ -3,17 +3,19 @@
     import ListTask from "../task/ListTask.svelte";
     import type { Priority, ContextButtonProps } from "../../types/todoist";
 
-    let { context, tasksForContext }: ContextButtonProps = $props();
+    let { context, tasksForContext, isDisabled }: ContextButtonProps = $props();
 </script>
 
-<div class="tooltip-content w-70 text-left">
-    {tasksForContext.total} tasks due in this context:
-    <div class="my-2 space-y-1">
-        {#each tasksForContext.tasks as task (task.id)}
-            <ListTask {task} />
-        {/each}
+{#if !isDisabled}
+    <div class="tooltip-content w-70 text-left">
+        {tasksForContext.total} tasks due in this context:
+        <div class="my-2 space-y-1">
+            {#each tasksForContext.tasks as task (task.id)}
+                <ListTask {task} />
+            {/each}
+        </div>
     </div>
-</div>
+{/if}
 
 <div class="gap-0 px-2 py-1">
     <p class="cursor-pointer text-left text-lg font-bold">{context.name}</p>

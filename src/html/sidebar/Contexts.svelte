@@ -61,7 +61,14 @@
                 tabindex={index + 1}
                 type="button"
             >
-                <ContextButtonContents {context} tasksForContext={dueTasksByContext[context.id]} />
+                <ContextButtonContents
+                    {context}
+                    isDisabled={Boolean(
+                        $userSettings.selectedContext &&
+                            $userSettings.selectedContext.id !== context.id,
+                    )}
+                    tasksForContext={dueTasksByContext[context.id]}
+                />
             </button>
         {/if}
     {/each}
