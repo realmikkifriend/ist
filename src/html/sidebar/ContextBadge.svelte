@@ -31,14 +31,14 @@
     }}
     type="reset"
 >
-    {#if dueTaskCount === 0}
-        loading...
-    {:else if $firstDueTask?.skip}
+    {#if $firstDueTask?.skip}
         low priority, defer?
         <kbd>x</kbd>
     {:else if $firstDueTask?.summoned}
         summoned task
         <kbd>x</kbd>
+    {:else if dueTaskCount === 0}
+        loading...
     {:else}
         {dueTaskCount} left in {getSelectedContextName($todoistData, $userSettings, $firstDueTask)}
     {/if}
