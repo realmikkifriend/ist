@@ -31,7 +31,9 @@
     }}
     type="reset"
 >
-    {#if $firstDueTask?.skip}
+    {#if dueTaskCount === 0}
+        loading...
+    {:else if $firstDueTask?.skip}
         low priority, defer?
         <kbd>x</kbd>
     {:else if $firstDueTask?.summoned}
