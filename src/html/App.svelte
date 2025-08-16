@@ -82,14 +82,14 @@
      * @returns Promise that resolves when the task is updated.
      */
     const updateDisplayedTask = async (): Promise<void> => {
-        const { task, showNewTaskToast, contextCleared, updatedTodoistData } =
+        const { task, showNewTaskToast, doClearContext, updatedTodoistData } =
             await updateFirstDueTask();
 
         if (updatedTodoistData) {
             todoistData.set(updatedTodoistData);
         }
 
-        if (contextCleared) {
+        if (doClearContext) {
             userSettings.update((settings) => ({ ...settings, selectedContext: null }));
         }
 
@@ -179,7 +179,7 @@
         return {
             task: get(firstDueTask),
             showNewTaskToast: false,
-            contextCleared: false,
+            doClearContext: false,
             dueTasks: get(todoistData).dueTasks,
         };
     }

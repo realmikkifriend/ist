@@ -138,7 +138,7 @@ export interface ListTaskProps {
 export interface UpdateFirstDueTaskResult {
     task: Task | null;
     showNewTaskToast: boolean;
-    contextCleared: boolean;
+    doClearContext: boolean;
     dueTasks: Task[];
     updatedTodoistData?: TodoistData;
 }

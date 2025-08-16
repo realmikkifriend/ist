@@ -24,7 +24,7 @@ export { debounceState };
 /**
  * Skip the current task and summon the next one.
  * @param {Task} task - The task to skip.
- * @returns {Promise<{task: Task | null, showNewTaskToast: boolean, contextCleared: boolean}>} The next task and related flags.
+ * @returns {Promise<{task: Task | null, showNewTaskToast: boolean, doClearContext: boolean}>} The next task and related flags.
  */
 export const skipTask = (task: Task): Promise<UpdateFirstDueTaskResult> => {
     const $todoistData: TodoistData = get(todoistData);
@@ -40,14 +40,14 @@ export const skipTask = (task: Task): Promise<UpdateFirstDueTaskResult> => {
         return Promise.resolve({
             task: reverseTasks[nextIndex],
             showNewTaskToast: false,
-            contextCleared: false,
+            doClearContext: false,
             dueTasks: get(todoistData).dueTasks,
         });
     }
     return Promise.resolve({
         task: null,
         showNewTaskToast: false,
-        contextCleared: false,
+        doClearContext: false,
         dueTasks: get(todoistData).dueTasks,
     });
 };
@@ -73,18 +73,18 @@ export const updateFirstDueTask = async (
         return {
             task: initialCheckResult.taskToSet ?? null,
             showNewTaskToast: initialCheckResult.showNewTaskToast ?? false,
-            contextCleared: false,
+            doClearContext: false,
             dueTasks: $todoistData.dueTasks,
         };
     }
 
-    const { selectedContextId, filteredByContext, contextWasCleared, tasksToConsiderForNext } =
+    const { selectedContextId, filteredByContext, doClearContext, tasksToConsiderForNext } =
         getTaskContextData(task, $todoistData);
 
     const { task: newTask, showNewTaskToast } = await processDueTaskUpdate(
         tasksToConsiderForNext,
         prevTask,
-        contextWasCleared ? null : selectedContextId,
+        doClearContext ? null : selectedContextId,
         initialCheckResult.taskToSet,
     );
 
@@ -95,7 +95,7 @@ export const updateFirstDueTask = async (
     return {
         task: newTask,
         showNewTaskToast,
-        contextCleared: contextWasCleared,
+        doClearContext: doClearContext,
         dueTasks: filteredByContext,
     };
 };
@@ -104,7 +104,7 @@ export const updateFirstDueTask = async (
  * Helper function to get task context data.
  * @param {Task | null} task - Optional task to set as the first due task.
  * @param {TodoistData} todoistData - The current Todoist data.
- * @returns {{selectedContextId: string | null, filteredByContext: Task[], contextWasCleared: boolean, tasksToConsiderForNext: Task[]}} Tasks processed by context.
+ * @returns {{selectedContextId: string | null, filteredByContext: Task[], doClearContext: boolean, tasksToConsiderForNext: Task[]}} Tasks processed by context.
  */
 const getTaskContextData = (task: Task | null, todoistData: TodoistData) => {
     const selectedContextId: string | null = get(userSettings).selectedContext?.id ?? null;
@@ -114,16 +114,16 @@ const getTaskContextData = (task: Task | null, todoistData: TodoistData) => {
         ? currentDueTasks.filter((t) => t.contextId === selectedContextId)
         : currentDueTasks;
 
-    const contextWasCleared = Boolean(selectedContextId && filteredByContext.length === 0);
+    const doClearContext = Boolean(selectedContextId && filteredByContext.length === 0);
 
     const tasksToConsiderForNext =
-        contextWasCleared && currentDueTasks.length > 0
+        doClearContext && currentDueTasks.length > 0
             ? currentDueTasks
             : task
               ? [task]
               : filteredByContext;
 
-    return { selectedContextId, filteredByContext, contextWasCleared, tasksToConsiderForNext };
+    return { selectedContextId, filteredByContext, doClearContext, tasksToConsiderForNext };
 };
 
 /**
