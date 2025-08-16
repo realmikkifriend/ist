@@ -1,6 +1,6 @@
 import { DateTime } from "luxon";
-import { createButtons, setupTomorrowButton, formatButtonTime } from "../utils/deferTimeUtils";
-import { getSoonTasks, getTasksInTimeRange } from "../utils/filterUtils";
+import { createButtons, setupTomorrowButton, formatButtonTime } from "./deferTimeUtils";
+import { getSoonTasks, getTasksInTimeRange } from "./filterUtils";
 import type { Task, Priority } from "../types/todoist";
 import type { DateButtonConfig } from "../types/defer";
 

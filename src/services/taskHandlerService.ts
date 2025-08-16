@@ -1,46 +1,6 @@
 import { DateTime } from "luxon";
 import { markTaskDone, deferTasks } from "../services/apiService";
-import type { Task, TodoistData, TaskUpdates } from "../types/todoist";
-import { getDueTasks } from "../utils/filterUtils";
-
-/**
- * Calculates the updated TodoistData based on the provided task updates.
- * @param {TodoistData} currentResources - The current TodoistData from the store.
- * @param {TaskUpdates} taskUpdates - Task updates as an array of [taskID, newDueDate] tuples. NewDueDate can be a Date, DateTime, or string.
- * @param {string[]} removedTaskIds - IDs of tasks to be removed.
- * @returns {TodoistData} - The updated TodoistData.
- */
-export function calculateUpdatedTaskResources(
-    currentResources: TodoistData,
-    taskUpdates: TaskUpdates,
-    removedTaskIds: string[] = [],
-): TodoistData {
-    const updatedTasks = currentResources.tasks
-        .filter((task) => !removedTaskIds.includes(task.id))
-        .map((task) => {
-            const updatedDueDate = taskUpdates.find(([taskId]) => taskId === task.id)?.[1];
-            if (updatedDueDate) {
-                const newDueDate =
-                    updatedDueDate instanceof DateTime
-                        ? updatedDueDate
-                        : updatedDueDate instanceof Date
-                          ? DateTime.fromJSDate(updatedDueDate)
-                          : DateTime.fromISO(updatedDueDate);
-
-                if (newDueDate.startOf("day") > DateTime.now().startOf("day")) {
-                    return null; // Task is deferred beyond today, remove it from active tasks
-                }
-                return { ...task, due: { ...task.due, date: newDueDate.toISO()! } };
-            }
-            return task;
-        })
-        .filter((task) => task !== null) as Task[];
-
-    const updatedTodoistData = { ...currentResources, tasks: updatedTasks };
-    const newDueTasks = getDueTasks(updatedTodoistData);
-
-    return { ...updatedTodoistData, dueTasks: newDueTasks };
-}
+import type { Task, TaskUpdates } from "../types/todoist";
 
 /**
  * Marks a task as done and returns the updates needed for the store.

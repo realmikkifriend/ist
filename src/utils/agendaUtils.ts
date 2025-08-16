@@ -1,7 +1,8 @@
 import { DateTime } from "luxon";
-import type { Task, TodoistData, Context } from "../types/todoist";
 import { filterAndSortTasks } from "../utils/filterUtils";
 import { compareByPriority } from "../utils/comparisonUtils";
+import type { Task, TodoistData, Context } from "../types/todoist";
+import type { AgendaData } from "../types/agenda";
 
 /**
  * Get all tasks for a specific date.
@@ -170,3 +171,19 @@ export const calculateTaskStyle = (
 
     return `${marginClass} ${zIndexClass}`;
 };
+
+function getTaskCountForHash(agendaData: AgendaData, currentHash: string): number {
+    return currentHash === "#tomorrow" ? agendaData.todayTasks?.length || 0 : 0;
+}
+
+/**
+ * Gets the total tasks for the agenda, considering the current hash.
+ * @param {AgendaData} agendaData - Information on tasks for calculations.
+ * @param {string} currentHash - The agenda page being displayed.
+ * @returns The total number of tasks.
+ */
+export function getAgendaTaskCount(agendaData: AgendaData, currentHash: string): number {
+    const baseTotal = (agendaData.tasks?.length || 0) + (agendaData.tasksWithNoTime?.length || 0);
+    const additionalTasks = getTaskCountForHash(agendaData, currentHash);
+    return baseTotal + additionalTasks;
+}

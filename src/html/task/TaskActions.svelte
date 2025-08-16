@@ -11,11 +11,8 @@
     } from "svelte-hero-icons";
     import { previousFirstDueTask, todoistData, taskActivity } from "../../stores/stores";
     import { success, error } from "../../services/toastService";
-    import {
-        calculateUpdatedTaskResources,
-        handleTaskDefer,
-        handleTaskDone,
-    } from "../../services/taskHandlerService";
+    import { handleTaskDefer, handleTaskDone } from "../../services/taskHandlerService";
+    import { calculateUpdatedTaskResources } from "../../utils/processUtils";
     import type { Task } from "../../types/todoist";
     import type { TaskActivity } from "../../types/activity";
     import type { MethodsContext } from "../../types/interface";

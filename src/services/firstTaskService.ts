@@ -3,7 +3,7 @@ import { todoistData, previousFirstDueTask } from "../stores/stores";
 import { userSettings } from "../stores/interface";
 import { todoistAccessToken } from "../stores/secret";
 import { handleInitialChecks, enrichTask } from "./taskEnrichmentService";
-import { shouldShowNewTaskToast } from "../utils/firstTaskUtils";
+import { doShowNewTaskToast, getTasksToConsider } from "../utils/firstTaskUtils";
 import type { Task, TodoistData, UpdateFirstDueTaskResult } from "../types/todoist";
 
 const debounceState: {
@@ -101,29 +101,6 @@ export const updateFirstDueTask = async (
 };
 
 /**
- * Determines the next set of tasks to consider based on context and current task.
- * @param {boolean} doClearContext - Flag to clear context.
- * @param {Task[]} currentDueTasks - All current due tasks.
- * @param {Task | null} task - The current task.
- * @param {Task[]} filteredByContext - Tasks filtered by the current context.
- * @returns {Task[]} The tasks to consider for the next action.
- */
-const determineTasksToConsider = (
-    doClearContext: boolean,
-    currentDueTasks: Task[],
-    task: Task | null,
-    filteredByContext: Task[],
-): Task[] => {
-    if (doClearContext && currentDueTasks.length > 0) {
-        return currentDueTasks;
-    }
-    if (task) {
-        return [task];
-    }
-    return filteredByContext;
-};
-
-/**
  * Helper function to get task context data.
  * @param {Task | null} task - Optional task to set as the first due task.
  * @param {TodoistData} todoistData - The current Todoist data.
@@ -147,7 +124,7 @@ const getTaskContextData = (
 
     const doClearContext = Boolean(selectedContextId && filteredByContext.length === 0);
 
-    const tasksToConsiderForNext = determineTasksToConsider(
+    const tasksToConsiderForNext = getTasksToConsider(
         doClearContext,
         currentDueTasks,
         task,
@@ -178,7 +155,7 @@ const processDueTaskUpdate = async (
     const taskToProcess = preEnrichedTask || dueTasks[0];
     const taskWithData = await enrichTask(taskToProcess, get(todoistAccessToken));
 
-    const showNewTaskToast = shouldShowNewTaskToast(taskWithData, prevTask, selectedContextId);
+    const showNewTaskToast = doShowNewTaskToast(taskWithData, prevTask, selectedContextId);
 
     return { task: taskWithData, showNewTaskToast };
 };

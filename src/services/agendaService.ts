@@ -9,6 +9,7 @@ import {
     getSortedTasksForDate,
     getFilteredTasksWithNoTime,
     getTodayTasksForAgenda,
+    getAgendaTaskCount,
 } from "../utils/agendaUtils";
 import type { Task } from "../types/todoist";
 import type { AgendaData } from "../types/agenda";
@@ -108,28 +109,13 @@ export const getTitle = (): string => {
 };
 
 /**
- * Gets the total tasks for the agenda, considering the current hash.
- * @param {AgendaData} agendaData - Information on tasks for calculations.
- * @param {string} currentHash - The agenda page being displayed.
- * @returns The total number of tasks.
- */
-function getAdditionalTasksForHash(agendaData: AgendaData, currentHash: string): number {
-    return currentHash === "#tomorrow" ? agendaData.todayTasks?.length || 0 : 0;
-}
-function getTotalAgendaTasks(agendaData: AgendaData, currentHash: string): number {
-    const baseTotal = (agendaData.tasks?.length || 0) + (agendaData.tasksWithNoTime?.length || 0);
-    const additionalTasks = getAdditionalTasksForHash(agendaData, currentHash);
-    return baseTotal + additionalTasks;
-}
-
-/**
  * Computes the header gradient color based on the number of tasks and the current hash.
  * @param {AgendaData} agendaData - Information on tasks for calculations.
  * @returns Tailwind classes of header gradient.
  */
 export function computeHeaderGradientColor(agendaData: AgendaData): string {
     const currentHash = window.location.hash;
-    const totalTasks = getTotalAgendaTasks(agendaData, currentHash);
+    const totalTasks = getAgendaTaskCount(agendaData, currentHash);
     return getGradientColor(totalTasks, currentHash ?? "") ?? "";
 }
 

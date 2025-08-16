@@ -1,10 +1,19 @@
+import { DateTime } from "luxon";
 import {
     CONTEXT_PROPS_TO_REMOVE,
     TASK_PROPS_TO_REMOVE,
     TASK_RENAME_MAP,
     USER_PROPS_TO_REMOVE,
 } from "./dataCleaningConstants";
-import type { CleanableTodoistData, Context, Task, User } from "../types/todoist";
+import { getDueTasks } from "./filterUtils";
+import type {
+    CleanableTodoistData,
+    TodoistData,
+    Context,
+    Task,
+    User,
+    TaskUpdates,
+} from "../types/todoist";
 
 /**
  * Removes specified properties from each object in the array and optionally renames properties.
@@ -61,4 +70,43 @@ export function cleanTodoistData(data: CleanableTodoistData): CleanableTodoistDa
     }
 
     return data;
+}
+
+/**
+ * Calculates the updated TodoistData based on the provided task updates.
+ * @param {TodoistData} currentResources - The current TodoistData from the store.
+ * @param {TaskUpdates} taskUpdates - Task updates as an array of [taskID, newDueDate] tuples. NewDueDate can be a Date, DateTime, or string.
+ * @param {string[]} removedTaskIds - IDs of tasks to be removed.
+ * @returns {TodoistData} - The updated TodoistData.
+ */
+export function calculateUpdatedTaskResources(
+    currentResources: TodoistData,
+    taskUpdates: TaskUpdates,
+    removedTaskIds: string[] = [],
+): TodoistData {
+    const updatedTasks = currentResources.tasks
+        .filter((task) => !removedTaskIds.includes(task.id))
+        .map((task) => {
+            const updatedDueDate = taskUpdates.find(([taskId]) => taskId === task.id)?.[1];
+            if (updatedDueDate) {
+                const newDueDate =
+                    updatedDueDate instanceof DateTime
+                        ? updatedDueDate
+                        : updatedDueDate instanceof Date
+                          ? DateTime.fromJSDate(updatedDueDate)
+                          : DateTime.fromISO(updatedDueDate);
+
+                if (newDueDate.startOf("day") > DateTime.now().startOf("day")) {
+                    return null; // Task is deferred beyond today, remove it from active tasks
+                }
+                return { ...task, due: { ...task.due, date: newDueDate.toISO()! } };
+            }
+            return task;
+        })
+        .filter((task) => task !== null) as Task[];
+
+    const updatedTodoistData = { ...currentResources, tasks: updatedTasks };
+    const newDueTasks = getDueTasks(updatedTodoistData);
+
+    return { ...updatedTodoistData, dueTasks: newDueTasks };
 }

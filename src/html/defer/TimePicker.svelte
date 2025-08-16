@@ -1,7 +1,7 @@
 <script lang="ts">
     import { onDestroy } from "svelte";
     import { shortcut } from "@svelte-put/shortcut";
-    import { updateMilliseconds } from "../../services/deferModalService";
+    import { updateMilliseconds } from "../../utils/deferModalUtils";
     import { getPriorityClasses } from "../../utils/styleUtils";
     import { getShiftedSymbol } from "../../utils/deferTimeConfigs";
     import ListTask from "../task/ListTask.svelte";

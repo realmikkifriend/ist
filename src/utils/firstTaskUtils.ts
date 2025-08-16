@@ -9,7 +9,7 @@ import type { UserSettings } from "../types/interface";
  * @param {string | null} selectedContextId - The currently selected context ID.
  * @returns True if a toast should be shown, false otherwise.
  */
-export const shouldShowNewTaskToast = (
+export const doShowNewTaskToast = (
     newTask: Task,
     prevTask: Task | null,
     selectedContextId: string | null,
@@ -82,4 +82,27 @@ export const loadCommentsForTask = async (
 ): Promise<Task> => {
     const comments = await getTaskComments(todoistAccessTokenValue, task.id);
     return { ...task, comments };
+};
+
+/**
+ * Determines the next set of tasks to consider based on context and current task.
+ * @param {boolean} doClearContext - Flag to clear context.
+ * @param {Task[]} currentDueTasks - All current due tasks.
+ * @param {Task | null} task - The current task.
+ * @param {Task[]} filteredByContext - Tasks filtered by the current context.
+ * @returns {Task[]} The tasks to consider for the next action.
+ */
+export const getTasksToConsider = (
+    doClearContext: boolean,
+    currentDueTasks: Task[],
+    task: Task | null,
+    filteredByContext: Task[],
+): Task[] => {
+    if (doClearContext && currentDueTasks.length > 0) {
+        return currentDueTasks;
+    }
+    if (task) {
+        return [task];
+    }
+    return filteredByContext;
 };
