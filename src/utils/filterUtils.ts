@@ -3,6 +3,7 @@ import { getTaskTime } from "./timeUtils";
 import { compareTasks } from "./comparisonUtils";
 import type { GetProjectsResponse } from "@doist/todoist-api-typescript";
 import type { Task, Context, DueTasksData, TasksGroupedByContext } from "../types/todoist";
+import type { UserSettings } from "../types/interface";
 
 /**
  * Returns the list of due tasks, filtered and sorted.
@@ -165,4 +166,30 @@ export function filterContexts(projects: GetProjectsResponse): Context[] {
             "inboxProject" in context &&
             "parentId" in context,
     );
+}
+
+/**
+ * Gets the count of due tasks for a specific context.
+ * @param {Task[]} dueTasks - The current due tasks.
+ * @param {Task | null} firstDueTask - The first due task (used as a fallback for context if no selected context).
+ * @param {UserSettings} userSettings - The user settings, containing the selected context.
+ * @returns {number} The number of due tasks in the specified context.
+ */
+export function getDueTaskCountByContext(
+    dueTasks: Task[],
+    firstDueTask: Task | null,
+    userSettings: UserSettings,
+): number {
+    const selectedContextId = userSettings.selectedContext?.id;
+
+    if (selectedContextId) {
+        const count = dueTasks.filter((task: Task) => task.contextId === selectedContextId).length;
+        return count;
+    } else if (firstDueTask?.contextId) {
+        const count = dueTasks.filter(
+            (task: Task) => task.contextId === firstDueTask.contextId,
+        ).length;
+        return count;
+    }
+    return dueTasks.length;
 }

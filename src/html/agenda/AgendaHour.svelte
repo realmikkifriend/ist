@@ -1,8 +1,11 @@
 <script lang="ts">
     import { DateTime } from "luxon";
-    import { todoistData } from "../../stores/stores";
-    import { markTasks } from "../../services/agendaService";
-    import { calculateTaskPosition, calculateTaskStyle } from "./../../utils/agendaUtils";
+    import { todoistData, firstDueTask } from "../../stores/stores";
+    import {
+        markTasks,
+        calculateTaskPosition,
+        calculateTaskStyle,
+    } from "./../../utils/agendaDisplayUtils";
     import { getQuarterHourPosition } from "../../styles/styleUtils";
     import AgendaTask from "./AgendaTask.svelte";
     import type { Task, Context, ColorName } from "../../types/todoist";
@@ -31,7 +34,7 @@
      * @returns The tasks after processing.
      */
     function getProcessedTasks(tasks: Task[]): Task[] {
-        return markTasks(tasks);
+        return markTasks(tasks, $firstDueTask);
     }
 
     const processedTasks: Task[] = getProcessedTasks(tasks);

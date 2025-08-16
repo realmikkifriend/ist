@@ -4,7 +4,7 @@
     import { Icon, XMark } from "svelte-hero-icons";
     import { todoistData, firstDueTask } from "../../stores/stores";
     import { userSettings } from "../../stores/interface";
-    import { getDueTaskCountByContext } from "../../services/sidebarService";
+    import { getDueTaskCountByContext } from "../../utils/filterUtils";
     import { getSelectedContextName } from "../../utils/firstTaskUtils";
     import type { MethodsContext } from "../../types/interface";
 

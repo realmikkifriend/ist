@@ -92,7 +92,7 @@ export const loadCommentsForTask = async (
  * @param {Task[]} filteredByContext - Tasks filtered by the current context.
  * @returns {Task[]} The tasks to consider for the next action.
  */
-export const getTasksToConsider = (
+const getTasksToConsider = (
     doClearContext: boolean,
     currentDueTasks: Task[],
     task: Task | null,
@@ -105,4 +105,45 @@ export const getTasksToConsider = (
         return [task];
     }
     return filteredByContext;
+};
+
+/**
+ * Helper function to get task context data.
+ * @param {Task | null} task - Optional task to set as the first due task.
+ * @param {TodoistData} todoistData - The current Todoist data.
+ * @param {UserSettings} userSettings - Settings containing the currently selected context.
+ * @returns {{selectedContextId: string | null, filteredByContext: Task[], doClearContext: boolean, tasksToConsiderForNext: Task[]}} Tasks processed by context.
+ */
+export const getTaskContextData = (
+    task: Task | null,
+    todoistData: TodoistData,
+    userSettings: UserSettings,
+): {
+    selectedContextId: string | null;
+    filteredByContext: Task[];
+    doClearContext: boolean;
+    tasksToConsiderForNext: Task[];
+} => {
+    const selectedContextInfo = userSettings.selectedContext;
+    const selectedContext = selectedContextInfo
+        ? (todoistData.contexts.find((c) => c.id === selectedContextInfo.id) ?? null)
+        : null;
+
+    const selectedContextId: string | null = selectedContext?.id ?? null;
+    const currentDueTasks = todoistData.dueTasks;
+
+    const filteredByContext = selectedContextId
+        ? currentDueTasks.filter((t) => t.contextId === selectedContextId)
+        : currentDueTasks;
+
+    const doClearContext = Boolean(selectedContextId && filteredByContext.length === 0);
+
+    const tasksToConsiderForNext = getTasksToConsider(
+        doClearContext,
+        currentDueTasks,
+        task,
+        filteredByContext,
+    );
+
+    return { selectedContextId, filteredByContext, doClearContext, tasksToConsiderForNext };
 };

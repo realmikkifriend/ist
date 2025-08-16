@@ -1,7 +1,7 @@
 import { get } from "svelte/store";
 import { TodoistRequestError } from "@doist/todoist-api-typescript";
 import { todoistAccessToken } from "../stores/secret";
-import { handleOverdueTasks } from "./deferService";
+import { handleOverdueTasks } from "./taskHandlerService";
 import { success } from "./toastService";
 import { initializeApi, getEndpoint, processApiResponse, handleApiError } from "../utils/apiUtils";
 import type { TodoistData } from "../types/todoist";

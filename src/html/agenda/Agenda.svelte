@@ -3,12 +3,8 @@
     import { on } from "svelte/events";
     import { DateTime } from "luxon";
     import { todoistData } from "../../stores/stores";
-    import {
-        updateAgenda,
-        getDisplayHours,
-        getTitle,
-        computeHeaderGradientColor,
-    } from "../../services/agendaService";
+    import { updateAgenda, getTitle } from "../../services/agendaService";
+    import { computeHeaderGradientColor, getDisplayHours } from "../../utils/agendaDisplayUtils";
     import { getTaskColor } from "../../styles/styleUtils";
     import AgendaHeader from "./AgendaHeader.svelte";
     import AgendaHour from "./AgendaHour.svelte";
@@ -56,7 +52,7 @@
             agendaData={agendaStore}
             displayData={{
                 title: getTitle(),
-                headerGradientColor: computeHeaderGradientColor(agendaStore),
+                headerGradientColor: computeHeaderGradientColor(agendaStore, getTitle()),
             }}
         />
 
@@ -75,7 +71,7 @@
         <div class="w-[99%] overflow-hidden pr-1">
             {#key (DateTime.now().hour, agendaStore.tasks)}
                 {#each hourSlots as hour (hour)}
-                    {#if getDisplayHours(agendaStore, DateTime.now(), hourSlots)[hour]}
+                    {#if getDisplayHours(agendaStore, DateTime.now(), hourSlots, getTitle())[hour]}
                         <AgendaHour
                             {hour}
                             now={DateTime.now()}

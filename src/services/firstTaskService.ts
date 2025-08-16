@@ -3,7 +3,7 @@ import { todoistData, previousFirstDueTask } from "../stores/stores";
 import { userSettings } from "../stores/interface";
 import { todoistAccessToken } from "../stores/secret";
 import { handleInitialChecks, enrichTask } from "./taskEnrichmentService";
-import { doShowNewTaskToast, getTasksToConsider } from "../utils/firstTaskUtils";
+import { doShowNewTaskToast, getTaskContextData } from "../utils/firstTaskUtils";
 import type { Task, TodoistData, UpdateFirstDueTaskResult } from "../types/todoist";
 
 const debounceState: {
@@ -79,7 +79,7 @@ export const updateFirstDueTask = async (
     }
 
     const { selectedContextId, filteredByContext, doClearContext, tasksToConsiderForNext } =
-        getTaskContextData(task, $todoistData);
+        getTaskContextData(task, $todoistData, get(userSettings));
 
     const { task: newTask, showNewTaskToast } = await processDueTaskUpdate(
         tasksToConsiderForNext,
@@ -98,40 +98,6 @@ export const updateFirstDueTask = async (
         doClearContext: doClearContext,
         dueTasks: filteredByContext,
     };
-};
-
-/**
- * Helper function to get task context data.
- * @param {Task | null} task - Optional task to set as the first due task.
- * @param {TodoistData} todoistData - The current Todoist data.
- * @returns {{selectedContextId: string | null, filteredByContext: Task[], doClearContext: boolean, tasksToConsiderForNext: Task[]}} Tasks processed by context.
- */
-const getTaskContextData = (
-    task: Task | null,
-    todoistData: TodoistData,
-): {
-    selectedContextId: string | null;
-    filteredByContext: Task[];
-    doClearContext: boolean;
-    tasksToConsiderForNext: Task[];
-} => {
-    const selectedContextId: string | null = get(userSettings).selectedContext?.id ?? null;
-    const currentDueTasks = todoistData.dueTasks;
-
-    const filteredByContext = selectedContextId
-        ? currentDueTasks.filter((t) => t.contextId === selectedContextId)
-        : currentDueTasks;
-
-    const doClearContext = Boolean(selectedContextId && filteredByContext.length === 0);
-
-    const tasksToConsiderForNext = getTasksToConsider(
-        doClearContext,
-        currentDueTasks,
-        task,
-        filteredByContext,
-    );
-
-    return { selectedContextId, filteredByContext, doClearContext, tasksToConsiderForNext };
 };
 
 /**

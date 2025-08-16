@@ -1,5 +1,6 @@
 import { DateTime } from "luxon";
 import { markTaskDone, deferTasks } from "../services/apiService";
+import { createDateWithTime } from "../utils/timeUtils";
 import type { Task, TaskUpdates } from "../types/todoist";
 
 /**
@@ -28,4 +29,28 @@ export async function handleTaskDefer(
     const errors = results.filter((result) => result.status === "error");
 
     return { success: errors.length === 0, taskUpdates: updatedTaskResources };
+}
+
+/**
+ * Handles overdue tasks by deferring them to today.
+ * @param {Task[]} tasks - Array of Task objects to check for overdue status.
+ * @returns {void}
+ */
+export function handleOverdueTasks(tasks: Task[]): void {
+    const today = DateTime.now().startOf("day");
+    const overdueTasks =
+        tasks.filter((task) => {
+            const dueDate = task.due?.date && DateTime.fromISO(task.due.date).startOf("day");
+            return dueDate && dueDate < today;
+        }) || [];
+
+    if (overdueTasks.length > 0) {
+        const taskUpdates: [Task, DateTime][] = overdueTasks.map((task) => {
+            const extracted = task.due?.string ? createDateWithTime(task.due.string, today) : null;
+            const time: DateTime = extracted?.newDate ?? today;
+            return [task, time];
+        });
+
+        void handleTaskDefer(taskUpdates);
+    }
 }
