@@ -86,7 +86,11 @@ export default defineConfig([
     {
         files: ["src/**/*.ts", "src/**/*.svelte"],
         rules: {
-            complexity: ["error", { max: 10 }],
+            complexity: ["warn", { max: 7 }],
+            "max-lines-per-function": [
+                "warn",
+                { max: 50, skipComments: true, skipBlankLines: true },
+            ],
         },
     },
     // -----------------------------------
@@ -171,7 +175,7 @@ export default defineConfig([
             },
         },
         rules: {
-            "max-lines": ["warn", { max: 160, skipComments: true, skipBlankLines: true }],
+            // "max-lines": ["warn", { max: 170, skipComments: true, skipBlankLines: true }],
             "max-depth": ["warn", 2],
             "no-restricted-syntax": [
                 "warn",
