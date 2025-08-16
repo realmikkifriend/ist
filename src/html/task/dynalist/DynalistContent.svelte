@@ -6,7 +6,7 @@
     import DynalistCrossOff from "./DynalistCrossOff.svelte";
     import DynalistTracking from "./DynalistTracking.svelte";
     import DynalistTypeMenu from "./DynalistTypeMenu.svelte";
-    import { generateDynalistComment } from "../../../utils/dynalistUtils";
+    import { generateDynalistComment } from "../../../utils/dynalistProcessUtils";
     import type { DynalistTaskType, DynalistViewProps } from "../../../types/dynalist";
 
     let {

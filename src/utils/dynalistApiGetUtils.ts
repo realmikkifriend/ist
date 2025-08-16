@@ -1,4 +1,4 @@
-import { getDynalistType, processNode } from "./dynalistUtils";
+import { getDynalistType, processNode } from "./dynalistProcessUtils";
 import type {
     DynalistContent,
     DynalistDocumentData,

@@ -3,7 +3,7 @@
     import { DateTime } from "luxon";
     import SvelteMarkdown from "@humanspeak/svelte-markdown";
     import { isMonthYearFormat } from "../../../utils/timeUtils";
-    import { generateDynalistComment } from "../../../utils/dynalistUtils";
+    import { generateDynalistComment } from "../../../utils/dynalistProcessUtils";
     import { updateDynalistWithToken } from "../../../services/dynalistService";
     import { success } from "../../../services/toastService";
     import type { DynalistNode, DynalistChange, DynalistViewProps } from "../../../types/dynalist";

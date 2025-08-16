@@ -1,6 +1,7 @@
 <script lang="ts">
     import { handleCount } from "../../../services/dynalistService";
-    import { parseCountData, calculateLabel } from "../../../utils/dynalistUtils";
+    import { calculateLabel } from "../../../utils/dynalistUtils";
+    import { parseCountData } from "../../../utils/dynalistProcessUtils";
     import type { DynalistCountData, LabelInfo, DynalistViewProps } from "../../../types/dynalist";
 
     let { dynalistObject: content }: DynalistViewProps = $props();

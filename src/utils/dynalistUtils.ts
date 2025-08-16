@@ -1,102 +1,4 @@
-import type {
-    DynalistNode,
-    DynalistDocumentData,
-    DynalistCountData,
-    DetermineLabelAndClassesParams,
-} from "../types/dynalist";
-
-/**
- * Recursively processes a Dynalist node, filtering out checked nodes and processing children.
- * @param {DynalistNode} node - The node to process.
- * @param {DynalistDocumentData} data - The document data containing all nodes.
- * @returns {DynalistNode | null} The processed node or null if checked.
- */
-export function processNode(node: DynalistNode, data: DynalistDocumentData): DynalistNode | null {
-    if (node.checked) return null;
-
-    const { children, ...rest } = node;
-    const processedNode: DynalistNode = {
-        ...rest,
-        note: node.note,
-        content: node.content,
-        checked: node.checked,
-        children: undefined,
-    };
-
-    if (children && children.length > 0) {
-        processedNode.children = children
-            .map((childId) => {
-                const child = data.nodes.find((n) => n.id === childId);
-                return child ? processNode(child, data) : null;
-            })
-            .filter((child): child is DynalistNode => child !== null);
-    }
-
-    return processedNode;
-}
-
-/**
- * Determines the Dynalist type from a note string.
- * @param {string | undefined} note - The note to analyze.
- * @returns {string} The determined type.
- */
-export function getDynalistType(note: string | undefined): string {
-    if (!note) {
-        return "read";
-    }
-
-    const firstWord = note.split(" ")[0];
-
-    const validTypes = ["read", "checklist", "count", "rotating", "crossoff", "tracking"];
-    if (validTypes.includes(firstWord)) {
-        return firstWord;
-    }
-
-    return "read";
-}
-
-/**
- * Generates a markdown comment from a Dynalist node and its children.
- * @param {DynalistNode} node - The root node.
- * @param {number} indent - The indentation level.
- * @returns {string} The generated markdown comment.
- */
-export function generateDynalistComment(node: DynalistNode, indent: number = 0): string {
-    if (!node || !Array.isArray(node.children)) return "";
-
-    const processNodeContent = (child: DynalistNode | string, level: number): string => {
-        if (typeof child === "string") {
-            return `${"  ".repeat(level)}- ${child}\n`;
-        } else {
-            const markdown =
-                `${"  ".repeat(level)}- ${child.content}\n` +
-                (Array.isArray(child.children)
-                    ? child.children
-                          .map((subChild) => processNodeContent(subChild, level + 1))
-                          .join("")
-                    : "");
-            return markdown;
-        }
-    };
-
-    return node.children.map((child) => processNodeContent(child, indent)).join("");
-}
-
-/**
- * Parses a markdown list into an array of strings, preserving indentation.
- * @param {string} content - The markdown list content.
- * @returns {string[]} The parsed list items.
- */
-export function parseList(content: string): string[] {
-    return content.split("\n").reduce<string[]>((result, line) => {
-        if (line.startsWith("  ") && result.length > 0) {
-            result[result.length - 1] += "\n" + line;
-        } else {
-            result.push(line.substring(2).trim());
-        }
-        return result;
-    }, []);
-}
+import type { DynalistCountData, DetermineLabelAndClassesParams } from "../types/dynalist";
 
 /**
  * Returns whether the provided object has an error property.
@@ -108,24 +10,56 @@ export function hasError(obj: unknown): obj is { error: { message?: string } } {
 }
 
 /**
- * Parses count data from a Dynalist note string.
- * @param {string} note - The note string to parse.
- * @returns {DynalistCountData} The parsed count data.
+ * Determines the label and classes based on progress.
+ * @param {DetermineLabelAndClassesParams} params - Object containing all necessary parameters.
+ * @returns {{ label: string; classes: string }} - Paired button label and classes.
  */
-export const parseCountData = (note: string): DynalistCountData => {
-    const match = note.match(/count (\d+)(?:\/(\d+))?\s*(\d{4}-\d{1,2}-\d{1,2})?/);
-    if (!match) {
-        return { total: 0, current: 0 };
+export function determineLabelAndClasses(params: DetermineLabelAndClassesParams): {
+    label: string;
+    classes: string;
+} {
+    const { percentageComplete, currentHour, endHour, current, goalCount } = params;
+
+    const conditions = [
+        {
+            condition: percentageComplete >= 100,
+            label: "complete",
+            classes: "bg-blue-500 text-blue-100",
+        },
+        {
+            condition: currentHour > endHour && percentageComplete < 100,
+            label: "incomplete",
+            classes: "",
+        },
+        {
+            condition: percentageComplete === 0,
+            label: "ready",
+            classes: "bg-neutral text-secondary",
+        },
+        {
+            condition: current >= goalCount * 1.2,
+            label: "ahead",
+            classes: "bg-purple-500 text-purple-100",
+        },
+        {
+            condition: current <= goalCount * 0.5,
+            label: "way behind",
+            classes: "bg-orange-500 text-orange-100",
+        },
+        {
+            condition: current <= goalCount * 0.8,
+            label: "behind",
+            classes: "bg-yellow-600 text-yellow-100",
+        },
+    ];
+
+    const foundCondition = conditions.find((condition) => condition.condition);
+    if (foundCondition) {
+        return { label: foundCondition.label, classes: foundCondition.classes };
     }
-    const [totalStr, currentStr, date] = match.slice(1);
-    const total = totalStr !== undefined ? parseInt(totalStr, 10) : 0;
-    const current = currentStr !== undefined ? parseInt(currentStr, 10) : 0;
-    return {
-        total,
-        current,
-        ...(date ? { date } : {}),
-    };
-};
+
+    return { label: "on track", classes: "bg-green-700 text-green-100" };
+}
 
 /**
  * Calculates the label and classes for the current count state.
@@ -162,32 +96,6 @@ export function calculateLabel(countData: DynalistCountData): { label: string; c
 
     const goalCount = calculateGoalCount(currentHour, startHour, endHour, total);
     const percentageComplete = total === 0 ? 0 : (current / total) * 100;
-
-    /**
-     * Determines the label and classes based on progress.
-     * @param {DetermineLabelAndClassesParams} params - Object containing all necessary parameters.
-     * @returns {{ label: string; classes: string }} - Paired button label and classes.
-     */
-    const determineLabelAndClasses = (
-        params: DetermineLabelAndClassesParams,
-    ): { label: string; classes: string } => {
-        const { percentageComplete, currentHour, endHour, current, goalCount } = params;
-        if (percentageComplete >= 100) {
-            return { label: "complete", classes: "bg-blue-500 text-blue-100" };
-        } else if (currentHour > endHour && percentageComplete < 100) {
-            return { label: "incomplete", classes: "" };
-        } else if (percentageComplete === 0) {
-            return { label: "ready", classes: "bg-neutral text-secondary" };
-        } else if (current >= goalCount * 1.2) {
-            return { label: "ahead", classes: "bg-purple-500 text-purple-100" };
-        } else if (current <= goalCount * 0.5) {
-            return { label: "way behind", classes: "bg-orange-500 text-orange-100" };
-        } else if (current <= goalCount * 0.8) {
-            return { label: "behind", classes: "bg-yellow-600 text-yellow-100" };
-        } else {
-            return { label: "on track", classes: "bg-green-700 text-green-100" };
-        }
-    };
 
     return determineLabelAndClasses({
         percentageComplete,

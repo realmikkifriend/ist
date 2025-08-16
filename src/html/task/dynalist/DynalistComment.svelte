@@ -1,7 +1,8 @@
 <script lang="ts">
     import { Icon, ArrowPath } from "svelte-hero-icons";
     import { loadDynalistCommentWithToken } from "../../../services/dynalistService";
-    import { hasError, getDynalistType } from "../../../utils/dynalistUtils";
+    import { hasError } from "../../../utils/dynalistUtils";
+    import { getDynalistType } from "../../../utils/dynalistProcessUtils";
     import DynalistContentComponent from "./DynalistContent.svelte";
     import { error as showError } from "../../../services/toastService";
     import type {
