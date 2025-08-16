@@ -78,20 +78,13 @@ export const updateFirstDueTask = async (
         };
     }
 
-    const selectedContextId: string | null = get(userSettings).selectedContext?.id ?? null;
-
-    const currentDueTasks = $todoistData.dueTasks;
-
-    const filteredByContext = selectedContextId
-        ? currentDueTasks.filter((t) => t.contextId === selectedContextId)
-        : currentDueTasks;
-
-    const tasksToProcess = task ? [task] : filteredByContext;
+    const { selectedContextId, filteredByContext, contextWasCleared, tasksToConsiderForNext } =
+        getTaskContextData(task, $todoistData);
 
     const { task: newTask, showNewTaskToast } = await processDueTaskUpdate(
-        tasksToProcess,
+        tasksToConsiderForNext,
         prevTask,
-        selectedContextId,
+        contextWasCleared ? null : selectedContextId,
         initialCheckResult.taskToSet,
     );
 
@@ -102,9 +95,35 @@ export const updateFirstDueTask = async (
     return {
         task: newTask,
         showNewTaskToast,
-        contextCleared: Boolean(selectedContextId && filteredByContext.length === 0),
+        contextCleared: contextWasCleared,
         dueTasks: filteredByContext,
     };
+};
+
+/**
+ * Helper function to get task context data.
+ * @param {Task | null} task - Optional task to set as the first due task.
+ * @param {TodoistData} todoistData - The current Todoist data.
+ * @returns {{selectedContextId: string | null, filteredByContext: Task[], contextWasCleared: boolean, tasksToConsiderForNext: Task[]}} Tasks processed by context.
+ */
+const getTaskContextData = (task: Task | null, todoistData: TodoistData) => {
+    const selectedContextId: string | null = get(userSettings).selectedContext?.id ?? null;
+    const currentDueTasks = todoistData.dueTasks;
+
+    const filteredByContext = selectedContextId
+        ? currentDueTasks.filter((t) => t.contextId === selectedContextId)
+        : currentDueTasks;
+
+    const contextWasCleared = Boolean(selectedContextId && filteredByContext.length === 0);
+
+    const tasksToConsiderForNext =
+        contextWasCleared && currentDueTasks.length > 0
+            ? currentDueTasks
+            : task
+              ? [task]
+              : filteredByContext;
+
+    return { selectedContextId, filteredByContext, contextWasCleared, tasksToConsiderForNext };
 };
 
 /**

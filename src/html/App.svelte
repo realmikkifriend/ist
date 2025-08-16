@@ -89,6 +89,10 @@
             todoistData.set(updatedTodoistData);
         }
 
+        if (contextCleared) {
+            userSettings.update((settings) => ({ ...settings, selectedContext: null }));
+        }
+
         if (task) {
             if (showNewTaskToast && task?.id !== $firstDueTask?.id) {
                 newFirstTask((t) => {
@@ -104,10 +108,6 @@
         } else {
             firstDueTask.set(null);
             previousFirstDueTask.set(null);
-        }
-
-        if (contextCleared) {
-            userSettings.update((settings) => ({ ...settings, selectedContext: null }));
         }
     };
 
