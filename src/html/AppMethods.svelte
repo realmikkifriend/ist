@@ -12,8 +12,11 @@
     import { updateFirstDueTask, skipTask } from "../services/firstTaskService";
     import { refreshData } from "../services/updateService";
     import { newFirstTask, clearToasts, success } from "../services/toastService";
+    import { calculateUpdatedTaskResources } from "../utils/processUtils";
     import AppCompose from "./AppCompose.svelte";
-    import type { Task, UpdateFirstDueTaskResult } from "../types/todoist";
+    import type { Task, UpdateFirstDueTaskResult, TaskUpdates } from "../types/todoist";
+    import type { TaskActivity } from "../types/activity";
+    import { taskActivity } from "../stores/stores";
 
     let isSpinning = $state(false);
 
@@ -80,6 +83,25 @@
     };
 
     /**
+     * Clears the previous first due task.
+     */
+    const clearPreviousFirstDueTask = (): void => {
+        previousFirstDueTask.set(null);
+    };
+
+    /**
+     * Updates the todoistData store with new task resources.
+     * @param taskUpdates - Array of tasks that have been updated.
+     * @param deletedTaskIds - Array of task IDs that have been deleted.
+     */
+    const updateTodoistDataResources = (
+        taskUpdates: TaskUpdates = [],
+        deletedTaskIds: string[] = [],
+    ): void => {
+        todoistData.set(calculateUpdatedTaskResources($todoistData, taskUpdates, deletedTaskIds));
+    };
+
+    /**
      * Handles data updates from fetching the first due task.
      * @param updatedTodoistData - The data to be updated.
      * @param doClearContext - Whether to clear the selected context.
@@ -95,6 +117,14 @@
         if (doClearContext) {
             changeSelectedContext(null);
         }
+    };
+
+    /**
+     * Adds a new task activity entry to the store.
+     * @param newActivityEntry - The new activity to add to entries.
+     */
+    const addTaskActivityEntry = (newActivityEntry: TaskActivity): void => {
+        taskActivity.update((activities) => [...activities, newActivityEntry]);
     };
 
     /**
@@ -218,6 +248,9 @@
         updateDisplayedTask,
         handleSkipTask,
         summonTask,
+        clearPreviousFirstDueTask,
+        updateTodoistDataResources,
+        addTaskActivityEntry,
     });
 
     /**

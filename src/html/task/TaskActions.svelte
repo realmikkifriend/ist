@@ -9,13 +9,11 @@
         Calendar as CalendarIcon,
         Clock,
     } from "svelte-hero-icons";
-    import { previousFirstDueTask, todoistData, taskActivity } from "../../stores/stores";
     import { success, error } from "../../services/toastService";
     import { handleTaskDefer, handleTaskDone } from "../../services/taskHandlerService";
-    import { calculateUpdatedTaskResources } from "../../utils/processUtils";
     import type { Task } from "../../types/todoist";
-    import type { TaskActivity } from "../../types/activity";
     import type { MethodsContext } from "../../types/methods";
+    import type { TaskActivity } from "../../types/activity";
 
     let {
         task,
@@ -25,8 +23,14 @@
         openModal: (modalId: string, props?: Record<string, unknown>) => void;
     } = $props();
 
-    const { handleRefresh, updateDisplayedTask, handleSkipTask } =
-        getContext<MethodsContext>("methods");
+    const {
+        handleRefresh,
+        updateDisplayedTask,
+        handleSkipTask,
+        clearPreviousFirstDueTask,
+        updateTodoistDataResources,
+        addTaskActivityEntry,
+    } = getContext<MethodsContext>("methods");
 
     /**
      * Handles marking a task as done, calling the service and showing a toast.
@@ -34,12 +38,12 @@
      */
     const onDone = async (task: Task): Promise<void> => {
         if (task.summoned) window.location.hash = String(task.summoned);
-        previousFirstDueTask.set(null);
+        clearPreviousFirstDueTask();
 
         const { success: doneSuccessful, taskId } = await handleTaskDone(task);
 
         if (doneSuccessful) {
-            todoistData.set(calculateUpdatedTaskResources($todoistData, [], [taskId]));
+            updateTodoistDataResources([], [taskId]);
 
             const newActivityEntry: TaskActivity = {
                 date: DateTime.now(),
@@ -48,7 +52,7 @@
                 title: task.content,
                 temporary: true,
             };
-            taskActivity.update((activities) => [...activities, newActivityEntry]);
+            addTaskActivityEntry(newActivityEntry);
 
             success("Task marked done.");
             await handleRefresh();
@@ -71,12 +75,12 @@
             window.location.hash = String(deferredTask.summoned);
         }
 
-        previousFirstDueTask.set(null);
+        clearPreviousFirstDueTask();
         const { success: deferSuccessful, taskUpdates: deferredTaskUpdates } =
             await handleTaskDefer([[deferredTask, time]]);
 
         if (deferSuccessful) {
-            todoistData.set(calculateUpdatedTaskResources($todoistData, deferredTaskUpdates));
+            updateTodoistDataResources(deferredTaskUpdates);
             success("Task deferred successfully.");
             await handleRefresh(); // Refresh data after task is deferred
             await updateDisplayedTask();

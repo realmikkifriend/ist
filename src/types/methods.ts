@@ -1,4 +1,5 @@
-import type { Task, UpdateFirstDueTaskResult } from "./todoist";
+import type { Task, UpdateFirstDueTaskResult, TaskUpdates } from "./todoist";
+import type { TaskActivity } from "./activity";
 
 export type MethodsContext = {
     handleRefresh: () => Promise<void>;
@@ -10,4 +11,7 @@ export type MethodsContext = {
         task: Task & { firstDue?: boolean; skip?: boolean; summoned?: string | boolean },
         enableSkip?: boolean,
     ) => Promise<UpdateFirstDueTaskResult>;
+    clearPreviousFirstDueTask: () => void;
+    updateTodoistDataResources: (taskUpdates?: TaskUpdates, deletedTaskIds?: string[]) => void;
+    addTaskActivityEntry: (newActivityEntry: TaskActivity) => void;
 };

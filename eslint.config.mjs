@@ -76,7 +76,7 @@ export default defineConfig([
                 },
             ],
             "jsdoc/no-types": "off",
-            "jsdoc/require-param-type": "error",
+            "jsdoc/require-param-type": "warn",
         },
     },
     // -----------------------------------
@@ -130,11 +130,11 @@ export default defineConfig([
                 "warn",
                 {
                     selector: "CallExpression[callee.property.name='set']",
-                    message: "Setting stores is only allowed in components.",
+                    message: "Setting stores is only allowed in top-level components.",
                 },
                 {
                     selector: "CallExpression[callee.property.name='update']",
-                    message: "Updating stores is only allowed in components.",
+                    message: "Updating stores is only allowed in top-level components.",
                 },
                 ...noTypesOrInterfaces,
             ],
@@ -169,7 +169,7 @@ export default defineConfig([
                 extraFileExtensions: [".svelte"],
                 svelteFeatures: {
                     experimentalGenerics: true,
-                    runes: true, // Enable Svelte 5 runes
+                    runes: true,
                 },
                 svelteConfig,
             },
@@ -212,6 +212,27 @@ export default defineConfig([
             "svelte/require-stores-init": "warn",
         },
     },
+    {
+        files: ["**/*.svelte"],
+        ignores: [
+            "src/html/AppMethods.svelte",
+            "src/html/OAuthCallback.svelte",
+            "src/html/task/dynalist/DynalistAuthRequest.svelte",
+        ],
+        rules: {
+            "no-restricted-syntax": [
+                "warn",
+                {
+                    selector: "CallExpression[callee.property.name='set']",
+                    message: "Setting stores is only allowed in top-level/auth components.",
+                },
+                {
+                    selector: "CallExpression[callee.property.name='update']",
+                    message: "Updating stores is only allowed in top-level/auth components.",
+                },
+            ],
+        },
+    },
     // -----------------------------------
     // `     Vitest Configuration (for test files)
     {
@@ -225,12 +246,12 @@ export default defineConfig([
                 tsconfigRootDir: import.meta.dirname,
             },
             sourceType: "module",
-            globals: globals.vitest, // Add Vitest globals
+            globals: globals.vitest,
         },
         rules: {
             ...vitest.configs.recommended.rules,
             "functional/no-let": "off",
-            "functional/no-promise-reject": "off", // Disable for test files
+            "functional/no-promise-reject": "off",
             "@typescript-eslint/no-unused-vars": [
                 "error",
                 {

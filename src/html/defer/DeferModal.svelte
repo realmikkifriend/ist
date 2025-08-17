@@ -14,7 +14,7 @@
         onDeferFinal,
     }: { task: Task; onDeferFinal?: (detail: { task: Task; time: DateTime }) => void } = $props();
 
-    let isTimeTabActive: boolean = $derived(Boolean(task.due && task.due.allDay !== 1));
+    let isTimeTabActive: boolean = $state(Boolean(task.due && task.due.allDay !== 1));
 
     /**
      * Selects the active tab ("time" or "calendar").
@@ -39,10 +39,10 @@
 
         const time: DateTime =
             typeof rawTime === "number"
-                ? DateTime.now().setZone(tz).plus({ milliseconds: rawTime })
+                ? DateTime.local({ zone: tz }).plus({ milliseconds: rawTime })
                 : (() => {
                       const date = DateTime.fromISO(rawTime);
-                      const tomorrow = DateTime.now().plus({ days: 1 }).setZone(tz);
+                      const tomorrow = DateTime.local({ zone: tz }).plus({ days: 1 });
 
                       const extracted = task.due
                           ? createDateWithTime(task.due.string, tomorrow)
@@ -51,7 +51,16 @@
                           return date;
                       } else {
                           const { hour, minute } = extracted.newDate;
-                          return date.set({ hour, minute });
+                          return DateTime.fromObject(
+                              {
+                                  year: date.year,
+                                  month: date.month,
+                                  day: date.day,
+                                  hour: hour,
+                                  minute: minute,
+                              },
+                              { zone: date.zoneName ?? tz },
+                          );
                       }
                   })();
 
