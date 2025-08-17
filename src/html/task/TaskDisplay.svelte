@@ -9,7 +9,8 @@
     import History from "../interface/History.svelte";
     import TaskActions from "./TaskActions.svelte";
     import type { Task, Priority } from "../../types/todoist";
-    import type { DynamicModalProps, MethodsContext } from "../../types/interface";
+    import type { DynamicModalProps } from "../../types/interface";
+    import type { MethodsContext } from "../../types/methods";
 
     let { task }: { task: Task } = $props();
 

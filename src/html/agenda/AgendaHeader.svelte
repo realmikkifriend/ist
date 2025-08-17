@@ -4,7 +4,7 @@
     import { shortcut } from "@svelte-put/shortcut";
     import { todoistData } from "../../stores/stores";
     import type { AgendaHeaderProps } from "../../types/agenda";
-    import type { MethodsContext } from "../../types/interface";
+    import type { MethodsContext } from "../../types/methods";
 
     let { agendaData, displayData }: AgendaHeaderProps = $props();
 

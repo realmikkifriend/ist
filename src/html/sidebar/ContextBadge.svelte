@@ -6,7 +6,7 @@
     import { userSettings } from "../../stores/interface";
     import { getDueTaskCountByContext } from "../../utils/filterUtils";
     import { getSelectedContextName } from "../../utils/firstTaskUtils";
-    import type { MethodsContext } from "../../types/interface";
+    import type { MethodsContext } from "../../types/methods";
 
     const { handleClearSelectedTask, handleContextChange } = getContext<MethodsContext>("methods");
 

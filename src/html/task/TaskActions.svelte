@@ -15,7 +15,7 @@
     import { calculateUpdatedTaskResources } from "../../utils/processUtils";
     import type { Task } from "../../types/todoist";
     import type { TaskActivity } from "../../types/activity";
-    import type { MethodsContext } from "../../types/interface";
+    import type { MethodsContext } from "../../types/methods";
 
     let {
         task,

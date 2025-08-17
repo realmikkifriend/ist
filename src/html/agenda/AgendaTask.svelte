@@ -5,7 +5,7 @@
     import { getPriorityClasses, colorClasses, borderClasses } from "../../styles/styleUtils";
     import type { Priority } from "../../types/todoist";
     import type { AgendaTaskProps } from "../../types/agenda";
-    import type { MethodsContext } from "../../types/interface";
+    import type { MethodsContext } from "../../types/methods";
 
     let { task, color }: AgendaTaskProps = $props();
 

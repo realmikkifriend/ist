@@ -6,7 +6,7 @@
     import { openAgenda } from "../../services/agendaService";
     import { getTasksGroupedByContext } from "../../utils/filterUtils";
     import ContextButtonContents from "./ContextButtonContents.svelte";
-    import type { MethodsContext } from "../../types/interface";
+    import type { MethodsContext } from "../../types/methods";
 
     let { closeSidebar }: { closeSidebar: () => void } = $props();
 

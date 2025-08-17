@@ -1,9 +1,6 @@
 <script lang="ts">
     import { onMount, setContext } from "svelte";
-    import { get } from "svelte/store";
     import { on } from "svelte/events";
-    import { Icon, ArrowPath } from "svelte-hero-icons";
-    import { shortcut } from "@svelte-put/shortcut";
     import {
         todoistData,
         firstDueTask,
@@ -14,13 +11,8 @@
     import { debounceState } from "../services/firstTaskService";
     import { updateFirstDueTask, skipTask } from "../services/firstTaskService";
     import { refreshData } from "../services/updateService";
-    import { toggleAgendaHash } from "../services/agendaService";
     import { newFirstTask, clearToasts, success } from "../services/toastService";
-    import AppView from "./AppView.svelte";
-    import Sidebar from "./sidebar/Sidebar.svelte";
-    import ContextBadge from "./sidebar/ContextBadge.svelte";
-    import Agenda from "./agenda/Agenda.svelte";
-    import Toasts from "./interface/Toasts.svelte";
+    import AppCompose from "./AppCompose.svelte";
     import type { Task, UpdateFirstDueTaskResult } from "../types/todoist";
 
     let isSpinning = $state(false);
@@ -54,7 +46,7 @@
 
     const handleClearSelectedTask = async (): Promise<void> => {
         debounceState.clearDebounceTimeout();
-        const selectedContext = get(userSettings).selectedContext;
+        const selectedContext = $userSettings.selectedContext;
         const summoned = $firstDueTask?.summoned;
 
         if (summoned) {
@@ -188,7 +180,7 @@
         if (enableSkip) {
             task.skip = true;
         }
-        const currentFirstDueSummoned = get(firstDueTask)?.summoned;
+        const currentFirstDueSummoned = $firstDueTask?.summoned;
 
         task.summoned = currentFirstDueSummoned || window.location.hash;
 
@@ -212,10 +204,10 @@
             return performSummon(task, enableSkip);
         }
         return {
-            task: get(firstDueTask),
+            task: $firstDueTask,
             showNewTaskToast: false,
             doClearContext: false,
-            dueTasks: get(todoistData).dueTasks,
+            dueTasks: $todoistData.dueTasks,
         };
     }
 
@@ -254,48 +246,4 @@
     });
 </script>
 
-<div class="flex w-fit items-center">
-    <Sidebar hash={$hashStore} />
-
-    {#if $firstDueTask && $hashStore !== "#today" && $hashStore !== "#tomorrow"}
-        {#key $firstDueTask.id}
-            <ContextBadge />
-        {/key}
-    {/if}
-</div>
-
-{#if $hashStore === "#today" || $hashStore === "#tomorrow"}
-    <Agenda />
-{:else}
-    <AppView {dataPromise} />
-{/if}
-
-<div class="fixed right-2 bottom-2 z-10">
-    <button class="bg-base-100 rounded-md p-1" onclick={handleRefresh} type="button">
-        <Icon class="h-6 w-6 {isSpinning ? 'animate-spin cursor-wait' : ''}" src={ArrowPath} />
-    </button>
-</div>
-
-<Toasts />
-
-<svelte:window
-    use:shortcut={{
-        trigger: [
-            {
-                key: "a",
-                callback: () => {
-                    toggleAgendaHash();
-                    window.dispatchEvent(
-                        new KeyboardEvent("keydown", {
-                            key: "c",
-                            bubbles: true,
-                            ctrlKey: true,
-                            shiftKey: true,
-                        }),
-                    );
-                },
-                modifier: false,
-            },
-        ],
-    }}
-/>
+<AppCompose {dataPromise} {isSpinning} />
