@@ -2,15 +2,15 @@ import { DateTime } from "luxon";
 import { roundFutureTime, createDateWithTime } from "./timeUtils";
 import { buttonConfig, handleSameDayButton, handleNextDayButton } from "./deferTimeConfigs";
 import type { Task } from "../types/todoist";
-import type { TimeButtonConfig, DateButtonConfig, TimeButtonContext } from "../types/defer";
+import type { ButtonConfig, DateButtonConfig, TimeButtonContext } from "../types/defer";
 
 /**
  * Processes a button to calculate its ms and styling based on its position and time.
- * @param {TimeButtonConfig} button - The button to process.
+ * @param {ButtonConfig} button - The button to process.
  * @param {TimeButtonContext} context - Object containing futureTime, now, nextMorning, index, and processedButtons.
  * @returns The processed button.
  */
-function processButton(button: TimeButtonConfig, context: TimeButtonContext): TimeButtonConfig {
+function processButton(button: ButtonConfig, context: TimeButtonContext): ButtonConfig {
     const futureTime = new Date(context.now.getTime() + (button.ms ?? 0));
     const roundedFutureTime = roundFutureTime(futureTime, context.index);
 
@@ -31,7 +31,7 @@ function processButton(button: TimeButtonConfig, context: TimeButtonContext): Ti
  * @param {Date} now - The current date and time.
  * @returns An array of processed hour buttons.
  */
-const processHourButtons = (now: Date): TimeButtonConfig[] => {
+const processHourButtons = (now: Date): ButtonConfig[] => {
     return buttonConfig.hours
         .reduce(
             (acc, item) => {
@@ -40,7 +40,7 @@ const processHourButtons = (now: Date): TimeButtonConfig[] => {
                 const isNextDayAdjustmentNeeded = futureTimeCandidate.getDate() !== now.getDate();
                 const nextDayHourButtonCount = acc.filter(
                     (btn) =>
-                        (btn as TimeButtonConfig & { isAdjustedForNextDay?: boolean })
+                        (btn as ButtonConfig & { isAdjustedForNextDay?: boolean })
                             .isAdjustedForNextDay,
                 ).length;
 
@@ -68,7 +68,7 @@ const processHourButtons = (now: Date): TimeButtonConfig[] => {
                 });
                 return acc;
             },
-            [] as (TimeButtonConfig & { isAdjustedForNextDay?: boolean })[],
+            [] as (ButtonConfig & { isAdjustedForNextDay?: boolean })[],
         )
         .map(({ text, ms, styling, stylingButton, value, height }) => ({
             text,
@@ -84,7 +84,7 @@ const processHourButtons = (now: Date): TimeButtonConfig[] => {
  * Creates an array of minute buttons with their configurations.
  * @returns An array of minute buttons.
  */
-const createMinuteButtons = (): TimeButtonConfig[] => {
+const createMinuteButtons = (): ButtonConfig[] => {
     return buttonConfig.minutes.map(({ value, height }) => ({
         text: `${value} minute${value && value > 1 ? "s" : ""}`,
         ms: (value ?? 0) * 60 * 1000,
@@ -99,13 +99,13 @@ const createMinuteButtons = (): TimeButtonConfig[] => {
  * Creates an array of processed defer buttons with calculated times and styling.
  * @returns An array of processed buttons.
  */
-export const createButtons = (): TimeButtonConfig[] => {
+export const createButtons = (): ButtonConfig[] => {
     const now = new Date();
     const nextMorning = new Date(now);
     nextMorning.setDate(now.getDate() + 1);
     nextMorning.setHours(6, 0, 0, 0);
 
-    const buttons: TimeButtonConfig[] = [
+    const buttons: ButtonConfig[] = [
         buttonConfig.tomorrow,
         ...createMinuteButtons(),
         ...processHourButtons(now),

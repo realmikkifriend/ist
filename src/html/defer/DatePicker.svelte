@@ -7,7 +7,7 @@
     import type { Task, Priority } from "../../types/todoist";
     import type { DatePickerProps } from "../../types/defer";
 
-    let { taskToDefer, tz, tasks, onDefer }: DatePickerProps = $props();
+    let { task, tz, tasks, onDefer }: DatePickerProps = $props();
 
     let dateInfo = $derived(
         (() => {
@@ -20,7 +20,7 @@
                 },
                 {
                     tz,
-                    contextId: taskToDefer.contextId ?? "",
+                    contextId: task.contextId ?? "",
                     monthYear: now.toFormat("MMMM yyyy"),
                     now,
                     soonTasks: tasks,

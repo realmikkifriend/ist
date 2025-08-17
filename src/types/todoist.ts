@@ -20,12 +20,7 @@ export interface TodoistData {
     };
 }
 
-export interface CleanableTodoistData {
-    tasks?: Task[];
-    contexts?: Context[];
-    user?: User;
-    [key: string]: unknown;
-}
+export type CleanableTodoistData = Partial<TodoistData> & { [key: string]: unknown };
 
 export type Priority = 1 | 2 | 3 | 4;
 
@@ -117,11 +112,7 @@ export interface ContextButtonProps {
     isDisabled?: boolean;
 }
 
-export interface DueTasksData {
-    tasks: Task[];
-    contexts: Context[];
-    user?: User;
-}
+export type DueTasksData = Pick<TodoistData, "tasks" | "contexts" | "user">;
 
 export type TaskUpdates = Array<[string, Date | DateTime | string]>;
 

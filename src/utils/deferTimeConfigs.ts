@@ -1,4 +1,4 @@
-import type { DeferButtonConfig, TimeButtonConfig, TimeButtonContext } from "../types/defer";
+import type { DeferButtonConfig, ButtonConfig, TimeButtonContext } from "../types/defer";
 
 /**
  * Button configuration for defer buttons (time-based).
@@ -20,11 +20,11 @@ export const buttonConfig: DeferButtonConfig = {
         { value: 45, height: "h-7" },
     ],
 
-    hours: ((): TimeButtonConfig[] => {
+    hours: ((): ButtonConfig[] => {
         const baseStyling = "basis-[22.75%]";
         const largeStyling = "basis-[48.5%]";
 
-        const hoursValues: Array<Partial<TimeButtonConfig> & { value: number }> = [
+        const hoursValues: Array<Partial<ButtonConfig> & { value: number }> = [
             { value: 1, text: "1 hour", styling: largeStyling },
             { value: 1.5, text: "90 minutes", styling: largeStyling },
             { value: 2 },
@@ -48,16 +48,16 @@ export const buttonConfig: DeferButtonConfig = {
 
 /**
  * Handles the processing for a button that crosses into the next day.
- * @param {TimeButtonConfig} button - The button to process.
+ * @param {ButtonConfig} button - The button to process.
  * @param {TimeButtonContext} context - Object containing futureTime, now, nextMorning, index, and processedButtons.
  * @param {Date} adjustedFutureTime - Time to add to button.
  * @returns The processed button configuration.
  */
 export function handleNextDayButton(
-    button: TimeButtonConfig,
+    button: ButtonConfig,
     context: TimeButtonContext,
     adjustedFutureTime: Date,
-): TimeButtonConfig {
+): ButtonConfig {
     return {
         ...button,
         ms: adjustedFutureTime.getTime() - context.now.getTime(),
@@ -69,16 +69,16 @@ export function handleNextDayButton(
 
 /**
  * Handles the processing for a button that does not cross into the next day.
- * @param {TimeButtonConfig} button - The button to process.
+ * @param {ButtonConfig} button - The button to process.
  * @param {Date} futureTime - The button deferral time.
  * @param {Date} now - The current date.
  * @returns The processed button configuration.
  */
 export function handleSameDayButton(
-    button: TimeButtonConfig,
+    button: ButtonConfig,
     futureTime: Date,
     now: Date,
-): TimeButtonConfig {
+): ButtonConfig {
     const stylingButton =
         (button.stylingButton ?? "") + (button.text !== "tomorrow" ? " bg-neutral" : "");
     return {

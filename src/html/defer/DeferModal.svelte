@@ -101,7 +101,7 @@
             {#if isTimeTabActive}
                 <TimePicker onDefer={handleDefer} {task} {tasks} />
             {:else}
-                <DatePicker onDefer={handleDefer} taskToDefer={task} {tasks} {tz} />
+                <DatePicker onDefer={handleDefer} {task} {tasks} {tz} />
             {/if}
         {/key}
     {/key}

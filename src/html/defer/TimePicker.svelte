@@ -6,9 +6,9 @@
     import { getPriorityClasses } from "../../styles/styleUtils";
     import ListTask from "../task/ListTask.svelte";
     import type { ShortcutModifierDefinition } from "@svelte-put/shortcut";
-    import type { TimePickerProps } from "../../types/defer";
+    import type { DeferPickerProps } from "../../types/defer";
 
-    let { task, tasks = $bindable(), onDefer }: TimePickerProps = $props();
+    let { task, tasks = $bindable(), onDefer }: DeferPickerProps = $props();
 
     let buttons: HTMLButtonElement[] = $state([]);
 

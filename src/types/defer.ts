@@ -9,8 +9,6 @@ export interface ButtonConfig {
     stylingButton?: string;
 }
 
-export type TimeButtonConfig = ButtonConfig;
-
 export interface DateButtonConfig extends ButtonConfig {
     priority?: Priority;
     time?: string;
@@ -18,9 +16,9 @@ export interface DateButtonConfig extends ButtonConfig {
 }
 
 export interface DeferButtonConfig {
-    tomorrow: TimeButtonConfig;
-    minutes: TimeButtonConfig[];
-    hours: TimeButtonConfig[];
+    tomorrow: ButtonConfig;
+    minutes: ButtonConfig[];
+    hours: ButtonConfig[];
 }
 
 export interface TimeButtonContext {
@@ -28,22 +26,19 @@ export interface TimeButtonContext {
     now: Date;
     nextMorning: Date;
     index: number;
-    processedButtons: (TimeButtonConfig | null)[];
+    processedButtons: (ButtonConfig | null)[];
 }
 
 export interface DeferEventDetail {
     rawTime: string | number;
 }
 
-export interface DatePickerProps {
-    taskToDefer: Task;
-    tz: string;
+export interface DeferPickerProps {
+    task: Task;
     tasks: Task[];
     onDefer: (detail: DeferEventDetail) => void;
 }
 
-export interface TimePickerProps {
-    task: Task;
-    tasks: Task[];
-    onDefer: (detail: DeferEventDetail) => void;
+export interface DatePickerProps extends DeferPickerProps {
+    tz: string;
 }
