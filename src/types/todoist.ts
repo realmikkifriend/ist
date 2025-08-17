@@ -143,17 +143,6 @@ export interface UpdateFirstDueTaskResult {
     updatedTodoistData?: TodoistData;
 }
 
-export interface HistoryProps {
-    entityId: string;
-    content: string;
-    activity:
-        | TaskActivity[]
-        | Promise<TaskActivity[] | undefined>
-        | undefined
-        | Record<string, { dots: { color: string }[]; tasks: Task[] }>;
-    title?: string;
-}
-
 export interface InitialCheckOutcome {
     action: "continue" | "exit" | "set_task_and_exit" | "set_task_and_continue";
     taskToSet?: Task | null;

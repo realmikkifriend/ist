@@ -3,6 +3,7 @@ import type { DateTime } from "luxon";
 import type { ListBullet } from "svelte-hero-icons";
 import type { Task } from "./todoist";
 import type { DynalistTaskType } from "./dynalist";
+import type { DateInfo } from "./calendar";
 
 export type ResettableStore<T> = Writable<T> & {
     reset: () => void;
@@ -37,14 +38,9 @@ export interface LogoProps {
 }
 
 export interface CalendarProps {
-    dateInfo?: Record<string, { dots: { color: string }[]; tasks: Task[] }>;
+    dateInfo?: DateInfo;
     onDayClick?: ((day: DateTime) => void) | undefined;
     disable?: "past" | "future" | null;
-}
-export interface CalendarHeaderProps {
-    disable?: "past" | "future" | null;
-    displayDate: DateTime;
-    onchangeMonth: (date: DateTime) => void;
 }
 
 export type DynamicModalProps = {

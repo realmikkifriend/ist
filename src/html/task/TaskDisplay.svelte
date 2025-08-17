@@ -73,7 +73,9 @@
     <DeferModal onDeferFinal={() => closeModal("defer_modal")} {task} {...modalProps} />
 </dialog>
 
-<History activity={task.activity} content={task.content} entityId={task.id} />
+{#if task.activity}
+    <History activity={task.activity} content={task.content} entityId={task.id} />
+{/if}
 
 <svelte:window
     use:shortcut={{

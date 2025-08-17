@@ -1,7 +1,7 @@
 <script lang="ts">
     import { DateTime } from "luxon";
     import ListTask from "../task/ListTask.svelte";
-    import type { CalendarDayProps } from "../../types/defer";
+    import type { CalendarDayProps } from "../../types/calendar";
 
     let { day, dots, tooltip = undefined, disable = null }: CalendarDayProps = $props();
 

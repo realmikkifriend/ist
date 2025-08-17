@@ -1,5 +1,4 @@
 import type { Priority, Task } from "./todoist";
-import type { DateTime } from "luxon";
 
 export interface ButtonConfig {
     value?: number;
@@ -24,14 +23,6 @@ export interface DeferButtonConfig {
     hours: TimeButtonConfig[];
 }
 
-export interface CalendarContext {
-    monthYear: string;
-    now: DateTime;
-    soonTasks: Task[];
-    tz: string;
-    contextId: string;
-}
-
 export interface TimeButtonContext {
     futureTime: Date;
     now: Date;
@@ -49,13 +40,6 @@ export interface DatePickerProps {
     tz: string;
     tasks: Task[];
     onDefer: (detail: DeferEventDetail) => void;
-}
-
-export interface CalendarDayProps {
-    day: DateTime;
-    dots: { color: string }[];
-    tooltip?: Task[] | undefined;
-    disable?: "past" | "future" | null;
 }
 
 export interface TimePickerProps {

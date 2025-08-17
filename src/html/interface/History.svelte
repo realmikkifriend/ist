@@ -1,7 +1,7 @@
 <script lang="ts">
     import { processActivityForCalendar } from "../../utils/calendarUtils";
     import Calendar from "./Calendar.svelte";
-    import type { HistoryProps } from "../../types/todoist";
+    import type { HistoryProps } from "../../types/calendar";
 
     let { entityId, content, activity, title = "History" }: HistoryProps = $props();
 

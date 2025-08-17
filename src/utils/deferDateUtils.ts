@@ -1,6 +1,6 @@
 import { DateTime } from "luxon";
 import type { Task } from "../types/todoist";
-import type { CalendarContext } from "../types/defer";
+import type { CalendarContext } from "../types/calendar";
 
 /**
  * Filters tasks for those due within the given date range and context.

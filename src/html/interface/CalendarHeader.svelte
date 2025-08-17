@@ -3,7 +3,7 @@
     import { DateTime } from "luxon";
     import { Icon, ChevronUp, ChevronDown } from "svelte-hero-icons";
     import { shortcut } from "@svelte-put/shortcut";
-    import type { CalendarHeaderProps } from "../../types/interface";
+    import type { CalendarHeaderProps } from "../../types/calendar";
 
     let { disable = null, displayDate, onchangeMonth }: CalendarHeaderProps = $props();
 
