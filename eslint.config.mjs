@@ -51,7 +51,7 @@ export default defineConfig([
             globals: globals.browser,
         },
         rules: {
-            "max-lines": ["warn", { max: 150, skipComments: true, skipBlankLines: true }],
+            "max-lines": ["warn", { max: 130, skipComments: true, skipBlankLines: true }],
             "max-depth": ["warn", 2],
         },
     },
@@ -89,7 +89,7 @@ export default defineConfig([
             complexity: ["warn", { max: 7 }],
             "max-lines-per-function": [
                 "warn",
-                { max: 50, skipComments: true, skipBlankLines: true },
+                { max: 45, skipComments: true, skipBlankLines: true },
             ],
         },
     },
@@ -175,7 +175,7 @@ export default defineConfig([
             },
         },
         rules: {
-            // "max-lines": ["warn", { max: 170, skipComments: true, skipBlankLines: true }],
+            "max-lines": ["warn", { max: 140, skipComments: true, skipBlankLines: true }],
             "max-depth": ["warn", 2],
             "no-restricted-syntax": [
                 "warn",
@@ -216,6 +216,7 @@ export default defineConfig([
         files: ["**/*.svelte"],
         ignores: [
             "src/html/AppMethods.svelte",
+            "src/html/AppStateMutators.svelte",
             "src/html/OAuthCallback.svelte",
             "src/html/task/dynalist/DynalistAuthRequest.svelte",
         ],
