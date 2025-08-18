@@ -3,7 +3,8 @@
     import { todoistData } from "../../stores/stores";
     import { hashStore } from "../../stores/interface";
     import { updateAgenda, getTitle } from "../../services/agendaService";
-    import { computeHeaderGradientColor, getDisplayHours } from "../../utils/agendaDisplayUtils";
+    import { getDisplayHours } from "../../utils/agendaDisplayUtils";
+    import { computeHeaderGradientColor } from "../../utils/agendaGradientUtils";
     import { getTaskColor } from "../../styles/styleUtils";
     import AgendaHeader from "./AgendaHeader.svelte";
     import AgendaHour from "./AgendaHour.svelte";
