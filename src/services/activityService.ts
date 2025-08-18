@@ -4,13 +4,12 @@ import { todoistData, taskActivity } from "../stores/stores";
 import { todoistAccessToken } from "../stores/secret";
 import {
     getNewActivity,
-    checkCoverage,
-    filterActivityByTimeframe,
     mergeActivity,
     processActivityData,
     shouldContinueFetchingActivity,
     processActivityAccumulation,
 } from "../utils/activityUtils";
+import { filterActivityByTimeframe, checkCoverage } from "../utils/activityTimeframeUtils";
 import { colorClasses } from "../styles/styleUtils";
 import type { Task, ColorName, GetAllActivityDataParams } from "../types/todoist";
 import type { TaskActivity, TodoistActivity } from "../types/activity";
