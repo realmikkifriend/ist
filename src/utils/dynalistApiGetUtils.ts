@@ -7,59 +7,49 @@ import type {
     ValidateDynalistTokenResult,
 } from "../types/dynalist";
 
+function parseDynalistUrl(url: string) {
+    const lastIndex = url.lastIndexOf("/");
+    const hashIndex = url.indexOf("#z=", lastIndex);
+    const dynalistFileID = url.slice(lastIndex + 1, hashIndex === -1 ? undefined : hashIndex);
+    const dynalistSubItem = hashIndex === -1 ? undefined : url.slice(hashIndex + 3);
+    return { dynalistFileID, dynalistSubItem };
+}
+
 /**
  * Fetches a Dynalist document by URL and access token.
  * @param {string} url - The URL of the Dynalist document to fetch.
  * @param {string} accessToken - The Dynalist API access token.
  * @returns {Promise<FetchDynalistDocumentResult>} The result containing the document data or an error.
  */
-export function fetchDynalistDocument(
+export async function fetchDynalistDocument(
     url: string,
     accessToken: string,
 ): Promise<FetchDynalistDocumentResult> {
-    const lastIndex = url.lastIndexOf("/"),
-        hashIndex = url.indexOf("#z=", lastIndex),
-        dynalistFileID = url.slice(lastIndex + 1, hashIndex === -1 ? undefined : hashIndex),
-        dynalistSubItem = hashIndex === -1 ? undefined : url.slice(hashIndex + 3);
+    const { dynalistFileID, dynalistSubItem } = parseDynalistUrl(url);
 
-    return fetch("https://dynalist.io/api/v1/doc/read", {
+    const response = await fetch("https://dynalist.io/api/v1/doc/read", {
         method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-            token: accessToken,
-            file_id: dynalistFileID,
-        }),
-    })
-        .then((response) =>
-            response
-                .json()
-                .then((data: unknown) => ({ response, data, jsonError: false }))
-                .catch(() => ({ response, data: null, jsonError: true })),
-        )
-        .then((result) => {
-            if (result.jsonError) {
-                return {
-                    error: "Failed to parse Dynalist response as JSON",
-                    jsonError: true,
-                };
-            }
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token: accessToken, file_id: dynalistFileID }),
+    });
 
-            const data = result.data;
-            const isObj = (val: unknown): val is { _code?: string; _msg?: string } =>
-                typeof val === "object" && val !== null;
-            if (!result.response.ok || (isObj(data) && data._code === "NotFound")) {
-                return {
-                    error: result.response.statusText || (isObj(data) ? data._msg : undefined),
-                    data: null,
-                };
-            }
-            return { data: data as DynalistContent | null, dynalistSubItem };
-        })
-        .catch((error) => ({
-            error: (error as Error)?.message || "Unknown error fetching Dynalist document",
-        }));
+    const data: unknown = await response.json().catch(() => null);
+    const jsonError = data === null;
+
+    if (jsonError) {
+        return { error: "Failed to parse Dynalist response as JSON", jsonError: true };
+    }
+
+    const isObj = (val: unknown): val is { _code?: string; _msg?: string } =>
+        typeof val === "object" && val !== null;
+
+    if (!response.ok || (isObj(data) && data._code === "NotFound")) {
+        return {
+            error: response.statusText || (isObj(data) ? data._msg : undefined),
+            data: null,
+        };
+    }
+    return { data: data as DynalistContent | null, dynalistSubItem };
 }
 
 /**

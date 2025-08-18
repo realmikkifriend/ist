@@ -109,12 +109,10 @@ export async function handleDynalistTrackingClick(
         (c): c is DynalistNode => typeof c !== "string",
     );
 
-    const handleDeleteAction = () => {
+    if (changeAction.action === "delete") {
         success("Removed date from Dynalist!");
         return existingNodes.filter((c) => c.content !== today);
-    };
-
-    const handleInsertAction = () => {
+    } else {
         success("Added date to Dynalist!");
         const newNode: DynalistNode = {
             id: result.new_node_ids?.[0] || "temp-id",
@@ -123,7 +121,5 @@ export async function handleDynalistTrackingClick(
             children: [],
         };
         return [...existingNodes, newNode];
-    };
-
-    return changeAction.action === "delete" ? handleDeleteAction() : handleInsertAction();
+    }
 }
