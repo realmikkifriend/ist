@@ -6,7 +6,7 @@
     import { getPriorityClasses } from "../../styles/styleUtils";
     import ListTask from "../task/ListTask.svelte";
     import type { ShortcutModifierDefinition } from "@svelte-put/shortcut";
-    import type { DeferPickerProps } from "../../types/defer";
+    import type { DeferPickerProps, DateButtonConfig } from "../../types/defer";
 
     let { task, tasks = $bindable(), onDefer }: DeferPickerProps = $props();
 
@@ -26,14 +26,17 @@
         onDefer({ rawTime });
     };
 
+    const deferButtons = $derived(updateMilliseconds(task, tasks));
+
     const shortcutTriggers = $derived(
-        Array.from({ length: buttons.length }, (_, i) => {
+        Array.from({ length: deferButtons.length }, (_, i) => {
             const hotkey = i + 1;
+            const button: DateButtonConfig = deferButtons[i];
             const returnKey = {
                 key: hotkey >= 10 ? getShiftedSymbol(hotkey - 10) : String(hotkey),
                 callback: () => {
-                    if (buttons[i]) {
-                        buttons[i].click();
+                    if (button.ms !== undefined) {
+                        handleDefer(Number(button.ms));
                     }
                 },
                 modifier: (hotkey >= 10 ? "shift" : undefined) as
@@ -43,8 +46,6 @@
             return returnKey;
         }),
     );
-
-    const deferButtons = $derived(updateMilliseconds(task, tasks));
 </script>
 
 <div class="mt-2 flex w-72 flex-row flex-wrap gap-x-2 gap-y-1">
