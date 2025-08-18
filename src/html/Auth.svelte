@@ -3,9 +3,9 @@
     import "@fontsource/clear-sans/400.css";
     import "@fontsource/clear-sans/700.css";
     import "../styles/styles.css";
-    import AppMethods from "./AppMethods.svelte";
-    import LandingPage from "./Landing.svelte";
     import OAuthCallback from "./OAuthCallback.svelte";
+    import LandingPage from "./Landing.svelte";
+    import AppStateMutators from "./AppStateMutators.svelte";
 
     const isBrowser = typeof window !== "undefined";
     const search = isBrowser ? window.location.search : "";
@@ -24,5 +24,5 @@
         <LandingPage />
     {/if}
 {:else}
-    <AppMethods />
+    <AppStateMutators />
 {/if}

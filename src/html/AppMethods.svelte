@@ -1,24 +1,25 @@
 <script lang="ts">
-    import { onMount, setContext } from "svelte";
+    import { onMount, setContext, getContext } from "svelte";
     import { on } from "svelte/events";
-    import {
-        todoistData,
-        firstDueTask,
-        todoistError,
-        previousFirstDueTask,
-    } from "../stores/stores";
+    import { todoistData, todoistError, firstDueTask } from "../stores/stores";
     import { userSettings, hashStore } from "../stores/interface";
     import { debounceState } from "../services/firstTaskService";
     import { updateFirstDueTask, skipTask } from "../services/firstTaskService";
     import { refreshData } from "../services/updateService";
-    import { newFirstTask, clearToasts, success } from "../services/toastService";
-    import { calculateUpdatedTaskResources } from "../utils/processUtils";
+    import { success } from "../services/toastService";
     import AppCompose from "./AppCompose.svelte";
-    import type { Task, UpdateFirstDueTaskResult, TaskUpdates } from "../types/todoist";
-    import type { TaskActivity } from "../types/activity";
-    import { taskActivity } from "../stores/stores";
+    import type { Task, UpdateFirstDueTaskResult } from "../types/todoist";
+    import type { AppStateMutatorsContext, HandlerMethodsContext } from "../types/methods";
 
     let isSpinning = $state(false);
+
+    const {
+        changeSelectedContext,
+        setTask,
+        clearPreviousFirstDueTask,
+        handleDataUpdates,
+        handleTaskDisplay,
+    } = getContext<AppStateMutatorsContext>("appStateMutators");
 
     $effect(() => {
         if ($userSettings.selectedContext || $todoistData.dueTasks) {
@@ -66,87 +67,6 @@
     };
 
     /**
-     * Changes the selected context in user settings.
-     * @param context - The context to set, or null to clear.
-     */
-    const changeSelectedContext = (context: { id: string; name: string } | null): void => {
-        userSettings.update((settings) => ({ ...settings, selectedContext: context }));
-    };
-
-    /**
-     * Sets the first due task and the previous first due task.
-     * @param task - The task to set.
-     */
-    const setTask = (task: Task | null): void => {
-        firstDueTask.set(task);
-        previousFirstDueTask.set(task);
-    };
-
-    /**
-     * Clears the previous first due task.
-     */
-    const clearPreviousFirstDueTask = (): void => {
-        previousFirstDueTask.set(null);
-    };
-
-    /**
-     * Updates the todoistData store with new task resources.
-     * @param taskUpdates - Array of tasks that have been updated.
-     * @param deletedTaskIds - Array of task IDs that have been deleted.
-     */
-    const updateTodoistDataResources = (
-        taskUpdates: TaskUpdates = [],
-        deletedTaskIds: string[] = [],
-    ): void => {
-        todoistData.set(calculateUpdatedTaskResources($todoistData, taskUpdates, deletedTaskIds));
-    };
-
-    /**
-     * Handles data updates from fetching the first due task.
-     * @param updatedTodoistData - The data to be updated.
-     * @param doClearContext - Whether to clear the selected context.
-     */
-    const handleDataUpdates = (
-        updatedTodoistData: UpdateFirstDueTaskResult["updatedTodoistData"],
-        doClearContext: boolean,
-    ): void => {
-        if (updatedTodoistData) {
-            todoistData.set(updatedTodoistData);
-        }
-
-        if (doClearContext) {
-            changeSelectedContext(null);
-        }
-    };
-
-    /**
-     * Adds a new task activity entry to the store.
-     * @param newActivityEntry - The new activity to add to entries.
-     */
-    const addTaskActivityEntry = (newActivityEntry: TaskActivity): void => {
-        taskActivity.update((activities) => [...activities, newActivityEntry]);
-    };
-
-    /**
-     * Handles displaying the task.
-     * @param task - The task to display.
-     * @param showNewTaskToast - Whether to show a new task toast.
-     */
-    const handleTaskDisplay = (task: Task | null, showNewTaskToast: boolean): void => {
-        if (!task) {
-            setTask(null);
-            return;
-        }
-
-        if (showNewTaskToast && task.id !== $firstDueTask?.id) {
-            newFirstTask((t) => setTask(t), task);
-        } else {
-            setTask(task);
-            clearToasts(undefined, "info");
-        }
-    };
-
-    /**
      * Updates the displayed task.
      * @returns Promise that resolves when the task is updated.
      */
@@ -166,7 +86,7 @@
     function handleContextChange(contextId: string | null): void {
         debounceState.clearDebounceTimeout();
 
-        previousFirstDueTask.set(null);
+        clearPreviousFirstDueTask();
         const isCurrentlySelected = $userSettings.selectedContext?.id === contextId;
         const newSelectedContext = isCurrentlySelected
             ? null
@@ -215,8 +135,7 @@
         task.summoned = currentFirstDueSummoned || window.location.hash;
 
         const result = await updateFirstDueTask(task);
-        firstDueTask.set(result.task);
-        previousFirstDueTask.set(result.task);
+        setTask(result.task);
         return result;
     }
 
@@ -241,16 +160,13 @@
         };
     }
 
-    setContext("methods", {
+    setContext<HandlerMethodsContext>("handlerMethods", {
         handleRefresh,
         handleClearSelectedTask,
         handleContextChange,
         updateDisplayedTask,
         handleSkipTask,
         summonTask,
-        clearPreviousFirstDueTask,
-        updateTodoistDataResources,
-        addTaskActivityEntry,
     });
 
     /**

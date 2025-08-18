@@ -10,11 +10,11 @@
     import TaskActions from "./TaskActions.svelte";
     import type { Task, Priority } from "../../types/todoist";
     import type { DynamicModalProps } from "../../types/interface";
-    import type { MethodsContext } from "../../types/methods";
+    import type { HandlerMethodsContext } from "../../types/methods";
 
     let { task }: { task: Task } = $props();
 
-    const { handleSkipTask } = getContext<MethodsContext>("methods");
+    const { handleSkipTask } = getContext<HandlerMethodsContext>("handlerMethods");
 
     const priorityBorderClass = getPriorityBorder(task.priority as Priority);
 

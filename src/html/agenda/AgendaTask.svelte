@@ -5,11 +5,11 @@
     import { getPriorityClasses, colorClasses, borderClasses } from "../../styles/styleUtils";
     import type { Priority } from "../../types/todoist";
     import type { AgendaTaskProps } from "../../types/agenda";
-    import type { MethodsContext } from "../../types/methods";
+    import type { HandlerMethodsContext } from "../../types/methods";
 
     let { task, color }: AgendaTaskProps = $props();
 
-    const { summonTask } = getContext<MethodsContext>("methods");
+    const { summonTask } = getContext<HandlerMethodsContext>("handlerMethods");
 
     const firstDueClasses = "shadow-sm shadow-red-400";
     const taskPriority = task.priority as Priority;

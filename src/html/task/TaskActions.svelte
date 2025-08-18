@@ -12,7 +12,7 @@
     import { success, error } from "../../services/toastService";
     import { handleTaskDefer, handleTaskDone } from "../../services/taskHandlerService";
     import type { Task } from "../../types/todoist";
-    import type { MethodsContext } from "../../types/methods";
+    import type { AppStateMutatorsContext, HandlerMethodsContext } from "../../types/methods";
     import type { TaskActivity } from "../../types/activity";
 
     let {
@@ -23,14 +23,11 @@
         openModal: (modalId: string, props?: Record<string, unknown>) => void;
     } = $props();
 
-    const {
-        handleRefresh,
-        updateDisplayedTask,
-        handleSkipTask,
-        clearPreviousFirstDueTask,
-        updateTodoistDataResources,
-        addTaskActivityEntry,
-    } = getContext<MethodsContext>("methods");
+    const { clearPreviousFirstDueTask, updateTodoistDataResources, addTaskActivityEntry } =
+        getContext<AppStateMutatorsContext>("appStateMutators");
+
+    const { handleRefresh, updateDisplayedTask, handleSkipTask } =
+        getContext<HandlerMethodsContext>("handlerMethods");
 
     /**
      * Handles marking a task as done, calling the service and showing a toast.
@@ -89,7 +86,7 @@
         }
 
         if (deferredTask.skip) {
-            await handleSkipTask();
+            handleSkipTask();
         }
     };
 </script>

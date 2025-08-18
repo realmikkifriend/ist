@@ -4,11 +4,11 @@
     import { shortcut } from "@svelte-put/shortcut";
     import { todoistData } from "../../stores/stores";
     import type { AgendaHeaderProps } from "../../types/agenda";
-    import type { MethodsContext } from "../../types/methods";
+    import type { HandlerMethodsContext } from "../../types/methods";
 
     let { agendaData, displayData }: AgendaHeaderProps = $props();
 
-    const { summonTask } = getContext<MethodsContext>("methods");
+    const { summonTask } = getContext<HandlerMethodsContext>("handlerMethods");
 
     let { tasks, tasksWithNoTime, todayTasks } = $derived(agendaData);
     let { title, headerGradientColor } = $derived(displayData);

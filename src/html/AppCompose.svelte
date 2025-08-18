@@ -10,14 +10,14 @@
     import ContextBadge from "./sidebar/ContextBadge.svelte";
     import Agenda from "./agenda/Agenda.svelte";
     import Toasts from "./interface/Toasts.svelte";
-    import type { MethodsContext } from "../types/methods";
+    import type { HandlerMethodsContext } from "../types/methods";
 
     let { isSpinning, dataPromise } = $props<{
         isSpinning: boolean;
         dataPromise: Promise<void>;
     }>();
 
-    const { handleRefresh } = getContext<MethodsContext>("methods");
+    const { handleRefresh } = getContext<HandlerMethodsContext>("handlerMethods");
 </script>
 
 <div class="flex w-fit items-center">

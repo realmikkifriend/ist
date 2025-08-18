@@ -6,9 +6,10 @@
     import { userSettings } from "../../stores/interface";
     import { getDueTaskCountByContext } from "../../utils/filterUtils";
     import { getSelectedContextName } from "../../utils/firstTaskUtils";
-    import type { MethodsContext } from "../../types/methods";
+    import type { HandlerMethodsContext } from "../../types/methods";
 
-    const { handleClearSelectedTask, handleContextChange } = getContext<MethodsContext>("methods");
+    const { handleClearSelectedTask, handleContextChange } =
+        getContext<HandlerMethodsContext>("handlerMethods");
 
     const dueTaskCount = $derived(
         getDueTaskCountByContext($todoistData.dueTasks, $firstDueTask ?? null, $userSettings),

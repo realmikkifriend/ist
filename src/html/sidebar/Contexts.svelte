@@ -6,11 +6,11 @@
     import { openAgenda } from "../../services/agendaService";
     import { getTasksGroupedByContext } from "../../utils/filterUtils";
     import ContextButtonContents from "./ContextButtonContents.svelte";
-    import type { MethodsContext } from "../../types/methods";
+    import type { HandlerMethodsContext } from "../../types/methods";
 
     let { closeSidebar }: { closeSidebar: () => void } = $props();
 
-    const { handleContextChange } = getContext<MethodsContext>("methods");
+    const { handleContextChange } = getContext<HandlerMethodsContext>("handlerMethods");
 
     /**
      * A derived store grouping due tasks by context.
