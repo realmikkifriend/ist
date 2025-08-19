@@ -5,8 +5,10 @@
     import { userSettings } from "../../stores/interface";
     import { openAgenda } from "../../services/agendaService";
     import { getTasksGroupedByContext } from "../../utils/filterUtils";
+    import { borderClasses } from "../../styles/styleUtils";
     import ContextButtonContents from "./ContextButtonContents.svelte";
     import type { HandlerMethodsContext } from "../../types/methods";
+    import type { ColorName } from "../../types/todoist";
 
     let { closeSidebar }: { closeSidebar: () => void } = $props();
 
@@ -51,7 +53,9 @@
     {#each $todoistData.contexts as context, index (index)}
         {#if dueTasksByContext[context.id] && dueTasksByContext[context.id].total > 0}
             <button
-                class="bg-secondary text-base-100 tooltip sm:tooltip-right tooltip-bottom mb-2 w-full rounded-lg"
+                class="bg-secondary text-base-100 tooltip sm:tooltip-right tooltip-bottom mb-2 w-full rounded-lg border-l-6 {borderClasses[
+                    context.color as ColorName
+                ]}"
                 class:opacity-25={$userSettings.selectedContext &&
                     $userSettings.selectedContext.id !== context.id}
                 onclick={() => {
