@@ -62,6 +62,13 @@
                 },
                 modifier: false,
             },
+            {
+                key: "?",
+                callback: () => {
+                    document.body.classList.toggle("show-kbd");
+                },
+                modifier: "shift",
+            },
         ],
     }}
 />

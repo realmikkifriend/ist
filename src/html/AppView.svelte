@@ -1,5 +1,4 @@
 <script lang="ts">
-    import { shortcut } from "@svelte-put/shortcut";
     import { todoistData, todoistError, firstDueTask } from "../stores/stores";
     import { error as showError } from "../services/toastService";
     import NoTasks from "./NoTasks.svelte";
@@ -32,17 +31,3 @@
 {:catch error}
     <div class="hero">Error loading Todoist data: {error.message}</div>
 {/await}
-
-<svelte:window
-    use:shortcut={{
-        trigger: [
-            {
-                key: "?",
-                callback: () => {
-                    document.body.classList.toggle("show-kbd");
-                },
-                modifier: "shift",
-            },
-        ],
-    }}
-/>
