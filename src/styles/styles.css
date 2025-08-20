@@ -19,6 +19,8 @@
     --color-priority-2: oklch(0.681 0.1692 258.47); /* blue */
     --color-priority-3: oklch(0.774 0.171 64.17); /* tangerine */
     --color-priority-4: oklch(0.7172 0.1765 26.45); /* red */
+
+    --text-tiny: 0.625rem;
 }
 
 @plugin "daisyui/theme" {

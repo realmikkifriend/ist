@@ -61,9 +61,9 @@
                 >
                 <kbd>{i + 1 >= 10 ? "SHIFT+" + (i - 9) : i + 1}</kbd>
                 {#if button.time}
-                    <div class="flex max-h-4 w-full justify-between text-xs">
+                    <div class="text-tiny flex max-h-4 w-full items-start justify-between">
                         <span
-                            class="text-secondary w-fit overflow-hidden text-left opacity-65"
+                            class="text-secondary w-fit overflow-hidden pl-0.5 text-left leading-3 opacity-90"
                             class:invisible={button.time && button.time.startsWith("*")}
                             >{button.time && button.time.startsWith("*")
                                 ? button.time.slice(1)
@@ -77,7 +77,7 @@
                                     {/each}
                                 </div>
                                 <span
-                                    class="badge badge-xs mt-0 w-fit overflow-hidden px-1 text-right text-xs font-bold {getPriorityClasses(
+                                    class="badge badge-xs text-tiny relative -top-0.5 mt-0 h-3 w-fit overflow-hidden px-1 pb-0.5 text-right font-bold {getPriorityClasses(
                                         button.priority ?? 1,
                                     )}">{button.tasks.length}</span
                                 >
