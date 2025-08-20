@@ -50,11 +50,16 @@
     <div class="text-error italic">{errorMessage}</div>
 {:else if checklistItems && currentIndex < checklistItems.length - 1}
     <div class="mt-1">
-        <em class="absolute -top-3 -left-0.5 text-xs text-nowrap opacity-25">
-            <span class="mr-0.5 inline-block w-7"
-                >{currentIndex + 1}/{checklistItems.length - 1}</span
+        <div class="absolute -top-3.5 left-0 flex w-full items-center">
+            <progress
+                class="progress h-1 w-64 opacity-25"
+                max={checklistItems.length - 1}
+                value={currentIndex}
+            ></progress>
+            <span class="text-tiny mr-0.5 ml-2 inline-block w-7"
+                >{currentIndex}/{checklistItems.length - 1}</span
             >
-        </em>
+        </div>
         <button
             class="comment-focus border-primary-content relative float-left mt-1 mr-2 inline-block h-5 w-5 cursor-pointer border-2 transition-colors"
             aria-label="Next item"
@@ -64,6 +69,11 @@
         <SvelteMarkdown source={checklistItems[currentIndex] ?? ""} />
     </div>
 {:else}
+    <progress
+        class="progress progress-success absolute -top-1 left-0 h-1 w-72 opacity-25"
+        max="1"
+        value="1"
+    ></progress>
     <span class="italic">End of list!</span>
 {/if}
 
