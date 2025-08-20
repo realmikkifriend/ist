@@ -52,7 +52,7 @@
     <div class="mt-1">
         <div class="absolute -top-3.5 left-0 flex w-full items-center">
             <progress
-                class="progress h-1 w-64 opacity-25"
+                class="progress h-1 w-3/4 opacity-25 sm:w-4/5"
                 max={checklistItems.length - 1}
                 value={currentIndex}
             ></progress>
@@ -70,7 +70,7 @@
     </div>
 {:else}
     <progress
-        class="progress progress-success absolute -top-1 left-0 h-1 w-72 opacity-25"
+        class="progress progress-success absolute -top-1 left-0 h-1 w-9/10 opacity-25"
         max="1"
         value="1"
     ></progress>
