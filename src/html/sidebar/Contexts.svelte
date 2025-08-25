@@ -87,11 +87,13 @@
 >
     {#each currentContexts as context, index (context.id)}
         <button
-            class="bg-secondary text-base-100 tooltip sm:tooltip-right tooltip-bottom mb-2 w-full rounded-lg border-l-6 {borderClasses[
+            class="bg-secondary text-base-100 tooltip sm:tooltip-right tooltip-bottom mb-2 w-full rounded-lg border-l-6 disabled:opacity-25 {borderClasses[
                 context.color as ColorName
             ]}"
-            class:opacity-25={$userSettings.selectedContext &&
-                $userSettings.selectedContext.id !== context.id}
+            disabled={($userSettings.selectedContext &&
+                $userSettings.selectedContext.id !== context.id) ||
+                !dueTasksByContext[context.id] ||
+                dueTasksByContext[context.id].total === 0}
             onclick={() => {
                 handleContextChange(context.id);
                 closeSidebar();
@@ -102,8 +104,10 @@
             <ContextButtonContents
                 {context}
                 isDisabled={Boolean(
-                    $userSettings.selectedContext &&
-                        $userSettings.selectedContext.id !== context.id,
+                    ($userSettings.selectedContext &&
+                        $userSettings.selectedContext.id !== context.id) ||
+                        !dueTasksByContext[context.id] ||
+                        dueTasksByContext[context.id].total === 0,
                 )}
                 tasksForContext={dueTasksByContext[context.id] || {
                     total: 0,
