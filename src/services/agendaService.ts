@@ -1,6 +1,4 @@
-import { get } from "svelte/store";
 import { DateTime } from "luxon";
-import { todoistData } from "../stores/stores";
 import {
     sortAgendaTasks,
     getTargetDate,
@@ -8,6 +6,7 @@ import {
     getFilteredTasksWithNoTime,
     getTodayTasksForAgenda,
 } from "../utils/agendaUtils";
+import type { TodoistData } from "../types/todoist";
 import { getTasksInTimeRange } from "../utils/filterUtils";
 import type { AgendaData } from "../types/agenda";
 
@@ -46,10 +45,10 @@ export const getTitle = (hash: string): string => {
 /**
  * Updates the agenda page data based on the current hash and todoist data.
  * @param {string} hash - The current URL hash.
+ * @param {TodoistData} currentData - The current Todoist data.
  * @returns {AgendaData} Data to be displayed in agenda component.
  */
-export const updateAgenda = (hash: string): AgendaData => {
-    const currentData = get(todoistData);
+export const updateAgenda = (hash: string, currentData: TodoistData): AgendaData => {
     const now = DateTime.now();
 
     const targetDate = getTargetDate(now);

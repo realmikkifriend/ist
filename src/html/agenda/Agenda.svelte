@@ -11,7 +11,7 @@
     import AgendaTask from "./AgendaTask.svelte";
     import type { AgendaData } from "../../types/agenda";
 
-    let agendaStore: AgendaData = $derived(updateAgenda($hashStore));
+    let agendaStore: AgendaData = $derived(updateAgenda($hashStore, $todoistData));
 
     const hourSlots: number[] = Array.from({ length: 18 }, (_, i) => i + 6);
 </script>
