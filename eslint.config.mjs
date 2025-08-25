@@ -218,6 +218,7 @@ export default defineConfig([
             "src/html/AppMethods.svelte",
             "src/html/AppStateMutators.svelte",
             "src/html/OAuthCallback.svelte",
+            "src/html/sidebar/Contexts.svelte",
             "src/html/task/dynalist/DynalistAuthRequest.svelte",
         ],
         rules: {

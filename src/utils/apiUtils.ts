@@ -20,7 +20,7 @@ export function initializeApi(accessToken: string): TodoistApi | null {
  * @returns {{ status: "error"; error: TodoistRequestError }} - Formatted error object.
  */
 export function handleApiError(err: unknown): { status: "error"; error: TodoistRequestError } {
-    console.error("Error during API operation:", err); 
+    console.error("Error during API operation:", err);
 
     if (err instanceof TodoistRequestError) {
         return { status: "error", error: err };
@@ -117,6 +117,29 @@ export function getEndpoint<T>(
             Authorization: `Bearer ${accessToken}`,
             "Content-Type": CONTENT_TYPE,
         },
+    }).then((response) =>
+        response.ok ? response.json() : Promise.resolve({ error: `Error: ${response.status}` }),
+    );
+}
+
+/**
+ * Calls a Todoist API endpoint with a POST request.
+ * @param {string} accessToken - The access token for the Todoist API.
+ * @param {string} endpoint - The endpoint to call.
+ * @param {object} data - The data to send in the request body.
+ * @returns {Promise<T>} - Result of API endpoint call.
+ */
+export function postEndpoint<T>(accessToken: string, endpoint: string, data: object): Promise<T> {
+    const CONTENT_TYPE = "application/json";
+    const url = `https://api.todoist.com/api/v1/${endpoint}`;
+
+    return fetch(url, {
+        method: "POST",
+        headers: {
+            Authorization: `Bearer ${accessToken}`,
+            "Content-Type": CONTENT_TYPE,
+        },
+        body: JSON.stringify(data),
     }).then((response) =>
         response.ok ? response.json() : Promise.resolve({ error: `Error: ${response.status}` }),
     );

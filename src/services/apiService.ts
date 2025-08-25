@@ -2,10 +2,10 @@ import { get } from "svelte/store";
 import { TodoistRequestError } from "@doist/todoist-api-typescript";
 import { todoistAccessToken } from "../stores/secret";
 import { formatTaskDate } from "../utils/timeUtils";
-import { initializeApi, handleApiError } from "../utils/apiUtils";
+import { initializeApi, handleApiError, postEndpoint } from "../utils/apiUtils";
 import type { DateTime } from "luxon";
 import type { UpdateTaskArgs } from "@doist/todoist-api-typescript";
-import type { Task } from "../types/todoist";
+import type { Task, Context } from "../types/todoist";
 
 /**
  * Marks a task as done.
@@ -56,4 +56,35 @@ export function deferTasks(
     });
 
     return Promise.all(updatePromises);
+}
+
+/**
+ * Reorders contexts (projects) in Todoist.
+ * @param {Context[]} contexts - The reordered list of contexts.
+ * @returns {Promise<{ status: "success" } | { status: "error"; error: TodoistRequestError | string }>} - Result of API call to reorder contexts.
+ */
+export function reorderContexts(
+    contexts: Context[],
+): Promise<{ status: "success" } | { status: "error"; error: TodoistRequestError | string }> {
+    const accessToken = get(todoistAccessToken);
+    if (!accessToken) {
+        return Promise.resolve(handleApiError("No access token found."));
+    }
+
+    const commands = [
+        {
+            type: "project_reorder",
+            uuid: crypto.randomUUID(),
+            args: {
+                projects: contexts.map((context, index) => ({
+                    id: context.id,
+                    child_order: index + 1,
+                })),
+            },
+        },
+    ];
+
+    return postEndpoint(accessToken, "sync", { commands: JSON.stringify(commands) })
+        .then(() => ({ status: "success" }) as const)
+        .catch(handleApiError);
 }
