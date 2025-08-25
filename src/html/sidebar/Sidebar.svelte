@@ -51,11 +51,15 @@
             {/if}
 
             <div class="mt-auto">
-                <div class="bg-neutral mb-4 flex w-full flex-row items-center rounded-sm p-2">
+                <div class="bg-neutral my-2 flex w-full flex-row items-center rounded-sm p-2">
                     <DailyGoal />
                 </div>
                 <Footer />
-                <button class="btn btn-secondary w-full" onclick={resetAllStores} type="button">
+                <button
+                    class="btn btn-secondary my-1 w-full"
+                    onclick={resetAllStores}
+                    type="button"
+                >
                     <Icon class="h-6 w-6" src={ArrowLeftOnRectangle} />Log Out
                 </button>
             </div>
