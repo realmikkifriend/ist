@@ -22,6 +22,7 @@ export interface ToastMessage {
     type: "success" | "error" | "info";
     message: string;
     expirationTime: DateTime;
+    progress: number;
     action?: () => void;
 }
 

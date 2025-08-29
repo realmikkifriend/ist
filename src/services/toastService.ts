@@ -18,12 +18,14 @@ export function addToast(
 ): void {
     const id = Math.random().toString(36).substring(2, 9);
     const expirationTime = DateTime.now().plus({ milliseconds: duration });
+    const startTime = DateTime.now();
 
     const toast: ToastMessage = {
         id,
         type,
         message,
         expirationTime,
+        progress: 0,
         action,
     };
 
@@ -32,7 +34,28 @@ export function addToast(
         return [...otherToasts, toast];
     });
 
+    const intervalTime = 50;
+
+    const progressInterval = setInterval(() => {
+        const now = DateTime.now();
+        toastMessages.update((toasts) =>
+            toasts.map((t) => {
+                if (t.id === id) {
+                    const elapsedTime = now.diff(startTime, "milliseconds").milliseconds;
+                    const calculatedProgress = Math.min((elapsedTime / duration) * 100, 100);
+                    return { ...t, progress: calculatedProgress };
+                }
+                return t;
+            }),
+        );
+
+        if (now >= expirationTime) {
+            clearInterval(progressInterval);
+        }
+    }, intervalTime);
+
     setTimeout(() => {
+        clearInterval(progressInterval);
         clearToasts(id);
     }, duration);
 }
