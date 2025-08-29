@@ -100,7 +100,5 @@ export function error(message: string): void {
  * @param {Task} task - The task to be summoned on toast click.
  */
 export function newFirstTask(onClickHandler: (task: Task) => void, task: Task): void {
-    addToast("info", "First due task has changed! Click here to update...", 10000, () =>
-        onClickHandler(task),
-    );
+    addToast("info", "New first-due task! Click to update...", 10000, () => onClickHandler(task));
 }
