@@ -102,3 +102,7 @@ body.show-kbd kbd {
     display: inline-block;
     opacity: 0.5;
 }
+
+:active > kbd {
+    display: none;
+}
