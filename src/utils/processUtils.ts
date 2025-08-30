@@ -110,3 +110,14 @@ export function calculateUpdatedTaskResources(
 
     return { ...updatedTodoistData, dueTasks: newDueTasks };
 }
+
+/**
+ * Extracts user data from the API response.
+ * @param {unknown} userResponse - User data retrieved from API.
+ * @returns {User | undefined} Processed user data.
+ */
+export function extractUser(userResponse: unknown): User | undefined {
+    return userResponse && typeof userResponse === "object" && "tz_info" in userResponse
+        ? (userResponse as User)
+        : undefined;
+}

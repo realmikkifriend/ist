@@ -1,7 +1,7 @@
 import type { Writable } from "svelte/store";
 import type { DateTime } from "luxon";
 import type { ListBullet } from "svelte-hero-icons";
-import type { Task } from "./todoist";
+import type { Task, Context, TasksGroupedByContext } from "./todoist";
 import type { DynalistTaskType } from "./dynalist";
 import type { DateInfo } from "./calendar";
 
@@ -48,3 +48,9 @@ export type DynamicModalProps = {
     onDeferFinal?: (detail: { task: Task; time: DateTime }) => void;
     title?: string;
 };
+
+export interface ContextButtonProps {
+    context: Context;
+    tasksForContext: TasksGroupedByContext[string];
+    isDisabled?: boolean;
+}

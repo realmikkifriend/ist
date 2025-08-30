@@ -1,6 +1,6 @@
 import { TodoistApi, TodoistRequestError } from "@doist/todoist-api-typescript";
 import { getDueTasks, getReverseTasks, filterContexts } from "../utils/filterUtils";
-import { cleanTodoistData } from "../utils/processUtils";
+import { cleanTodoistData, extractUser } from "../utils/processUtils";
 import type { GetProjectsResponse, GetTasksResponse } from "@doist/todoist-api-typescript";
 import type { Task, TodoistData, Context, User, Comment } from "../types/todoist";
 
@@ -55,6 +55,13 @@ export function processApiResponse(
         user,
     }) as { tasks: Task[]; contexts: Context[]; user?: User };
 
+    cleanedData.tasks = cleanedData.tasks.map((task) => {
+        if (task.labels && task.labels.includes("never-mark-done")) {
+            return { ...task, neverDone: true };
+        }
+        return task;
+    });
+
     const todoistDataObj: TodoistData = {
         tasks: cleanedData.tasks ?? [],
         contexts: cleanedData.contexts ?? [],
@@ -79,17 +86,6 @@ export function processApiResponse(
     };
 
     return todoistDataObj;
-}
-
-/**
- * Extracts user data from the API response.
- * @param {unknown} userResponse - User data retrieved from API.
- * @returns {User | undefined} Processed user data.
- */
-function extractUser(userResponse: unknown): User | undefined {
-    return userResponse && typeof userResponse === "object" && "tz_info" in userResponse
-        ? (userResponse as User)
-        : undefined;
 }
 
 /**

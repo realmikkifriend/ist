@@ -74,6 +74,7 @@ export type Task = Omit<
     summoned?: string | boolean;
     skip?: boolean;
     firstDue?: boolean;
+    neverDone?: boolean;
     comments?: Comment[] | Promise<Comment[]>;
     activity?: TaskActivity[] | Promise<TaskActivity[]>;
 
@@ -104,12 +105,6 @@ export interface TasksGroupedByContext {
         priorities: { [priority: number]: number };
         tasks: Task[];
     };
-}
-
-export interface ContextButtonProps {
-    context: Context;
-    tasksForContext: TasksGroupedByContext[string];
-    isDisabled?: boolean;
 }
 
 export type DueTasksData = Pick<TodoistData, "tasks" | "contexts" | "user">;

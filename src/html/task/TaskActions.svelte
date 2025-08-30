@@ -92,15 +92,17 @@
 </script>
 
 <div class="card-actions relative -right-5 justify-center">
-    <button
-        class="text-md btn btn-primary focus:btn-soft relative h-8 min-h-8 content-center p-4 focus:cursor-progress"
-        onclick={() => onDone(task)}
-        title={task.due?.string ? `repeats ${task.due.string}` : "one-time task"}
-        type="button"
-    >
-        <Icon class="h-5 w-5 [&>path]:stroke-3" src={Check} />
-        <kbd>CTRL+Enter</kbd>
-    </button>
+    {#if !task.neverDone}
+        <button
+            class="text-md btn btn-primary focus:btn-soft relative h-8 min-h-8 content-center p-4 focus:cursor-progress"
+            onclick={() => onDone(task)}
+            title={task.due?.string ? `repeats ${task.due.string}` : "one-time task"}
+            type="button"
+        >
+            <Icon class="h-5 w-5 [&>path]:stroke-3" src={Check} />
+            <kbd>CTRL+Enter</kbd>
+        </button>
+    {/if}
     <button
         class="text-md btn btn-secondary relative h-8 min-h-8 content-center p-4"
         onclick={() => openModal("defer_modal", { onDeferFinal })}
