@@ -1,7 +1,8 @@
 <script lang="ts">
     import { getPriorityClasses } from "../../styles/styleUtils";
     import ListTask from "../task/ListTask.svelte";
-    import type { Priority, ContextButtonProps } from "../../types/todoist";
+    import type { Priority } from "../../types/todoist";
+    import type { ContextButtonProps } from "../../types/interface";
 
     let { context, tasksForContext, isDisabled }: ContextButtonProps = $props();
 </script>
