@@ -90,7 +90,9 @@ export const getTodayTasksForAgenda = (tasksForTomorrow: {
 };
 
 function getTaskCountForHash(agendaData: AgendaData, currentHash: string): number {
-    return currentHash === "#tomorrow" ? agendaData.todayTasks?.length || 0 : 0;
+    return currentHash === "#tomorrow"
+        ? agendaData.todayTasks?.filter((task) => !task.neverDone).length || 0
+        : 0;
 }
 
 /**
@@ -100,7 +102,9 @@ function getTaskCountForHash(agendaData: AgendaData, currentHash: string): numbe
  * @returns The total number of tasks.
  */
 export function getAgendaTaskCount(agendaData: AgendaData, currentHash: string): number {
-    const baseTotal = (agendaData.tasks?.length || 0) + (agendaData.tasksWithNoTime?.length || 0);
+    const baseTotal =
+        (agendaData.tasks?.filter((task) => !task.neverDone).length || 0) +
+        (agendaData.tasksWithNoTime?.filter((task) => !task.neverDone).length || 0);
     const additionalTasks = getTaskCountForHash(agendaData, currentHash);
     return baseTotal + additionalTasks;
 }
