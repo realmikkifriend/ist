@@ -98,9 +98,11 @@ body.show-kbd kbd {
     display: inline-block;
 }
 
-:hover > kbd {
-    display: inline-block;
-    opacity: 0.5;
+@media (hover: hover) and (pointer: fine) {
+    :hover > kbd {
+        display: inline-block;
+        opacity: 0.5;
+    }
 }
 
 :active > kbd {
