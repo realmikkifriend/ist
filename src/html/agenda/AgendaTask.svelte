@@ -1,7 +1,7 @@
 <script lang="ts">
     import { getContext } from "svelte";
     import { DateTime } from "luxon";
-    import { Icon, InboxArrowDown, Inbox } from "svelte-hero-icons";
+    import { Icon, InboxArrowDown, Inbox, Check, NoSymbol } from "svelte-hero-icons";
     import { getPriorityClasses, colorClasses, borderClasses } from "../../styles/styleUtils";
     import type { Priority } from "../../types/todoist";
     import type { AgendaTaskProps } from "../../types/agenda";
@@ -43,6 +43,19 @@
             <Icon class="h-3 min-h-3 w-4 min-w-4" src={InboxArrowDown} />
         {/if}
     </button>
+
+    {#if task.neverDone}
+        <div
+            class="relative -left-0.25 mr-0.75 rounded-full bg-green-200 outline-3 outline-green-200"
+            title="task is never marked done"
+        >
+            <Icon class="relative h-2 w-2 stroke-5 text-green-700" src={Check} />
+            <Icon
+                class="absolute -top-[0.27em] -left-[0.24em] h-[1.2em] w-[1.2em] stroke-3 text-red-500"
+                src={NoSymbol}
+            />
+        </div>
+    {/if}
 
     {task.content}
 </div>
