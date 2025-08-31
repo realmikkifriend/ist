@@ -14,7 +14,7 @@
 </script>
 
 <dialog id={`calendar_modal_${entityId}`} class="modal">
-    <div class="modal-box min-h-[64%] w-84 overflow-hidden">
+    <div class="modal-box min-h-100 w-84 overflow-hidden">
         <div class="text-md mx-3 w-11/12 border-b-2 border-b-gray-200 p-0">
             <strong>{title}:</strong>
             {content}
