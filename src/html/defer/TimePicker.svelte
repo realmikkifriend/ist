@@ -49,7 +49,7 @@
 </script>
 
 <div class="mt-2 flex w-72 flex-row flex-wrap gap-x-2 gap-y-1">
-    {#each deferButtons as button, i (button.ms)}
+    {#each deferButtons as button, i (i)}
         {#if button.ms !== undefined}
             <div class={button.styling + " relative"}>
                 <button
