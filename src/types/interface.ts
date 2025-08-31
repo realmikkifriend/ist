@@ -42,6 +42,7 @@ export interface CalendarProps {
     dateInfo?: DateInfo;
     onDayClick?: ((day: DateTime) => void) | undefined;
     disable?: "past" | "future" | null;
+    displayDate?: DateTime;
 }
 
 export type DynamicModalProps = {

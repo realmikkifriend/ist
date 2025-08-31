@@ -5,13 +5,20 @@
     import CalendarDay from "./CalendarDay.svelte";
     import type { CalendarProps } from "../../types/interface";
 
-    let { dateInfo = {}, onDayClick = undefined, disable = null }: CalendarProps = $props();
+    let {
+        dateInfo = {},
+        onDayClick = undefined,
+        disable = null,
+        displayDate = $bindable(),
+    }: CalendarProps = $props();
+
+    if (!displayDate) {
+        displayDate = DateTime.now();
+    }
 
     const today = DateTime.now().startOf("day");
 
-    let displayDate = $state(DateTime.now());
-
-    const days = $derived(getCalendarGrid(displayDate));
+    const days = $derived(getCalendarGrid(displayDate!));
     const weekDays = ["M", "T", "W", "T", "F", "S", "S"];
 
     /**
@@ -31,7 +38,7 @@
 </script>
 
 <div class="w-full">
-    <CalendarHeader {disable} {displayDate} onchangeMonth={handleMonthChange} />
+    <CalendarHeader {disable} displayDate={displayDate!} onchangeMonth={handleMonthChange} />
     <div class="relative grid grid-cols-7 gap-x-0.5 gap-y-1">
         {#each weekDays as day, i (i)}
             <div class="text-secondary flex h-3 w-full justify-center font-bold">{day}</div>

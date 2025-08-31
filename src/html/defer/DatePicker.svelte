@@ -9,20 +9,21 @@
 
     let { task, tz, tasks, onDefer }: DatePickerProps = $props();
 
+    let displayDate = $state(DateTime.now().setZone(tz));
+
     let dateInfo = $derived(
         (() => {
-            const now = DateTime.now().setZone(tz);
             const monthTasks = getTasksForMonth(
                 tasks,
                 {
-                    start: now.startOf("month"),
-                    end: now.endOf("month"),
+                    start: displayDate.startOf("month"),
+                    end: displayDate.endOf("month"),
                 },
                 {
                     tz,
                     contextId: task.contextId ?? "",
-                    monthYear: now.toFormat("MMMM yyyy"),
-                    now,
+                    monthYear: displayDate.toFormat("MMMM yyyy"),
+                    now: displayDate,
                     soonTasks: tasks,
                 },
             );
@@ -58,4 +59,5 @@
             onDefer({ rawTime: isoDate });
         }
     }}
+    bind:displayDate
 />
