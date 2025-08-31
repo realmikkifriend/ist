@@ -131,7 +131,7 @@
         trigger: [
             {
                 key: "d",
-                callback: () => openModal("defer_modal"),
+                callback: () => openModal("defer_modal", { onDeferFinal }),
                 modifier: false,
             },
             {
