@@ -47,7 +47,7 @@
     });
 </script>
 
-<div class="mx-3 my-5 flex items-center justify-between">
+<div class="mx-3 mt-5 mb-2 flex items-center justify-between">
     <div class="font-bold">{displayDate.monthLong} {displayDate.year}</div>
 
     <div class="flex items-center">

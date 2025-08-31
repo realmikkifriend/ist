@@ -41,7 +41,9 @@
     <CalendarHeader {disable} displayDate={displayDate!} onchangeMonth={handleMonthChange} />
     <div class="relative grid grid-cols-7 gap-x-0.5 gap-y-1">
         {#each weekDays as day, i (i)}
-            <div class="text-secondary flex h-3 w-full justify-center font-bold">{day}</div>
+            <div class="text-secondary flex h-3 w-full justify-center pb-6 font-bold opacity-25">
+                {day}
+            </div>
         {/each}
         {#each days as day, i (day ? day.toMillis() : `empty-${i}`)}
             {#if day}
