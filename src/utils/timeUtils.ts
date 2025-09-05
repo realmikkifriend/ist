@@ -10,7 +10,9 @@ import type { ParsedResult } from "chrono-node";
 export const getTaskTime = (dueString: string): { hour: number; minute: number } | null => {
     const dueParsed: ParsedResult | undefined = parse(dueString)[0];
 
-    if (!dueParsed) return null;
+    if (!dueParsed || !dueParsed.start.isCertain("hour")) {
+        return null;
+    }
 
     const date: Date = dueParsed.start.date();
 
