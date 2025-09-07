@@ -65,9 +65,10 @@
         if (!currentItem || isLoading || !content) return false;
 
         isLoading = true;
-        rotationIndex = (rotationIndex + 1) % checklistItems.length;
 
         const changes = createUpdateChanges(currentItem);
+
+        rotationIndex = (rotationIndex + 1) % checklistItems.length;
 
         return updateDynalistWithToken(content.file_id, changes).then(
             () => {
