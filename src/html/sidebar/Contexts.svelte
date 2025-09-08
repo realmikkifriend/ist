@@ -50,8 +50,9 @@
     }
 </script>
 
-<div class="mb-2 ml-2 flex items-center justify-between">
-    <div class="buttons">
+<div class="mb-2 ml-2 flex justify-between">
+    <h1 class="text-2xl font-bold">Contexts</h1>
+    <div class="buttons mt-0.5">
         <button
             class="relative"
             onclick={() => {
@@ -64,19 +65,18 @@
             <Icon class="h-7 w-8" src={Calendar} />
             <kbd>a</kbd>
         </button>
+        <button
+            class="drawer-button relative top-0.25 bg-transparent hover:border-transparent hover:bg-transparent"
+            onclick={() => {
+                closeSidebar();
+            }}
+            tabindex="-1"
+            type="button"
+        >
+            <Icon class="h-7 w-8" src={XCircle} />
+            <kbd>c</kbd>
+        </button>
     </div>
-    <h1 class="text-2xl font-bold">Contexts</h1>
-    <button
-        class="btn drawer-button relative bg-transparent px-0 hover:border-transparent hover:bg-transparent"
-        onclick={() => {
-            closeSidebar();
-        }}
-        tabindex="-1"
-        type="button"
-    >
-        <Icon class="h-7 w-8" src={XCircle} />
-        <kbd>c</kbd>
-    </button>
 </div>
 
 <div
