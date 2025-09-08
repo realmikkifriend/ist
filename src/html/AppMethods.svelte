@@ -6,7 +6,6 @@
     import { debounceState } from "../services/firstTaskService";
     import { updateFirstDueTask, skipTask } from "../services/firstTaskService";
     import { refreshData } from "../services/updateService";
-    import { success } from "../services/toastService";
     import AppCompose from "./AppCompose.svelte";
     import type { Task, UpdateFirstDueTaskResult } from "../types/todoist";
     import type { AppStateMutatorsContext, HandlerMethodsContext } from "../types/methods";
@@ -47,24 +46,6 @@
     let dataPromise: Promise<void> = $state(
         $firstDueTask?.summoned ? Promise.resolve() : handleRefresh(),
     );
-
-    const handleClearSelectedTask = async (): Promise<void> => {
-        debounceState.clearDebounceTimeout();
-        const selectedContext = $userSettings.selectedContext;
-        const summoned = $firstDueTask?.summoned;
-
-        if (summoned) {
-            window.location.hash = summoned as string;
-        }
-
-        if (summoned || selectedContext) {
-            if (selectedContext) {
-                changeSelectedContext(null);
-                success("No more tasks in context! Showing all due tasks...");
-            }
-            await updateDisplayedTask();
-        }
-    };
 
     /**
      * Updates the displayed task.
@@ -132,7 +113,7 @@
         }
         const currentFirstDueSummoned = $firstDueTask?.summoned;
 
-        task.summoned = currentFirstDueSummoned || window.location.hash;
+        task.summoned = currentFirstDueSummoned || window.location.hash || "#";
 
         const result = await updateFirstDueTask(task);
         setTask(result.task);
@@ -162,7 +143,6 @@
 
     setContext<HandlerMethodsContext>("handlerMethods", {
         handleRefresh,
-        handleClearSelectedTask,
         handleContextChange,
         updateDisplayedTask,
         handleSkipTask,

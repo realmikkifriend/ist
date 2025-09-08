@@ -16,7 +16,6 @@ export interface AppStateMutatorsContext {
 
 export interface HandlerMethodsContext {
     handleRefresh: () => Promise<void>;
-    handleClearSelectedTask: () => Promise<void>;
     handleContextChange: (contextId: string | null) => void;
     updateDisplayedTask: () => Promise<void>;
     handleSkipTask: () => void;
