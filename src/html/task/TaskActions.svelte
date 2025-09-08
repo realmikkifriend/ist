@@ -34,7 +34,7 @@
      * @param task - The task to mark as done.
      */
     const onDone = async (task: Task): Promise<void> => {
-        if (task.summoned) window.location.hash = String(task.summoned);
+        if (task.summoned && task.summoned !== "#") window.location.hash = String(task.summoned);
         clearPreviousFirstDueTask();
 
         const { success: doneSuccessful, taskId } = await handleTaskDone(task);
@@ -68,7 +68,7 @@
     const onDeferFinal = async (detail: { task: Task; time: DateTime }): Promise<void> => {
         const { task: deferredTask, time } = detail;
 
-        if (deferredTask.summoned && !deferredTask.skip) {
+        if (deferredTask.summoned && !deferredTask.skip && deferredTask.summoned !== "#") {
             window.location.hash = String(deferredTask.summoned);
         }
 

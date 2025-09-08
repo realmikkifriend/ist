@@ -8,8 +8,7 @@
     import { getSelectedContextName } from "../../utils/firstTaskUtils";
     import type { HandlerMethodsContext } from "../../types/methods";
 
-    const { handleClearSelectedTask, handleContextChange } =
-        getContext<HandlerMethodsContext>("handlerMethods");
+    const { handleContextChange } = getContext<HandlerMethodsContext>("handlerMethods");
 
     const dueTaskCount = $derived(
         getDueTaskCountByContext($todoistData.dueTasks, $firstDueTask ?? null, $userSettings),
@@ -56,7 +55,7 @@
         trigger: {
             key: "x",
             callback: () => {
-                void handleClearSelectedTask();
+                handleContextChange(null);
             },
             modifier: false,
         },
