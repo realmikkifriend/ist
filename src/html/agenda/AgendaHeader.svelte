@@ -23,7 +23,7 @@
     /**
      * Summons the first task from the reverse task list for the current view.
      */
-    async function viewReverseTaskList(): Promise<void> {
+    async function openSkipMode(): Promise<void> {
         const reverseTasks =
             title === "Today"
                 ? $todoistData.reverseTasks.today
@@ -47,6 +47,7 @@
     <button
         class="relative rounded-full p-1 transition-colors duration-200 hover:bg-blue-800"
         onclick={switchView}
+        title="switch agenda view"
         type="button"
     >
         <Icon class="h-5 w-6" src={Calendar} />
@@ -54,7 +55,8 @@
     </button>
     <button
         class="relative rounded-full p-1 transition-colors duration-200 hover:bg-blue-800"
-        onclick={viewReverseTaskList}
+        onclick={openSkipMode}
+        title="open skip mode to view tasks in reverse order"
         type="button"
     >
         <Icon class="h-5 w-6" src={BarsArrowUp} />
@@ -89,7 +91,7 @@
             {
                 key: "s",
                 callback: () => {
-                    void viewReverseTaskList();
+                    void openSkipMode();
                 },
                 modifier: false,
             },
