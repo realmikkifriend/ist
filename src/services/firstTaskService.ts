@@ -35,17 +35,9 @@ export const skipTask = (task: Task): Promise<UpdateFirstDueTaskResult> => {
     const reverseTasks =
         task.summoned === "#today" ? reverseTasksObj.today : reverseTasksObj.tomorrow;
     const currentIndex = reverseTasks.findIndex((t) => t.id === task.id);
-    const nextIndex = currentIndex + 1;
-    if (nextIndex < reverseTasks.length) {
-        return Promise.resolve({
-            task: reverseTasks[nextIndex],
-            showNewTaskToast: false,
-            doClearContext: false,
-            dueTasks: get(todoistData).dueTasks,
-        });
-    }
+    const nextIndex = (currentIndex + 1) % reverseTasks.length;
     return Promise.resolve({
-        task: null,
+        task: reverseTasks[nextIndex],
         showNewTaskToast: false,
         doClearContext: false,
         dueTasks: get(todoistData).dueTasks,
