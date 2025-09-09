@@ -6,11 +6,11 @@ function getTomorrowGradient(
     gradients: Record<GradientType, string>,
 ): string | null {
     const thresholds = [
-        { limit: 21, color: gradients.red },
-        { limit: 19, color: gradients.orange },
-        { limit: 17, color: null },
-        { limit: 15, color: gradients.darkGreen },
-        { limit: 12, color: gradients.green },
+        { limit: 20, color: gradients.red },
+        { limit: 18, color: gradients.orange },
+        { limit: 16, color: null },
+        { limit: 13, color: gradients.darkGreen },
+        { limit: 10, color: gradients.green },
     ];
 
     const found = thresholds.find(({ limit }) => totalTasks >= limit);
