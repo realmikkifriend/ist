@@ -2,18 +2,19 @@
     import { getContext } from "svelte";
     import { shortcut } from "@svelte-put/shortcut";
     import { Icon, XCircle, Calendar, MagnifyingGlass } from "svelte-hero-icons";
+    import { dndzone } from "svelte-dnd-action";
     import { todoistData } from "../../stores/stores";
     import { userSettings } from "../../stores/interface";
+    import { reorderContexts } from "../../services/apiService";
     import { openAgenda } from "../../services/agendaService";
+    import { success } from "../../services/toastService";
     import { getTasksGroupedByContext } from "../../utils/filterUtils";
     import { borderClasses } from "../../styles/styleUtils";
     import ContextButtonContents from "./ContextButtonContents.svelte";
     import TaskSearchModal from "../interface/TaskSearchModal.svelte";
     import type { HandlerMethodsContext } from "../../types/methods";
     import type { ColorName, Context } from "../../types/todoist";
-    import { dndzone, type DndEvent } from "svelte-dnd-action";
-    import { reorderContexts } from "../../services/apiService";
-    import { success } from "../../services/toastService";
+    import type { DndEvent } from "svelte-dnd-action";
 
     let { closeSidebar }: { closeSidebar: () => void } = $props();
 
@@ -120,30 +121,28 @@
     onfinalize={handleDndFinalize}
     use:dndzone={{ items: currentContexts, flipDurationMs: 100 }}
 >
-    {#each currentContexts as context, index (context.id)}
+    {#each currentContexts as context, i (context.id)}
+        {@const isDisabled =
+            ($userSettings.selectedContext && $userSettings.selectedContext.id !== context.id) ||
+            !dueTasksByContext[context.id] ||
+            dueTasksByContext[context.id].total === 0}
         <button
-            class="bg-secondary text-base-100 tooltip sm:tooltip-right tooltip-bottom mb-2 w-full rounded-lg border-l-6 disabled:opacity-25 {borderClasses[
+            class="bg-secondary text-base-100 tooltip sm:tooltip-right tooltip-bottom mb-2 w-full rounded-lg border-l-6 {borderClasses[
                 context.color as ColorName
             ]}"
-            disabled={($userSettings.selectedContext &&
-                $userSettings.selectedContext.id !== context.id) ||
-                !dueTasksByContext[context.id] ||
-                dueTasksByContext[context.id].total === 0}
+            class:opacity-25={isDisabled}
             onclick={() => {
-                handleContextChange(context.id);
-                closeSidebar();
+                if (!isDisabled) {
+                    handleContextChange(context.id);
+                    closeSidebar();
+                }
             }}
-            tabindex={index + 1}
+            tabindex={i + 1}
             type="button"
         >
             <ContextButtonContents
                 {context}
-                isDisabled={Boolean(
-                    ($userSettings.selectedContext &&
-                        $userSettings.selectedContext.id !== context.id) ||
-                        !dueTasksByContext[context.id] ||
-                        dueTasksByContext[context.id].total === 0,
-                )}
+                {isDisabled}
                 tasksForContext={dueTasksByContext[context.id] || {
                     total: 0,
                     priorities: {},

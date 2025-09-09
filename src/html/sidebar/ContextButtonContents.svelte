@@ -18,7 +18,7 @@
     </div>
 {/if}
 
-<div class="px-2 {isDisabled ? 'cursor-default' : 'cursor-pointer py-0.5'}">
+<div class="px-2 {isDisabled ? 'cursor-move' : 'cursor-pointer py-0.5'}">
     <p class="text-left text-lg font-bold">{context.name}</p>
     <div class="flex flex-row items-start space-x-2">
         {#each Object.keys(tasksForContext.priorities).sort((a, b) => +b - +a) as priorityStr, index (index)}
