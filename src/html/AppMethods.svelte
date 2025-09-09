@@ -89,7 +89,6 @@
             void skipTask($firstDueTask).then(async (skipResult) => {
                 if (skipResult.task) {
                     await summonTask(skipResult.task, true);
-                    void updateDisplayedTask();
                 } else {
                     void updateDisplayedTask();
                 }
