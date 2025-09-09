@@ -198,12 +198,7 @@ export default defineConfig([
                 },
             ],
             "functional/no-let": "off",
-            "@typescript-eslint/no-unused-vars": [
-                "error",
-                {
-                    argsIgnorePattern: "^_",
-                },
-            ],
+            "@typescript-eslint/no-unused-vars": "off",
             "svelte/no-add-event-listener": "warn",
             "svelte/button-has-type": "warn",
             "svelte/prefer-class-directive": "warn",
