@@ -17,9 +17,9 @@
 
 <button
     class="group badge badge-outline relative items-center whitespace-nowrap"
+    class:!cursor-default={!$firstDueTask?.summoned && !$userSettings.selectedContext}
     class:border-purple-400={$firstDueTask?.summoned}
     class:border-yellow-500={$firstDueTask?.skip}
-    class:cursor-default={!$firstDueTask?.summoned && !$userSettings.selectedContext}
     class:cursor-pointer={$userSettings.selectedContext}
     class:opacity-40={!$userSettings.selectedContext}
     class:opacity-75={$userSettings.selectedContext}
