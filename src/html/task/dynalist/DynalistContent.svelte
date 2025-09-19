@@ -15,14 +15,6 @@
         url,
         onTypeChange,
     }: DynalistViewProps & { onTypeChange: (type: DynalistTaskType) => void } = $props();
-
-    /**
-     * Handles selection of a Dynalist type from the menu.
-     * @param event - The event containing the selected type.
-     */
-    const handleTypeSelection = (event: CustomEvent<{ type: DynalistTaskType }>) => {
-        onTypeChange(event.detail.type);
-    };
 </script>
 
 <div class="relative">
@@ -46,9 +38,9 @@
 
         {#key selectedType}
             <DynalistTypeMenu
+                onSelectType={(type: DynalistTaskType) => onTypeChange(type)}
                 selectedType={selectedType || "read"}
                 url={url || ""}
-                on:selectType={handleTypeSelection}
             />
         {/key}
     {/if}

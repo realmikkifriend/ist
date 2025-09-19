@@ -1,5 +1,4 @@
 <script lang="ts">
-    import { createEventDispatcher } from "svelte";
     import {
         Icon,
         ChevronDown,
@@ -14,7 +13,11 @@
     import type { DynalistTaskType, DynalistViewProps } from "../../../types/dynalist";
     import type { IconPair } from "../../../types/interface";
 
-    let { selectedType, url }: DynalistViewProps = $props();
+    let {
+        selectedType,
+        url,
+        onSelectType,
+    }: DynalistViewProps & { onSelectType: (type: DynalistTaskType) => void } = $props();
 
     const iconPairs: IconPair[] = [
         { icon: ListBullet, label: "Read", type: "read" },
@@ -25,20 +28,18 @@
         { icon: CalendarDateRange, label: "Tracking", type: "tracking" },
     ];
 
-    const dispatcher = createEventDispatcher<{ selectType: { type: DynalistTaskType } }>();
-
     /**
      * Dispatches a selectType event with the chosen Dynalist task type.
      * @param type - The selected Dynalist task type.
      */
     function handleSelectType(type: DynalistTaskType): void {
-        dispatcher("selectType", { type });
+        onSelectType(type);
     }
 </script>
 
-<div class="dropdown dropdown-left absolute -top-3 -right-7">
+<div class="dropdown dropdown-left absolute -top-3 -right-9">
     <div
-        class="btn bg-accent hover:bg-primary m-0 flex h-2 min-h-8 flex-row content-center gap-0 border-transparent px-1 py-0 shadow-none"
+        class="btn bg-accent hover:bg-primary m-0 flex h-2 min-h-8 flex-row content-center gap-0 border-transparent px-0.5 py-0 shadow-none"
         role="button"
         tabindex="0"
     >
