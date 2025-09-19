@@ -159,7 +159,7 @@
     class="modal modal-top justify-center"
     onclick={closeOnBackdropClick}
 >
-    <TaskSearchModal tasks={$todoistData.tasks} bind:searchTerm={taskSearchTerm} />
+    <TaskSearchModal {closeSidebar} tasks={$todoistData.tasks} bind:searchTerm={taskSearchTerm} />
 </dialog>
 
 <svelte:window

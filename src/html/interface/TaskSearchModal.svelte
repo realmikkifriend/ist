@@ -5,7 +5,11 @@
     import type { Task } from "../../types/todoist";
     import type { HandlerMethodsContext } from "../../types/methods";
 
-    let { tasks, searchTerm = $bindable("") }: { tasks: Task[]; searchTerm: string } = $props();
+    let {
+        closeSidebar,
+        tasks,
+        searchTerm = $bindable(""),
+    }: { closeSidebar: () => void; tasks: Task[]; searchTerm: string } = $props();
 
     const { summonTask } = getContext<HandlerMethodsContext>("handlerMethods");
 
@@ -31,6 +35,7 @@
         event.stopPropagation();
         if (event.key === "Enter" && filteredTasks.length > 0 && searchTerm) {
             await summonTask(filteredTasks[0]);
+            closeSidebar();
             closeModal();
         }
     }
@@ -73,6 +78,7 @@
                     class="btn btn-primary btn-sm"
                     onclick={async () => {
                         await summonTask(task);
+                        closeSidebar();
                         closeModal();
                     }}
                     tabindex={i + 1}
