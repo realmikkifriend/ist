@@ -11,7 +11,7 @@
 
     const { summonTask } = getContext<HandlerMethodsContext>("handlerMethods");
 
-    const firstDueClasses = "shadow-sm shadow-red-400";
+    const displayTaskClasses = "shadow-sm shadow-red-400";
     const taskPriority = task.priority as Priority;
 </script>
 
@@ -22,7 +22,7 @@
             ? colorClasses[color].faded || "bg-gray-600"
             : colorClasses[color].default || "bg-gray-600",
         task.priority < 3 ? `border  ${borderClasses[color] || "border-gray-600"}` : "",
-        task.firstDue ? firstDueClasses : "",
+        task.displayed ? displayTaskClasses : "",
     ].join(" ")}
 >
     <button
@@ -37,7 +37,7 @@
             {DateTime.fromISO(task.due.date).toFormat("h:mm")}
         {/if}
 
-        {#if task.firstDue}
+        {#if task.displayed}
             <Icon class="h-3 min-h-3 w-4 min-w-4" src={Inbox} />
         {:else}
             <Icon class="h-3 min-h-3 w-4 min-w-4" src={InboxArrowDown} />

@@ -1,6 +1,6 @@
 <script lang="ts">
     import { DateTime } from "luxon";
-    import { todoistData, firstDueTask } from "../../stores/stores";
+    import { todoistData, displayTask } from "../../stores/stores";
     import {
         markTasks,
         calculateTaskPosition,
@@ -34,7 +34,7 @@
      * @returns The tasks after processing.
      */
     function getProcessedTasks(tasks: Task[]): Task[] {
-        return markTasks(tasks, $firstDueTask);
+        return markTasks(tasks, $displayTask);
     }
 
     const processedTasks: Task[] = getProcessedTasks(tasks);

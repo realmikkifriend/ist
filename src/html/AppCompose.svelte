@@ -2,7 +2,7 @@
     import { getContext } from "svelte";
     import { Icon, ArrowPath } from "svelte-hero-icons";
     import { shortcut } from "@svelte-put/shortcut";
-    import { firstDueTask } from "../stores/stores";
+    import { displayTask } from "../stores/stores";
     import { hashStore } from "../stores/interface";
     import { toggleAgendaHash } from "../services/agendaService";
     import AppView from "./AppView.svelte";
@@ -23,8 +23,8 @@
 <div class="flex w-fit items-center">
     <Sidebar hash={$hashStore} />
 
-    {#if $firstDueTask && $hashStore !== "#today" && $hashStore !== "#tomorrow"}
-        {#key $firstDueTask.id}
+    {#if $displayTask && $hashStore !== "#today" && $hashStore !== "#tomorrow"}
+        {#key $displayTask.id}
             <ContextBadge />
         {/key}
     {/if}

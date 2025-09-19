@@ -171,13 +171,13 @@ export function filterContexts(projects: GetProjectsResponse): Context[] {
 /**
  * Gets the count of due tasks for a specific context.
  * @param {Task[]} dueTasks - The current due tasks.
- * @param {Task | null} firstDueTask - The first due task (used as a fallback for context if no selected context).
+ * @param {Task | null} displayTask - The first due task (used as a fallback for context if no selected context).
  * @param {UserSettings} userSettings - The user settings, containing the selected context.
  * @returns {number} The number of due tasks in the specified context.
  */
 export function getDueTaskCountByContext(
     dueTasks: Task[],
-    firstDueTask: Task | null,
+    displayTask: Task | null,
     userSettings: UserSettings,
 ): number {
     const selectedContextId = userSettings.selectedContext?.id;
@@ -185,9 +185,9 @@ export function getDueTaskCountByContext(
     if (selectedContextId) {
         const count = dueTasks.filter((task: Task) => task.contextId === selectedContextId).length;
         return count;
-    } else if (firstDueTask?.contextId) {
+    } else if (displayTask?.contextId) {
         const count = dueTasks.filter(
-            (task: Task) => task.contextId === firstDueTask.contextId,
+            (task: Task) => task.contextId === displayTask.contextId,
         ).length;
         return count;
     }

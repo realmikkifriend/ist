@@ -2,7 +2,7 @@
     import { getContext } from "svelte";
     import { shortcut } from "@svelte-put/shortcut";
     import { Icon, XMark } from "svelte-hero-icons";
-    import { todoistData, firstDueTask } from "../../stores/stores";
+    import { todoistData, displayTask } from "../../stores/stores";
     import { userSettings } from "../../stores/interface";
     import { getDueTaskCountByContext } from "../../utils/filterUtils";
     import { getSelectedContextName } from "../../utils/firstTaskUtils";
@@ -11,38 +11,38 @@
     const { handleContextChange } = getContext<HandlerMethodsContext>("handlerMethods");
 
     const dueTaskCount = $derived(
-        getDueTaskCountByContext($todoistData.dueTasks, $firstDueTask ?? null, $userSettings),
+        getDueTaskCountByContext($todoistData.dueTasks, $displayTask ?? null, $userSettings),
     );
 </script>
 
 <button
     class="group badge badge-outline relative items-center whitespace-nowrap"
-    class:!cursor-default={!$firstDueTask?.summoned && !$userSettings.selectedContext}
-    class:border-purple-400={$firstDueTask?.summoned}
-    class:border-yellow-500={$firstDueTask?.skip}
+    class:!cursor-default={!$displayTask?.summoned && !$userSettings.selectedContext}
+    class:border-purple-400={$displayTask?.summoned}
+    class:border-yellow-500={$displayTask?.skip}
     class:cursor-pointer={$userSettings.selectedContext}
     class:opacity-40={!$userSettings.selectedContext}
     class:opacity-75={$userSettings.selectedContext}
     class:text-primary={$userSettings.selectedContext}
-    class:text-purple-400={$firstDueTask?.summoned}
-    class:text-yellow-500={$firstDueTask?.skip}
+    class:text-purple-400={$displayTask?.summoned}
+    class:text-yellow-500={$displayTask?.skip}
     onclick={() => {
         handleContextChange(null);
     }}
     type="reset"
 >
-    {#if $firstDueTask?.skip}
+    {#if $displayTask?.skip}
         low priority, defer?
         <kbd>x</kbd>
-    {:else if $firstDueTask?.summoned}
+    {:else if $displayTask?.summoned}
         summoned task
         <kbd>x</kbd>
     {:else if dueTaskCount === 0}
         loading...
     {:else}
-        {dueTaskCount} left in {getSelectedContextName($todoistData, $userSettings, $firstDueTask)}
+        {dueTaskCount} left in {getSelectedContextName($todoistData, $userSettings, $displayTask)}
     {/if}
-    {#if $userSettings.selectedContext || $firstDueTask?.summoned}
+    {#if $userSettings.selectedContext || $displayTask?.summoned}
         <p class="block sm:hidden sm:group-hover:block">
             <Icon class="h-4 w-4" src={XMark} />
         </p>

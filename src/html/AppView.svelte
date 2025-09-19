@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { todoistData, todoistError, firstDueTask } from "../stores/stores";
+    import { todoistData, todoistError, displayTask } from "../stores/stores";
     import { error as showError } from "../services/toastService";
     import NoTasks from "./NoTasks.svelte";
     import TaskDisplay from "./task/TaskDisplay.svelte";
@@ -18,9 +18,9 @@
     <div class="hero">Loading...</div>
 {:then}
     {#if $todoistData.tasks}
-        {#if $firstDueTask}
-            {#key $firstDueTask.id}
-                <TaskDisplay task={$firstDueTask} />
+        {#if $displayTask}
+            {#key $displayTask.id}
+                <TaskDisplay task={$displayTask} />
             {/key}
         {:else}
             <NoTasks />

@@ -1,6 +1,6 @@
 import { get } from "svelte/store";
 import { DateTime } from "luxon";
-import { firstDueTask } from "../stores/stores";
+import { displayTask } from "../stores/stores";
 import { todoistAccessToken } from "../stores/secret";
 import { getActivity } from "./activityService";
 import { loadCommentsForTask } from "../utils/firstTaskUtils";
@@ -30,7 +30,7 @@ export const enrichTask = async (task: Task, accessToken: string): Promise<Task>
 };
 
 /**
- * Handles initial checks and early exits for updateFirstDueTask.
+ * Handles initial checks and early exits for the main task display function.
  * @param {Task | null} task - Optional task to set as the first due task.
  * @param {TodoistData} $todoistData - The current Todoist data.
  * @param {ReturnType<typeof setTimeout> | null} debounceTimeoutId - The current debounce timeout ID.
@@ -55,7 +55,7 @@ export const handleInitialChecks = async (
     }
 
     if (debounceTimeoutId) {
-        return { action: "exit", taskToSet: get(firstDueTask), showNewTaskToast: false };
+        return { action: "exit", taskToSet: get(displayTask), showNewTaskToast: false };
     }
 
     return { action: "continue", showNewTaskToast: true };

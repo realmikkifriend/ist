@@ -1,13 +1,13 @@
-import type { Task, UpdateFirstDueTaskResult, TaskUpdates } from "./todoist";
+import type { Task, UpdateDisplayTaskResult, TaskUpdates } from "./todoist";
 import type { TaskActivity } from "./activity";
 
 export interface AppStateMutatorsContext {
     changeSelectedContext: (context: { id: string; name: string } | null) => void;
     setTask: (task: Task | null) => void;
-    clearPreviousFirstDueTask: () => void;
+    clearPreviousDisplayTask: () => void;
     updateTodoistDataResources: (taskUpdates?: TaskUpdates, deletedTaskIds?: string[]) => void;
     handleDataUpdates: (
-        updatedTodoistData: UpdateFirstDueTaskResult["updatedTodoistData"],
+        updatedTodoistData: UpdateDisplayTaskResult["updatedTodoistData"],
         doClearContext: boolean,
     ) => void;
     addTaskActivityEntry: (newActivityEntry: TaskActivity) => void;
@@ -20,7 +20,7 @@ export interface HandlerMethodsContext {
     updateDisplayedTask: () => Promise<void>;
     handleSkipTask: () => void;
     summonTask: (
-        task: Task & { firstDue?: boolean; skip?: boolean; summoned?: string | boolean },
+        task: Task & { displayed?: boolean; skip?: boolean; summoned?: string | boolean },
         enableSkip?: boolean,
-    ) => Promise<UpdateFirstDueTaskResult>;
+    ) => Promise<UpdateDisplayTaskResult>;
 }

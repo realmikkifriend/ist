@@ -1,13 +1,13 @@
 <script lang="ts">
     import { onMount, setContext, getContext } from "svelte";
     import { on } from "svelte/events";
-    import { todoistData, todoistError, firstDueTask } from "../stores/stores";
+    import { todoistData, todoistError, displayTask } from "../stores/stores";
     import { userSettings, hashStore } from "../stores/interface";
     import { debounceState } from "../services/firstTaskService";
-    import { updateFirstDueTask, skipTask } from "../services/firstTaskService";
+    import { updateDisplayTask, skipTask } from "../services/firstTaskService";
     import { refreshData } from "../services/updateService";
     import AppCompose from "./AppCompose.svelte";
-    import type { Task, UpdateFirstDueTaskResult } from "../types/todoist";
+    import type { Task, UpdateDisplayTaskResult } from "../types/todoist";
     import type { AppStateMutatorsContext, HandlerMethodsContext } from "../types/methods";
 
     let isSpinning = $state(false);
@@ -15,7 +15,7 @@
     const {
         changeSelectedContext,
         setTask,
-        clearPreviousFirstDueTask,
+        clearPreviousDisplayTask,
         handleDataUpdates,
         handleTaskDisplay,
     } = getContext<AppStateMutatorsContext>("appStateMutators");
@@ -44,7 +44,7 @@
     };
 
     let dataPromise: Promise<void> = $state(
-        $firstDueTask?.summoned ? Promise.resolve() : handleRefresh(),
+        $displayTask?.summoned ? Promise.resolve() : handleRefresh(),
     );
 
     /**
@@ -53,7 +53,7 @@
      */
     const updateDisplayedTask = async (): Promise<void> => {
         const { task, showNewTaskToast, doClearContext, updatedTodoistData } =
-            await updateFirstDueTask();
+            await updateDisplayTask();
 
         handleDataUpdates(updatedTodoistData, doClearContext);
         handleTaskDisplay(task, showNewTaskToast);
@@ -67,7 +67,7 @@
     function handleContextChange(contextId: string | null): void {
         debounceState.clearDebounceTimeout();
 
-        clearPreviousFirstDueTask();
+        clearPreviousDisplayTask();
         const isCurrentlySelected = $userSettings.selectedContext?.id === contextId;
         const newSelectedContext = isCurrentlySelected
             ? null
@@ -85,8 +85,8 @@
      * Handles skipping the current task.
      */
     const handleSkipTask = (): void => {
-        if ($firstDueTask) {
-            void skipTask($firstDueTask).then(async (skipResult) => {
+        if ($displayTask) {
+            void skipTask($displayTask).then(async (skipResult) => {
                 if (skipResult.task) {
                     await summonTask(skipResult.task, true);
                 } else {
@@ -103,18 +103,18 @@
      * @returns The result of updating the first due task.
      */
     async function performSummon(
-        task: Task & { firstDue?: boolean; skip?: boolean; summoned?: string | boolean },
+        task: Task & { displayed?: boolean; skip?: boolean; summoned?: string | boolean },
         enableSkip: boolean,
-    ): Promise<UpdateFirstDueTaskResult> {
+    ): Promise<UpdateDisplayTaskResult> {
         debounceState.clearDebounceTimeout();
         if (enableSkip) {
             task.skip = true;
         }
-        const currentFirstDueSummoned = $firstDueTask?.summoned;
+        const currentDisplayTaskWasSummoned = $displayTask?.summoned;
 
-        task.summoned = currentFirstDueSummoned || window.location.hash || "#";
+        task.summoned = currentDisplayTaskWasSummoned || window.location.hash || "#";
 
-        const result = await updateFirstDueTask(task);
+        const result = await updateDisplayTask(task);
         setTask(result.task);
         return result;
     }
@@ -126,14 +126,14 @@
      * @returns The summoned task.
      */
     export async function summonTask(
-        task: Task & { firstDue?: boolean; skip?: boolean; summoned?: string | boolean },
+        task: Task & { displayed?: boolean; skip?: boolean; summoned?: string | boolean },
         enableSkip: boolean = false,
-    ): Promise<UpdateFirstDueTaskResult> {
-        if (!task.firstDue || enableSkip) {
+    ): Promise<UpdateDisplayTaskResult> {
+        if (!task.displayed || enableSkip) {
             return performSummon(task, enableSkip);
         }
         return {
-            task: $firstDueTask,
+            task: $displayTask,
             showNewTaskToast: false,
             doClearContext: false,
             dueTasks: $todoistData.dueTasks,

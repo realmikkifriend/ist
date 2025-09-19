@@ -3,21 +3,21 @@ import type { Task } from "../types/todoist";
 import type { AgendaData } from "../types/agenda";
 
 /**
- * Mark tasks with firstDue and closeTiming properties.
+ * Mark tasks as displayed and closeTiming properties.
  * @param {Task[]} tasks - The tasks to mark.
- * @param {Task | null} firstDueTask - The task displayed in the main screen.
- * @returns {(Task & { firstDue?: boolean; closeTiming?: boolean })[]} Marked tasks.
+ * @param {Task | null} displayTask - The task displayed in the main screen.
+ * @returns {(Task & { displayed?: boolean; closeTiming?: boolean })[]} Marked tasks.
  */
 export function markTasks(
     tasks: Task[],
-    firstDueTask: Task | null,
-): (Task & { firstDue?: boolean; closeTiming?: boolean })[] {
-    const firstDueTaskID = firstDueTask?.id || null;
+    displayTask: Task | null,
+): (Task & { displayed?: boolean; closeTiming?: boolean })[] {
+    const displayTaskID = displayTask?.id || null;
 
     return tasks.map((currentTask, index) => {
-        const markedTask: Task & { firstDue?: boolean; closeTiming?: boolean } = {
+        const markedTask: Task & { displayed?: boolean; closeTiming?: boolean } = {
             ...currentTask,
-            firstDue: firstDueTaskID === currentTask.id,
+            displayed: displayTaskID === currentTask.id,
             closeTiming: false,
         };
 

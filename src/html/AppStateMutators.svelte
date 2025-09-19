@@ -1,16 +1,11 @@
 <script lang="ts">
     import { setContext } from "svelte";
-    import {
-        todoistData,
-        firstDueTask,
-        previousFirstDueTask,
-        taskActivity,
-    } from "../stores/stores";
+    import { todoistData, displayTask, previousDisplayTask, taskActivity } from "../stores/stores";
     import { userSettings } from "../stores/interface";
     import { calculateUpdatedTaskResources } from "../utils/processUtils";
     import { newFirstTask, clearToasts } from "../services/toastService";
     import AppMethods from "./AppMethods.svelte";
-    import type { Task, UpdateFirstDueTaskResult, TaskUpdates } from "../types/todoist";
+    import type { Task, UpdateDisplayTaskResult, TaskUpdates } from "../types/todoist";
     import type { TaskActivity } from "../types/activity";
     import type { AppStateMutatorsContext } from "../types/methods";
 
@@ -27,15 +22,15 @@
      * @param task - The task to set.
      */
     const setTask = (task: Task | null): void => {
-        firstDueTask.set(task);
-        previousFirstDueTask.set(task);
+        displayTask.set(task);
+        previousDisplayTask.set(task);
     };
 
     /**
      * Clears the previous first due task.
      */
-    const clearPreviousFirstDueTask = (): void => {
-        previousFirstDueTask.set(null);
+    const clearPreviousDisplayTask = () => {
+        previousDisplayTask.set(null);
     };
 
     /**
@@ -56,7 +51,7 @@
      * @param doClearContext - Whether to clear the selected context.
      */
     const handleDataUpdates = (
-        updatedTodoistData: UpdateFirstDueTaskResult["updatedTodoistData"],
+        updatedTodoistData: UpdateDisplayTaskResult["updatedTodoistData"],
         doClearContext: boolean,
     ): void => {
         if (updatedTodoistData) {
@@ -87,7 +82,7 @@
             return;
         }
 
-        if (showNewTaskToast && task.id !== $firstDueTask?.id) {
+        if (showNewTaskToast && task.id !== $displayTask?.id) {
             newFirstTask((t) => setTask(t), task);
         } else {
             setTask(task);
@@ -98,7 +93,7 @@
     setContext("appStateMutators", {
         changeSelectedContext,
         setTask,
-        clearPreviousFirstDueTask,
+        clearPreviousDisplayTask,
         updateTodoistDataResources,
         handleDataUpdates,
         addTaskActivityEntry,

@@ -1,10 +1,10 @@
 import { get } from "svelte/store";
-import { todoistData, previousFirstDueTask } from "../stores/stores";
+import { todoistData, previousDisplayTask } from "../stores/stores";
 import { userSettings } from "../stores/interface";
 import { todoistAccessToken } from "../stores/secret";
 import { handleInitialChecks, enrichTask } from "./taskEnrichmentService";
 import { doShowNewTaskToast, getTaskContextData } from "../utils/firstTaskUtils";
-import type { Task, TodoistData, UpdateFirstDueTaskResult } from "../types/todoist";
+import type { Task, TodoistData, UpdateDisplayTaskResult } from "../types/todoist";
 
 const debounceState: {
     timeoutId: ReturnType<typeof setTimeout> | null;
@@ -26,7 +26,7 @@ export { debounceState };
  * @param {Task} task - The task to skip.
  * @returns {Promise<{task: Task | null, showNewTaskToast: boolean, doClearContext: boolean}>} The next task and related flags.
  */
-export const skipTask = (task: Task): Promise<UpdateFirstDueTaskResult> => {
+export const skipTask = (task: Task): Promise<UpdateDisplayTaskResult> => {
     const $todoistData: TodoistData = get(todoistData);
     const reverseTasksObj = $todoistData.reverseTasks as unknown as {
         today: Task[];
@@ -49,11 +49,11 @@ export const skipTask = (task: Task): Promise<UpdateFirstDueTaskResult> => {
  * @param {Task | null} task - Optional task to set as the first due task.
  * @returns {Promise<{task: Task | null, showNewTaskToast: boolean}>} The new first due task and a flag indicating if the new task toast should be shown.
  */
-export const updateFirstDueTask = async (
+export const updateDisplayTask = async (
     task: Task | null = null,
-): Promise<UpdateFirstDueTaskResult> => {
+): Promise<UpdateDisplayTaskResult> => {
     const $todoistData: TodoistData = get(todoistData);
-    const prevTask: Task | null = get(previousFirstDueTask);
+    const prevTask: Task | null = get(previousDisplayTask);
 
     const initialCheckResult = await handleInitialChecks(
         task,

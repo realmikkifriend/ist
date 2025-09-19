@@ -26,15 +26,15 @@ export const doShowNewTaskToast = (
 /**
  * Get the context name from provided data.
  * @param {TodoistData | null | undefined} todoistDataValue - The value of the todoistData store.
- * @param {Task | null} firstDueTaskValue - The value of the firstDueTask store.
+ * @param {Task | null} displayTask - The value of the displayed task store.
  * @returns - The context name, or an empty string if not found.
  */
 function findContextNameFromTodoistData(
     todoistDataValue: TodoistData | null | undefined,
-    firstDueTaskValue: Task | null,
+    displayTask: Task | null,
 ): string | null {
-    if (todoistDataValue?.contexts && firstDueTaskValue?.contextId) {
-        const context = todoistDataValue.contexts.find((c) => c.id === firstDueTaskValue.contextId);
+    if (todoistDataValue?.contexts && displayTask?.contextId) {
+        const context = todoistDataValue.contexts.find((c) => c.id === displayTask.contextId);
         if (context && typeof context.name === "string") {
             return context.name;
         }
@@ -46,22 +46,19 @@ function findContextNameFromTodoistData(
  * Get the name of the current context, either from user settings or from the first due task's context.
  * @param {TodoistData | null | undefined} todoistDataValue - The value of the todoistData store.
  * @param {UserSettings | null | undefined} userSettingsValue - The value of the userSettings store.
- * @param {Task | null} firstDueTaskValue - The value of the firstDueTask store.
+ * @param {Task | null} displayTask - The value of the displayed task store.
  * @returns - The context name, or an empty string if not found.
  */
 export function getSelectedContextName(
     todoistDataValue: TodoistData | null | undefined,
     userSettingsValue: UserSettings | null | undefined,
-    firstDueTaskValue: Task | null,
+    displayTask: Task | null,
 ): string {
     if (userSettingsValue?.selectedContext?.name) {
         return userSettingsValue.selectedContext.name;
     }
 
-    const contextNameFromTodoist = findContextNameFromTodoistData(
-        todoistDataValue,
-        firstDueTaskValue,
-    );
+    const contextNameFromTodoist = findContextNameFromTodoistData(todoistDataValue, displayTask);
 
     if (contextNameFromTodoist) {
         return contextNameFromTodoist;

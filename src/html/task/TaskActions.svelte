@@ -23,7 +23,7 @@
         openModal: (modalId: string, props?: Record<string, unknown>) => void;
     } = $props();
 
-    const { clearPreviousFirstDueTask, updateTodoistDataResources, addTaskActivityEntry } =
+    const { clearPreviousDisplayTask, updateTodoistDataResources, addTaskActivityEntry } =
         getContext<AppStateMutatorsContext>("appStateMutators");
 
     const { handleRefresh, updateDisplayedTask, handleSkipTask } =
@@ -35,7 +35,7 @@
      */
     const onDone = async (task: Task): Promise<void> => {
         if (task.summoned && task.summoned !== "#") window.location.hash = String(task.summoned);
-        clearPreviousFirstDueTask();
+        clearPreviousDisplayTask();
 
         const { success: doneSuccessful, taskId } = await handleTaskDone(task);
 
@@ -72,7 +72,7 @@
             window.location.hash = String(deferredTask.summoned);
         }
 
-        clearPreviousFirstDueTask();
+        clearPreviousDisplayTask();
         const { success: deferSuccessful, taskUpdates: deferredTaskUpdates } =
             await handleTaskDefer([[deferredTask, time]]);
 

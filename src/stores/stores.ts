@@ -25,14 +25,14 @@ registerStore(todoistError);
 /**
  * Stores the first due task.
  */
-export const firstDueTask = resettablePersisted<Task | null>("firstDueTask", null);
-registerStore(firstDueTask);
+export const displayTask = resettablePersisted<Task | null>("displayTask", null);
+registerStore(displayTask);
 
 /**
  * Stores the previous first due task.
  */
-export const previousFirstDueTask: ResettableStore<Task | null> = resettableWritable(null);
-registerStore(previousFirstDueTask);
+export const previousDisplayTask: ResettableStore<Task | null> = resettableWritable(null);
+registerStore(previousDisplayTask);
 
 /**
  * Stores task activity.

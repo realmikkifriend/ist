@@ -73,7 +73,7 @@ export type Task = Omit<
     contextId?: string;
     summoned?: string | boolean;
     skip?: boolean;
-    firstDue?: boolean;
+    displayed?: boolean;
     neverDone?: boolean;
     comments?: Comment[] | Promise<Comment[]>;
     activity?: TaskActivity[] | Promise<TaskActivity[]>;
@@ -121,7 +121,7 @@ export interface ListTaskProps {
     task: Task;
 }
 
-export interface UpdateFirstDueTaskResult {
+export interface UpdateDisplayTaskResult {
     task: Task | null;
     showNewTaskToast: boolean;
     doClearContext: boolean;
