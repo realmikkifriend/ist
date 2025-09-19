@@ -90,7 +90,7 @@
     >
         <Icon class="h-6 w-6 p-1" src={CalendarDateRange} />
     </button>
-    <span class="text-lg">{content?.content}</span>
+    <span class="text-md">{content?.content}</span>
 </div>
 <History
     activity={dateInfo}
