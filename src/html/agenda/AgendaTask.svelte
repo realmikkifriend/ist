@@ -1,18 +1,59 @@
 <script lang="ts">
     import { getContext } from "svelte";
     import { DateTime } from "luxon";
-    import { Icon, InboxArrowDown, Inbox, Check, NoSymbol } from "svelte-hero-icons";
+    import { Icon, InboxArrowDown, Inbox, Check, NoSymbol, ChevronUpDown } from "svelte-hero-icons";
     import { getPriorityClasses, colorClasses, borderClasses } from "../../styles/styleUtils";
     import type { Priority } from "../../types/todoist";
     import type { AgendaTaskProps } from "../../types/agenda";
-    import type { HandlerMethodsContext } from "../../types/methods";
+    import type { HandlerMethodsContext, AppStateMutatorsContext } from "../../types/methods";
+    import ScheduleModal from "../defer/ScheduleModal.svelte";
+    import { handleTaskDefer } from "../../services/taskHandlerService";
+    import { success, error } from "../../services/toastService";
 
     let { task, color }: AgendaTaskProps = $props();
 
-    const { summonTask } = getContext<HandlerMethodsContext>("handlerMethods");
+    const modalId = `schedule_modal_${task.id}`;
+
+    const { summonTask, handleRefresh } = getContext<HandlerMethodsContext>("handlerMethods");
+    const { clearPreviousDisplayTask, updateTodoistDataResources } =
+        getContext<AppStateMutatorsContext>("appStateMutators");
 
     const displayTaskClasses = "shadow-sm shadow-red-400";
     const taskPriority = task.priority as Priority;
+
+    /**
+     * Displays schedule modal.
+     */
+    const openScheduleModal = (): void => {
+        (document.getElementById(modalId) as HTMLDialogElement | null)?.showModal();
+    };
+
+    /**
+     * Exits the schedule modal.
+     */
+    const closeScheduleModal = (): void => {
+        (document.getElementById(modalId) as HTMLDialogElement | null)?.close();
+    };
+
+    /**
+     * Schedules a task to a specific time.
+     * @param time - The selected DateTime to schedule the task for
+     */
+    async function handleSchedule(time: DateTime): Promise<void> {
+        closeScheduleModal();
+
+        clearPreviousDisplayTask();
+        const { success: deferSuccessful, taskUpdates: deferredTaskUpdates } =
+            await handleTaskDefer([[task, time]]);
+
+        if (deferSuccessful) {
+            updateTodoistDataResources(deferredTaskUpdates);
+            success("Task scheduled successfully.");
+            await handleRefresh();
+        } else {
+            error("Failed to schedule task.");
+        }
+    }
 </script>
 
 <div
@@ -57,5 +98,20 @@
         </div>
     {/if}
 
-    {task.content}
+    <div class="min-w-0 flex-1 truncate">
+        {task.content}
+    </div>
+
+    <button
+        class="ml-1 flex h-4 w-4 shrink-0 items-center justify-center rounded-md hover:bg-gray-700"
+        onclick={openScheduleModal}
+        title="Schedule task"
+        type="button"
+    >
+        <Icon class="h-3 w-3" src={ChevronUpDown} />
+    </button>
 </div>
+
+<dialog id={modalId} class="modal">
+    <ScheduleModal onClose={closeScheduleModal} onSchedule={handleSchedule} {task} />
+</dialog>

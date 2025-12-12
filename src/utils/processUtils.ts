@@ -86,9 +86,9 @@ export function calculateUpdatedTaskResources(
 ): TodoistData {
     const updatedTasks = currentResources.tasks
         .filter((task) => !removedTaskIds.includes(task.id))
-        .map((task) => {
+        .map((task): Task => {
             const updatedDueDate = taskUpdates.find(([taskId]) => taskId === task.id)?.[1];
-            if (updatedDueDate) {
+            if (updatedDueDate && task.due) {
                 const newDueDate =
                     updatedDueDate instanceof DateTime
                         ? updatedDueDate
@@ -96,14 +96,17 @@ export function calculateUpdatedTaskResources(
                           ? DateTime.fromJSDate(updatedDueDate)
                           : DateTime.fromISO(updatedDueDate);
 
-                if (newDueDate.startOf("day") > DateTime.now().startOf("day")) {
-                    return null; // Task is deferred beyond today, remove it from active tasks
-                }
-                return { ...task, due: { ...task.due, date: newDueDate.toISO()! } };
+                return {
+                    ...task,
+                    due: {
+                        ...task.due,
+                        date: newDueDate.toISO()!,
+                        string: task.due.string || newDueDate.toISO()!,
+                    },
+                };
             }
             return task;
-        })
-        .filter((task) => task !== null) as Task[];
+        });
 
     const updatedTodoistData = { ...currentResources, tasks: updatedTasks };
     const newDueTasks = getDueTasks(updatedTodoistData);
