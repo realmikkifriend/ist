@@ -1,12 +1,13 @@
 <script lang="ts">
     import { getContext } from "svelte";
     import { DateTime } from "luxon";
-    import { Icon, InboxArrowDown, Inbox, Check, NoSymbol, ChevronUpDown } from "svelte-hero-icons";
+    import { Icon, InboxArrowDown, Inbox, ChevronUpDown } from "svelte-hero-icons";
     import { getPriorityClasses, colorClasses, borderClasses } from "../../styles/styleUtils";
     import type { Priority } from "../../types/todoist";
     import type { AgendaTaskProps } from "../../types/agenda";
     import type { HandlerMethodsContext, AppStateMutatorsContext } from "../../types/methods";
     import ScheduleModal from "../defer/ScheduleModal.svelte";
+    import NeverDoneIcon from "./NeverDoneIcon.svelte";
     import { handleTaskDefer } from "../../services/taskHandlerService";
     import { success, error } from "../../services/toastService";
 
@@ -95,16 +96,7 @@
     </button>
 
     {#if task.neverDone}
-        <div
-            class="relative -left-1 mr-2 rounded-full bg-green-200 outline-3 outline-green-200"
-            title="task is never marked done"
-        >
-            <Icon class="relative top-[0.02em] h-2 w-2 stroke-5 text-green-700" src={Check} />
-            <Icon
-                class="absolute -top-[0.27em] -left-[0.24em] h-[1.2em] w-[1.15em] stroke-3 text-red-500"
-                src={NoSymbol}
-            />
-        </div>
+        <NeverDoneIcon className="-left-1 mr-2" />
     {/if}
 
     <div class="relative -left-1.5 min-w-0 flex-1 truncate">
