@@ -2,6 +2,7 @@
     import { getContext } from "svelte";
     import { Icon, XCircle, Calendar, BarsArrowUp } from "svelte-hero-icons";
     import { shortcut } from "@svelte-put/shortcut";
+    import NeverDoneIcon from "./NeverDoneIcon.svelte";
     import { todoistData } from "../../stores/stores";
     import type { AgendaHeaderProps } from "../../types/agenda";
     import type { HandlerMethodsContext } from "../../types/methods";
@@ -12,6 +13,17 @@
 
     let { tasks, tasksWithNoTime, todayTasks } = $derived(agendaData);
     let { title, headerGradientColor } = $derived(displayData);
+
+    /**
+     * Generates plaintext title for the h2 element
+     */
+    let h2title = $derived(
+        tasks.filter((t) => t.neverDone).length > 0
+            ? `${tasks.filter((t) => !t.neverDone).length} regular tasks, ` +
+                  `${tasks.filter((t) => t.neverDone).length} quick tasks` +
+                  `${todayTasks.length > 0 && window.location.hash === "#tomorrow" ? `,\n${todayTasks.length} tasks left over from today` : ""}`
+            : `${tasks.length + tasksWithNoTime.length} tasks`,
+    );
 
     /**
      * Switches the agenda view between "today" and "tomorrow".
@@ -64,7 +76,21 @@
     </button>
     <div class="mr-6 flex grow cursor-default flex-col items-center">
         <h1 class="flex-1 text-center">{title}</h1>
-        <h2 class="rounded-lg px-3 py-0.5 text-center {headerGradientColor}">
+        <h2 class="rounded-lg px-3 py-0.5 text-center {headerGradientColor}" title={h2title}>
+            {#if tasks.filter((t) => t.neverDone).length > 0 || (todayTasks.length > 0 && window.location.hash === "#tomorrow")}
+                <div class="mt-0 mb-1 flex flex-row items-center justify-center gap-1 text-xs">
+                    <NeverDoneIcon slash={false} />
+                    <span>{tasks.filter((t) => !t.neverDone).length}</span>
+                    {#if tasks.filter((t) => t.neverDone).length > 0}
+                        <NeverDoneIcon className="ml-1" />
+                        <span>{tasks.filter((t) => t.neverDone).length}</span>
+                    {/if}
+                    {#if todayTasks.length > 0 && window.location.hash === "#tomorrow"}
+                        <span class="ml-0.5 w-2.5 text-[0.8em]">&#9888;&#65039;</span>
+                        {todayTasks.length}
+                    {/if}
+                </div>
+            {/if}
             {#if todayTasks.length > 0 && window.location.hash === "#tomorrow"}
                 <div class="my-0.5 text-xs/[.5rem]">
                     {tasks.length + tasksWithNoTime.length}+{todayTasks.length}=
