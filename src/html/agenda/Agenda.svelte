@@ -13,7 +13,15 @@
 
     let agendaStore: AgendaData = $derived(updateAgenda($hashStore, $todoistData));
 
-    const hourSlots: number[] = Array.from({ length: 15 }, (_, i) => i + 7);
+    let hourSlots: number[] = $derived.by(() => {
+        const taskHours = agendaStore.tasks.map(
+            (task) => DateTime.fromISO(task.due?.date ?? "").hour,
+        );
+        const minHour = Math.min(7, ...taskHours);
+        const maxHour = Math.max(21, ...taskHours);
+        const length = maxHour - minHour + 1;
+        return Array.from({ length }, (_, i) => i + minHour);
+    });
 </script>
 
 {#key agendaStore.tasks}
