@@ -15,12 +15,20 @@
     let { title, headerGradientColor } = $derived(displayData);
 
     /**
+     * Combines .neverDone tasks from both tasks and tasksWithNoTime
+     */
+    let tasksNeverDone = $derived([
+        ...tasks.filter((t) => t.neverDone),
+        ...tasksWithNoTime.filter((t) => t.neverDone),
+    ]);
+
+    /**
      * Generates plaintext title for the h2 element
      */
     let h2title = $derived(
-        tasks.filter((t) => t.neverDone).length > 0
-            ? `${tasks.filter((t) => !t.neverDone).length} tasks, ` +
-                  `${tasks.filter((t) => t.neverDone).length} routines` +
+        tasksNeverDone.length > 0
+            ? `${tasks.length + tasksWithNoTime.length - tasksNeverDone.length} tasks, ` +
+                  `${tasksNeverDone.length} routines` +
                   `${todayTasks.length > 0 && window.location.hash === "#tomorrow" ? `,\n${todayTasks.length} tasks left over from today` : ""}`
             : `${tasks.length + tasksWithNoTime.length} tasks`,
     );
@@ -77,13 +85,13 @@
     <div class="mr-6 flex grow cursor-default flex-col items-center">
         <h1 class="flex-1 text-center">{title}</h1>
         <h2 class="rounded-lg px-3 py-0.5 text-center {headerGradientColor}" title={h2title}>
-            {#if tasks.filter((t) => t.neverDone).length > 0 || (todayTasks.length > 0 && window.location.hash === "#tomorrow")}
+            {#if tasksNeverDone.length > 0 || (todayTasks.length > 0 && window.location.hash === "#tomorrow")}
                 <div class="mt-0 mb-1 flex flex-row items-center justify-center gap-1 text-xs">
                     <NeverDoneIcon slash={false} />
-                    <span>{tasks.filter((t) => !t.neverDone).length}</span>
-                    {#if tasks.filter((t) => t.neverDone).length > 0}
+                    <span>{tasks.length + tasksWithNoTime.length - tasksNeverDone.length}</span>
+                    {#if tasksNeverDone.length > 0}
                         <NeverDoneIcon className="ml-1" />
-                        <span>{tasks.filter((t) => t.neverDone).length}</span>
+                        <span>{tasksNeverDone.length}</span>
                     {/if}
                     {#if todayTasks.length > 0 && window.location.hash === "#tomorrow"}
                         <span class="ml-0.5 w-2.5 text-[0.8em]">&#9888;&#65039;</span>
