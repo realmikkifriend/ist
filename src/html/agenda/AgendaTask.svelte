@@ -85,9 +85,18 @@
         {/if}
     </button>
 
+    <button
+        class="relative -left-1.5 ml-0 flex h-4 w-4 shrink-0 items-center justify-center rounded-md hover:bg-gray-700"
+        onclick={openScheduleModal}
+        title="Schedule task"
+        type="button"
+    >
+        <Icon class="h-3 w-3" src={ChevronUpDown} />
+    </button>
+
     {#if task.neverDone}
         <div
-            class="relative -left-0.25 mr-0.75 rounded-full bg-green-200 outline-3 outline-green-200"
+            class="relative -left-1 mr-2 rounded-full bg-green-200 outline-3 outline-green-200"
             title="task is never marked done"
         >
             <Icon class="relative top-[0.02em] h-2 w-2 stroke-5 text-green-700" src={Check} />
@@ -98,18 +107,9 @@
         </div>
     {/if}
 
-    <div class="min-w-0 flex-1 truncate">
+    <div class="relative -left-1.5 min-w-0 flex-1 truncate">
         {task.content}
     </div>
-
-    <button
-        class="ml-1 flex h-4 w-4 shrink-0 items-center justify-center rounded-md hover:bg-gray-700"
-        onclick={openScheduleModal}
-        title="Schedule task"
-        type="button"
-    >
-        <Icon class="h-3 w-3" src={ChevronUpDown} />
-    </button>
 </div>
 
 <dialog id={modalId} class="modal">
