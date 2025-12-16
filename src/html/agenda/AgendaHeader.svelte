@@ -19,8 +19,8 @@
      */
     let h2title = $derived(
         tasks.filter((t) => t.neverDone).length > 0
-            ? `${tasks.filter((t) => !t.neverDone).length} regular tasks, ` +
-                  `${tasks.filter((t) => t.neverDone).length} quick tasks` +
+            ? `${tasks.filter((t) => !t.neverDone).length} tasks, ` +
+                  `${tasks.filter((t) => t.neverDone).length} routines` +
                   `${todayTasks.length > 0 && window.location.hash === "#tomorrow" ? `,\n${todayTasks.length} tasks left over from today` : ""}`
             : `${tasks.length + tasksWithNoTime.length} tasks`,
     );
