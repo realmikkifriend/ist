@@ -13,7 +13,7 @@
 
     let agendaStore: AgendaData = $derived(updateAgenda($hashStore, $todoistData));
 
-    const hourSlots: number[] = Array.from({ length: 18 }, (_, i) => i + 6);
+    const hourSlots: number[] = Array.from({ length: 15 }, (_, i) => i + 7);
 </script>
 
 {#key agendaStore.tasks}
