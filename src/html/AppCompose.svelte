@@ -40,6 +40,7 @@
     <button class="bg-base-100 rounded-md p-1" onclick={handleRefresh} type="button">
         <Icon class="h-6 w-6 {isSpinning ? 'animate-spin cursor-wait' : ''}" src={ArrowPath} />
     </button>
+    <kbd>r</kbd>
 </div>
 
 <Toasts />
@@ -68,6 +69,13 @@
                     document.body.classList.toggle("show-kbd");
                 },
                 modifier: "shift",
+            },
+            {
+                key: "r",
+                callback: () => {
+                    void handleRefresh();
+                },
+                modifier: false,
             },
         ],
     }}
