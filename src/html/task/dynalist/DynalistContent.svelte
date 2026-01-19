@@ -17,7 +17,7 @@
     }: DynalistViewProps & { onTypeChange: (type: DynalistTaskType) => void } = $props();
 </script>
 
-<div class="relative">
+<div class="relative flex">
     {#if dynalistObject}
         {#if selectedType === "read"}
             <SvelteMarkdown

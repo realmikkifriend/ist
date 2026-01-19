@@ -37,7 +37,7 @@
     }
 </script>
 
-<div class="dropdown dropdown-left absolute -top-3 -right-9">
+<div class="dropdown dropdown-left absolute -top-3 -right-7 h-fit w-fit justify-self-end">
     <div
         class="btn bg-accent hover:bg-primary m-0 flex h-2 min-h-8 flex-row content-center gap-0 border-transparent px-0.5 py-0 shadow-none"
         role="button"
