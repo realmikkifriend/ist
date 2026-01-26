@@ -49,7 +49,7 @@
 {#if errorMessage}
     <div class="text-error italic">{errorMessage}</div>
 {:else if checklistItems && currentIndex < checklistItems.length - 1}
-    <div class="mt-1">
+    <div class="mt-1 w-23/24">
         <div class="absolute -top-3.5 left-0 flex w-full items-center">
             <progress
                 class="progress h-1 w-3/4 opacity-25 sm:w-4/5"
