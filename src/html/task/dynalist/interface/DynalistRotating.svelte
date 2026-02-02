@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { Icon, ArrowUturnDown } from "svelte-hero-icons";
+    import { Icon, ArrowUturnDown, Backward } from "svelte-hero-icons";
     import { DateTime } from "luxon";
     import SvelteMarkdown from "@humanspeak/svelte-markdown";
     import { isMonthYearFormat } from "../../../../utils/timeUtils";
@@ -32,19 +32,23 @@
     /**
      * Creates an array of changes for updating a Dynalist item.
      * @param item - The Dynalist node to update.
+     * @param moveDirection - The direction of the move ('next' or 'previous').
      * @returns An array of changes.
      */
-    function createUpdateChanges(item: DynalistNode): DynalistChange[] {
+    function createUpdateChanges(
+        item: DynalistNode,
+        moveDirection: "next" | "previous" = "next",
+    ): DynalistChange[] {
         const changes: DynalistChange[] = [
             {
                 action: "move",
                 node_id: item.id,
                 parent_id: content!.id,
-                index: -1,
+                index: moveDirection === "next" ? -1 : 0, // -1 for bottom, 0 for top
             },
         ];
 
-        if (!item.note || isMonthYearFormat(item.note)) {
+        if ((!item.note || isMonthYearFormat(item.note)) && moveDirection === "next") {
             const today = DateTime.now();
             const newMonthYear = today.toFormat("LLLL yyyy");
             changes.push({
@@ -58,21 +62,31 @@
     }
 
     /**
-     * Rotates to the next item in the checklist and updates Dynalist.
+     * Rotates to the next or previous item in the checklist and updates Dynalist.
+     * @param direction - The direction to rotate ('next' or 'previous').
      * @returns A promise resolving to true if successful, false otherwise.
      */
-    async function showNextItem(): Promise<boolean> {
+    async function rotateItem(direction: "next" | "previous"): Promise<boolean> {
         if (!currentItem || isLoading || !content) return false;
 
         isLoading = true;
 
-        const changes = createUpdateChanges(currentItem);
+        let changes: DynalistChange[];
+        let newRotationIndex: number;
 
-        rotationIndex = (rotationIndex + 1) % checklistItems.length;
+        if (direction === "next") {
+            changes = createUpdateChanges(currentItem, "next");
+            newRotationIndex = (rotationIndex + 1) % checklistItems.length;
+        } else {
+            changes = createUpdateChanges(checklistItems[checklistItems.length - 1], "previous");
+            newRotationIndex = (rotationIndex - 1 + checklistItems.length) % checklistItems.length;
+        }
+
+        rotationIndex = newRotationIndex;
 
         return updateDynalistWithToken(content.file_id, changes).then(
             () => {
-                success("Sent to bottom of list in Dynalist!");
+                success("Updated list saved to Dynalist!");
                 isLoading = false;
                 return true;
             },
@@ -90,12 +104,20 @@
 </script>
 
 {#if hasItems}
-    <div class="mt-2">
+    <div class="mt-2 w-23/24">
+        <button
+            class="btn bg-primary relative float-left mt-0.25 mr-1 inline-block h-5 w-5 rounded-sm p-1 pr-5 pb-5"
+            aria-label="Rewind checklist"
+            onclick={() => rotateItem("previous")}
+            type="reset"
+        >
+            <Icon class="h-4 w-4" src={Backward} />
+        </button>
         <button
             class="comment-focus bg-primary relative float-left mt-0.5 mr-2 inline-block h-5 w-5 cursor-pointer rounded-sm p-1 pr-5 pb-5"
             class:animate-ping={isLoading}
             disabled={isLoading}
-            onclick={showNextItem}
+            onclick={() => rotateItem("next")}
             type="button"
         >
             <Icon class="h-4 w-4" src={ArrowUturnDown} />
