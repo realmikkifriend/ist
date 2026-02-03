@@ -104,25 +104,29 @@
 </script>
 
 {#if hasItems}
-    <div class="mt-2 w-23/24">
-        <button
-            class="btn bg-primary relative float-left mt-0.25 mr-1 inline-block h-5 w-5 rounded-sm p-1 pr-5 pb-5"
-            aria-label="Rewind checklist"
-            onclick={() => rotateItem("previous")}
-            type="reset"
+    <div class="mt-1 w-23/24">
+        <div
+            class="outline-primary/50 float-left mt-1.5 mr-2 flex flex-col gap-0.5 rounded-sm p-0.5 outline-1"
         >
-            <Icon class="h-4 w-4" src={Backward} />
-        </button>
-        <button
-            class="comment-focus bg-primary relative float-left mt-0.5 mr-2 inline-block h-5 w-5 cursor-pointer rounded-sm p-1 pr-5 pb-5"
-            class:animate-ping={isLoading}
-            disabled={isLoading}
-            onclick={() => rotateItem("next")}
-            type="button"
-        >
-            <Icon class="h-4 w-4" src={ArrowUturnDown} />
-            <kbd>z, Enter</kbd>
-        </button>
+            <button
+                class="btn bg-secondary relative inline-block h-5 w-6 rounded-sm pt-0.25 pr-5 pb-4 pl-1"
+                aria-label="Rewind checklist"
+                onclick={() => rotateItem("previous")}
+                type="reset"
+            >
+                <Icon class="h-4 w-4 object-fill" src={Backward} />
+            </button>
+            <button
+                class="comment-focus bg-primary relative inline-block h-5 w-6 cursor-pointer rounded-sm pt-1 pr-5 pb-5 pl-1"
+                class:animate-ping={isLoading}
+                disabled={isLoading}
+                onclick={() => rotateItem("next")}
+                type="button"
+            >
+                <Icon class="h-4 w-4 object-fill" src={ArrowUturnDown} />
+                <kbd>z, Enter</kbd>
+            </button>
+        </div>
 
         {#key rotationIndex}
             <em class="absolute -top-3.5 left-0 text-xs text-nowrap opacity-25">
