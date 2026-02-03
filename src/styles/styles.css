@@ -52,6 +52,7 @@ body {
     border: none;
     position: relative;
     top: -0.09em;
+    white-space: nowrap;
 }
 
 /* AGENDA */
