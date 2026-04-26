@@ -104,7 +104,9 @@
     let displayNote = $derived(() => {
         if (!currentItem?.note) return "";
         const parsed = parseRotatingDate(currentItem.note);
-        return parsed ? parsed.toFormat("MMM d yyyy") : currentItem.note;
+        if (!parsed) return currentItem.note;
+        if (parsed.hasSame(DateTime.now(), "day")) return "today";
+        return parsed.toRelative();
     });
 </script>
 
