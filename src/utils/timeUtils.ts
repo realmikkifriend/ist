@@ -70,13 +70,29 @@ export function roundFutureTime(futureTime: Date, index: number): Date {
 }
 
 /**
- * Checks if a date string is in "Month Year" format.
+ * Checks if a date string is in a valid date format ("Month Year" or "Month Date, Year").
  * @param {string} dateString - The date string to check.
- * @returns True if the string is in "Month Year" format, false otherwise.
+ * @returns True if the string matches a supported format, false otherwise.
  */
 export function isMonthYearFormat(dateString?: string): boolean {
-    const trimmed = dateString?.trim() || "";
+    if (!dateString) return false;
+    const trimmed = dateString.trim();
     const fullMonthFormat = DateTime.fromFormat(trimmed, "LLLL yyyy");
-    const shortMonthFormat = DateTime.fromFormat(trimmed, "LLL yyyy");
-    return fullMonthFormat.isValid || shortMonthFormat.isValid;
+    const newFormat = DateTime.fromFormat(trimmed, "MMM d yyyy");
+    return fullMonthFormat.isValid || newFormat.isValid;
+}
+
+/**
+ * Parses a rotating date string, supporting "Month Year" (assumes 15th) and "Month Date, Year".
+ * @param {string} dateString - The date string to parse.
+ * @returns A DateTime object or null if parsing fails.
+ */
+export function parseRotatingDate(dateString?: string): DateTime | null {
+    if (!dateString) return null;
+    const trimmed = dateString.trim();
+    const newFormat = DateTime.fromFormat(trimmed, "MMM d yyyy");
+    if (newFormat.isValid) return newFormat;
+    const fullMonthFormat = DateTime.fromFormat(trimmed, "LLLL yyyy");
+    if (fullMonthFormat.isValid) return fullMonthFormat.set({ day: 15 });
+    return null;
 }

@@ -2,7 +2,7 @@
     import { Icon, ArrowUturnDown, Backward } from "svelte-hero-icons";
     import { DateTime } from "luxon";
     import SvelteMarkdown from "@humanspeak/svelte-markdown";
-    import { isMonthYearFormat } from "../../../../utils/timeUtils";
+    import { isMonthYearFormat, parseRotatingDate } from "../../../../utils/timeUtils";
     import { generateDynalistComment } from "../../../../utils/dynalistProcessUtils";
     import { updateDynalistWithToken } from "../../../../services/dynalistService";
     import { success } from "../../../../services/toastService";
@@ -50,7 +50,7 @@
 
         if ((!item.note || isMonthYearFormat(item.note)) && moveDirection === "next") {
             const today = DateTime.now();
-            const newMonthYear = today.toFormat("LLLL yyyy");
+            const newMonthYear = today.toFormat("MMM d yyyy");
             changes.push({
                 action: "edit",
                 node_id: item.id,
@@ -101,6 +101,11 @@
     let rotatedItems = $derived(rotateArray(checklistItems, rotationIndex));
     let currentItem = $derived(rotatedItems[0]);
     let hasItems = $derived(checklistItems.length > 0);
+    let displayNote = $derived(() => {
+        if (!currentItem?.note) return "";
+        const parsed = parseRotatingDate(currentItem.note);
+        return parsed ? parsed.toFormat("MMM d yyyy") : currentItem.note;
+    });
 </script>
 
 {#if hasItems}
@@ -132,7 +137,7 @@
             <em class="absolute -top-3.5 left-0 text-xs text-nowrap opacity-25">
                 <span class="mr-0.5 inline-block w-7">&infin;{checklistItems.length}</span>
                 {#if currentItem?.note && isMonthYearFormat(currentItem.note)}
-                    <span>last completed {currentItem.note}</span>
+                    <span>last completed {displayNote()}</span>
                 {/if}
             </em>
             <SvelteMarkdown
