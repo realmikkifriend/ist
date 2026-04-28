@@ -78,7 +78,7 @@
             changes = createUpdateChanges(currentItem, "next");
             newRotationIndex = (rotationIndex + 1) % checklistItems.length;
         } else {
-            changes = createUpdateChanges(checklistItems[checklistItems.length - 1], "previous");
+            changes = createUpdateChanges(rotatedItems[rotatedItems.length - 1], "previous");
             newRotationIndex = (rotationIndex - 1 + checklistItems.length) % checklistItems.length;
         }
 
