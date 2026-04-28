@@ -78,7 +78,7 @@ export function isMonthYearFormat(dateString?: string): boolean {
     if (!dateString) return false;
     const trimmed = dateString.trim();
     const fullMonthFormat = DateTime.fromFormat(trimmed, "LLLL yyyy");
-    const newFormat = DateTime.fromFormat(trimmed, "MMM d yyyy");
+    const newFormat = DateTime.fromFormat(trimmed, "MMMM d yyyy");
     return fullMonthFormat.isValid || newFormat.isValid;
 }
 
@@ -90,7 +90,7 @@ export function isMonthYearFormat(dateString?: string): boolean {
 export function parseRotatingDate(dateString?: string): DateTime | null {
     if (!dateString) return null;
     const trimmed = dateString.trim();
-    const newFormat = DateTime.fromFormat(trimmed, "MMM d yyyy");
+    const newFormat = DateTime.fromFormat(trimmed, "MMMM d yyyy");
     if (newFormat.isValid) return newFormat;
     const fullMonthFormat = DateTime.fromFormat(trimmed, "LLLL yyyy");
     if (fullMonthFormat.isValid) return fullMonthFormat.set({ day: 15 });

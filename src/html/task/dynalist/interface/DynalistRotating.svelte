@@ -50,7 +50,7 @@
 
         if ((!item.note || isMonthYearFormat(item.note)) && moveDirection === "next") {
             const today = DateTime.now();
-            const newMonthYear = today.toFormat("MMM d yyyy");
+            const newMonthYear = today.toFormat("MMMM d yyyy");
             changes.push({
                 action: "edit",
                 node_id: item.id,
