@@ -17,6 +17,7 @@ export interface CalendarDayProps {
     dots: { color: string }[];
     tooltip?: Task[] | undefined;
     disable?: "past" | "future" | null;
+    isTrailing?: boolean;
 }
 
 export interface CalendarHeaderProps {

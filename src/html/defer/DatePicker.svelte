@@ -13,11 +13,21 @@
 
     let dateInfo = $derived(
         (() => {
+            const start = displayDate.startOf("month");
+
+            const endOfMonth = displayDate.endOf("month");
+            const endOfMonthWeekday = endOfMonth.weekday;
+            const trailingDaysCount = 7 - endOfMonthWeekday + 7;
+            const nextMonth = displayDate.plus({ months: 1 });
+            const end = DateTime.local(nextMonth.year, nextMonth.month, trailingDaysCount).endOf(
+                "day",
+            );
+
             const monthTasks = getTasksForMonth(
                 tasks,
                 {
-                    start: displayDate.startOf("month"),
-                    end: displayDate.endOf("month"),
+                    start,
+                    end,
                 },
                 {
                     tz,

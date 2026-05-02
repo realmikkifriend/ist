@@ -18,6 +18,7 @@
 
     const today = DateTime.now().startOf("day");
 
+    const displayMonth = $derived(displayDate!.startOf("month"));
     const days = $derived(getCalendarGrid(displayDate!));
     const weekDays = ["M", "T", "W", "T", "F", "S", "S"];
 
@@ -48,6 +49,7 @@
         {#each days as day, i (day ? day.toMillis() : `empty-${i}`)}
             {#if day}
                 {@const info = getInfoForDay(day, dateInfo)}
+                {@const isTrailing = !day.hasSame(displayMonth, "month")}
                 {#if onDayClick}
                     <button
                         class="hover:bg-primary w-full cursor-pointer rounded-sm text-left disabled:hover:bg-transparent"
@@ -60,6 +62,7 @@
                             {day}
                             {disable}
                             dots={info?.dots ?? []}
+                            {isTrailing}
                             tooltip={info?.tasks}
                         />
                     </button>
@@ -69,6 +72,7 @@
                             {day}
                             {disable}
                             dots={info?.dots ?? []}
+                            {isTrailing}
                             tooltip={info?.tasks}
                         />
                     </div>

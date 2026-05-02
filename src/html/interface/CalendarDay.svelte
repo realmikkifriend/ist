@@ -3,7 +3,13 @@
     import ListTask from "../task/ListTask.svelte";
     import type { CalendarDayProps } from "../../types/calendar";
 
-    let { day, dots, tooltip = undefined, disable = null }: CalendarDayProps = $props();
+    let {
+        day,
+        dots,
+        tooltip = undefined,
+        disable = null,
+        isTrailing = false,
+    }: CalendarDayProps = $props();
 
     const today = DateTime.now().startOf("day");
     const tomorrow = today.plus({ days: 1 });
@@ -18,7 +24,7 @@
     class:bg-red-950={day.hasSame(today, "day")}
     class:cursor-not-allowed={isDisabled}
     class:hover:bg-transparent={isDisabled}
-    class:opacity-50={isDisabled}
+    class:opacity-50={isDisabled || isTrailing}
 >
     {#if tooltip}
         <div class="tooltip-content w-44 text-left">

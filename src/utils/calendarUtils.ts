@@ -17,7 +17,15 @@ export function getCalendarGrid(displayMonthDate: DateTime): (DateTime | null)[]
         DateTime.local(displayMonthDate.year, displayMonthDate.month, i + 1),
     );
 
-    return [...leadingEmptyDays, ...monthDays] as (DateTime | null)[];
+    const endOfMonthWeekday = endOfMonth.weekday;
+    const trailingDaysCount = 7 - endOfMonthWeekday + 7;
+
+    const nextMonth = displayMonthDate.plus({ months: 1 });
+    const trailingDays: DateTime[] = Array.from({ length: trailingDaysCount }, (_, i) =>
+        DateTime.local(nextMonth.year, nextMonth.month, i + 1),
+    );
+
+    return [...leadingEmptyDays, ...monthDays, ...trailingDays] as (DateTime | null)[];
 }
 
 /**
