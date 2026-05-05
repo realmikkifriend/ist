@@ -13,9 +13,17 @@
 
     const { summonTask } = getContext<HandlerMethodsContext>("handlerMethods");
 
+    const normalizeText = (text: string) =>
+        text
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .toLowerCase();
+
     const filteredTasks = $derived(
         searchTerm
-            ? tasks.filter((task) => task.content.toLowerCase().includes(searchTerm.toLowerCase()))
+            ? tasks.filter((task) =>
+                  normalizeText(task.content).includes(normalizeText(searchTerm)),
+              )
             : [],
     );
 
