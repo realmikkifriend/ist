@@ -34,9 +34,9 @@ export async function handleTaskDefer(
 /**
  * Handles overdue tasks by deferring them to today.
  * @param {Task[]} tasks - Array of Task objects to check for overdue status.
- * @returns {void}
+ * @returns {Promise<TaskUpdates | null>} - The updates applied to the tasks, or null if none.
  */
-export function handleOverdueTasks(tasks: Task[]): void {
+export async function handleOverdueTasks(tasks: Task[]): Promise<TaskUpdates | null> {
     const today = DateTime.now().startOf("day");
     const overdueTasks =
         tasks.filter((task) => {
@@ -51,6 +51,8 @@ export function handleOverdueTasks(tasks: Task[]): void {
             return [task, time];
         });
 
-        void handleTaskDefer(taskUpdates);
+        const result = await handleTaskDefer(taskUpdates);
+        return result.taskUpdates;
     }
+    return null;
 }
