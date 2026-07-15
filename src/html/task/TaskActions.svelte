@@ -94,7 +94,7 @@
 <div class="card-actions relative -right-5 justify-center">
     {#if !task.neverDone}
         <button
-            class="text-md btn btn-primary focus:btn-soft relative h-8 min-h-8 content-center p-4 focus:cursor-progress"
+            class="text-md btn btn-primary focus:btn-soft xs:flex relative hidden h-8 min-h-8 content-center p-4 focus:cursor-progress"
             onclick={() => onDone(task)}
             title={task.due?.string ? `repeats ${task.due.string}` : "one-time task"}
             type="button"
@@ -104,7 +104,7 @@
         </button>
     {/if}
     <button
-        class="text-md btn btn-secondary relative h-8 min-h-8 content-center p-4"
+        class="text-md btn btn-secondary xs:flex relative hidden h-8 min-h-8 content-center p-4"
         onclick={() => openModal("defer_modal", { onDeferFinal })}
         type="button"
     >
@@ -116,7 +116,7 @@
         <kbd>d</kbd>
     </button>
     <button
-        class="text-md hover:bg-accent btn btn-ghost btn-sm relative -left-1 min-h-8 w-8 content-center border-0 p-0"
+        class="text-md hover:bg-accent btn btn-ghost btn-sm xs:flex relative -left-1 hidden min-h-8 w-8 content-center border-0 p-0"
         onclick={() => openModal(`calendar_modal_${task.id}`)}
         title="view task completion history"
         type="button"

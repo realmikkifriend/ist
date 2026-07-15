@@ -20,7 +20,7 @@
     const { handleRefresh } = getContext<HandlerMethodsContext>("handlerMethods");
 </script>
 
-<div class="flex w-fit items-center">
+<div class="xs:flex hidden w-fit items-center">
     <Sidebar hash={$hashStore} />
 
     {#if $displayTask && $hashStore !== "#today" && $hashStore !== "#tomorrow"}

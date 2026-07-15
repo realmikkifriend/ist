@@ -44,14 +44,14 @@
     };
 </script>
 
-<div class="mx-auto mt-4 max-w-72 sm:mt-2 sm:max-w-sm">
+<div class="xs:max-w-72 xs:mt-2 mx-auto mt-0 max-w-full sm:max-w-sm">
     <div
         class={`card bg-neutral text-primary-content mt-0 rounded-xl border-b-[0.75rem] ${priorityBorderClass}`}
     >
-        <div class="card-body pb-7">
+        <div class="card-body xs:p-5 p-2 pb-0">
             {#if task.skip}
                 <button
-                    class="text-md hover:bg-accent btn btn-ghost btn-sm absolute top-0 right-0 h-8 min-h-8 content-center border-0 p-4"
+                    class="text-md hover:bg-accent btn btn-ghost btn-sm xs:block absolute top-0 right-0 hidden h-8 min-h-8 content-center border-0 p-4"
                     onclick={handleSkipTask}
                     title="skip task"
                     type="button"
@@ -60,12 +60,14 @@
                     <kbd>s</kbd>
                 </button>
             {/if}
-            <h2 class="card-title text-center text-3xl">{task.content}</h2>
+            <h2 class="card-title text-md xs:text-3xl text-center">{task.content}</h2>
             <TaskActions {openModal} {task} />
         </div>
     </div>
     {#if task.comments}
-        <Comments commentsPromise={Promise.resolve(task.comments)} />
+        <div class="xs:block hidden">
+            <Comments commentsPromise={Promise.resolve(task.comments)} />
+        </div>
     {/if}
 </div>
 
