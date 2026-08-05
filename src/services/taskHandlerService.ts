@@ -9,6 +9,12 @@ import type { Task, TaskUpdates } from "../types/todoist";
  * @returns Promise&lt;{ success: boolean, taskUpdates: TaskUpdates }> - Object containing success status and task updates.
  */
 export async function handleTaskDone(task: Task): Promise<{ success: boolean; taskId: string }> {
+    if (task.due?.isRecurring) {
+        const today = DateTime.now().startOf("day");
+        const { newDate } = createDateWithTime(task.due.string, today);
+        const deferTime = newDate ?? today;
+        await handleTaskDefer([[task, deferTime]]);
+    }
     const result = await markTaskDone(task.id);
     return { success: result.status === "success", taskId: task.id };
 }
