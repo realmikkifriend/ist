@@ -91,7 +91,7 @@
     };
 </script>
 
-<div class="card-actions relative -right-5 justify-center">
+<div class="card-actions relative justify-center" class:-right-5={!task.neverDone}>
     {#if !task.neverDone}
         <button
             class="text-md btn btn-primary focus:btn-soft xs:flex relative hidden h-8 min-h-8 content-center p-4 focus:cursor-progress"
@@ -115,15 +115,17 @@
         {/if}
         <kbd>d</kbd>
     </button>
-    <button
-        class="text-md hover:bg-accent btn btn-ghost btn-sm xs:flex relative -left-1 hidden min-h-8 w-8 content-center border-0 p-0"
-        onclick={() => openModal(`calendar_modal_${task.id}`)}
-        title="view task completion history"
-        type="button"
-    >
-        <Icon class="stroke-secondary h-5 w-5 [&>path]:stroke-2" src={CalendarDateRange} />
-        <kbd>h</kbd>
-    </button>
+    {#if !task.neverDone}
+        <button
+            class="text-md hover:bg-accent btn btn-ghost btn-sm xs:flex relative -left-1 hidden min-h-8 w-8 content-center border-0 p-0"
+            onclick={() => openModal(`calendar_modal_${task.id}`)}
+            title="view task completion history"
+            type="button"
+        >
+            <Icon class="stroke-secondary h-5 w-5 [&>path]:stroke-2" src={CalendarDateRange} />
+            <kbd>h</kbd>
+        </button>
+    {/if}
 </div>
 
 <svelte:window
