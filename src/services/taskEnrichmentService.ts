@@ -1,8 +1,8 @@
 import { get } from "svelte/store";
-import { DateTime } from "luxon";
+// import { DateTime } from "luxon";
 import { displayTask } from "../stores/stores";
 import { todoistAccessToken } from "../stores/secret";
-import { getActivity } from "./activityService";
+// import { getActivity } from "./activityService";
 import { loadCommentsForTask } from "../utils/firstTaskUtils";
 import type { TodoistData, Task, InitialCheckOutcome } from "../types/todoist";
 
@@ -14,6 +14,7 @@ import type { TodoistData, Task, InitialCheckOutcome } from "../types/todoist";
  */
 export const enrichTask = async (task: Task, accessToken: string): Promise<Task> => {
     const taskWithComments = await loadCommentsForTask(task, accessToken);
+    /*
     const activity = getActivity(
         [DateTime.now().minus({ years: 1 }), DateTime.now()],
         taskWithComments,
@@ -22,6 +23,8 @@ export const enrichTask = async (task: Task, accessToken: string): Promise<Task>
     const activityPromise = activity.promise
         ? activity.promise.then(({ relevant }) => relevant)
         : Promise.resolve(activity.data);
+    */
+    const activityPromise = Promise.resolve([]);
 
     return {
         ...taskWithComments,
