@@ -3,6 +3,12 @@ import { DateTime } from "luxon";
 import type { ParsedResult } from "chrono-node";
 
 /**
+ * Gets the device's local time zone (IANA).
+ * @returns {string} - The local time zone name.
+ */
+export const getLocalTimeZone = (): string => Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+/**
  * Extracts the time from a due string, if available.
  * @param {string} dueString - The string to parse for time information.
  * @returns {{ hour: number; minute: number } | null} The extracted hour and minute, or null if no time found.

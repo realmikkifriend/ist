@@ -1,5 +1,5 @@
 import { DateTime } from "luxon";
-import { getTaskTime } from "./timeUtils";
+import { getTaskTime, getLocalTimeZone } from "./timeUtils";
 import { compareTasks } from "./comparisonUtils";
 import type { GetProjectsResponse } from "@doist/todoist-api-typescript";
 import type { Task, Context, DueTasksData, TasksGroupedByContext } from "../types/todoist";
@@ -11,10 +11,9 @@ import type { UserSettings } from "../types/interface";
  * @returns {Task[]} The filtered and sorted due tasks.
  */
 export function getDueTasks(data: DueTasksData): Task[] {
-    const { tasks, contexts, user } = data;
-    const timeZone = user?.tz_info?.timezone || "local";
+    const { tasks, contexts } = data;
 
-    return filterAndSortTasks(tasks, contexts, { timeZone });
+    return filterAndSortTasks(tasks, contexts, { timeZone: getLocalTimeZone() });
 }
 
 /**
@@ -40,10 +39,9 @@ export function getSoonTasks(tasks: Task[]): Task[] {
  * @returns {Task[]} The filtered and reverse-sorted tasks.
  */
 export function getReverseTasks(data: DueTasksData): Task[] {
-    const { tasks, contexts, user } = data;
-    const timeZone = user?.tz_info?.timezone || "local";
+    const { tasks, contexts } = data;
 
-    return filterAndSortTasks(tasks, contexts, { timeZone, reverse: true });
+    return filterAndSortTasks(tasks, contexts, { timeZone: getLocalTimeZone(), reverse: true });
 }
 
 /**
