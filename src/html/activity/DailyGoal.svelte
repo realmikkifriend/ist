@@ -17,30 +17,49 @@
 
     let dailyGoal = $derived($todoistData.user.daily_goal);
 
+    /**
+     * Fetches daily activity from the store and, if needed, the API.
+     */
+    const fetchActivity = () => {
+        const activity = fetchDailyActivity();
+        sortedLists = activity.preliminary as {
+            byContext: TaskActivity[];
+            byTime: TaskActivity[];
+        };
+
+        if (activity.promise) {
+            isLoading = true;
+            void activity.promise.then(({ display, newActivities }) => {
+                sortedLists = display;
+                $taskActivity = mergeActivity($taskActivity, newActivities);
+                isLoading = false;
+            });
+        } else {
+            isLoading = false;
+        }
+    };
+
+    /**
+     * Reloads activity stats, resetting any temporary entries.
+     */
+    const reloadActivity = () => {
+        if (isLoading) {
+            return;
+        }
+        if (debounceTimeoutId) {
+            clearTimeout(debounceTimeoutId);
+        }
+        $taskActivity = $taskActivity.filter((activity) => activity.temporary !== true);
+        fetchActivity();
+    };
+
     $effect(() => {
         if ($todoistData.tasks) {
             if (debounceTimeoutId) {
                 clearTimeout(debounceTimeoutId);
             }
 
-            debounceTimeoutId = setTimeout(() => {
-                const activity = fetchDailyActivity();
-                sortedLists = activity.preliminary as {
-                    byContext: TaskActivity[];
-                    byTime: TaskActivity[];
-                };
-
-                if (activity.promise) {
-                    isLoading = true;
-                    void activity.promise.then(({ display, newActivities }) => {
-                        sortedLists = display;
-                        $taskActivity = mergeActivity($taskActivity, newActivities);
-                        isLoading = false;
-                    });
-                } else {
-                    isLoading = false;
-                }
-            }, 2000);
+            debounceTimeoutId = setTimeout(fetchActivity, 2000);
         }
     });
 </script>
@@ -49,8 +68,10 @@
     class="tooltip min-w-32"
     class:cursor-progress={isLoading}
     onblur={(e) => e.currentTarget.classList.remove("tooltip-open")}
+    onclick={reloadActivity}
     onfocus={(e) => e.currentTarget.classList.add("tooltip-open")}
     tabindex="0"
+    title="Reload activity stats"
     type="button"
 >
     <DailyGoalTooltip {dailyGoal} {isLoading} sortedByTime={sortedLists.byTime} />
