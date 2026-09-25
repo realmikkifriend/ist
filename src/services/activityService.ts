@@ -12,7 +12,7 @@ import {
 import { filterActivityByTimeframe, checkCoverage } from "../utils/activityTimeframeUtils";
 import { colorClasses } from "../styles/styleUtils";
 import type { Task, ColorName, GetAllActivityDataParams } from "../types/todoist";
-import type { TaskActivity, TodoistActivity } from "../types/activity";
+import type { TaskActivity } from "../types/activity";
 
 /**
  * Creates dataset for display.
@@ -128,10 +128,7 @@ const getAllActivityData = async ({
     emptyResponsesCount = 0,
 }: GetAllActivityDataParams): Promise<TaskActivity[]> => {
     const [startDate, endDate] = timeframe;
-    const newActivityData = (await getNewActivity(get(todoistAccessToken), task, cursor)) as {
-        next_cursor: string | null;
-        results: TodoistActivity[];
-    };
+    const newActivityData = await getNewActivity(get(todoistAccessToken), timeframe, task, cursor);
 
     const processedActivityData: TaskActivity[] = processActivityData(newActivityData);
 
@@ -145,16 +142,12 @@ const getAllActivityData = async ({
         });
 
     if (
-        shouldContinueFetchingActivity(
-            newActivityData.next_cursor,
-            done,
-            updatedEmptyResponsesCount,
-        )
+        shouldContinueFetchingActivity(newActivityData.nextCursor, done, updatedEmptyResponsesCount)
     ) {
         return getAllActivityData({
             timeframe,
             accumulatedData: currentAccumulatedData,
-            cursor: newActivityData.next_cursor,
+            cursor: newActivityData.nextCursor,
             task,
             emptyResponsesCount: updatedEmptyResponsesCount,
         });

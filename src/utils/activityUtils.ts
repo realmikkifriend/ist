@@ -1,10 +1,13 @@
 import { DateTime } from "luxon";
-import { getEndpoint } from "./apiUtils";
+import { initializeApi } from "./apiUtils";
 import { checkCoverage } from "./activityTimeframeUtils";
+import type {
+    GetCompletedTasksByCompletionDateArgs,
+    GetCompletedTasksResponse,
+} from "@doist/todoist-sdk";
 import type { Task } from "../types/todoist";
 import type {
     TaskActivity,
-    TodoistActivity,
     ProcessActivityAccumulationParams,
     ProcessActivityAccumulationResult,
 } from "../types/activity";
@@ -12,52 +15,82 @@ import type {
 /**
  * Retrieves task activity from Todoist API.
  * @param {string} accessToken - The access token for the Todoist API.
+ * @param {DateTime[]} timeframe - Timeframe (start and end) to retrieve activity for.
  * @param {Task | null} task - Optional task to filter activity by.
  * @param {string | null} cursor - Optional cursor for pagination.
- * @returns {Promise<{results: TodoistActivity[]}>} Task activity history data.
+ * @returns {Promise<GetCompletedTasksResponse>} Completed tasks within the timeframe.
  */
 export async function getNewActivity(
     accessToken: string,
+    timeframe: DateTime[],
     task: Task | null = null,
     cursor: string | null = null,
-): Promise<{ results: TodoistActivity[] }> {
-    const params: Record<string, string | number> = {
-        limit: 100,
-        object_type: "item",
-        event_type: "completed",
-    };
+): Promise<GetCompletedTasksResponse> {
+    const api = initializeApi(accessToken);
 
-    if (task?.id) {
-        params.object_id = String(task.id);
+    if (!api) {
+        return { items: [], nextCursor: null };
     }
 
-    if (cursor) {
-        params.cursor = cursor;
-    }
-
-    const endpointData = await getEndpoint<{ results: TodoistActivity[] }>(
-        accessToken,
-        "activities",
-        params,
+    const endpointData = await api.getCompletedTasksByCompletionDate(
+        buildCompletedTasksQuery(timeframe, task, cursor),
     );
 
-    return endpointData;
+    return {
+        items: filterTasksById(endpointData.items, task),
+        nextCursor: endpointData.nextCursor,
+    };
 }
 
 /**
- * Converts raw activity data into activity logs.
- * @param {TodoistActivity[]} newActivityData - Raw activity data.
- * @param {TodoistActivity[]} newActivityData.results - Raw activity data.
+ * Builds the query arguments for the completed-tasks-by-completion-date endpoint.
+ * @param {DateTime[]} timeframe - Timeframe (start and end) to retrieve activity for.
+ * @param {Task | null} task - Optional task to narrow the query to its project.
+ * @param {string | null} cursor - Optional cursor for pagination.
+ * @returns {GetCompletedTasksByCompletionDateArgs} The endpoint query arguments.
+ */
+const buildCompletedTasksQuery = (
+    timeframe: DateTime[],
+    task: Task | null,
+    cursor: string | null,
+): GetCompletedTasksByCompletionDateArgs => {
+    const [startDate, endDate] = timeframe;
+    return {
+        since: startDate.toISODate() ?? "",
+        until: endDate.toISODate() ?? "",
+        projectId: task?.projectId ?? null,
+        cursor,
+        limit: 100,
+    };
+};
+
+/**
+ * Filters completed tasks down to a single task if one is provided.
+ * @param {Task[]} items - Completed tasks to filter.
+ * @param {Task | null} task - Optional task to filter by.
+ * @returns {Task[]} Filtered list of completed tasks.
+ */
+const filterTasksById = (
+    items: GetCompletedTasksResponse["items"],
+    task: Task | null,
+): GetCompletedTasksResponse["items"] => {
+    if (task?.id) {
+        return items.filter((item) => item.id === task.id);
+    }
+    return items;
+};
+
+/**
+ * Converts raw completed task data into activity logs.
+ * @param {GetCompletedTasksResponse} newActivityData - Completed tasks retrieved from the API.
  * @returns {TaskActivity[]} An array of processed activity logs.
  */
-export const processActivityData = (newActivityData: {
-    results: TodoistActivity[];
-}): TaskActivity[] => {
-    return newActivityData.results.map((item) => ({
-        date: DateTime.fromISO(item.event_date),
-        taskId: item.object_id,
-        contextId: item.parent_project_id,
-        title: item.extra_data.content,
+export const processActivityData = (newActivityData: GetCompletedTasksResponse): TaskActivity[] => {
+    return newActivityData.items.map((item) => ({
+        date: DateTime.fromISO(item.completedAt?.toISOString() ?? ""),
+        taskId: item.id,
+        contextId: item.projectId,
+        title: item.content,
         temporary: null,
     }));
 };

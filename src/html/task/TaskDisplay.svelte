@@ -76,7 +76,9 @@
 </dialog>
 
 {#if task.activity}
-    <History activity={task.activity} content={task.content} entityId={task.id} />
+    {#key task.activity}
+        <History activity={task.activity} content={task.content} entityId={task.id} />
+    {/key}
 {/if}
 
 <svelte:window
