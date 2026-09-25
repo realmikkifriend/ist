@@ -1,10 +1,10 @@
 import { get } from "svelte/store";
-import { TodoistRequestError } from "@doist/todoist-api-typescript";
+import { TodoistRequestError } from "@doist/todoist-sdk";
 import { todoistAccessToken } from "../stores/secret";
 import { formatTaskDate } from "../utils/timeUtils";
 import { initializeApi, handleApiError, postEndpoint } from "../utils/apiUtils";
 import type { DateTime } from "luxon";
-import type { UpdateTaskArgs } from "@doist/todoist-api-typescript";
+import type { UpdateTaskArgs } from "@doist/todoist-sdk";
 import type { Task, Context } from "../types/todoist";
 
 /**

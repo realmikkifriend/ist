@@ -1,7 +1,7 @@
 import { DateTime } from "luxon";
 import { getTaskTime, getLocalTimeZone } from "./timeUtils";
 import { compareTasks } from "./comparisonUtils";
-import type { GetProjectsResponse } from "@doist/todoist-api-typescript";
+import type { GetProjectsResponse } from "@doist/todoist-sdk";
 import type { Task, Context, DueTasksData, TasksGroupedByContext } from "../types/todoist";
 import type { UserSettings } from "../types/interface";
 

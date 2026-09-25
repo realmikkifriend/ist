@@ -1,7 +1,7 @@
-import { TodoistApi, TodoistRequestError } from "@doist/todoist-api-typescript";
+import { TodoistApi, TodoistRequestError } from "@doist/todoist-sdk";
 import { getDueTasks, getReverseTasks, filterContexts } from "../utils/filterUtils";
 import { cleanTodoistData, extractUser } from "../utils/processUtils";
-import type { GetProjectsResponse, GetTasksResponse } from "@doist/todoist-api-typescript";
+import type { GetProjectsResponse, GetTasksResponse } from "@doist/todoist-sdk";
 import type { Task, TodoistData, Context, User, Comment } from "../types/todoist";
 
 /**
@@ -171,7 +171,7 @@ export function getTaskComments(accessToken: string, taskId: string): Promise<Co
                     postedAt: new Date().toISOString(),
                     id: "error-comment",
                     taskId: taskId,
-                } as Comment,
+                } as unknown as Comment,
             ];
         });
 }

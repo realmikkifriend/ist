@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { getAuthStateParameter, getAuthorizationUrl } from "@doist/todoist-api-typescript";
+    import { getAuthStateParameter, getAuthorizationUrl } from "@doist/todoist-sdk";
     import Logo from "./interface/Logo.svelte";
     import Footer from "./interface/Footer.svelte";
 
@@ -16,7 +16,11 @@
      * @returns {string} The authorization URL.
      */
     const todoistAuthURL: string | undefined = TODOIST_CLIENT_ID
-        ? getAuthorizationUrl(TODOIST_CLIENT_ID, ["data:read_write"], todoistAuthState)
+        ? getAuthorizationUrl({
+              clientId: TODOIST_CLIENT_ID,
+              permissions: ["data:read_write"],
+              state: todoistAuthState,
+          })
         : undefined;
 </script>
 

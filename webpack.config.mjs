@@ -14,6 +14,16 @@ export default {
         extensions: [".mjs", ".js", ".ts", ".svelte"],
         mainFields: ["svelte", "browser", "module", "main"],
         conditionNames: ["svelte", "browser", "import"],
+        // @doist/todoist-sdk lazily imports Node-only modules (fs, path, undici)
+        // for file-path uploads and a Node HTTP dispatcher; stub them out so they
+        // are not pulled into the browser bundle.
+        alias: {
+            undici: false,
+        },
+        fallback: {
+            fs: false,
+            path: false,
+        },
     },
     module: {
         rules: [

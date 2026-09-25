@@ -1,5 +1,5 @@
 import { get } from "svelte/store";
-import { TodoistRequestError } from "@doist/todoist-api-typescript";
+import { TodoistRequestError } from "@doist/todoist-sdk";
 import { DateTime } from "luxon";
 import { todoistAccessToken } from "../stores/secret";
 import { handleOverdueTasks } from "./taskHandlerService";

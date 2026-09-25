@@ -4,7 +4,7 @@ import type {
     PersonalProject,
     User as BaseUser,
     Comment as BaseComment,
-} from "@doist/todoist-api-typescript";
+} from "@doist/todoist-sdk";
 import type { TaskActivity } from "./activity";
 
 export type Context = PersonalProject;
