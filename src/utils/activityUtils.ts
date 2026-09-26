@@ -2,8 +2,9 @@ import { DateTime } from "luxon";
 import { initializeApi } from "./apiUtils";
 import { checkCoverage } from "./activityTimeframeUtils";
 import type {
-    GetCompletedTasksByCompletionDateArgs,
-    GetCompletedTasksResponse,
+    ActivityEvent,
+    GetActivityLogsArgs,
+    GetActivityLogsResponse,
 } from "@doist/todoist-sdk";
 import type { Task } from "../types/todoist";
 import type {
@@ -18,81 +19,86 @@ import type {
  * @param {DateTime[]} timeframe - Timeframe (start and end) to retrieve activity for.
  * @param {Task | null} task - Optional task to filter activity by.
  * @param {string | null} cursor - Optional cursor for pagination.
- * @returns {Promise<GetCompletedTasksResponse>} Completed tasks within the timeframe.
+ * @returns {Promise<GetActivityLogsResponse>} Completed-task activity events within the timeframe.
  */
 export async function getNewActivity(
     accessToken: string,
     timeframe: DateTime[],
     task: Task | null = null,
     cursor: string | null = null,
-): Promise<GetCompletedTasksResponse> {
+): Promise<GetActivityLogsResponse> {
     const api = initializeApi(accessToken);
 
     if (!api) {
-        return { items: [], nextCursor: null };
+        return { results: [], nextCursor: null };
     }
 
-    const endpointData = await api.getCompletedTasksByCompletionDate(
-        buildCompletedTasksQuery(timeframe, task, cursor),
-    );
-
-    return {
-        items: filterTasksById(endpointData.items, task),
-        nextCursor: endpointData.nextCursor,
-    };
+    return api.getActivityLogs(buildActivityLogsQuery(timeframe, task, cursor));
 }
 
 /**
- * Builds the query arguments for the completed-tasks-by-completion-date endpoint.
+ * Builds the query arguments for the activity-logs endpoint.
  * @param {DateTime[]} timeframe - Timeframe (start and end) to retrieve activity for.
- * @param {Task | null} task - Optional task to narrow the query to its project.
+ * @param {Task | null} task - Optional task to narrow the query to.
  * @param {string | null} cursor - Optional cursor for pagination.
- * @returns {GetCompletedTasksByCompletionDateArgs} The endpoint query arguments.
+ * @returns {GetActivityLogsArgs} The endpoint query arguments.
  */
-const buildCompletedTasksQuery = (
+const buildActivityLogsQuery = (
     timeframe: DateTime[],
     task: Task | null,
     cursor: string | null,
-): GetCompletedTasksByCompletionDateArgs => {
+): GetActivityLogsArgs => {
     const [startDate, endDate] = timeframe;
     return {
-        since: startDate.toISODate() ?? "",
-        until: endDate.toISODate() ?? "",
-        projectId: task?.projectId ?? null,
+        dateFrom: startDate.toISODate() ?? "",
+        dateTo: endDate.plus({ days: 1 }).toISODate() ?? "",
+        objectEventTypes: "task:completed",
         cursor,
         limit: 100,
+        ...(task?.id ? { objectId: task.id } : {}),
     };
 };
 
 /**
- * Filters completed tasks down to a single task if one is provided.
- * @param {Task[]} items - Completed tasks to filter.
- * @param {Task | null} task - Optional task to filter by.
- * @returns {Task[]} Filtered list of completed tasks.
+ * Coerces an unknown value to a string, defaulting to an empty string.
+ * @param {unknown} value - The value to coerce.
+ * @returns {string} The value as a string, or an empty string if it is not one.
  */
-const filterTasksById = (
-    items: GetCompletedTasksResponse["items"],
-    task: Task | null,
-): GetCompletedTasksResponse["items"] => {
-    if (task?.id) {
-        return items.filter((item) => item.id === task.id);
-    }
-    return items;
+const getStringValue = (value: unknown): string => {
+    return typeof value === "string" ? value : "";
 };
 
 /**
- * Converts raw completed task data into activity logs.
- * @param {GetCompletedTasksResponse} newActivityData - Completed tasks retrieved from the API.
+ * Converts a raw activity-log event into an activity log.
+ * @param {ActivityEvent} event - Activity event retrieved from the API.
+ * @returns {TaskActivity} The processed activity log.
+ */
+const parseActivityEvent = (event: ActivityEvent): TaskActivity => {
+    const extraData: Record<string, unknown> = event.extraData ?? {};
+
+    const contextId =
+        event.parentProjectId ??
+        (typeof extraData.project_id === "string" ? extraData.project_id : null) ??
+        "";
+
+    const title = getStringValue(extraData.title ?? extraData.content);
+
+    return {
+        date: DateTime.fromJSDate(event.eventDate),
+        taskId: event.objectId,
+        contextId,
+        title,
+        temporary: null,
+    };
+};
+
+/**
+ * Converts raw activity-log events into activity logs.
+ * @param {GetActivityLogsResponse} newActivityData - Activity events retrieved from the API.
  * @returns {TaskActivity[]} An array of processed activity logs.
  */
-export const processActivityData = (newActivityData: GetCompletedTasksResponse): TaskActivity[] => {
-    return newActivityData.items.map((item) => ({
-        date: DateTime.fromISO(item.completedAt?.toISOString() ?? ""),
-        taskId: item.id,
-        contextId: item.projectId,
-        title: item.content,
-        temporary: null,
-    }));
+export const processActivityData = (newActivityData: GetActivityLogsResponse): TaskActivity[] => {
+    return newActivityData.results.map(parseActivityEvent);
 };
 
 /**
