@@ -1,8 +1,8 @@
 import { get } from "svelte/store";
-import { TodoistRequestError } from "@doist/todoist-sdk";
+import { TodoistRequestError, createCommand } from "@doist/todoist-sdk";
 import { todoistAccessToken } from "../stores/secret";
 import { formatTaskDate } from "../utils/timeUtils";
-import { initializeApi, handleApiError, postEndpoint } from "../utils/apiUtils";
+import { initializeApi, handleApiError } from "../utils/apiUtils";
 import type { DateTime } from "luxon";
 import type { UpdateTaskArgs } from "@doist/todoist-sdk";
 import type { Task, Context } from "../types/todoist";
@@ -66,25 +66,20 @@ export function deferTasks(
 export function reorderContexts(
     contexts: Context[],
 ): Promise<{ status: "success" } | { status: "error"; error: TodoistRequestError | string }> {
-    const accessToken = get(todoistAccessToken);
-    if (!accessToken) {
+    const api = initializeApi(get(todoistAccessToken));
+    if (!api) {
         return Promise.resolve(handleApiError("No access token found."));
     }
 
-    const commands = [
-        {
-            type: "project_reorder",
-            uuid: crypto.randomUUID(),
-            args: {
-                projects: contexts.map((context, index) => ({
-                    id: context.id,
-                    child_order: index + 1,
-                })),
-            },
-        },
-    ];
+    const command = createCommand("project_reorder", {
+        projects: contexts.map((context, index) => ({
+            id: context.id,
+            childOrder: index + 1,
+        })),
+    });
 
-    return postEndpoint(accessToken, "sync", { commands: JSON.stringify(commands) })
+    return api
+        .sync({ commands: [command] })
         .then(() => ({ status: "success" }) as const)
         .catch(handleApiError);
 }

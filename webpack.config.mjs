@@ -68,5 +68,13 @@ export default {
     devServer: {
         hot: false,
         liveReload: true,
+        proxy: [
+            {
+                context: ["/oauth"],
+                target: "https://todoist.com",
+                changeOrigin: true,
+                secure: true,
+            },
+        ],
     },
 };

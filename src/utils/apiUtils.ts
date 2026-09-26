@@ -89,59 +89,6 @@ export function processApiResponse(
 }
 
 /**
- * Calls a Todoist API endpoint.
- * @param {string} accessToken - The access token for the Todoist API.
- * @param {string} endpoint - The endpoint to call.
- * @param {Record<string, string>} params - Additional parameters.
- * @returns {Promise<T>} - Result of API endpoint call.
- */
-export function getEndpoint<T>(
-    accessToken: string,
-    endpoint: string,
-    params: Record<string, string | number> = {},
-): Promise<T> {
-    const CONTENT_TYPE = "application/x-www-form-urlencoded";
-    const stringParams = Object.fromEntries(
-        Object.entries(params).map(([key, value]) => [key, String(value)]),
-    );
-    const queryString = new URLSearchParams(stringParams).toString();
-    const url = `https://api.todoist.com/api/v1/${endpoint}${queryString ? `?${queryString}` : ""}`;
-
-    return fetch(url, {
-        method: "GET",
-        headers: {
-            Authorization: `Bearer ${accessToken}`,
-            "Content-Type": CONTENT_TYPE,
-        },
-    }).then((response) =>
-        response.ok ? response.json() : Promise.resolve({ error: `Error: ${response.status}` }),
-    );
-}
-
-/**
- * Calls a Todoist API endpoint with a POST request.
- * @param {string} accessToken - The access token for the Todoist API.
- * @param {string} endpoint - The endpoint to call.
- * @param {object} data - The data to send in the request body.
- * @returns {Promise<T>} - Result of API endpoint call.
- */
-export function postEndpoint<T>(accessToken: string, endpoint: string, data: object): Promise<T> {
-    const CONTENT_TYPE = "application/json";
-    const url = `https://api.todoist.com/api/v1/${endpoint}`;
-
-    return fetch(url, {
-        method: "POST",
-        headers: {
-            Authorization: `Bearer ${accessToken}`,
-            "Content-Type": CONTENT_TYPE,
-        },
-        body: JSON.stringify(data),
-    }).then((response) =>
-        response.ok ? response.json() : Promise.resolve({ error: `Error: ${response.status}` }),
-    );
-}
-
-/**
  * Gets comments for a specific task.
  * @param {string} accessToken - The access token for the Todoist API.
  * @param {string} taskId - The ID of the task for which comments will be retrieved.

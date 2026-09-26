@@ -2,7 +2,7 @@ import type { DateTime } from "luxon";
 import type {
     Task as BaseTask,
     PersonalProject,
-    User as BaseUser,
+    CurrentUser,
     Comment as BaseComment,
 } from "@doist/todoist-sdk";
 import type { TaskActivity } from "./activity";
@@ -92,12 +92,7 @@ interface Due {
     timezone?: string | null | undefined;
 }
 
-export interface User extends BaseUser {
-    tz_info?: {
-        timezone?: string;
-    };
-    daily_goal: number;
-}
+export type User = CurrentUser;
 
 export interface TasksGroupedByContext {
     [contextId: string]: {

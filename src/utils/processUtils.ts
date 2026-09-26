@@ -120,7 +120,7 @@ export function calculateUpdatedTaskResources(
  * @returns {User | undefined} Processed user data.
  */
 export function extractUser(userResponse: unknown): User | undefined {
-    return userResponse && typeof userResponse === "object" && "tz_info" in userResponse
+    return userResponse && typeof userResponse === "object" && "dailyGoal" in userResponse
         ? (userResponse as User)
         : undefined;
 }

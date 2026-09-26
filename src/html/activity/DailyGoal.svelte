@@ -15,7 +15,7 @@
     });
     let isLoading: boolean = $derived(true);
 
-    let dailyGoal = $derived($todoistData.user.daily_goal);
+    let dailyGoal = $derived($todoistData.user.dailyGoal);
 
     /**
      * Fetches daily activity from the store and, if needed, the API.

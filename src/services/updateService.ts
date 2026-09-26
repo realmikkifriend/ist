@@ -4,7 +4,7 @@ import { DateTime } from "luxon";
 import { todoistAccessToken } from "../stores/secret";
 import { handleOverdueTasks } from "./taskHandlerService";
 import { success } from "./toastService";
-import { initializeApi, getEndpoint, processApiResponse, handleApiError } from "../utils/apiUtils";
+import { initializeApi, processApiResponse, handleApiError } from "../utils/apiUtils";
 import { getDueTasks, getReverseTasks } from "../utils/filterUtils";
 import type { TodoistData, Task, TaskUpdates } from "../types/todoist";
 
@@ -67,11 +67,7 @@ export function refreshData(): Promise<
         return Promise.resolve(handleApiError("No access token found."));
     }
 
-    return Promise.all([
-        api.getTasks({ limit: 200 }),
-        api.getProjects(),
-        getEndpoint(get(todoistAccessToken), "user"),
-    ])
+    return Promise.all([api.getTasks({ limit: 200 }), api.getProjects(), api.getUser()])
         .then(async (apiResult) => {
             const [tasks, projects, userResponse] = apiResult;
 
