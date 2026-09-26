@@ -49,13 +49,14 @@ const buildActivityLogsQuery = (
     cursor: string | null,
 ): GetActivityLogsArgs => {
     const [startDate, endDate] = timeframe;
+    const taskFilter = task?.id ? { object_type: "item", objectId: task.id } : {};
     return {
         dateFrom: startDate.toISODate() ?? "",
         dateTo: endDate.plus({ days: 1 }).toISODate() ?? "",
         objectEventTypes: "task:completed",
         cursor,
         limit: 100,
-        ...(task?.id ? { objectId: task.id } : {}),
+        ...taskFilter,
     };
 };
 
