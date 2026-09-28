@@ -234,6 +234,7 @@ export default defineConfig([
     // `     Vitest Configuration (for test files)
     {
         files: ["tests/**/*.ts"],
+        ignores: ["tests/e2e/**/*.ts"],
         plugins: {
             vitest,
         },
@@ -259,6 +260,29 @@ export default defineConfig([
             "@typescript-eslint/no-unsafe-member-access": "off",
             "@typescript-eslint/no-unsafe-assignment": "off",
             "@typescript-eslint/no-explicit-any": "off",
+        },
+    },
+
+    // -----------------------------------
+    // `     Playwright Configuration (for e2e tests)
+    {
+        files: ["tests/e2e/**/*.ts", "playwright.config.ts"],
+        languageOptions: {
+            sourceType: "module",
+            globals: {
+                ...globals.node,
+            },
+        },
+        rules: {
+            "functional/no-let": "off",
+            "functional/no-promise-reject": "off",
+            "functional/no-loop-func": "off",
+            "@typescript-eslint/no-unused-vars": [
+                "error",
+                {
+                    argsIgnorePattern: "^_",
+                },
+            ],
         },
     },
 ]);

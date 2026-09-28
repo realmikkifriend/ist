@@ -29,6 +29,7 @@
         "src/**/*.svelte",
         "src/types/**/*.ts",
         "tests/**/*.ts",
+        "playwright.config.ts",
         "knip.ts"
     ],
     "exclude": [
