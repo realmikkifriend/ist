@@ -50,7 +50,7 @@
 </script>
 
 <div
-    class="modal-box mt-12 flex max-h-[25.5rem] min-h-6 w-90 flex-col justify-center overflow-hidden"
+    class="modal-box mt-12 flex max-h-102 min-h-6 w-90 flex-col justify-center overflow-hidden"
 >
     <!-- svelte-ignore a11y_positive_tabindex -->
     <input
@@ -63,7 +63,7 @@
         type="text"
         bind:value={searchTerm}
     />
-    <div class="grid flex-grow gap-2 overflow-y-auto" class:my-4={filteredTasks.length > 0}>
+    <div class="grid grow gap-2 overflow-y-auto" class:my-4={filteredTasks.length > 0}>
         {#if filteredTasks.length === 0 && searchTerm}
             <div class="text-error pt-6 text-center">No results...</div>
         {/if}

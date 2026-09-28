@@ -102,7 +102,7 @@
             <kbd>a</kbd>
         </button>
         <button
-            class="drawer-button relative -top-0.25 bg-transparent hover:border-transparent hover:bg-transparent"
+            class="drawer-button relative -top-px bg-transparent hover:border-transparent hover:bg-transparent"
             onclick={() => {
                 closeSidebar();
             }}

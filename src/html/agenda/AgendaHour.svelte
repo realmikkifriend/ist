@@ -75,7 +75,7 @@
                 class="rounded-badge absolute left-0 z-40 h-0.5 w-full bg-red-600"
             >
                 <div
-                    class="absolute -top-[0.2rem] -right-[0.3rem] h-2 w-2 rounded-full bg-red-600"
+                    class="absolute top-[-0.2rem] right-[-0.3rem] h-2 w-2 rounded-full bg-red-600"
                 ></div>
             </div>
         {/if}

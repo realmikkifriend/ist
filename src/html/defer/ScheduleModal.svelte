@@ -126,7 +126,7 @@
     }
 </script>
 
-<div class="modal-box flex min-h-[25.5rem] w-84 flex-col justify-start overflow-hidden">
+<div class="modal-box flex min-h-102 w-84 flex-col justify-start overflow-hidden">
     {#if task && task.due && task.due.date && task.due.date.includes("T")}
         <div class="p-0">
             <button

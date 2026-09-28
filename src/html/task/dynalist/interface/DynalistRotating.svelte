@@ -116,7 +116,7 @@
             class="outline-primary/50 float-left mt-1.5 mr-2 flex flex-col gap-0.5 rounded-sm p-0.5 outline-1"
         >
             <button
-                class="btn bg-secondary relative inline-block h-5 w-6 rounded-sm pt-0.25 pr-5 pb-4 pl-1"
+                class="btn bg-secondary relative inline-block h-5 w-6 rounded-sm pt-px pr-5 pb-4 pl-1"
                 aria-label="Rewind checklist"
                 onclick={() => rotateItem("previous")}
                 type="reset"

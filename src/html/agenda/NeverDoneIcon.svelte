@@ -12,7 +12,7 @@
     <Icon class="relative top-[0.02em] h-2 w-2 stroke-5 text-green-700" src={Check} />
     {#if slash}
         <Icon
-            class="absolute -top-[0.27em] -left-[0.24em] h-[1.2em] w-[1.15em] stroke-3 text-red-500"
+            class="absolute top-[-0.27em] left-[-0.24em] h-[1.2em] w-[1.15em] stroke-3 text-red-500"
             src={NoSymbol}
         />
     {/if}
