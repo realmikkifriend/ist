@@ -1,4 +1,8 @@
-import type { DynalistCountData, DetermineLabelAndClassesParams } from "../types/dynalist";
+import type {
+    DynalistCountData,
+    DetermineLabelAndClassesParams,
+    LabelInfo,
+} from "../types/dynalist";
 
 /**
  * Returns whether the provided object has an error property.
@@ -66,7 +70,7 @@ export function determineLabelAndClasses(params: DetermineLabelAndClassesParams)
  * @param {DynalistCountData} countData - An object containing count data.
  * @returns {{ label: string; classes: string }} The label and CSS classes.
  */
-export function calculateLabel(countData: DynalistCountData): { label: string; classes: string } {
+export function calculateLabel(countData: DynalistCountData): LabelInfo {
     const { current, total } = countData;
     const now = new Date();
     const startHour = 8;

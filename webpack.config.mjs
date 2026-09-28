@@ -29,10 +29,29 @@ export default {
         rules: [
             {
                 test: /\.svelte$/,
+                exclude: /node_modules/,
                 use: {
                     loader: "svelte-loader",
                     options: {
                         preprocess: sveltePreprocess(),
+                    },
+                },
+            },
+            {
+                // Third-party components (e.g. @humanspeak/svelte-markdown) reference
+                // reactive props in top-level code; their build output is out of our
+                // control, so ignore that warning for files in node_modules only.
+                test: /\.svelte$/,
+                include: /node_modules/,
+                use: {
+                    loader: "svelte-loader",
+                    options: {
+                        preprocess: sveltePreprocess(),
+                        onwarn: (warning, handleWarning) => {
+                            if (warning.code !== "state_referenced_locally") {
+                                handleWarning(warning);
+                            }
+                        },
                     },
                 },
             },

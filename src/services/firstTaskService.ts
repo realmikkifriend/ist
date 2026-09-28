@@ -28,10 +28,7 @@ export { debounceState };
  */
 export const skipTask = (task: Task): Promise<UpdateDisplayTaskResult> => {
     const $todoistData: TodoistData = get(todoistData);
-    const reverseTasksObj = $todoistData.reverseTasks as unknown as {
-        today: Task[];
-        tomorrow: Task[];
-    };
+    const reverseTasksObj = $todoistData.reverseTasks;
     const reverseTasks =
         task.summoned === "#today" ? reverseTasksObj.today : reverseTasksObj.tomorrow;
     const currentIndex = reverseTasks.findIndex((t) => t.id === task.id);

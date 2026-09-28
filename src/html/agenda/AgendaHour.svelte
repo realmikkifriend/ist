@@ -13,7 +13,7 @@
 
     let { tasks, hour, title, now }: AgendaHourProps = $props();
 
-    const currentHour: boolean = title === "Today" && hour === now.hour;
+    const currentHour: boolean = $derived(title === "Today" && hour === now.hour);
 
     /**
      * Returns the color associated with a context ID, or null if not found.
@@ -37,7 +37,7 @@
         return markTasks(tasks, $displayTask);
     }
 
-    const processedTasks: Task[] = getProcessedTasks(tasks);
+    const processedTasks: Task[] = $derived(getProcessedTasks(tasks));
 
     const quarterHourPositions: QuarterHourPosition[] = [0.25, 0.5, 0.75];
 </script>

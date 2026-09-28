@@ -22,7 +22,7 @@
 
     let resolvedLoadStateStore: DynalistStoreState | undefined = $state(undefined);
 
-    const loadPromise: Promise<DynalistStoreState> = loadDynalistCommentWithToken(url).then(
+    const loadPromise: Promise<DynalistStoreState> = $derived(loadDynalistCommentWithToken(url).then(
         (value: { dynalistObject?: DynalistContent; selectedType?: string; error?: unknown }) => {
             const { dynalistObject, selectedType, error } = value;
 
@@ -57,7 +57,7 @@
             resolvedLoadStateStore = newState;
             return newState;
         },
-    );
+    ));
 
     /**
      * Handles selection of a Dynalist type from the menu.

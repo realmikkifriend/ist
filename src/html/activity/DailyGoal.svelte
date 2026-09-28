@@ -22,10 +22,7 @@
      */
     const fetchActivity = () => {
         const activity = fetchDailyActivity();
-        sortedLists = activity.preliminary as {
-            byContext: TaskActivity[];
-            byTime: TaskActivity[];
-        };
+        sortedLists = activity.preliminary;
 
         if (activity.promise) {
             isLoading = true;

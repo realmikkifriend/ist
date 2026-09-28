@@ -5,12 +5,14 @@
 
     let { entityId, content, activity, title = "History" }: HistoryProps = $props();
 
-    const dateInfo = Promise.resolve(activity).then((res) => {
-        if (Array.isArray(res)) {
-            return processActivityForCalendar(res);
-        }
-        return res || {};
-    });
+    const dateInfo = $derived(
+        Promise.resolve(activity).then((res) => {
+            if (Array.isArray(res)) {
+                return processActivityForCalendar(res);
+            }
+            return res || {};
+        }),
+    );
 </script>
 
 <dialog id={`calendar_modal_${entityId}`} class="modal">

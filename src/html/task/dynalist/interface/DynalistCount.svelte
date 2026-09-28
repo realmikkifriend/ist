@@ -2,25 +2,28 @@
     import { handleCount } from "../../../../services/dynalistService";
     import { calculateLabel } from "../../../../utils/dynalistUtils";
     import { parseCountData } from "../../../../utils/dynalistProcessUtils";
-    import type {
-        DynalistCountData,
-        LabelInfo,
-        DynalistViewProps,
-    } from "../../../../types/dynalist";
+    import type { DynalistCountData, DynalistViewProps } from "../../../../types/dynalist";
 
     let { dynalistObject: content }: DynalistViewProps = $props();
 
     const todayFormatted: string = new Date().toLocaleDateString("en-CA");
     const options: string[] = ["+1", "+5", "+10"];
 
-    const noteContent: string = typeof content?.note === "string" ? content.note : "";
-    const initialData: DynalistCountData = parseCountData(noteContent);
+    const noteContent: string = $derived(typeof content?.note === "string" ? content.note : "");
+    const initialData: DynalistCountData = $derived(parseCountData(noteContent));
 
-    let countData: DynalistCountData = $state(
-        initialData.date !== todayFormatted
-            ? { ...initialData, date: todayFormatted, current: 0 }
-            : initialData,
-    );
+    /**
+     * Creates the initial count data, resetting the count when the stored date is not today.
+     * @returns The initial DynalistCountData value.
+     */
+    function getInitialCountData(): DynalistCountData {
+        const data = initialData;
+        return data.date !== todayFormatted
+            ? { ...data, date: todayFormatted, current: 0 }
+            : data;
+    }
+
+    let countData: DynalistCountData = $state(getInitialCountData());
 
     /**
      * Handles a click on a count option button.
@@ -33,7 +36,7 @@
         countData = updatedData;
     }
 
-    let labelInfo = $derived(calculateLabel(countData) as LabelInfo);
+    let labelInfo = $derived(calculateLabel(countData));
 </script>
 
 <span class="flex w-full flex-col justify-between">

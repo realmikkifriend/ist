@@ -34,7 +34,7 @@
     "dependencies": {
         "@doist/todoist-sdk": "^15.3.1",
         "@fontsource/clear-sans": "^5.2.5",
-        "@humanspeak/svelte-markdown": "^0.8.9",
+        "@humanspeak/svelte-markdown": "^1.9.5",
         "@tailwindcss/postcss": "^4.3.3",
         "@tailwindcss/typography": "^0.5.20",
         "@tailwindcss/vite": "^4.3.3",

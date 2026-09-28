@@ -9,7 +9,15 @@
 
     let { task, tz, tasks, onDefer }: DatePickerProps = $props();
 
-    let displayDate = $state(DateTime.now().setZone(tz));
+    /**
+     * Creates the initial calendar display date for the given timezone.
+     * @returns The current DateTime set to the local timezone.
+     */
+    function getInitialDate(): DateTime {
+        return DateTime.now().setZone(tz);
+    }
+
+    let displayDate = $state(getInitialDate());
 
     let dateInfo = $derived(
         (() => {

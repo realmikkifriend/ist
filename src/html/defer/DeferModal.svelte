@@ -14,7 +14,15 @@
         onDeferFinal,
     }: { task: Task; onDeferFinal?: (detail: { task: Task; time: DateTime }) => void } = $props();
 
-    let isTimeTabActive: boolean = $state(Boolean(task.due && task.due.allDay !== 1));
+    /**
+     * Determines whether the time tab is active initially.
+     * @returns True when the task has a time-based due date.
+     */
+    function getInitialTimeTabState(): boolean {
+        return Boolean(task.due && task.due.allDay !== 1);
+    }
+
+    let isTimeTabActive: boolean = $state(getInitialTimeTabState());
 
     /**
      * Selects the active tab ("time" or "calendar").

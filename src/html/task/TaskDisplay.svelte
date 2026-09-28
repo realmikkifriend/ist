@@ -16,7 +16,7 @@
 
     const { handleSkipTask } = getContext<HandlerMethodsContext>("handlerMethods");
 
-    const priorityBorderClass = getPriorityBorder(task.priority as Priority);
+    const priorityBorderClass = $derived(getPriorityBorder(task.priority as Priority));
 
     let modalProps = $state<DynamicModalProps>({});
     /**
@@ -27,10 +27,7 @@
     const openModal = (modalId: string, props: DynamicModalProps = {}): void => {
         modalProps = { ...props };
         if (modalProps.onDeferFinal) {
-            const originalOnDeferFinal = modalProps.onDeferFinal as (detail: {
-                task: Task;
-                time: DateTime;
-            }) => void;
+            const originalOnDeferFinal = modalProps.onDeferFinal;
             modalProps.onDeferFinal = (detail: { task: Task; time: DateTime }) => {
                 originalOnDeferFinal(detail);
                 closeModal(modalId);

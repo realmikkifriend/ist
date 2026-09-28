@@ -7,7 +7,6 @@
     import AppMethods from "./AppMethods.svelte";
     import type { Task, UpdateDisplayTaskResult, TaskUpdates } from "../types/todoist";
     import type { TaskActivity } from "../types/activity";
-    import type { AppStateMutatorsContext } from "../types/methods";
 
     /**
      * Changes the selected context in user settings.
@@ -98,7 +97,7 @@
         handleDataUpdates,
         addTaskActivityEntry,
         handleTaskDisplay,
-    }) as AppStateMutatorsContext;
+    });
 </script>
 
 <AppMethods />

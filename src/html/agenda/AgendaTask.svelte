@@ -13,14 +13,14 @@
 
     let { task, color }: AgendaTaskProps = $props();
 
-    const modalId = `schedule_modal_${task.id}`;
+    const modalId = $derived(`schedule_modal_${task.id}`);
 
     const { summonTask, handleRefresh } = getContext<HandlerMethodsContext>("handlerMethods");
     const { clearPreviousDisplayTask, updateTodoistDataResources } =
         getContext<AppStateMutatorsContext>("appStateMutators");
 
     const displayTaskClasses = "shadow-sm shadow-red-400";
-    const taskPriority = task.priority as Priority;
+    const taskPriority = $derived(task.priority as Priority);
 
     /**
      * Displays schedule modal.

@@ -14,8 +14,10 @@
     const today = DateTime.now().startOf("day");
     const tomorrow = today.plus({ days: 1 });
 
-    const isDisabled = (disable === "past" && day < today) || (disable === "future" && day > today);
-    const isTomorrow = day.hasSame(tomorrow, "day") && disable !== "future";
+    const isDisabled = $derived(
+        (disable === "past" && day < today) || (disable === "future" && day > today),
+    );
+    const isTomorrow = $derived(day.hasSame(tomorrow, "day") && disable !== "future");
 </script>
 
 <div

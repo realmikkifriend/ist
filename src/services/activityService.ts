@@ -11,7 +11,7 @@ import {
 } from "../utils/activityUtils";
 import { filterActivityByTimeframe, checkCoverage } from "../utils/activityTimeframeUtils";
 import { colorClasses } from "../styles/styleUtils";
-import type { Task, ColorName, GetAllActivityDataParams } from "../types/todoist";
+import type { Task, GetAllActivityDataParams } from "../types/todoist";
 import type { TaskActivity } from "../types/activity";
 
 /**
@@ -36,8 +36,8 @@ export function fetchDailyActivity(): {
         return [...activities].sort((a, b) => {
             const aContext = currentData.contexts.find((c) => c.id === a.contextId);
             const bContext = currentData.contexts.find((c) => c.id === b.contextId);
-            const aColorIndex = aContext ? colorOrder.indexOf(aContext.color as ColorName) : -1;
-            const bColorIndex = bContext ? colorOrder.indexOf(bContext.color as ColorName) : -1;
+            const aColorIndex = aContext ? colorOrder.indexOf(aContext.color) : -1;
+            const bColorIndex = bContext ? colorOrder.indexOf(bContext.color) : -1;
             return aColorIndex - bColorIndex;
         });
     };

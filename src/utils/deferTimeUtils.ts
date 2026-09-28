@@ -38,11 +38,7 @@ const processHourButtons = (now: Date): ButtonConfig[] => {
                 const baseMs = (item.value ?? 0) * 60 * 60 * 1000;
                 const futureTimeCandidate = new Date(now.getTime() + baseMs);
                 const isNextDayAdjustmentNeeded = futureTimeCandidate.getDate() !== now.getDate();
-                const nextDayHourButtonCount = acc.filter(
-                    (btn) =>
-                        (btn as ButtonConfig & { isAdjustedForNextDay?: boolean })
-                            .isAdjustedForNextDay,
-                ).length;
+                const nextDayHourButtonCount = acc.filter((btn) => btn.isAdjustedForNextDay).length;
 
                 const nextDayTargetDateTime = DateTime.fromJSDate(now)
                     .plus({ days: 1 })
