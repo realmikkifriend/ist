@@ -49,9 +49,7 @@
     }
 </script>
 
-<div
-    class="modal-box mt-12 flex max-h-102 min-h-6 w-90 flex-col justify-center overflow-hidden"
->
+<div class="modal-box mt-12 flex max-h-102 min-h-6 w-90 flex-col justify-center overflow-hidden">
     <!-- svelte-ignore a11y_positive_tabindex -->
     <input
         id="task_search_modal_input"

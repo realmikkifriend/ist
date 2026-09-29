@@ -22,42 +22,48 @@
 
     let resolvedLoadStateStore: DynalistStoreState | undefined = $state(undefined);
 
-    const loadPromise: Promise<DynalistStoreState> = $derived(loadDynalistCommentWithToken(url).then(
-        (value: { dynalistObject?: DynalistContent; selectedType?: string; error?: unknown }) => {
-            const { dynalistObject, selectedType, error } = value;
+    const loadPromise: Promise<DynalistStoreState> = $derived(
+        loadDynalistCommentWithToken(url).then(
+            (value: {
+                dynalistObject?: DynalistContent;
+                selectedType?: string;
+                error?: unknown;
+            }) => {
+                const { dynalistObject, selectedType, error } = value;
 
-            let newState: DynalistStoreState;
+                let newState: DynalistStoreState;
 
-            if (error) {
-                let errorMsg: string;
-                if (hasError(error) && typeof error.error.message === "string") {
-                    errorMsg = `Dynalist retrieval/processing error: ${error.error.message}`;
+                if (error) {
+                    let errorMsg: string;
+                    if (hasError(error) && typeof error.error.message === "string") {
+                        errorMsg = `Dynalist retrieval/processing error: ${error.error.message}`;
+                    } else {
+                        errorMsg = `Dynalist retrieval/processing error`;
+                    }
+
+                    showError(errorMsg);
+                    console.error(errorMsg);
+
+                    newState = {
+                        dynalistObject: undefined,
+                        selectedType: "",
+                        error: errorMsg,
+                    };
                 } else {
-                    errorMsg = `Dynalist retrieval/processing error`;
+                    const safeSelectedType = getDynalistType(selectedType);
+
+                    newState = {
+                        dynalistObject,
+                        selectedType: safeSelectedType as DynalistTaskType | "",
+                        error: undefined,
+                    };
                 }
-
-                showError(errorMsg);
-                console.error(errorMsg);
-
-                newState = {
-                    dynalistObject: undefined,
-                    selectedType: "",
-                    error: errorMsg,
-                };
-            } else {
-                const safeSelectedType = getDynalistType(selectedType);
-
-                newState = {
-                    dynalistObject,
-                    selectedType: safeSelectedType as DynalistTaskType | "",
-                    error: undefined,
-                };
-            }
-            dynalistStore = newState;
-            resolvedLoadStateStore = newState;
-            return newState;
-        },
-    ));
+                dynalistStore = newState;
+                resolvedLoadStateStore = newState;
+                return newState;
+            },
+        ),
+    );
 
     /**
      * Handles selection of a Dynalist type from the menu.

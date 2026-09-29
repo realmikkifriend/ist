@@ -8,7 +8,7 @@ import type { Task } from "../types/todoist";
  * @param {"success" | "error" | "info"} type - The type of toast message.
  * @param {string} message - The message to display.
  * @param {number} duration - The duration in milliseconds to display the message.
- * @param {Function} action - An optional function to execute on click.
+ * @param {() => void} action - An optional function to execute on click.
  */
 export function addToast(
     type: "success" | "error" | "info",

@@ -46,12 +46,7 @@ export type LabelInfo = {
 };
 
 export type DynalistTaskType =
-    | "read"
-    | "checklist"
-    | "count"
-    | "rotating"
-    | "crossoff"
-    | "tracking";
+    "read" | "checklist" | "count" | "rotating" | "crossoff" | "tracking";
 
 export type DynalistChange =
     | {

@@ -23,7 +23,7 @@
     <div class="flex flex-row items-start space-x-2">
         {#each Object.keys(tasksForContext.priorities).sort((a, b) => +b - +a) as priorityStr, index (index)}
             <div class="flex flex-row items-start space-x-1 py-1">
-                {#each Array.from( { length: tasksForContext.priorities[+priorityStr] }, ) as _, badgeIndex (badgeIndex)}
+                {#each Array.from( { length: tasksForContext.priorities[+priorityStr] } ) as _, badgeIndex (badgeIndex)}
                     <div
                         class="h-1 w-0.5 max-w-0.5 rounded-sm border-none p-1 {getPriorityClasses(
                             +priorityStr as Priority,

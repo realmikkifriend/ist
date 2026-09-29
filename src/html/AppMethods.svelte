@@ -12,12 +12,8 @@
 
     let isSpinning = $state(false);
 
-    const {
-        changeSelectedContext,
-        setTask,
-        handleDataUpdates,
-        handleTaskDisplay,
-    } = getContext<AppStateMutatorsContext>("appStateMutators");
+    const { changeSelectedContext, setTask, handleDataUpdates, handleTaskDisplay } =
+        getContext<AppStateMutatorsContext>("appStateMutators");
 
     $effect(() => {
         if ($userSettings.selectedContext || $todoistData.dueTasks) {

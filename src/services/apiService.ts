@@ -29,7 +29,8 @@ export function markTaskDone(
 /**
  * Defers multiple tasks to new times.
  * @param {[Task, DateTime][]} taskTimePairs - Array of [Task, DateTime] pairs.
- * @returns {Promise<any[]>} - Results of task-defer API calls.
+ * @returns {Promise<Array<{ status: "success" } | { status: "error"; error: TodoistRequestError }>>} -
+ *   Results of task-defer API calls.
  */
 export function deferTasks(
     taskTimePairs: [Task, DateTime][],

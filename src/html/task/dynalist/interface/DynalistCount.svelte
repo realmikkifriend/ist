@@ -18,9 +18,7 @@
      */
     function getInitialCountData(): DynalistCountData {
         const data = initialData;
-        return data.date !== todayFormatted
-            ? { ...data, date: todayFormatted, current: 0 }
-            : data;
+        return data.date !== todayFormatted ? { ...data, date: todayFormatted, current: 0 } : data;
     }
 
     let countData: DynalistCountData = $state(getInitialCountData());

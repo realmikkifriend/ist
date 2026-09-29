@@ -40,8 +40,7 @@
                     }
                 },
                 modifier: (hotkey >= 10 ? "shift" : undefined) as
-                    | ShortcutModifierDefinition
-                    | undefined,
+                    ShortcutModifierDefinition | undefined,
             };
             return returnKey;
         }),
