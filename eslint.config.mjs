@@ -29,9 +29,13 @@ export default defineConfig([
     },
     // -----------------------------------
     // `     General JavaScript Configuration
+    // eslint 10 removed `extends` from flat config objects; spread the config instead
+    {
+        ...js.configs.recommended,
+        files: ["**/*.{js,mjs,cjs}"],
+    },
     {
         files: ["**/*.{js,mjs,cjs}"],
-        extends: [js.configs.recommended],
         languageOptions: {
             sourceType: "module",
             globals: globals.browser,
