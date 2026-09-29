@@ -7,7 +7,7 @@
         "build": "webpack --mode production",
         "test": "svelte-check && vitest run",
         "test:coverage": "svelte-check && vitest run --coverage",
-        "test:watch": "vitest",
+        "test:watch": "npx playwright test --ui",
         "test:coverage:watch": "vitest --coverage",
         "test:e2e": "playwright test",
         "lint": "eslint 'src/**/*.{svelte,ts}' 'tests/e2e/**/*.ts' 'playwright.config.ts'",
