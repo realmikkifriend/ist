@@ -28,14 +28,7 @@ test.describe("live Todoist smoke", () => {
     // Live network calls can exceed the default 30 s spec timeout.
     test.describe.configure({ timeout: 60_000 });
 
-    test("renders real data from api.todoist.com", async ({ page }, testInfo) => {
-        // The offline project is served by a static server with no /oauth
-        // proxy, so the smoke test only runs against the dev server.
-        test.skip(
-            testInfo.project.name !== "live",
-            "live smoke runs only against the `live` (dev server) project",
-        );
-
+    test("renders real data from api.todoist.com", async ({ page }) => {
         const token = envValue("TODOIST_ACCESS_TOKEN");
         if (!token) {
             throw new Error(
