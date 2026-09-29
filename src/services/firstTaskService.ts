@@ -58,7 +58,7 @@ export const updateDisplayTask = async (
         debounceState.timeoutId,
     );
 
-    if (initialCheckResult.action === "exit") {
+    if (initialCheckResult.action === "exit" || initialCheckResult.action === "set_task_and_exit") {
         return {
             task: initialCheckResult.taskToSet ?? null,
             showNewTaskToast: initialCheckResult.showNewTaskToast ?? false,

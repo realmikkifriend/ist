@@ -23,7 +23,9 @@ export default defineConfig({
             timeout: 180_000,
         },
         {
-            command: "npm start",
+            // Same as `npm start` but without `--open`, so running tests never
+            // pops a browser window on the developer's machine.
+            command: "dotenv -- webpack serve --mode development --no-stats",
             url: "http://localhost:8080",
             reuseExistingServer: true,
             timeout: 180_000,

@@ -119,7 +119,7 @@
     class="relative w-full"
     onconsider={handleDndConsider}
     onfinalize={handleDndFinalize}
-    use:dndzone={{ items: currentContexts, flipDurationMs: 100 }}
+    use:dndzone={{ items: currentContexts, flipDurationMs: 100, autoAriaDisabled: true }}
 >
     {#each currentContexts as context, i (context.id)}
         {@const isDisabled =

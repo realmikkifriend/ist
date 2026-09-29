@@ -15,7 +15,6 @@
     const {
         changeSelectedContext,
         setTask,
-        clearPreviousDisplayTask,
         handleDataUpdates,
         handleTaskDisplay,
     } = getContext<AppStateMutatorsContext>("appStateMutators");
@@ -67,7 +66,6 @@
     function handleContextChange(contextId: string | null): void {
         debounceState.clearDebounceTimeout();
 
-        clearPreviousDisplayTask();
         const isCurrentlySelected = $userSettings.selectedContext?.id === contextId;
         const newSelectedContext = isCurrentlySelected
             ? null
