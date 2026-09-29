@@ -2,7 +2,7 @@ import { createServer } from "node:http";
 import { readFile, stat } from "node:fs/promises";
 import path from "node:path";
 
-const port = Number(process.argv[2] ?? 8081);
+const port = Number(process.argv[2] ?? 9181);
 const root = path.resolve(process.argv[3] ?? "dist");
 
 const mime = {
