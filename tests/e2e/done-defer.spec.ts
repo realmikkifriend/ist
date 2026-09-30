@@ -1,14 +1,38 @@
 import { expect, test } from "@playwright/test";
 import { DateTime } from "luxon";
+import { loadApp } from "./helpers";
 import { dueObject, makeTask } from "./mock-data";
-import { mockTodoistApi } from "./mock";
-import { seedLocalStorage } from "./seed";
 import { makeScenario } from "./scenarios";
 
-const TODOIST_TOKEN = "e2e-todoist-token";
 const pad = (value: number): string => String(value).padStart(2, "0");
 
-test.describe("recurring tasks", () => {
+test.describe("done & defer", () => {
+    test("done and defer advance to the next due task", async ({ page }) => {
+        await loadApp(page, makeScenario());
+        await expect(page.getByRole("heading", { name: "Alpha due task" })).toBeVisible();
+
+        // Let the display debounce expire so the task change is not suppressed.
+        await page.waitForTimeout(2300);
+
+        // Reveal the keyboard shortcut labels so the action buttons are identified by them.
+        await page.evaluate(() => document.body.classList.add("show-kbd"));
+        await page.getByRole("button", { name: "CTRL+Enter" }).click();
+        await expect(page.getByRole("button", { name: "Task marked done." })).toBeVisible();
+        await expect(page.getByRole("heading", { name: "Beta due task" })).toBeVisible();
+
+        await page.waitForTimeout(2300);
+
+        await page.keyboard.press("d");
+        await page
+            .locator("#defer_modal")
+            .getByRole("button", { name: /tomorrow/ })
+            .click();
+        await expect(
+            page.getByRole("button", { name: "Task deferred successfully." }),
+        ).toBeVisible();
+        await expect(page.getByRole("heading", { name: "Gamma due task" })).toBeVisible();
+    });
+
     test("marking a recurring task done re-defers it to today and closes it", async ({ page }) => {
         // The task is a recurring task due earlier today (past, so it is due but
         // not overdue, which leaves its due string untouched by the auto-defer).
@@ -42,9 +66,7 @@ test.describe("recurring tasks", () => {
             ],
         });
 
-        await seedLocalStorage(page, { todoist_access_token: TODOIST_TOKEN });
-        const handle = await mockTodoistApi(page, scenario);
-        await page.goto("/");
+        const handle = await loadApp(page, scenario);
         await expect(page.getByRole("heading", { name: "Recurring task" })).toBeVisible();
         await page.waitForTimeout(2300); // let the display debounce expire
 

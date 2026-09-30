@@ -1,11 +1,11 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test } from "@playwright/test";
+import { loadApp, TODOIST_TOKEN } from "./helpers";
 import { failTodoistRoutes } from "./mock-failures";
 import { dueObject, makeTask } from "./mock-data";
 import { mockTodoistApi } from "./mock";
 import { seedLocalStorage } from "./seed";
 import { makeScenario } from "./scenarios";
 
-const TODOIST_TOKEN = "e2e-todoist-token";
 const MINUTE = 60 * 1000;
 const alphaTask = makeTask("task-alpha", "Alpha due task", {
     due: dueObject(new Date(Date.now() - 90 * MINUTE)),
@@ -13,22 +13,6 @@ const alphaTask = makeTask("task-alpha", "Alpha due task", {
 const betaTask = makeTask("task-beta", "Beta due task", {
     due: dueObject(new Date(Date.now() - 45 * MINUTE)),
 });
-
-/**
- * Loads the app authenticated against the given scenario.
- * @param {Page} page - The browser page to load.
- * @param {ReturnType<typeof makeScenario>} scenario - The mocked API data.
- * @returns {Promise<Awaited<ReturnType<typeof mockTodoistApi>>>} The mock API handle.
- */
-async function loadApp(
-    page: Page,
-    scenario: ReturnType<typeof makeScenario>,
-): Promise<Awaited<ReturnType<typeof mockTodoistApi>>> {
-    await seedLocalStorage(page, { todoist_access_token: TODOIST_TOKEN });
-    const handle = await mockTodoistApi(page, scenario);
-    await page.goto("/");
-    return handle;
-}
 
 test.describe("task refresh & display update", () => {
     test("keeps the displayed task while the 2 s display debounce is active", async ({ page }) => {

@@ -1,28 +1,10 @@
 import { expect, test, type Page } from "@playwright/test";
 import { DateTime } from "luxon";
+import { loadApp } from "./helpers";
 import { dueObject, makeOverdueTask, makeProject, makeTask } from "./mock-data";
-import { mockTodoistApi } from "./mock";
-import { seedLocalStorage } from "./seed";
 import { makeScenario } from "./scenarios";
 
-const TODOIST_TOKEN = "e2e-todoist-token";
 const HOUR = 60 * 60 * 1000;
-
-/**
- * Loads the app authenticated against the given scenario.
- * @param {Page} page - The browser page to load.
- * @param {ReturnType<typeof makeScenario>} scenario - The mocked API data.
- * @returns {Promise<Awaited<ReturnType<typeof mockTodoistApi>>>} The mock API handle.
- */
-async function loadApp(
-    page: Page,
-    scenario: ReturnType<typeof makeScenario>,
-): Promise<Awaited<ReturnType<typeof mockTodoistApi>>> {
-    await seedLocalStorage(page, { todoist_access_token: TODOIST_TOKEN });
-    const handle = await mockTodoistApi(page, scenario);
-    await page.goto("/");
-    return handle;
-}
 
 /**
  * Marks the displayed task done (via its kbd label) and waits for the next
@@ -125,6 +107,20 @@ test.describe("task display & ordering", () => {
         await page.keyboard.press("r");
         await expect(page.getByRole("button", { name: "Todoist data updated!" })).toBeVisible();
         expect(handle.updates().length).toBe(deferredCount);
+    });
+
+    test("shows NoTasks when nothing is due", async ({ page }) => {
+        const scenario = makeScenario({
+            tasks: [
+                makeTask("task-future", "Future task", {
+                    due: dueObject(new Date(Date.now() + 48 * HOUR)),
+                }),
+                makeTask("task-nodate", "No date task"),
+            ],
+        });
+        await loadApp(page, scenario);
+
+        await expect(page.getByText("No due tasks...")).toBeVisible();
     });
 
     test("shows NoTasks when the account has zero tasks", async ({ page }) => {

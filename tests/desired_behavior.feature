@@ -24,7 +24,7 @@ Feature: Auth & Onboarding
     THEN the entry point is a disabled button labeled "Todoist Client ID not configured".
 
   Scenario: Full login flow displays the first due task
-    # e2e: core.spec.ts › "full login flow displays the first due task"
+    # e2e: auth.spec.ts › "full login flow displays the first due task"
     GIVEN the app is loaded with no stored Todoist access token
     WHEN the user clicks "Continue with Todoist"
     AND the OAuth code is exchanged for an access token
@@ -50,13 +50,13 @@ Feature: Task Display
   So that I am not juggling my whole list.
 
   Scenario: App loads and displays the first-due task
-    # e2e: core.spec.ts › "full login flow displays the first due task"
+    # e2e: auth.spec.ts › "full login flow displays the first due task"
     GIVEN the app is loaded and data refreshes on startup
     WHEN the app initializes
     THEN the current first-due task is displayed.
 
   Scenario: Display "no tasks" component when no tasks are due
-    # e2e: core.spec.ts › "shows NoTasks when nothing is due"
+    # e2e: task-display.spec.ts › "shows NoTasks when nothing is due"
     GIVEN there are tasks but none are due
     WHEN the app loads
     THEN the NoTasks component is displayed with Today and Tomorrow agenda buttons.
@@ -140,13 +140,13 @@ Feature: Contexts
     AND a context is disabled when it has no due tasks or when a different context is selected.
 
   Scenario: Filter displayed tasks by selected context
-    # e2e: core.spec.ts › "context filter turns on and off"
+    # e2e: contexts.spec.ts › "context filter turns on and off"
     GIVEN there are tasks due in multiple contexts
     WHEN the user selects a context in the sidebar
     THEN the first due task of that context is displayed.
 
   Scenario: The user can clear the selected context
-    # e2e: core.spec.ts › "context filter turns on and off"
+    # e2e: contexts.spec.ts › "context filter turns on and off"
     GIVEN a context has been selected
     WHEN the user de-selects the context
     THEN the selection is cleared
@@ -187,7 +187,7 @@ Feature: Done / Defer
   So that the app can move on to what is next.
 
   Scenario: Display next due task after completing or deferring
-    # e2e: core.spec.ts › "done and defer advance to the next due task"
+    # e2e: done-defer.spec.ts › "done and defer advance to the next due task"
     GIVEN a task is displayed
     WHEN the task is marked done (CTRL+Enter) or deferred (d)
     THEN the task is removed from the local list
@@ -207,7 +207,7 @@ Feature: Done / Defer
     TODO (e2e): add a spec for time preservation on date-based defer.
 
   Scenario: Completing a recurring task re-defers it first
-    # e2e: recurring-task.spec.ts › "marking a recurring task done re-defers it to today and closes it"
+    # e2e: done-defer.spec.ts › "marking a recurring task done re-defers it to today and closes it"
     GIVEN the displayed task is due to repeat
     WHEN the user marks it done
     THEN the task is first re-deferred to today, keeping the time from its current due string when one can be parsed
@@ -233,7 +233,7 @@ Feature: Agenda
   So that I can pull any task forward.
 
   Scenario: Summoning a task from the agenda closes the agenda and displays the task
-    # e2e: core.spec.ts › "summoning a task from the agenda closes it and displays the task"
+    # e2e: agenda.spec.ts › "summoning a task from the agenda closes it and displays the task"
     GIVEN the agenda view is open
     WHEN the user clicks the time button of a specific task
     THEN the agenda view closes
@@ -302,7 +302,7 @@ Feature: Dynalist
     TODO (e2e): add specs for type detection and the type menu.
 
   Scenario: Checklist
-    # e2e: core.spec.ts › "dynalist URL in a comment renders an interactive checklist"
+    # e2e: dynalist.spec.ts › "dynalist URL in a comment renders an interactive checklist"
     GIVEN a Dynalist document is rendered as a checklist
     WHEN the user clicks "Next item" (z / Enter)
     THEN the next checklist item is shown with a strike animation
