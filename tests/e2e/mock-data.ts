@@ -1,13 +1,23 @@
 /**
- * Builders for deterministic synthetic Todoist data in the raw wire format
- * (snake_case), modeled on the shapes in `tests/e2e/fixtures/`.
+ * Builders for deterministic synthetic Todoist tasks and projects in the raw
+ * wire format (snake_case), modeled on the shapes in `tests/e2e/fixtures/`.
  */
 
 /** Real project ids from the fixture, used as contexts in the scenarios. */
-const E2E_PROJECTS = {
+export const E2E_PROJECTS = {
     selfCare: "6CrfrM2x34Qprfmh",
     home: "6CrfrM2wxrGX2Gwm",
 } as const;
+
+/** Synthetic project ids served by `makeMultiContextScenario`. */
+export const E2E_CONTEXTS = {
+    inbox: "e2e-inbox",
+    reading: "e2e-ctx-reading",
+    gardening: "e2e-ctx-gardening",
+    errands: "e2e-ctx-errands",
+} as const;
+
+const DAY = 24 * 60 * 60 * 1000;
 
 const pad = (value: number): string => String(value).padStart(2, "0");
 
@@ -83,48 +93,104 @@ export function makeTask(
 }
 
 /**
- * Builds the standard e2e scenario with five deterministic tasks: alpha, beta
- * and gamma are due earlier today (display order alpha, beta, gamma), delta is
- * due tomorrow at noon (agenda only) and epsilon has no due date.
- * @param {object} [overrides] - Optional scenario fields to replace the defaults with.
- * @param {Record<string, unknown>[]} [overrides.tasks] - The open tasks to serve.
- * @param {Record<string, Record<string, unknown>[]>} [overrides.comments] - Comments keyed by task id.
- * @param {Record<string, Record<string, unknown>[]>} [overrides.activity] - Activity events keyed by task id.
- * @returns {object} The scenario with `tasks`, `comments` and `activity` arrays.
+ * Builds a wire-format task whose due date is in the past (all-day), so a
+ * successful refresh auto-defers it to today.
+ * @param {string} id - The unique task identifier.
+ * @param {string} content - The task title.
+ * @param {number} [daysAgo] - How many days in the past the task is due.
+ * @param {Record<string, unknown>} [overrides] - Wire fields that override the defaults.
+ * @returns {Record<string, unknown>} The raw task.
  */
-export function makeScenario(
-    overrides: {
-        tasks?: Record<string, unknown>[];
-        comments?: Record<string, Record<string, unknown>[]>;
-        activity?: Record<string, Record<string, unknown>[]>;
-    } = {},
-) {
-    const now = Date.now();
-    const HOUR = 60 * 60 * 1000;
-    const tomorrowNoon = new Date(now + 24 * HOUR);
-    tomorrowNoon.setHours(12, 0, 0, 0);
+export function makeOverdueTask(
+    id: string,
+    content: string,
+    daysAgo: number = 1,
+    overrides: Record<string, unknown> = {},
+): Record<string, unknown> {
+    return makeTask(id, content, {
+        due: dueObject(new Date(Date.now() - daysAgo * DAY), true),
+        ...overrides,
+    });
+}
+
+/**
+ * Builds a wire-format task due at the given local moment (a timed task,
+ * so it appears in the agenda hour grid).
+ * @param {string} id - The unique task identifier.
+ * @param {string} content - The task title.
+ * @param {Date} date - The due moment in local time.
+ * @param {Record<string, unknown>} [overrides] - Wire fields that override the defaults.
+ * @returns {Record<string, unknown>} The raw task.
+ */
+export function makeTimedTask(
+    id: string,
+    content: string,
+    date: Date,
+    overrides: Record<string, unknown> = {},
+): Record<string, unknown> {
+    return makeTask(id, content, {
+        due: dueObject(date),
+        ...overrides,
+    });
+}
+
+/**
+ * Builds a wire-format routine task: the "never-mark-done" label makes the app
+ * flag it as `neverDone` (done and history buttons hidden), and the recurring
+ * due date makes "done" mean re-defer to today first, then close.
+ * @param {string} id - The unique task identifier.
+ * @param {string} content - The task title.
+ * @param {string} [dueString] - The recurring due string; when it defines a
+ *   time (e.g. "every day at 9am"), that time is preserved by re-defers.
+ * @param {Record<string, unknown>} [overrides] - Wire fields that override the defaults.
+ * @returns {Record<string, unknown>} The raw task.
+ */
+export function makeRoutineTask(
+    id: string,
+    content: string,
+    dueString: string = "every day at 9am",
+    overrides: Record<string, unknown> = {},
+): Record<string, unknown> {
+    return makeTask(id, content, {
+        labels: ["never-mark-done"],
+        due: {
+            ...dueObject(new Date(), true),
+            string: dueString,
+            is_recurring: true,
+        },
+        ...overrides,
+    });
+}
+
+/**
+ * Builds a Todoist wire-format project (context).
+ * @param {string} id - The project identifier.
+ * @param {string} name - The context name shown in the sidebar.
+ * @param {number} [childOrder] - The context sort order (lower sorts first).
+ * @param {Record<string, unknown>} [overrides] - Wire fields that override the defaults.
+ * @returns {Record<string, unknown>} The raw project.
+ */
+export function makeProject(
+    id: string,
+    name: string,
+    childOrder: number = 1,
+    overrides: Record<string, unknown> = {},
+): Record<string, unknown> {
     return {
-        tasks: [
-            makeTask("task-alpha", "Alpha due task", {
-                priority: 4,
-                due: dueObject(new Date(now - 90 * 60 * 1000)),
-            }),
-            makeTask("task-beta", "Beta due task", {
-                priority: 3,
-                due: dueObject(new Date(now - 45 * 60 * 1000)),
-            }),
-            makeTask("task-gamma", "Gamma due task", {
-                project_id: E2E_PROJECTS.home,
-                priority: 2,
-                due: dueObject(new Date(now - 3 * HOUR)),
-            }),
-            makeTask("task-delta", "Delta tomorrow task", {
-                due: dueObject(tomorrowNoon),
-            }),
-            makeTask("task-epsilon", "Epsilon no date"),
-        ],
-        comments: {} as Record<string, Record<string, unknown>[]>,
-        activity: {} as Record<string, Record<string, unknown>[]>,
+        id,
+        name,
+        inbox_project: false,
+        parent_id: null,
+        is_archived: false,
+        is_deleted: false,
+        is_collapsed: false,
+        is_favorite: false,
+        is_frozen: false,
+        is_shared: false,
+        view_style: "list",
+        color: "berry_red",
+        child_order: childOrder,
+        order_key: "a1",
         ...overrides,
     };
 }

@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import type { Page } from "@playwright/test";
-import { makeScenario } from "./mock-data";
+import { makeScenario } from "./scenarios";
 
 const CORS_HEADERS: Record<string, string> = { "access-control-allow-origin": "*" };
 
@@ -46,19 +46,28 @@ function applyTaskUpdate(
 
 /**
  * Intercepts `api.todoist.com/api/v1/**` and serves the scenario with mutable
- * task state, so close/defer round-trips behave like the live API.
+ * task state, so close/defer round-trips behave like the live API. Returns a
+ * handle for driving and observing the mock mid-test.
  * @param {Page} page - Playwright page on which to register the route.
  * @param {ReturnType<typeof makeScenario>} scenario - The data to serve.
- * @returns {Promise<void>} Resolves once the route is registered.
+ * @returns {Promise<object>} A handle: `setTasks(tasks)` replaces the served
+ *   open tasks (the next refresh serves them), `updates()` returns the recorded
+ *   task-update (defer) calls, and `closes()` the recorded closed task ids.
  */
 export async function mockTodoistApi(
     page: Page,
     scenario: ReturnType<typeof makeScenario>,
-): Promise<void> {
+): Promise<{
+    setTasks: (tasks: Record<string, unknown>[]) => void;
+    updates: () => Array<{ id: string; body: Record<string, unknown> }>;
+    closes: () => string[];
+}> {
     const byId = new Map<string, Record<string, unknown>>(
         scenario.tasks.map((task) => [String(task.id), task]),
     );
     const closedIds = new Set<string>();
+    const recordedUpdates: Array<{ id: string; body: Record<string, unknown> }> = [];
+    const recordedCloses: string[] = [];
 
     await page.route("**/api.todoist.com/api/v1/**", async (route) => {
         const request = route.request();
@@ -85,7 +94,10 @@ export async function mockTodoistApi(
         }
 
         if (request.method() === "GET" && path === "projects") {
-            await ok(rawFixture("projects"));
+            const projects = scenario.projects
+                ? { results: scenario.projects, next_cursor: null }
+                : rawFixture("projects");
+            await ok(projects);
             return;
         }
 
@@ -107,7 +119,9 @@ export async function mockTodoistApi(
         }
 
         if (request.method() === "POST" && path.endsWith("/close")) {
-            closedIds.add(path.slice("tasks/".length, path.length - "/close".length));
+            const closedId = path.slice("tasks/".length, path.length - "/close".length);
+            closedIds.add(closedId);
+            recordedCloses.push(closedId);
             await ok({});
             return;
         }
@@ -115,6 +129,7 @@ export async function mockTodoistApi(
         const taskMatch = path.match(/^tasks\/([^/]+)$/);
         if (request.method() === "POST" && taskMatch) {
             const body = (request.postDataJSON() ?? {}) as Record<string, unknown>;
+            recordedUpdates.push({ id: taskMatch[1], body });
             const updated = applyTaskUpdate(byId.get(taskMatch[1]) ?? {}, body);
             byId.set(taskMatch[1], updated);
             await ok(updated);
@@ -132,6 +147,16 @@ export async function mockTodoistApi(
             json: { error: `Unmocked Todoist call: ${request.method()} ${path}` },
         });
     });
+
+    return {
+        setTasks: (tasks: Record<string, unknown>[]): void => {
+            byId.clear();
+            closedIds.clear();
+            tasks.forEach((task) => byId.set(String(task.id), task));
+        },
+        updates: (): Array<{ id: string; body: Record<string, unknown> }> => recordedUpdates,
+        closes: (): string[] => recordedCloses,
+    };
 }
 
 /**
@@ -150,29 +175,4 @@ export async function seedLocalStorage(
             localStorage.setItem(key, JSON.stringify(value));
         });
     }, entries);
-}
-
-/**
- * Intercepts the Dynalist `doc/read` endpoint and serves the given document.
- * @param {Page} page - Playwright page on which to register the route.
- * @param {Record<string, unknown>} document - The `{ file_id, nodes }` payload to serve.
- * @returns {Promise<void>} Resolves once the route is registered.
- */
-export async function mockDynalistDocument(
-    page: Page,
-    document: Record<string, unknown>,
-): Promise<void> {
-    await page.route("**/dynalist.io/api/v1/doc/read", (route) => {
-        if (route.request().method() === "OPTIONS") {
-            return route.fulfill({
-                status: 204,
-                headers: {
-                    ...CORS_HEADERS,
-                    "access-control-allow-methods": "POST, OPTIONS",
-                    "access-control-allow-headers": "content-type",
-                },
-            });
-        }
-        return route.fulfill({ status: 200, headers: CORS_HEADERS, json: document });
-    });
 }

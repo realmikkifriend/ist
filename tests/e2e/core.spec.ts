@@ -1,6 +1,8 @@
 import { expect, test, type Page } from "@playwright/test";
-import { dueObject, makeScenario, makeTask } from "./mock-data";
-import { mockDynalistDocument, mockTodoistApi, seedLocalStorage } from "./mock";
+import { mockDynalistDocument } from "./mock-dynalist";
+import { dueObject, makeTask } from "./mock-data";
+import { mockTodoistApi, seedLocalStorage } from "./mock";
+import { makeScenario } from "./scenarios";
 
 const TODOIST_TOKEN = "e2e-todoist-token";
 const DYNALIST_TOKEN = "e2e-dynalist-token";
