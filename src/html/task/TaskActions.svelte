@@ -26,7 +26,7 @@
     const { clearPreviousDisplayTask, updateTodoistDataResources, addTaskActivityEntry } =
         getContext<AppStateMutatorsContext>("appStateMutators");
 
-    const { handleRefresh, updateDisplayedTask, handleSkipTask } =
+    const { handleRefresh, updateDisplayedTask } =
         getContext<HandlerMethodsContext>("handlerMethods");
 
     /**
@@ -68,7 +68,7 @@
     const onDeferFinal = async (detail: { task: Task; time: DateTime }): Promise<void> => {
         const { task: deferredTask, time } = detail;
 
-        if (deferredTask.summoned && !deferredTask.skip && deferredTask.summoned !== "#") {
+        if (deferredTask.summoned && deferredTask.summoned !== "#") {
             window.location.hash = String(deferredTask.summoned);
         }
 
@@ -83,10 +83,6 @@
             await updateDisplayedTask();
         } else {
             error("Failed to defer task.");
-        }
-
-        if (deferredTask.skip) {
-            handleSkipTask();
         }
     };
 </script>

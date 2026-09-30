@@ -18,9 +18,5 @@ export interface HandlerMethodsContext {
     handleRefresh: () => Promise<void>;
     handleContextChange: (contextId: string | null) => void;
     updateDisplayedTask: () => Promise<void>;
-    handleSkipTask: () => void;
-    summonTask: (
-        task: Task & { displayed?: boolean; skip?: boolean; summoned?: string | boolean },
-        enableSkip?: boolean,
-    ) => Promise<UpdateDisplayTaskResult>;
+    summonTask: (task: Task) => Promise<UpdateDisplayTaskResult>;
 }

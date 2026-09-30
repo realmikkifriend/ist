@@ -1,5 +1,5 @@
 import { TodoistApi, TodoistRequestError } from "@doist/todoist-sdk";
-import { getDueTasks, getReverseTasks, filterContexts } from "../utils/filterUtils";
+import { getDueTasks, filterContexts } from "../utils/filterUtils";
 import { cleanTodoistData, extractUser } from "../utils/processUtils";
 import type { GetProjectsResponse, GetTasksResponse } from "@doist/todoist-sdk";
 import type { Task, TodoistData, Context, User, Comment } from "../types/todoist";
@@ -67,23 +67,9 @@ export function processApiResponse(
         contexts: cleanedData.contexts ?? [],
         user: cleanedData.user ?? ({} as User),
         dueTasks: [],
-        reverseTasks: {
-            tomorrow: [],
-            today: [],
-        },
     };
 
     todoistDataObj.dueTasks = getDueTasks(todoistDataObj);
-    const reverseTasksTomorrow = getReverseTasks(todoistDataObj);
-    const now = new Date();
-    const reverseTasksToday = reverseTasksTomorrow.filter((task: Task) => {
-        if (!task.due || !(task.due.dateObject instanceof Date)) return false;
-        return task.due.dateObject.toDateString() === now.toDateString();
-    });
-    todoistDataObj.reverseTasks = {
-        tomorrow: reverseTasksTomorrow,
-        today: reverseTasksToday,
-    };
 
     return todoistDataObj;
 }

@@ -11,7 +11,6 @@ export const todoistData = resettablePersisted<TodoistData>("todoist_data", {
     tasks: [],
     contexts: [],
     dueTasks: [],
-    reverseTasks: { tomorrow: [], today: [] },
     user: {} as User,
 });
 registerStore(todoistData);

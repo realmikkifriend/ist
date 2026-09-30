@@ -1,8 +1,5 @@
 <script lang="ts">
-    import { getContext } from "svelte";
     import { DateTime } from "luxon";
-    import { Icon, Forward } from "svelte-hero-icons";
-    import { shortcut } from "@svelte-put/shortcut";
     import { getPriorityBorder } from "../../styles/styleUtils";
     import Comments from "./Comments.svelte";
     import DeferModal from "../defer/DeferModal.svelte";
@@ -10,11 +7,8 @@
     import TaskActions from "./TaskActions.svelte";
     import type { Task, Priority } from "../../types/todoist";
     import type { DynamicModalProps } from "../../types/interface";
-    import type { HandlerMethodsContext } from "../../types/methods";
 
     let { task }: { task: Task } = $props();
-
-    const { handleSkipTask } = getContext<HandlerMethodsContext>("handlerMethods");
 
     const priorityBorderClass = $derived(getPriorityBorder(task.priority as Priority));
 
@@ -46,17 +40,6 @@
         class={`card bg-neutral text-primary-content mt-0 rounded-xl border-b-[0.75rem] ${priorityBorderClass}`}
     >
         <div class="card-body xs:p-5 p-2 pb-0">
-            {#if task.skip}
-                <button
-                    class="text-md hover:bg-accent btn btn-ghost btn-sm xs:block absolute top-0 right-0 hidden h-8 min-h-8 content-center border-0 p-4"
-                    onclick={handleSkipTask}
-                    title="skip task"
-                    type="button"
-                >
-                    <Icon class="h-5 w-5 stroke-yellow-500 [&>path]:stroke-3" src={Forward} />
-                    <kbd>s</kbd>
-                </button>
-            {/if}
             <h2 class="card-title text-md xs:text-3xl text-center">{task.content}</h2>
             <TaskActions {openModal} {task} />
         </div>
@@ -77,13 +60,3 @@
         <History activity={task.activity} content={task.content} entityId={task.id} />
     {/key}
 {/if}
-
-<svelte:window
-    use:shortcut={{
-        trigger: {
-            key: "s",
-            callback: () => handleSkipTask,
-            modifier: false,
-        },
-    }}
-/>

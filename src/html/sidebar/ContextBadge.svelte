@@ -19,22 +19,17 @@
     class="group badge badge-outline relative items-center whitespace-nowrap"
     class:!cursor-default={!$displayTask?.summoned && !$userSettings.selectedContext}
     class:border-purple-400={$displayTask?.summoned}
-    class:border-yellow-500={$displayTask?.skip}
     class:cursor-pointer={$userSettings.selectedContext}
     class:opacity-40={!$userSettings.selectedContext}
     class:opacity-75={$userSettings.selectedContext}
     class:text-primary={$userSettings.selectedContext}
     class:text-purple-400={$displayTask?.summoned}
-    class:text-yellow-500={$displayTask?.skip}
     onclick={() => {
         handleContextChange(null);
     }}
     type="reset"
 >
-    {#if $displayTask?.skip}
-        low priority, defer?
-        <kbd>x</kbd>
-    {:else if $displayTask?.summoned}
+    {#if $displayTask?.summoned}
         summoned task
         <kbd>x</kbd>
     {:else if dueTaskCount === 0}

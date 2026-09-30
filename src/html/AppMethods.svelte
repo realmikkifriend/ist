@@ -4,7 +4,7 @@
     import { todoistData, todoistError, displayTask } from "../stores/stores";
     import { userSettings, hashStore } from "../stores/interface";
     import { debounceState } from "../services/firstTaskService";
-    import { updateDisplayTask, skipTask } from "../services/firstTaskService";
+    import { updateDisplayTask } from "../services/firstTaskService";
     import { refreshData } from "../services/updateService";
     import AppCompose from "./AppCompose.svelte";
     import type { Task, UpdateDisplayTaskResult } from "../types/todoist";
@@ -76,34 +76,12 @@
     }
 
     /**
-     * Handles skipping the current task.
-     */
-    const handleSkipTask = (): void => {
-        if ($displayTask) {
-            void skipTask($displayTask).then(async (skipResult) => {
-                if (skipResult.task) {
-                    await summonTask(skipResult.task, true);
-                } else {
-                    void updateDisplayedTask();
-                }
-            });
-        }
-    };
-
-    /**
      * Performs the summon action for a task.
      * @param task - The task to summon.
-     * @param enableSkip - Whether to enable skip.
      * @returns The result of updating the first due task.
      */
-    async function performSummon(
-        task: Task & { displayed?: boolean; skip?: boolean; summoned?: string | boolean },
-        enableSkip: boolean,
-    ): Promise<UpdateDisplayTaskResult> {
+    async function performSummon(task: Task): Promise<UpdateDisplayTaskResult> {
         debounceState.clearDebounceTimeout();
-        if (enableSkip) {
-            task.skip = true;
-        }
         const currentDisplayTaskWasSummoned = $displayTask?.summoned;
 
         task.summoned = currentDisplayTaskWasSummoned || window.location.hash || "#";
@@ -116,15 +94,11 @@
     /**
      * Summon a task as the first due task.
      * @param task - The task to summon.
-     * @param enableSkip - Whether to enable skip. Defaults to false.
      * @returns The summoned task.
      */
-    export async function summonTask(
-        task: Task & { displayed?: boolean; skip?: boolean; summoned?: string | boolean },
-        enableSkip: boolean = false,
-    ): Promise<UpdateDisplayTaskResult> {
-        if (!task.displayed || enableSkip) {
-            return performSummon(task, enableSkip);
+    export async function summonTask(task: Task): Promise<UpdateDisplayTaskResult> {
+        if (!task.displayed) {
+            return performSummon(task);
         }
         return {
             task: $displayTask,
@@ -138,7 +112,6 @@
         handleRefresh,
         handleContextChange,
         updateDisplayedTask,
-        handleSkipTask,
         summonTask,
     });
 

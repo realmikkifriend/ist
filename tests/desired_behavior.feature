@@ -9,9 +9,9 @@ Feature: Task Display
     THEN the current first-due task is displayed.
 
   Scenario: App load resets state
-    GIVEN a task was previously summoned, or skip mode was open, or a context was selected
+    GIVEN a task was previously summoned, or a context was selected
     WHEN the app loads
-    THEN the previously summoned task, skip mode, and selected context are reset.
+    THEN the previously summoned task and selected context are reset.
 
   Scenario: Display 'no tasks' component when no tasks are due
     GIVEN there are no tasks due
@@ -41,11 +41,6 @@ Feature: After Done/Defer
     GIVEN a task is displayed
     WHEN the task is deferred or marked as done
     THEN the next due task is displayed.
-
-  Scenario: Display next skipped task in skip mode
-    GIVEN the user is in skip mode
-    WHEN a task is deferred or marked as done
-    THEN the next task in the skip order is displayed.
 
 Feature: Summoning a Task
 

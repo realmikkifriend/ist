@@ -34,39 +34,25 @@ export function getSoonTasks(tasks: Task[]): Task[] {
 }
 
 /**
- * Returns the list of reverse tasks, filtered and sorted in reverse order.
- * @param {DueTasksData} data - The data object containing tasks, contexts, and user.
- * @returns {Task[]} The filtered and reverse-sorted tasks.
- */
-export function getReverseTasks(data: DueTasksData): Task[] {
-    const { tasks, contexts } = data;
-
-    return filterAndSortTasks(tasks, contexts, { timeZone: getLocalTimeZone(), reverse: true });
-}
-
-/**
  * Filters and sorts tasks based on due date, context, and priority.
  * @param {Task[]} tasks - The list of tasks.
  * @param {Context[]} contexts - The list of contexts.
  * @param {object} options - Options for filtering and sorting.
  * @param {string} [options.timeZone] - The time zone to use for date comparisons.
- * @param {boolean} [options.reverse] - Whether to reverse the sort order. Defaults to false.
  * @returns {Task[]} The filtered and sorted tasks.
  */
 export function filterAndSortTasks(
     tasks: Task[],
     contexts: Context[],
-    options: { timeZone?: string; reverse?: boolean } = {},
+    options: { timeZone?: string } = {},
 ): Task[] {
-    const { timeZone, reverse = false } = options;
+    const { timeZone } = options;
     const contextLookup = createContextLookup(contexts);
 
-    const date = reverse ? DateTime.now().plus({ days: 1 }).endOf("day").toJSDate() : new Date();
-
-    const filteredTasks = timeZone ? filterDueTasks(tasks, timeZone, date) : tasks;
+    const filteredTasks = timeZone ? filterDueTasks(tasks, timeZone, new Date()) : tasks;
 
     const sortedTasks = [...filteredTasks].sort((a, b) => {
-        return compareTasks({ a, b }, contextLookup, timeZone, reverse);
+        return compareTasks({ a, b }, contextLookup, timeZone);
     });
     return sortedTasks;
 }

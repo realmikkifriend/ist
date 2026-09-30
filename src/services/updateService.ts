@@ -5,8 +5,8 @@ import { todoistAccessToken } from "../stores/secret";
 import { handleOverdueTasks } from "./taskHandlerService";
 import { success } from "./toastService";
 import { initializeApi, processApiResponse, handleApiError } from "../utils/apiUtils";
-import { getDueTasks, getReverseTasks } from "../utils/filterUtils";
-import type { TodoistData, Task, TaskUpdates } from "../types/todoist";
+import { getDueTasks } from "../utils/filterUtils";
+import type { TodoistData, TaskUpdates } from "../types/todoist";
 
 /**
  * Applies overdue task updates to the Todoist data.
@@ -41,16 +41,6 @@ function applyOverdueUpdates(data: TodoistData, updates: TaskUpdates): TodoistDa
 
     const result = { ...data, tasks: updatedTasks };
     result.dueTasks = getDueTasks(result);
-    const reverseTasksTomorrow = getReverseTasks(result);
-    const now = new Date();
-    const reverseTasksToday = reverseTasksTomorrow.filter((task: Task) => {
-        if (!task.due || !(task.due.dateObject instanceof Date)) return false;
-        return task.due.dateObject.toDateString() === now.toDateString();
-    });
-    result.reverseTasks = {
-        tomorrow: reverseTasksTomorrow,
-        today: reverseTasksToday,
-    };
     return result;
 }
 

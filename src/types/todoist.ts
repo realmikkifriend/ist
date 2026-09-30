@@ -14,10 +14,6 @@ export interface TodoistData {
     contexts: Context[];
     dueTasks: Task[];
     user: User;
-    reverseTasks: {
-        tomorrow: Task[];
-        today: Task[];
-    };
 }
 
 export type CleanableTodoistData = Partial<TodoistData> & { [key: string]: unknown };
@@ -72,7 +68,6 @@ export type Task = Omit<
 
     contextId?: string;
     summoned?: string | boolean;
-    skip?: boolean;
     displayed?: boolean;
     neverDone?: boolean;
     comments?: Comment[] | Promise<Comment[]>;

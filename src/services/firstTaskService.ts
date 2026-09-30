@@ -22,26 +22,6 @@ const debounceState: {
 export { debounceState };
 
 /**
- * Skip the current task and summon the next one.
- * @param {Task} task - The task to skip.
- * @returns {Promise<{task: Task | null, showNewTaskToast: boolean, doClearContext: boolean}>} The next task and related flags.
- */
-export const skipTask = (task: Task): Promise<UpdateDisplayTaskResult> => {
-    const $todoistData: TodoistData = get(todoistData);
-    const reverseTasksObj = $todoistData.reverseTasks;
-    const reverseTasks =
-        task.summoned === "#today" ? reverseTasksObj.today : reverseTasksObj.tomorrow;
-    const currentIndex = reverseTasks.findIndex((t) => t.id === task.id);
-    const nextIndex = (currentIndex + 1) % reverseTasks.length;
-    return Promise.resolve({
-        task: reverseTasks[nextIndex],
-        showNewTaskToast: false,
-        doClearContext: false,
-        dueTasks: get(todoistData).dueTasks,
-    });
-};
-
-/**
  * Update the first due task, loading comments and handling context changes.
  * @param {Task | null} task - Optional task to set as the first due task.
  * @returns {Promise<{task: Task | null, showNewTaskToast: boolean}>} The new first due task and a flag indicating if the new task toast should be shown.

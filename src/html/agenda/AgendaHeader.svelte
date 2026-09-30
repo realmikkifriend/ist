@@ -1,15 +1,9 @@
 <script lang="ts">
-    import { getContext } from "svelte";
-    import { Icon, XCircle, Calendar, BarsArrowUp } from "svelte-hero-icons";
-    import { shortcut } from "@svelte-put/shortcut";
+    import { Icon, XCircle, Calendar } from "svelte-hero-icons";
     import NeverDoneIcon from "./NeverDoneIcon.svelte";
-    import { todoistData } from "../../stores/stores";
     import type { AgendaHeaderProps } from "../../types/agenda";
-    import type { HandlerMethodsContext } from "../../types/methods";
 
     let { agendaData, displayData }: AgendaHeaderProps = $props();
-
-    const { summonTask } = getContext<HandlerMethodsContext>("handlerMethods");
 
     let { tasks, tasksWithNoTime, todayTasks } = $derived(agendaData);
     let { title, headerGradientColor } = $derived(displayData);
@@ -41,21 +35,6 @@
     }
 
     /**
-     * Summons the first task from the reverse task list for the current view.
-     */
-    async function openSkipMode(): Promise<void> {
-        const reverseTasks =
-            title === "Today"
-                ? $todoistData.reverseTasks.today
-                : $todoistData.reverseTasks.tomorrow;
-
-        if (reverseTasks && reverseTasks.length > 0) {
-            await summonTask(reverseTasks[0], true);
-            closeAgenda();
-        }
-    }
-
-    /**
      * Closes the agenda by clearing the location hash.
      */
     function closeAgenda(): void {
@@ -72,15 +51,6 @@
     >
         <Icon class="h-5 w-6" src={Calendar} />
         <kbd>a</kbd>
-    </button>
-    <button
-        class="relative rounded-full p-1 transition-colors duration-200 hover:bg-blue-800"
-        onclick={openSkipMode}
-        title="open skip mode to view tasks in reverse order"
-        type="button"
-    >
-        <Icon class="h-5 w-6" src={BarsArrowUp} />
-        <kbd>s</kbd>
     </button>
     <div class="mr-6 flex grow cursor-default flex-col items-center">
         <h1 class="flex-1 text-center">{title}</h1>
@@ -118,17 +88,3 @@
         <Icon class="h-5 w-6" src={XCircle} />
     </button>
 </div>
-
-<svelte:window
-    use:shortcut={{
-        trigger: [
-            {
-                key: "s",
-                callback: () => {
-                    void openSkipMode();
-                },
-                modifier: false,
-            },
-        ],
-    }}
-/>

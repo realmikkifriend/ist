@@ -62,29 +62,23 @@ function compareByDueDate(a: Task, b: Task, timeZone: string): number {
  * @param {Task} tasks.b - The second task.
  * @param {Record<string, number>} contextLookup - The context lookup object.
  * @param {string} [timeZone] - The time zone to use for date comparisons.
- * @param {boolean} [reverse] - Whether to reverse the sort order. Defaults to false.
  * @returns {number} The comparison result.
  */
 export function compareTasks(
     tasks: { a: Task; b: Task },
     contextLookup: Record<string, number>,
     timeZone?: string,
-    reverse: boolean = false,
 ): number {
     const { a, b } = tasks;
-    const applyReverse = (val: number) => (reverse ? -val : val);
 
-    const priorityComparison = () => compareByPriority(a, b);
     const contextComparison = () => compareByContext(a, b, contextLookup);
+    const priorityComparison = () => compareByPriority(a, b);
 
     const comparisons = [
-        ...(reverse
-            ? [priorityComparison, contextComparison]
-            : [contextComparison, priorityComparison]),
+        contextComparison,
+        priorityComparison,
         () => (timeZone ? compareByDueDate(a, b, timeZone) : 0),
     ];
 
-    const result = comparisons.reduce((acc, comparison) => acc || comparison(), 0);
-
-    return applyReverse(result);
+    return comparisons.reduce((acc, comparison) => acc || comparison(), 0);
 }
