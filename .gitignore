@@ -12,6 +12,7 @@ dependencies.*
 dist
 test-results/
 playwright-report/
+coverage/
 tests/e2e/fixtures/
 AGENTS.md
 .local/

@@ -27,8 +27,10 @@ const config = {
 
     // Vite plugin options
     vitePlugin: {
-        // Exclude files that should not be processed by Vite
-        exclude: ["dist/**/*", "node_modules/**/*"],
+        // Exclude files that should not be processed by Vite.
+        // (node_modules must stay included: @testing-library/svelte's test
+        // scaffold is a .svelte module resolved from node_modules.)
+        exclude: ["dist/**/*"],
         // Enable inspector for development
         inspector: {
             toggleKeyCombo: "meta-shift",
