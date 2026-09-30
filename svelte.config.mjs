@@ -42,6 +42,12 @@ const config = {
 
     // Compiler warnings configuration
     onwarn: (warning, handler) => {
+        // Third-party components (e.g. @humanspeak/svelte-markdown) reference
+        // reactive props in top-level code; their build output is out of our
+        // control, so ignore that warning. (The old webpack config suppressed
+        // this for node_modules files only; Vite applies onwarn everywhere.)
+        if (warning.code === "state_referenced_locally") return;
+
         // Disable a11y warnings if needed (uncomment if you want to suppress them)
         // if (warning.code.startsWith('a11y-')) return;
 

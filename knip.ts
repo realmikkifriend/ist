@@ -1,5 +1,7 @@
 export default {
     project: ["**/*.ts", "**/*.svelte", "**/*.mjs", "**/*.css"],
+    // The app entry (src/js/index.ts) is picked up by knip's Vite adapter
+    // from index.html's module script, so it is not listed here.
     // Launched via a shell command in playwright.config.ts, not imported.
     // fixtures.ts is consumed by the fixture-based e2e specs (Phase 2.0.3).
     entry: [
@@ -12,5 +14,4 @@ export default {
         interface: true,
         type: true,
     },
-    webpack: { config: ["webpack.config.mjs"] },
 };

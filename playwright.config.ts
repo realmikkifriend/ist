@@ -25,9 +25,9 @@ export default defineConfig({
         {
             // Same as `npm start` but without `--open`, so running tests never
             // pops a browser window on the developer's machine.
-            // Pinned to port 9180 (webpack's default is 8080) so the test
-            // dev server never collides with the developer's live server.
-            command: "dotenv -- webpack serve --mode development --no-stats --port 9180",
+            // Pinned to port 9180 (the default is 8080) so the test dev server
+            // never collides with the developer's live server.
+            command: "vite --port 9180 --strictPort",
             url: "http://localhost:9180",
             reuseExistingServer: true,
             timeout: 180_000,
