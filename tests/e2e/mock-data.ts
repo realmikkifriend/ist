@@ -176,6 +176,7 @@ export function makeProject(
     childOrder: number = 1,
     overrides: Record<string, unknown> = {},
 ): Record<string, unknown> {
+    const now = new Date().toISOString();
     return {
         id,
         name,
@@ -191,6 +192,12 @@ export function makeProject(
         color: "berry_red",
         child_order: childOrder,
         order_key: "a1",
+        // Fields required by the SDK's project schema:
+        can_assign_tasks: false,
+        created_at: now,
+        updated_at: now,
+        default_order: 1,
+        description: "",
         ...overrides,
     };
 }

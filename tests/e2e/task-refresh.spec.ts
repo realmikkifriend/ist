@@ -65,7 +65,9 @@ test.describe("task refresh & display update", () => {
         await expect(page.getByRole("heading", { name: "Beta due task" })).toBeVisible();
     });
 
-    test("keeps the displayed task and shows an error toast when a refresh fails", async ({ page }) => {
+    test("keeps the displayed task and shows an error toast when a refresh fails", async ({
+        page,
+    }) => {
         await loadApp(page, makeScenario({ tasks: [alphaTask] }));
         await expect(page.getByRole("heading", { name: "Alpha due task" })).toBeVisible();
 

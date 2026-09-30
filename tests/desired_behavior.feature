@@ -210,9 +210,10 @@ Feature: Done / Defer
     # e2e: recurring-task.spec.ts › "marking a recurring task done re-defers it to today and closes it"
     GIVEN the displayed task is due to repeat
     WHEN the user marks it done
-    THEN the task is first deferred to the same time today
+    THEN the task is first re-deferred to today, keeping the time from its current due string when one can be parsed
     AND it is then marked done in Todoist
     AND a temporary activity entry is added for today.
+    TODO: after an overdue auto-defer rewrites the local due string to a date ("yyyy-MM-dd"), the re-defer has no time to keep and lands on midnight, silently losing the recurring time.
 
   Scenario: Done or defer fails
     GIVEN the displayed task is done or deferred

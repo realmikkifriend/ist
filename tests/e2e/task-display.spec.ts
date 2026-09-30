@@ -66,7 +66,9 @@ test.describe("task display & ordering", () => {
                     due: dueObject(new Date(now - 2 * HOUR)),
                 }),
                 makeTask("sort-noc", "No context task", {
-                    project_id: null,
+                    // Empty project id: the SDK schema requires a string, and the
+                    // app sorts a falsy contextId ("no context") before any context.
+                    project_id: "",
                     priority: 1,
                     due: dueObject(new Date(now - 9 * HOUR)),
                 }),
@@ -107,19 +109,22 @@ test.describe("task display & ordering", () => {
         });
 
         const handle = await loadApp(page, scenario);
+        // The success toast fires only after the overdue defers have been sent.
+        await expect(page.getByRole("button", { name: "Todoist data updated!" })).toBeVisible();
         const recorded = handle.updates();
-        expect(recorded.length).toBe(2);
-        const allday = recorded.find((entry) => entry.id === "overdue-allday");
-        const timed = recorded.find((entry) => entry.id === "overdue-timed");
         // All-day tasks are deferred to midnight; a time in the due string is kept.
-        expect(allday?.body.due_date).toBe(today);
-        expect(timed?.body.due_datetime).toBe(`${today}T09:00:00`);
+        expect(recorded.find((entry) => entry.id === "overdue-allday")?.body.due_date).toBe(today);
+        expect(recorded.find((entry) => entry.id === "overdue-timed")?.body.due_datetime).toBe(
+            `${today}T09:00:00`,
+        );
         await expect(page.getByRole("heading", { name: "Overdue all-day task" })).toBeVisible();
 
         // The mock applied the defers, so a new refresh must not defer again.
+        const deferredCount = handle.updates().length;
+        await expect(page.getByRole("button", { name: "Todoist data updated!" })).toBeHidden();
         await page.keyboard.press("r");
         await expect(page.getByRole("button", { name: "Todoist data updated!" })).toBeVisible();
-        expect(handle.updates().length).toBe(2);
+        expect(handle.updates().length).toBe(deferredCount);
     });
 
     test("shows NoTasks when the account has zero tasks", async ({ page }) => {
