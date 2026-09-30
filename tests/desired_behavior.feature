@@ -1,51 +1,381 @@
+# Ist behavior spec (non-executable BDD)
+#
+# This file reconciles desired behavior with ACTUAL app behavior (Phase 4.2,
+# 2026-09-30). Where actual behavior deviates from an ideal, it is documented
+# as-is and flagged with a `TODO:` gap. Scenarios covered by the Playwright
+# e2e suite carry a `# e2e: <spec> › "<test name>"` mapping comment;
+# `TODO (e2e):` marks scenarios 4.3 should add specs for.
+
+Feature: Auth & Onboarding
+
+  As a user, I want to sign in to my Todoist account
+  So that the app can show my tasks.
+
+  Scenario: Unauthenticated user sees the landing page
+    # e2e: landing.spec.ts › "renders the hero heading and the Todoist entry point"
+    GIVEN the app is loaded with no stored Todoist access token
+    WHEN the app initializes
+    THEN the landing page is displayed with a "Continue with Todoist" button.
+
+  Scenario: The Todoist Client ID is not configured
+    GIVEN the app is loaded with no stored Todoist access token
+    AND the TODOIST_CLIENT_ID environment value is missing
+    WHEN the landing page is displayed
+    THEN the entry point is a disabled button labeled "Todoist Client ID not configured".
+
+  Scenario: Full login flow displays the first due task
+    # e2e: core.spec.ts › "full login flow displays the first due task"
+    GIVEN the app is loaded with no stored Todoist access token
+    WHEN the user clicks "Continue with Todoist"
+    AND the OAuth code is exchanged for an access token
+    THEN the access token is stored
+    AND the app mounts and displays the current first-due task.
+
+  Scenario: Token exchange fails
+    GIVEN the app received an OAuth callback with a valid code
+    AND the token exchange request fails
+    THEN the failure is logged to the console only
+    AND the user remains on the "Authenticating..." screen.
+    TODO: surface a visible error with a retry path instead of a silent console error.
+
+  Scenario: Log out
+    GIVEN the user is signed in
+    WHEN the user clicks "Log Out" in the sidebar
+    THEN all persisted app state is reset, including both access tokens
+    AND the landing page is displayed.
+
 Feature: Task Display
 
-  As a user, I want the application to behave in a specific way
-  So that I can manage my tasks effectively.
+  As a user, I want to see the most important task I can work on now
+  So that I am not juggling my whole list.
 
   Scenario: App loads and displays the first-due task
-    GIVEN the app is loaded
+    # e2e: core.spec.ts › "full login flow displays the first due task"
+    GIVEN the app is loaded and data refreshes on startup
     WHEN the app initializes
     THEN the current first-due task is displayed.
 
-  Scenario: App load resets state
-    GIVEN a task was previously summoned, or a context was selected
+  Scenario: Display "no tasks" component when no tasks are due
+    # e2e: core.spec.ts › "shows NoTasks when nothing is due"
+    GIVEN there are tasks but none are due
     WHEN the app loads
-    THEN the previously summoned task and selected context are reset.
+    THEN the NoTasks component is displayed with Today and Tomorrow agenda buttons.
 
-  Scenario: Display 'no tasks' component when no tasks are due
-    GIVEN there are no tasks due
+  Scenario: Display placeholder when the account has no tasks at all
+    GIVEN the account has zero tasks
     WHEN the app loads
-    THEN the 'no tasks' component is displayed.
+    THEN the "No tasks, try adding some" placeholder is displayed.
+    TODO (e2e): add a spec for the zero-task state.
 
-Feature: Filter by Contexts
+  Scenario: Due task ordering
+    GIVEN there are multiple due tasks
+    WHEN the app determines the first-due task
+    THEN tasks are ordered by context order (tasks without a context first), then priority (highest first), then due date (earliest first).
+    TODO (e2e): add a spec asserting the ordering chain.
+
+  Scenario: Refresh data
+    GIVEN the app is loaded and signed in
+    WHEN the user clicks the refresh button or presses r
+    THEN the Todoist data is refetched
+    AND a "Todoist data updated!" success toast is shown.
+    AND data is also refreshed automatically every 5 minutes.
+
+  Scenario: Overdue tasks are auto-deferred to today
+    GIVEN there are tasks whose due date is before today
+    WHEN the data refreshes
+    THEN those tasks are deferred to today, keeping the original time-of-day when the due string defines one.
+    TODO (e2e): add a spec for overdue auto-deferral.
+
+  Scenario: A refresh happens while the display debounce is active
+    GIVEN a task is displayed
+    AND less than 2 seconds have passed since the last display update
+    WHEN new data arrives
+    THEN the currently displayed task is kept unchanged.
+    TODO (e2e): add a spec for the 2 s display debounce.
+
+  Scenario: The first-due task changes while the user is on another task
+    GIVEN a task is displayed
+    AND it was not summoned from the agenda
+    AND the agenda is not open
+    WHEN a refresh surfaces a different first-due task
+    THEN a "New first-due task! Click to update..." info toast is shown
+    AND clicking the toast displays the new task.
+    AND the toast is only shown when no context is selected, or the previous task belongs to the selected context.
+    TODO (e2e): add a spec for the new-first-due-task toast.
+
+  Scenario: The displayed task has comments
+    GIVEN the displayed task has comments
+    WHEN the task is displayed (on a wide screen)
+    THEN the comments are rendered below the task card as markdown
+    AND while loading a "Loading comments..." indicator is shown
+    AND on failure an "Error loading comments" message is shown.
+
+  Scenario: The displayed task is a routine that has never been done
+    GIVEN the displayed task has never been completed
+    WHEN the task card is displayed
+    THEN the done button and the history button are hidden.
+
+  Scenario: Data loading fails
+    GIVEN the initial data refresh fails
+    WHEN the app initializes
+    THEN the "Error loading Todoist data: {message}" screen is displayed
+    AND an error toast is shown.
+    TODO (e2e): add a spec for the refresh-failure state.
+
+Feature: Contexts
+
+  As a user, I want to filter my due tasks by context
+  So that I can focus on one area at a time.
+
+  Scenario: The context sidebar lists contexts with due counts
+    GIVEN the app is loaded and due tasks exist
+    WHEN the user opens the sidebar (c)
+    THEN each non-inbox context is listed with its due-task count and priority breakdown
+    AND a context is disabled when it has no due tasks or when a different context is selected.
 
   Scenario: Filter displayed tasks by selected context
-  GIVEN there are tasks due
-  WHEN the user has selected a context
-  THEN tasks filtered by the selected context are displayed.
+    # e2e: core.spec.ts › "context filter turns on and off"
+    GIVEN there are tasks due in multiple contexts
+    WHEN the user selects a context in the sidebar
+    THEN the first due task of that context is displayed.
 
   Scenario: The user can clear the selected context
-  GIVEN a context has been selected
-  WHEN the user de-selects the context
-  THEN the selected context is un-set and general due tasks are displayed.
+    # e2e: core.spec.ts › "context filter turns on and off"
+    GIVEN a context has been selected
+    WHEN the user de-selects the context
+    THEN the selection is cleared
+    AND the general due tasks are displayed
+    AND a "New first-due task!" toast is shown to confirm the general task.
 
   Scenario: The selected context has no due tasks left
-  GIVEN a context has been selected
-  WHEN there are no more tasks remaining in the selected context
-  THEN the selected context is un-set and general due tasks are displayed.
+    GIVEN a context has been selected
+    WHEN no due tasks remain in that context
+    THEN the selected context is un-set
+    AND the general due tasks are displayed.
+    TODO (e2e): add a spec for auto-unselecting an empty context.
 
-Feature: After Done/Defer
+  Scenario: Reorder contexts
+    GIVEN the user has dragged a context to a new position in the sidebar
+    WHEN the drag is finalized
+    THEN the new order is saved to Todoist (project_reorder)
+    AND a "Contexts reordered successfully!" toast is shown
+    AND the displayed task is re-evaluated under the new order.
+    TODO (e2e): add a spec for drag reordering.
+
+  Scenario: Task search
+    GIVEN the user opens the task search modal (/)
+    WHEN the user types a search term
+    THEN tasks from the full task list (not just due tasks) matching the term are listed
+    AND pressing Enter or clicking a result summons that task and closes the modal
+    AND "No results..." is shown when nothing matches.
+    TODO (e2e): add a spec for task search.
+
+  Scenario: Context badge
+    GIVEN a task is displayed and the agenda is not open
+    WHEN the main view is rendered
+    THEN a context badge shows the selected context, or the displayed task's context when none is selected.
+
+Feature: Done / Defer
+
+  As a user, I want to complete or reschedule the displayed task
+  So that the app can move on to what is next.
 
   Scenario: Display next due task after completing or deferring
+    # e2e: core.spec.ts › "done and defer advance to the next due task"
     GIVEN a task is displayed
-    WHEN the task is deferred or marked as done
-    THEN the next due task is displayed.
+    WHEN the task is marked done (CTRL+Enter) or deferred (d)
+    THEN the task is removed from the local list
+    AND the data is refreshed
+    AND the next due task is displayed.
 
-Feature: Summoning a Task
+  Scenario: The defer modal offers time and calendar picking
+    GIVEN the user opens the defer modal (d)
+    WHEN the modal is displayed
+    THEN it shows Time and Calendar tabs (switchable with the arrow keys), with the Time tab active initially for timed tasks
+    AND the Time tab offers quick options such as "tomorrow".
+
+  Scenario: Deferring a timed or recurring task keeps its time-of-day
+    GIVEN the displayed task has a due string that defines a time
+    WHEN the user defers it to a specific date
+    THEN the new due datetime keeps the original time-of-day.
+    TODO (e2e): add a spec for time preservation on date-based defer.
+
+  Scenario: Completing a recurring task re-defers it first
+    GIVEN the displayed task is due to repeat
+    WHEN the user marks it done
+    THEN the task is first deferred to the same time today
+    AND it is then marked done in Todoist
+    AND a temporary activity entry is added for today.
+    TODO (e2e): add a spec for recurring done = re-defer + close.
+
+  Scenario: Done or defer fails
+    GIVEN the displayed task is done or deferred
+    WHEN the corresponding Todoist API call fails
+    THEN an error toast is shown ("Failed to mark task done." / "Failed to defer task.")
+    AND the displayed task is unchanged.
+    TODO (e2e): add a spec for API failure on done/defer.
+
+  Scenario: The displayed task was summoned from the agenda
+    GIVEN a task was summoned while an agenda hash was open
+    WHEN the task is done or deferred
+    THEN the window hash is restored to the agenda it was summoned from.
+
+Feature: Agenda
+
+  As a user, I want to see my day and tomorrow laid out
+  So that I can pull any task forward.
 
   Scenario: Summoning a task from the agenda closes the agenda and displays the task
+    # e2e: core.spec.ts › "summoning a task from the agenda closes it and displays the task"
     GIVEN the agenda view is open
-    WHEN a user clicks the 'summon' button for a specific task
+    WHEN the user clicks the time button of a specific task
     THEN the agenda view closes
     AND the summoned task is displayed.
+    AND summoning an already-displayed task does nothing.
+
+  Scenario: Switch agenda views
+    GIVEN the app is loaded
+    WHEN the user presses a
+    THEN the agenda cycles between today, tomorrow, and closed
+    AND the agenda can also be opened from the sidebar or the NoTasks page and closed with its close button.
+
+  Scenario: The agenda header summarizes the day
+    GIVEN an agenda view is open
+    WHEN the agenda header is rendered
+    THEN it shows the total task count split into normal tasks and routines (never-done tasks)
+    AND on the tomorrow view it also warns about tasks left over from today.
+    TODO (e2e): add a spec for the agenda header counts.
+
+  Scenario: The agenda body lists the day
+    GIVEN an agenda view is open
+    WHEN the agenda is rendered
+    THEN tasks without a time are listed at the top
+    AND tasks with a time are grouped in an hour grid (7:00 to 21:00 at minimum).
+
+  Scenario: Schedule a task from the agenda
+    GIVEN the agenda view is open
+    WHEN the user clicks the schedule control of a task
+    THEN a schedule modal opens for a specific date and time
+    AND confirming defers the task and shows "Task scheduled successfully."
+    TODO (e2e): add a spec for scheduling from the agenda.
+
+  Scenario: The displayed task is highlighted in the agenda
+    GIVEN a task is currently displayed
+    WHEN the agenda view is open
+    THEN the displayed task is marked with a highlight and an inbox icon.
+
+Feature: Dynalist
+
+  As a user, I want Dynalist links in task comments to become interactive
+  So that I can work through linked documents from Ist.
+
+  Scenario: A Dynalist URL appears in a comment without a stored token
+    GIVEN the displayed task has a comment starting with https://dynalist.io/d/
+    AND no Dynalist access token is stored
+    WHEN the comments are rendered
+    THEN a Dynalist access token request form is shown
+    AND the comment itself shows "Dynalist URL detected but no access code stored."
+    TODO (e2e): add a spec for the auth request flow.
+
+  Scenario: Store a Dynalist access token
+    GIVEN the Dynalist token request form is shown
+    WHEN the user submits a token
+    AND the token validates against the Dynalist API
+    THEN the token is stored and a "Dynalist access token set!" toast is shown
+    AND the comment re-renders with the interactive Dynalist content
+    AND an invalid token shows an inline "Invalid token" message instead.
+
+  Scenario: Load and render a Dynalist document
+    GIVEN a valid Dynalist token is stored
+    AND a comment contains a Dynalist URL
+    WHEN the comments are rendered
+    THEN the document is fetched and rendered according to its detected type
+    AND the type can be switched with the type menu (read, checklist, count, rotating, cross off, tracking)
+    AND on fetch failure an error toast and inline error message are shown.
+    TODO (e2e): add specs for type detection and the type menu.
+
+  Scenario: Checklist
+    # e2e: core.spec.ts › "dynalist URL in a comment renders an interactive checklist"
+    GIVEN a Dynalist document is rendered as a checklist
+    WHEN the user clicks "Next item" (z / Enter)
+    THEN the next checklist item is shown with a strike animation
+    AND a progress bar and counter track the position
+    AND "End of list!" is shown at the end with a reset button.
+    TODO: checklist progress is local to the app and is not written back to Dynalist.
+
+  Scenario: Count
+    GIVEN a Dynalist document is rendered as a counter
+    WHEN the user clicks +1 or -1
+    THEN the current count is updated in the Dynalist document
+    AND an "Updated count!" toast is shown.
+    TODO (e2e): add a spec for the count widget.
+
+  Scenario: Cross off
+    GIVEN a Dynalist document is rendered as a cross-off list
+    WHEN the user clicks the cross-off button (z / Enter)
+    THEN the first item is marked checked in the Dynalist document
+    AND it is removed from the local list with a remaining-count indicator
+    AND a "Removed from list in Dynalist!" toast is shown.
+    TODO (e2e): add a spec for cross-off.
+
+  Scenario: Tracking
+    GIVEN a Dynalist document is rendered as a tracker
+    WHEN the user clicks the tracking button
+    THEN today's date is added to (or removed from) the document's tracked dates
+    AND a calendar modal can show the tracked dates.
+    TODO (e2e): add a spec for tracking.
+
+  Scenario: Cycle comment focus
+    GIVEN the displayed task has focusable comment content
+    WHEN the user presses z
+    THEN focus moves to the next comment focus target, wrapping around.
+
+Feature: Activity & History
+
+  As a user, I want to see what I have completed
+  So that I can keep a daily goal and review a task's history.
+
+  Scenario: Daily goal
+    GIVEN the app is loaded and signed in
+    WHEN the sidebar is rendered
+    THEN a daily goal pill shows today's completions against the user's daily goal
+    AND completions are segmented by context color, with an overflow segment when the goal is exceeded
+    AND clicking the pill reloads today's activity, discarding temporary entries.
+    TODO (e2e): add a spec for the daily goal pill.
+
+  Scenario: Completing a task updates today's activity immediately
+    GIVEN the user marks a task done
+    WHEN the completion succeeds
+    THEN a temporary activity entry for that task is added to today's activity.
+
+  Scenario: Task completion history
+    GIVEN the displayed task has been completed before
+    WHEN the user presses h or clicks the history button
+    THEN a calendar modal shows the task's completion dates (last 3 months), with future dates disabled.
+    TODO (e2e): add a spec for the history calendar.
+
+Feature: State Persistence
+
+  As a user, I want my app state to survive a reload
+  So that I do not lose my place.
+
+  Scenario: State persists across reloads
+    GIVEN the app has been used
+    WHEN the app is reloaded
+    THEN the Todoist data, displayed task, activity, selected context, and both access tokens are restored from localStorage
+    AND transient state (previous task, error, toasts, hash) starts fresh.
+    TODO (e2e): add a spec for state restoration on reload.
+
+  Scenario: App loads with a persisted token
+    # e2e: live.todoist.spec.ts › "renders real data from api.todoist.com"
+    GIVEN a valid Todoist access token is stored
+    WHEN the app is loaded
+    THEN the app is authenticated and renders data from api.todoist.com without showing the landing page or an error.
+
+  Scenario: A summoned task persists across reloads
+    GIVEN a task was summoned and the app is reloaded
+    WHEN the app initializes
+    THEN the persisted summoned task is displayed again
+    AND the initial data refresh is skipped.
+    TODO: the original spec expected app load to RESET the summoned task and selected context; the app actually persists them. Decide the desired behavior.
+    TODO (e2e): add a spec for the summoned-task load-skip.
