@@ -61,17 +61,19 @@ Feature: Task Display
     WHEN the app loads
     THEN the NoTasks component is displayed with Today and Tomorrow agenda buttons.
 
-  Scenario: Display placeholder when the account has no tasks at all
+  Scenario: Display "no tasks" state when the account has no tasks at all
+    # e2e: task-display.spec.ts › "shows NoTasks when the account has zero tasks"
     GIVEN the account has zero tasks
     WHEN the app loads
-    THEN the "No tasks, try adding some" placeholder is displayed.
-    TODO (e2e): add a spec for the zero-task state.
+    THEN the NoTasks component is displayed with Today and Tomorrow agenda buttons
+    AND the "No tasks, try adding some" placeholder is not displayed because the task list is an empty (truthy) array.
+    TODO: decide the intended zero-task state; the "No tasks, try adding some" branch in AppView is dead code.
 
   Scenario: Due task ordering
+    # e2e: task-display.spec.ts › "sorts due tasks by context, then priority, then due date"
     GIVEN there are multiple due tasks
     WHEN the app determines the first-due task
     THEN tasks are ordered by context order (tasks without a context first), then priority (highest first), then due date (earliest first).
-    TODO (e2e): add a spec asserting the ordering chain.
 
   Scenario: Refresh data
     GIVEN the app is loaded and signed in
@@ -81,19 +83,21 @@ Feature: Task Display
     AND data is also refreshed automatically every 5 minutes.
 
   Scenario: Overdue tasks are auto-deferred to today
+    # e2e: task-display.spec.ts › "auto-defers overdue tasks to today on refresh"
     GIVEN there are tasks whose due date is before today
     WHEN the data refreshes
-    THEN those tasks are deferred to today, keeping the original time-of-day when the due string defines one.
-    TODO (e2e): add a spec for overdue auto-deferral.
+    THEN those tasks are deferred to today, keeping the original time-of-day when the due string defines one
+    AND a subsequent refresh does not defer them again.
 
   Scenario: A refresh happens while the display debounce is active
+    # e2e: task-refresh.spec.ts › "keeps the displayed task while the 2 s display debounce is active"
     GIVEN a task is displayed
     AND less than 2 seconds have passed since the last display update
     WHEN new data arrives
     THEN the currently displayed task is kept unchanged.
-    TODO (e2e): add a spec for the 2 s display debounce.
 
   Scenario: The first-due task changes while the user is on another task
+    # e2e: task-refresh.spec.ts › "shows a new-first-due-task toast when the first due task changes"
     GIVEN a task is displayed
     AND it was not summoned from the agenda
     AND the agenda is not open
@@ -101,7 +105,6 @@ Feature: Task Display
     THEN a "New first-due task! Click to update..." info toast is shown
     AND clicking the toast displays the new task.
     AND the toast is only shown when no context is selected, or the previous task belongs to the selected context.
-    TODO (e2e): add a spec for the new-first-due-task toast.
 
   Scenario: The displayed task has comments
     GIVEN the displayed task has comments
@@ -116,11 +119,14 @@ Feature: Task Display
     THEN the done button and the history button are hidden.
 
   Scenario: Data loading fails
-    GIVEN the initial data refresh fails
-    WHEN the app initializes
-    THEN the "Error loading Todoist data: {message}" screen is displayed
-    AND an error toast is shown.
-    TODO (e2e): add a spec for the refresh-failure state.
+    # e2e: task-refresh.spec.ts › "shows NoTasks and an error toast when the initial refresh fails"
+    # e2e: task-refresh.spec.ts › "keeps the displayed task and shows an error toast when a refresh fails"
+    GIVEN a data refresh fails (initial or subsequent)
+    WHEN the app initializes (or the user refreshes)
+    THEN an error toast with the API error message is shown
+    AND on an initial failure the NoTasks component is displayed
+    AND on a subsequent failure the displayed task is unchanged.
+    TODO: the "Error loading Todoist data: {message}" screen is dead code because handleRefresh routes errors to the todoistError store instead of rejecting.
 
 Feature: Contexts
 
@@ -201,12 +207,12 @@ Feature: Done / Defer
     TODO (e2e): add a spec for time preservation on date-based defer.
 
   Scenario: Completing a recurring task re-defers it first
+    # e2e: recurring-task.spec.ts › "marking a recurring task done re-defers it to today and closes it"
     GIVEN the displayed task is due to repeat
     WHEN the user marks it done
     THEN the task is first deferred to the same time today
     AND it is then marked done in Todoist
     AND a temporary activity entry is added for today.
-    TODO (e2e): add a spec for recurring done = re-defer + close.
 
   Scenario: Done or defer fails
     GIVEN the displayed task is done or deferred
