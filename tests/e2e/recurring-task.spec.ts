@@ -1,7 +1,8 @@
 import { expect, test } from "@playwright/test";
 import { DateTime } from "luxon";
 import { dueObject, makeTask } from "./mock-data";
-import { mockTodoistApi, seedLocalStorage } from "./mock";
+import { mockTodoistApi } from "./mock";
+import { seedLocalStorage } from "./seed";
 import { makeScenario } from "./scenarios";
 
 const TODOIST_TOKEN = "e2e-todoist-token";
