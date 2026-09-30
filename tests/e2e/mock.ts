@@ -1,6 +1,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import type { Page } from "@playwright/test";
+import { applySyncCommands, applyTaskUpdate } from "./mock-state";
 import { makeScenario } from "./scenarios";
 
 const CORS_HEADERS: Record<string, string> = { "access-control-allow-origin": "*" };
@@ -18,30 +19,6 @@ function rawFixture(name: "projects" | "user"): unknown {
         );
     }
     return JSON.parse(readFileSync(file, "utf8")) as unknown;
-}
-
-/**
- * Applies a wire-format task update (due date fields) to a raw task.
- * @param {Record<string, unknown>} task - The raw task to update.
- * @param {Record<string, unknown>} body - The snake_case update body sent to the API.
- * @returns {Record<string, unknown>} The updated raw task.
- */
-function applyTaskUpdate(
-    task: Record<string, unknown>,
-    body: Record<string, unknown>,
-): Record<string, unknown> {
-    const due = (task.due ?? {}) as Record<string, unknown>;
-    return {
-        ...task,
-        due: {
-            ...due,
-            ...(typeof body.due_string === "string" ? { string: body.due_string } : {}),
-            ...(typeof body.due_date === "string" ? { date: body.due_date, datetime: null } : {}),
-            ...(typeof body.due_datetime === "string"
-                ? { date: body.due_datetime.slice(0, 10), datetime: body.due_datetime }
-                : {}),
-        },
-    };
 }
 
 /**
@@ -76,25 +53,6 @@ export async function mockTodoistApi(
     let servedProjects: Record<string, unknown>[] | null = scenario.projects
         ? [...scenario.projects]
         : null;
-
-    /**
-     * Applies the sync commands to the mutable mock state (project reorder
-     * updates the `child_order` served by the projects endpoint).
-     * @param {Record<string, unknown>} body - The raw `POST /sync` body.
-     */
-    const applySyncCommands = (body: Record<string, unknown>): void => {
-        const commands = (body.commands ?? []) as Array<Record<string, unknown>>;
-        for (const command of commands) {
-            if (command.type !== "project_reorder" || !servedProjects) continue;
-            const entries = ((command.args as Record<string, unknown>)?.projects ?? []) as Array<
-                Record<string, unknown>
-            >;
-            servedProjects = servedProjects.map((project) => {
-                const entry = entries.find((move) => move.id === project.id);
-                return entry ? { ...project, child_order: entry.child_order } : project;
-            });
-        }
-    };
 
     await page.route("**/api.todoist.com/api/v1/**", async (route) => {
         const request = route.request();
@@ -166,7 +124,9 @@ export async function mockTodoistApi(
         if (request.method() === "POST" && path === "sync") {
             const body = (request.postDataJSON() ?? {}) as Record<string, unknown>;
             recordedSyncs.push(body);
-            applySyncCommands(body);
+            if (servedProjects) {
+                servedProjects = applySyncCommands(servedProjects, body);
+            }
             await ok({});
             return;
         }

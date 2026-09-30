@@ -46,7 +46,12 @@ test.describe("contexts", () => {
         await expect
             .poll(() =>
                 page.evaluate(
-                    () => JSON.parse(localStorage.getItem("user_settings") ?? "{}").selectedContext,
+                    () =>
+                        (
+                            JSON.parse(localStorage.getItem("user_settings") ?? "{}") as {
+                                selectedContext: { id: string; name: string } | null;
+                            }
+                        ).selectedContext,
                 ),
             )
             .toBeNull();
