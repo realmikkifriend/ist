@@ -52,7 +52,10 @@ function applyTaskUpdate(
  * @param {ReturnType<typeof makeScenario>} scenario - The data to serve.
  * @returns {Promise<object>} A handle: `setTasks(tasks)` replaces the served
  *   open tasks (the next refresh serves them), `updates()` returns the recorded
- *   task-update (defer) calls, and `closes()` the recorded closed task ids.
+ *   task-update (defer) calls, `closes()` the recorded closed task ids, and
+ *   `syncs()` the recorded `POST /sync` request bodies. `project_reorder`
+ *   sync commands are persisted, so later projects fetches serve the new
+ *   `child_order` values.
  */
 export async function mockTodoistApi(
     page: Page,
@@ -61,6 +64,7 @@ export async function mockTodoistApi(
     setTasks: (tasks: Record<string, unknown>[]) => void;
     updates: () => Array<{ id: string; body: Record<string, unknown> }>;
     closes: () => string[];
+    syncs: () => Record<string, unknown>[];
 }> {
     const byId = new Map<string, Record<string, unknown>>(
         scenario.tasks.map((task) => [String(task.id), task]),
@@ -68,6 +72,29 @@ export async function mockTodoistApi(
     const closedIds = new Set<string>();
     const recordedUpdates: Array<{ id: string; body: Record<string, unknown> }> = [];
     const recordedCloses: string[] = [];
+    const recordedSyncs: Record<string, unknown>[] = [];
+    let servedProjects: Record<string, unknown>[] | null = scenario.projects
+        ? [...scenario.projects]
+        : null;
+
+    /**
+     * Applies the sync commands to the mutable mock state (project reorder
+     * updates the `child_order` served by the projects endpoint).
+     * @param {Record<string, unknown>} body - The raw `POST /sync` body.
+     */
+    const applySyncCommands = (body: Record<string, unknown>): void => {
+        const commands = (body.commands ?? []) as Array<Record<string, unknown>>;
+        for (const command of commands) {
+            if (command.type !== "project_reorder" || !servedProjects) continue;
+            const entries = ((command.args as Record<string, unknown>)?.projects ?? []) as Array<
+                Record<string, unknown>
+            >;
+            servedProjects = servedProjects.map((project) => {
+                const entry = entries.find((move) => move.id === project.id);
+                return entry ? { ...project, child_order: entry.child_order } : project;
+            });
+        }
+    };
 
     await page.route("**/api.todoist.com/api/v1/**", async (route) => {
         const request = route.request();
@@ -94,8 +121,8 @@ export async function mockTodoistApi(
         }
 
         if (request.method() === "GET" && path === "projects") {
-            const projects = scenario.projects
-                ? { results: scenario.projects, next_cursor: null }
+            const projects = servedProjects
+                ? { results: servedProjects, next_cursor: null }
                 : rawFixture("projects");
             await ok(projects);
             return;
@@ -137,6 +164,9 @@ export async function mockTodoistApi(
         }
 
         if (request.method() === "POST" && path === "sync") {
+            const body = (request.postDataJSON() ?? {}) as Record<string, unknown>;
+            recordedSyncs.push(body);
+            applySyncCommands(body);
             await ok({});
             return;
         }
@@ -156,5 +186,6 @@ export async function mockTodoistApi(
         },
         updates: (): Array<{ id: string; body: Record<string, unknown> }> => recordedUpdates,
         closes: (): string[] => recordedCloses,
+        syncs: (): Record<string, unknown>[] => recordedSyncs,
     };
 }

@@ -154,27 +154,27 @@ Feature: Contexts
     AND a "New first-due task!" toast is shown to confirm the general task.
 
   Scenario: The selected context has no due tasks left
+    # e2e: contexts.spec.ts › "auto-unselects a selected context when it has no due tasks left"
     GIVEN a context has been selected
     WHEN no due tasks remain in that context
     THEN the selected context is un-set
     AND the general due tasks are displayed.
-    TODO (e2e): add a spec for auto-unselecting an empty context.
 
   Scenario: Reorder contexts
+    # e2e: contexts.spec.ts › "drag reordering contexts syncs the new order and re-evaluates the task"
     GIVEN the user has dragged a context to a new position in the sidebar
     WHEN the drag is finalized
     THEN the new order is saved to Todoist (project_reorder)
     AND a "Contexts reordered successfully!" toast is shown
     AND the displayed task is re-evaluated under the new order.
-    TODO (e2e): add a spec for drag reordering.
 
   Scenario: Task search
+    # e2e: contexts.spec.ts › "task search finds non-due tasks and summons the pick"
     GIVEN the user opens the task search modal (/)
     WHEN the user types a search term
     THEN tasks from the full task list (not just due tasks) matching the term are listed
     AND pressing Enter or clicking a result summons that task and closes the modal
     AND "No results..." is shown when nothing matches.
-    TODO (e2e): add a spec for task search.
 
   Scenario: Context badge
     GIVEN a task is displayed and the agenda is not open
