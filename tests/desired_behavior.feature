@@ -39,6 +39,7 @@ Feature: Auth & Onboarding
     TODO: surface a visible error with a retry path instead of a silent console error.
 
   Scenario: Log out
+    # e2e: state-persistence.spec.ts › "logging out resets all persisted state to the landing page"
     GIVEN the user is signed in
     WHEN the user clicks "Log Out" in the sidebar
     THEN all persisted app state is reset, including both access tokens
@@ -395,11 +396,12 @@ Feature: State Persistence
   So that I do not lose my place.
 
   Scenario: State persists across reloads
+    # e2e: state-persistence.spec.ts › "selected context and displayed task persist across reload"
     GIVEN the app has been used
     WHEN the app is reloaded
-    THEN the Todoist data, displayed task, activity, selected context, and both access tokens are restored from localStorage
+    THEN the Todoist data, activity, selected context, and both access tokens are restored from localStorage
+    AND the displayed task is re-derived as the first-due task of the restored data (of the selected context when one is selected)
     AND transient state (previous task, error, toasts, hash) starts fresh.
-    TODO (e2e): add a spec for state restoration on reload.
 
   Scenario: App loads with a persisted token
     # e2e: live.todoist.spec.ts › "renders real data from api.todoist.com"
@@ -407,13 +409,13 @@ Feature: State Persistence
     WHEN the app is loaded
     THEN the app is authenticated and renders data from api.todoist.com without showing the landing page or an error.
 
-  Scenario: A summoned task persists across reloads
+  Scenario: A summoned task is cleared on a reload
+    # e2e: state-persistence.spec.ts › "a persisted summoned task is cleared on reload, taking the normal load path"
     GIVEN a task was summoned and the app is reloaded
     WHEN the app initializes
-    THEN the persisted summoned task is displayed again
-    AND the initial data refresh is skipped.
-    TODO: the original spec expected app load to RESET the summoned task and selected context; the app actually persists them. Decide the desired behavior.
-    TODO (e2e): add a spec for the summoned-task load-skip.
+    THEN the persisted summoned task is cleared and the normal load path runs
+    AND the initial data refresh happens
+    AND the displayed task is re-derived as the first-due task of the refreshed data (or the NoTasks state when nothing is due).
 
 Feature: Keyboard Shortcuts
 

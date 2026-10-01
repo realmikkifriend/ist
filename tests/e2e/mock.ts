@@ -29,10 +29,11 @@ function rawFixture(name: "projects" | "user"): unknown {
  * @param {ReturnType<typeof makeScenario>} scenario - The data to serve.
  * @returns {Promise<object>} A handle: `setTasks(tasks)` replaces the served
  *   open tasks (the next refresh serves them), `updates()` returns the recorded
- *   task-update (defer) calls, `closes()` the recorded closed task ids, and
- *   `syncs()` the recorded `POST /sync` request bodies. `project_reorder`
- *   sync commands are persisted, so later projects fetches serve the new
- *   `child_order` values.
+ *   task-update (defer) calls, `closes()` the recorded closed task ids,
+ *   `syncs()` the recorded `POST /sync` request bodies, and `taskFetches()`
+ *   the number of `GET /tasks` fetches served. `project_reorder` sync commands
+ *   are persisted, so later projects fetches serve the new `child_order`
+ *   values.
  */
 export async function mockTodoistApi(
     page: Page,
@@ -42,11 +43,13 @@ export async function mockTodoistApi(
     updates: () => Array<{ id: string; body: Record<string, unknown> }>;
     closes: () => string[];
     syncs: () => Record<string, unknown>[];
+    taskFetches: () => number;
 }> {
     const byId = new Map<string, Record<string, unknown>>(
         scenario.tasks.map((task) => [String(task.id), task]),
     );
     const closedIds = new Set<string>();
+    let taskFetchCount = 0;
     const recordedUpdates: Array<{ id: string; body: Record<string, unknown> }> = [];
     const recordedCloses: string[] = [];
     const recordedSyncs: Record<string, unknown>[] = [];
@@ -73,6 +76,7 @@ export async function mockTodoistApi(
         }
 
         if (request.method() === "GET" && path === "tasks") {
+            taskFetchCount += 1;
             const results = [...byId.values()].filter((task) => !closedIds.has(String(task.id)));
             await ok({ results, next_cursor: null });
             return;
@@ -147,5 +151,6 @@ export async function mockTodoistApi(
         updates: (): Array<{ id: string; body: Record<string, unknown> }> => recordedUpdates,
         closes: (): string[] => recordedCloses,
         syncs: (): Record<string, unknown>[] => recordedSyncs,
+        taskFetches: (): number => taskFetchCount,
     };
 }
