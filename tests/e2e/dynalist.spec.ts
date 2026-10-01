@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { loadApp, loadDynalist } from "./helpers";
+import { loadApp, loadDynalist, makeComment } from "./helpers";
 import {
     makeChecklistDynalistDocument,
     makeDynalistDocument,
@@ -89,22 +89,11 @@ test.describe("dynalist", () => {
     });
 
     test("the z key cycles focus across the comment focus targets", async ({ page }) => {
-        const comment = (id: string, content: string): Record<string, unknown> => ({
-            id,
-            item_id: "task-alpha",
-            content,
-            posted_at: new Date().toISOString(),
-            file_attachment: null,
-            posted_uid: "17324928",
-            uids_to_notify: null,
-            reactions: null,
-            is_deleted: false,
-        });
         const scenario = makeScenario({
             comments: {
                 "task-alpha": [
-                    comment("comment-one", "First plain comment"),
-                    comment("comment-two", "Second plain comment"),
+                    makeComment("comment-one", "task-alpha", "First plain comment"),
+                    makeComment("comment-two", "task-alpha", "Second plain comment"),
                 ],
             },
         });

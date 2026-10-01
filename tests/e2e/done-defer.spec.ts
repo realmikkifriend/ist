@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 import { DateTime } from "luxon";
 import { failTodoistRoutes } from "./mock-failures";
-import { dueEarlierToday, loadApp } from "./helpers";
+import { clickDoneButton, dueEarlierToday, loadApp } from "./helpers";
 import { dueObject, makeTask } from "./mock-data";
 import { makeScenario } from "./scenarios";
 
@@ -9,16 +9,16 @@ const pad = (value: number): string => String(value).padStart(2, "0");
 
 test.describe("done & defer", () => {
     test("done and defer advance to the next due task", async ({ page }) => {
-        await loadApp(page, makeScenario());
+        const handle = await loadApp(page, makeScenario());
         await expect(page.getByRole("heading", { name: "Alpha due task" })).toBeVisible();
 
         // Let the display debounce expire so the task change is not suppressed.
         await page.waitForTimeout(2300);
 
-        // Reveal the keyboard shortcut labels so the action buttons are identified by them.
-        await page.evaluate(() => document.body.classList.add("show-kbd"));
-        await page.getByRole("button", { name: "CTRL+Enter" }).click();
+        // The Ctrl+Enter keyboard shortcut marks the displayed task done.
+        await page.keyboard.press("Control+Enter");
         await expect(page.getByRole("button", { name: "Task marked done." })).toBeVisible();
+        expect(handle.closes()).toContain("task-alpha");
         await expect(page.getByRole("heading", { name: "Beta due task" })).toBeVisible();
 
         await page.waitForTimeout(2300);
@@ -63,8 +63,7 @@ test.describe("done & defer", () => {
         await expect(page.getByRole("heading", { name: "Recurring task" })).toBeVisible();
         await page.waitForTimeout(2300); // let the display debounce expire
 
-        await page.evaluate(() => document.body.classList.add("show-kbd"));
-        await page.getByRole("button", { name: "CTRL+Enter" }).click();
+        await clickDoneButton(page);
         await expect(page.getByRole("button", { name: "Task marked done." })).toBeVisible();
         await expect(page.getByRole("heading", { name: "Recurring next task" })).toBeVisible();
 
@@ -87,22 +86,9 @@ test.describe("done & defer", () => {
         await failTodoistRoutes(page, { done: ["task-alpha"] });
         await expect(page.getByRole("heading", { name: "Alpha due task" })).toBeVisible();
 
-        await page.evaluate(() => document.body.classList.add("show-kbd"));
-        await page.getByRole("button", { name: "CTRL+Enter" }).click();
+        await clickDoneButton(page);
 
         await expect(page.getByRole("button", { name: "Failed to mark task done." })).toBeVisible();
         await expect(page.getByRole("heading", { name: "Alpha due task" })).toBeVisible();
-    });
-
-    test("the keyboard shortcut marks the displayed task done", async ({ page }) => {
-        const handle = await loadApp(page, makeScenario());
-        await expect(page.getByRole("heading", { name: "Alpha due task" })).toBeVisible();
-        // Let the display debounce expire so the task change is not suppressed.
-        await page.waitForTimeout(2300);
-
-        await page.keyboard.press("Control+Enter");
-        await expect(page.getByRole("button", { name: "Task marked done." })).toBeVisible();
-        expect(handle.closes()).toContain("task-alpha");
-        await expect(page.getByRole("heading", { name: "Beta due task" })).toBeVisible();
     });
 });

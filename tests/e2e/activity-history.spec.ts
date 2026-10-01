@@ -1,6 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 import { makeActivityEvent } from "./mock-activity";
-import { loadApp, openSidebar } from "./helpers";
+import { clickDoneButton, loadApp, openSidebar } from "./helpers";
 import { makeScenario } from "./scenarios";
 
 // The non-wrapping "N / M tasks done" label sitting next to the daily-goal pill.
@@ -26,31 +26,17 @@ test.describe("activity & history", () => {
         await expect(page.locator("span.text-lime-500")).toContainText("8");
     });
 
-    test("marking a task done adds a temporary activity entry", async ({ page }) => {
+    test("a temporary activity entry is added on done and survives a reload", async ({ page }) => {
         await loadApp(page, makeScenario());
         await expect(page.getByRole("heading", { name: "Alpha due task" })).toBeVisible();
         // Let the initial debounce expire so the reload below is the post-done one.
         await page.waitForTimeout(2300);
 
-        await page.evaluate(() => document.body.classList.add("show-kbd"));
-        await page.getByRole("button", { name: "CTRL+Enter" }).click();
+        await clickDoneButton(page);
         await expect(page.getByRole("button", { name: "Task marked done." })).toBeVisible();
 
         await openSidebar(page);
         // The temporary entry is picked up on the next (debounced) activity reload.
-        await expect(pillCount(page)).toContainText("1 / 7 tasks done");
-    });
-
-    test("reloading the daily goal keeps a just-completed task", async ({ page }) => {
-        await loadApp(page, makeScenario());
-        await expect(page.getByRole("heading", { name: "Alpha due task" })).toBeVisible();
-        await page.waitForTimeout(2300);
-
-        await page.evaluate(() => document.body.classList.add("show-kbd"));
-        await page.getByRole("button", { name: "CTRL+Enter" }).click();
-        await expect(page.getByRole("button", { name: "Task marked done." })).toBeVisible();
-
-        await openSidebar(page);
         await expect(pillCount(page)).toContainText("1 / 7 tasks done");
 
         // Clicking the pill reloads activity; the (still unconfirmed) temporary

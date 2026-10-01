@@ -95,16 +95,17 @@ export async function openAgenda(page: Page, hash: string): Promise<void> {
 }
 
 /**
- * Builds a Todoist comment carrying a Dynalist document URL on task-alpha
- * (the default scenario's first due task).
- * @param {string} url - The `https://dynalist.io/d/...` URL to embed.
+ * Builds a raw Todoist comment (wire format) for the given task.
+ * @param {string} id - A unique comment id (the mock serves it by task).
+ * @param {string} itemId - The task the comment belongs to.
+ * @param {string} content - The comment body text.
  * @returns {Record<string, unknown>} The raw comment.
  */
-export function dynalistComment(url: string): Record<string, unknown> {
+export function makeComment(id: string, itemId: string, content: string): Record<string, unknown> {
     return {
-        id: "comment-dynalist",
-        item_id: "task-alpha",
-        content: url,
+        id,
+        item_id: itemId,
+        content,
         posted_at: new Date().toISOString(),
         file_attachment: null,
         posted_uid: "17324928",
@@ -112,6 +113,37 @@ export function dynalistComment(url: string): Record<string, unknown> {
         reactions: null,
         is_deleted: false,
     };
+}
+
+/**
+ * Builds a Todoist comment carrying a Dynalist document URL on task-alpha
+ * (the default scenario's first due task).
+ * @param {string} url - The `https://dynalist.io/d/...` URL to embed.
+ * @returns {Record<string, unknown>} The raw comment.
+ */
+export function dynalistComment(url: string): Record<string, unknown> {
+    return makeComment("comment-dynalist", "task-alpha", url);
+}
+
+/**
+ * Reveals the keyboard-shortcut kbd labels on the action buttons (they are
+ * display:none otherwise, and also out of accessible names).
+ * @param {Page} page - The browser page.
+ * @returns {Promise<void>} Resolves once the labels are revealed.
+ */
+export async function showKbd(page: Page): Promise<void> {
+    await page.evaluate(() => document.body.classList.add("show-kbd"));
+}
+
+/**
+ * Clicks the displayed task's done button, identified by its kbd label
+ * (reveals the kbd labels first).
+ * @param {Page} page - The browser page.
+ * @returns {Promise<void>} Resolves once the done button has been clicked.
+ */
+export async function clickDoneButton(page: Page): Promise<void> {
+    await showKbd(page);
+    await page.getByRole("button", { name: "CTRL+Enter" }).click();
 }
 
 /**

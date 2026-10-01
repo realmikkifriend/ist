@@ -1,6 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 import { DateTime } from "luxon";
-import { loadApp } from "./helpers";
+import { loadApp, showKbd } from "./helpers";
 import { dueObject, makeOverdueTask, makeProject, makeTask } from "./mock-data";
 import { makeScenario } from "./scenarios";
 
@@ -64,7 +64,7 @@ test.describe("task display & ordering", () => {
         await loadApp(page, scenario);
         await expect(page.getByRole("heading", { name: "No context task" })).toBeVisible();
         await page.waitForTimeout(2300); // let the display debounce expire
-        await page.evaluate(() => document.body.classList.add("show-kbd"));
+        await showKbd(page);
         await advanceTo(page, "Priority four task");
         await advanceTo(page, "Priority one task");
         await advanceTo(page, "Due earlier task");
@@ -110,6 +110,8 @@ test.describe("task display & ordering", () => {
     });
 
     test("shows NoTasks when nothing is due", async ({ page }) => {
+        // Tasks exist but none are due (this is also what the zero-task
+        // account renders: the same NoTasks view with nothing due).
         const scenario = makeScenario({
             tasks: [
                 makeTask("task-future", "Future task", {
@@ -121,13 +123,8 @@ test.describe("task display & ordering", () => {
         await loadApp(page, scenario);
 
         await expect(page.getByText("No due tasks...")).toBeVisible();
-    });
-
-    test("shows NoTasks when the account has zero tasks", async ({ page }) => {
-        await loadApp(page, makeScenario({ tasks: [] }));
-        await expect(page.getByText("No due tasks...")).toBeVisible();
         await expect(page.getByRole("button", { name: /Today/ })).toBeVisible();
-        // The empty task list is truthy, so AppView never reaches the
+        // The task list is truthy, so AppView never reaches the
         // "No tasks, try adding some" placeholder.
         await expect(page.getByText("No tasks, try adding some")).toHaveCount(0);
     });

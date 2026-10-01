@@ -20,15 +20,13 @@ function dayButtonIndex(target: DateTime): number {
 }
 
 test.describe("defer modal", () => {
-    test("tasks with a due time start on the time tab; arrow keys switch tabs", async ({
-        page,
-    }) => {
+    test("timed tasks start on the time tab; number keys and arrow keys work", async ({ page }) => {
         // The due string defines a time (the app derives the all-day flag from
         // the string, not the date), so the time tab is active initially.
         const task = makeTask("timed-task", "Timed defer task", {
             due: { ...dueObject(dueEarlierToday().toJSDate()), string: "at 9:30am" },
         });
-        await loadApp(page, makeScenario({ tasks: [task] }));
+        const handle = await loadApp(page, makeScenario({ tasks: [task] }));
         await expect(page.getByRole("heading", { name: "Timed defer task" })).toBeVisible();
 
         // Reveal the keyboard shortcut labels so the tabs are identified by them.
@@ -47,9 +45,18 @@ test.describe("defer modal", () => {
         await page.keyboard.press("ArrowRight");
         await expect(calendarTab).toHaveClass(/tab-active/);
         await expect(page.locator("#defer_modal .grid-cols-7")).toBeVisible();
-
         await page.keyboard.press("ArrowLeft");
         await expect(timeTab).toHaveClass(/tab-active/);
+
+        // Number key 1 picks the first quick option ("tomorrow", due time kept).
+        await page.keyboard.press("1");
+        await expect(
+            page.getByRole("button", { name: "Task deferred successfully." }),
+        ).toBeVisible();
+        const target = DateTime.now().plus({ days: 1 });
+        const updates = handle.updates().filter((entry) => entry.id === "timed-task");
+        expect(updates.length).toBe(1);
+        expect(updates[0].body.due_datetime).toBe(`${target.toISODate()}T09:30:00`);
     });
 
     test("all-day tasks start on the calendar tab", async ({ page }) => {
@@ -91,28 +98,6 @@ test.describe("defer modal", () => {
         expect(updates.length).toBe(1);
         expect(updates[0].body.due_datetime).toBe(`${target.toISODate()}T09:30:00`);
         expect(updates[0].body.due_string).toBe(dueString);
-    });
-
-    test("time tab quick options are picked with number keys", async ({ page }) => {
-        // The due string defines a time, so the first quick option (number key
-        // 1) is "tomorrow 9:30 AM", keeping the due time.
-        const task = makeTask("keyed-defer", "Keyed defer task", {
-            due: { ...dueObject(dueEarlierToday().toJSDate()), string: "at 9:30am" },
-        });
-        const handle = await loadApp(page, makeScenario({ tasks: [task] }));
-        await expect(page.getByRole("heading", { name: "Keyed defer task" })).toBeVisible();
-
-        await page.keyboard.press("d");
-        await expect(page.locator("#defer_modal")).toBeVisible();
-        await page.keyboard.press("1");
-
-        await expect(
-            page.getByRole("button", { name: "Task deferred successfully." }),
-        ).toBeVisible();
-        const target = DateTime.now().plus({ days: 1 });
-        const updates = handle.updates().filter((entry) => entry.id === "keyed-defer");
-        expect(updates.length).toBe(1);
-        expect(updates[0].body.due_datetime).toBe(`${target.toISODate()}T09:30:00`);
     });
 
     test("calendar tab: deferring an all-day task to a specific date defers without a time", async ({

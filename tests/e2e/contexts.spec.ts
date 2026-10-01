@@ -1,20 +1,34 @@
 import { expect, test } from "@playwright/test";
-import { loadApp, openSidebar, readSelectedContext, selectContext } from "./helpers";
+import {
+    clickDoneButton,
+    loadApp,
+    openSidebar,
+    readSelectedContext,
+    selectContext,
+} from "./helpers";
 import { dueObject, E2E_CONTEXTS, makeProject, makeTask } from "./mock-data";
 import { makeMultiContextScenario, makeScenario } from "./scenarios";
 
 const MINUTE = 60 * 1000;
 
 test.describe("contexts", () => {
-    test("context filter turns on and off", async ({ page }) => {
+    test("context filter turns on and off (re-click or x key)", async ({ page }) => {
         await loadApp(page, makeScenario());
         await expect(page.getByRole("heading", { name: "Alpha due task" })).toBeVisible();
 
         await selectContext(page, /Home/);
         await expect(page.getByRole("heading", { name: "Gamma due task" })).toBeVisible();
 
+        // Deselecting by re-clicking the selected context surfaces the
+        // new-first-due-task toast; confirm it.
         await selectContext(page, /Home/);
-        // Deselecting the context surfaces the new-first-due-task toast; confirm it.
+        await page.getByRole("button", { name: /New first-due task/ }).click();
+        await expect(page.getByRole("heading", { name: "Alpha due task" })).toBeVisible();
+
+        // The x key clears the selection the same way.
+        await selectContext(page, /Home/);
+        await expect(page.getByRole("heading", { name: "Gamma due task" })).toBeVisible();
+        await page.keyboard.press("x");
         await page.getByRole("button", { name: /New first-due task/ }).click();
         await expect(page.getByRole("heading", { name: "Alpha due task" })).toBeVisible();
     });
@@ -32,8 +46,7 @@ test.describe("contexts", () => {
         // Marking the context's last due task done closes it, refreshes, and
         // re-evaluates: the re-evaluation finds no due tasks left in the
         // selected context and auto-clears the selection.
-        await page.evaluate(() => document.body.classList.add("show-kbd"));
-        await page.getByRole("button", { name: "CTRL+Enter" }).click();
+        await clickDoneButton(page);
         await expect(page.getByRole("button", { name: "Task marked done." })).toBeVisible();
         expect(handle.closes()).toContain("task-reading");
 
@@ -142,16 +155,5 @@ test.describe("contexts", () => {
         await expect(toggle).toBeChecked();
         await page.keyboard.press("Escape");
         await expect(toggle).not.toBeChecked();
-    });
-
-    test("the x key clears the selected context", async ({ page }) => {
-        await loadApp(page, makeScenario());
-        await selectContext(page, /Home/);
-        await expect(page.getByRole("heading", { name: "Gamma due task" })).toBeVisible();
-
-        await page.keyboard.press("x");
-        // Deselecting the context surfaces the new-first-due-task toast; confirm it.
-        await page.getByRole("button", { name: /New first-due task/ }).click();
-        await expect(page.getByRole("heading", { name: "Alpha due task" })).toBeVisible();
     });
 });

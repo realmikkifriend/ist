@@ -64,7 +64,7 @@ Feature: Task Display
     THEN the NoTasks component is displayed with Today and Tomorrow agenda buttons.
 
   Scenario: Display "no tasks" state when the account has no tasks at all
-    # e2e: task-display.spec.ts › "shows NoTasks when the account has zero tasks"
+    # e2e: task-display.spec.ts › "shows NoTasks when nothing is due" (also covers the zero-task account: same NoTasks view)
     GIVEN the account has zero tasks
     WHEN the app loads
     THEN the NoTasks component is displayed with Today and Tomorrow agenda buttons
@@ -100,7 +100,7 @@ Feature: Task Display
     THEN the currently displayed task is kept unchanged.
 
   Scenario: The first-due task changes while the user is on another task
-    # e2e: task-refresh.spec.ts › "shows a new-first-due-task toast when the first due task changes"
+    # e2e: task-refresh.spec.ts › "keeps the displayed task while the 2 s display debounce is active" (ends with the toast click)
     GIVEN a task is displayed
     AND it was not summoned from the agenda
     AND the agenda is not open
@@ -146,14 +146,13 @@ Feature: Contexts
     AND the sidebar closes with c or Escape (opening the agenda with a closes it too).
 
   Scenario: Filter displayed tasks by selected context
-    # e2e: contexts.spec.ts › "context filter turns on and off"
+    # e2e: contexts.spec.ts › "context filter turns on and off (re-click or x key)"
     GIVEN there are tasks due in multiple contexts
     WHEN the user selects a context in the sidebar
     THEN the first due task of that context is displayed.
 
   Scenario: The user can clear the selected context
-    # e2e: contexts.spec.ts › "context filter turns on and off"
-    # e2e: contexts.spec.ts › "the x key clears the selected context"
+    # e2e: contexts.spec.ts › "context filter turns on and off (re-click or x key)"
     GIVEN a context has been selected
     WHEN the user de-selects the context (clicking the selected context, or pressing x)
     THEN the selection is cleared
@@ -194,8 +193,7 @@ Feature: Done / Defer
   So that the app can move on to what is next.
 
   Scenario: Display next due task after completing or deferring
-    # e2e: done-defer.spec.ts › "done and defer advance to the next due task"
-    # e2e: done-defer.spec.ts › "the keyboard shortcut marks the displayed task done"
+    # e2e: done-defer.spec.ts › "done and defer advance to the next due task" (done via the Ctrl+Enter shortcut)
     GIVEN a task is displayed
     WHEN the task is marked done (CTRL+Enter keyboard shortcut or button) or deferred (d key or button)
     THEN the task is removed from the local list
@@ -203,9 +201,8 @@ Feature: Done / Defer
     AND the next due task is displayed.
 
   Scenario: The defer modal offers time and calendar picking
-    # e2e: defer-modal.spec.ts › "tasks with a due time start on the time tab; arrow keys switch tabs"
+    # e2e: defer-modal.spec.ts › "timed tasks start on the time tab; number keys and arrow keys work"
     # e2e: defer-modal.spec.ts › "all-day tasks start on the calendar tab"
-    # e2e: defer-modal.spec.ts › "time tab quick options are picked with number keys"
     GIVEN the user opens the defer modal (d)
     WHEN the modal is displayed
     THEN it shows Time and Calendar tabs (switchable with the arrow keys), with the Time tab active initially for timed tasks
@@ -373,14 +370,14 @@ Feature: Activity & History
     AND completions are segmented by context color, with an overflow segment when the goal is exceeded.
 
   Scenario: Clicking the daily goal pill reloads today's activity
-    # e2e: activity-history.spec.ts › "reloading the daily goal keeps a just-completed task"
+    # e2e: activity-history.spec.ts › "a temporary activity entry is added on done and survives a reload"
     GIVEN the app is loaded and signed in
     WHEN the user clicks the daily goal pill
     THEN today's activity is reloaded from the API
     AND temporary entries are reconciled: a confirmed log replaces its temporary twin, and an unconfirmed temporary entry is kept (not lost).
 
   Scenario: Completing a task updates today's activity immediately
-    # e2e: activity-history.spec.ts › "marking a task done adds a temporary activity entry"
+    # e2e: activity-history.spec.ts › "a temporary activity entry is added on done and survives a reload"
     GIVEN the user marks a task done
     WHEN the completion succeeds
     THEN a temporary activity entry for that task is added to today's activity.

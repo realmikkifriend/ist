@@ -38,21 +38,6 @@ test.describe("task refresh & display update", () => {
         await expect(page.getByRole("heading", { name: "Beta due task" })).toBeVisible();
     });
 
-    test("shows a new-first-due-task toast when the first due task changes", async ({ page }) => {
-        const handle = await loadApp(page, makeScenario({ tasks: [alphaTask] }));
-        await expect(page.getByRole("heading", { name: "Alpha due task" })).toBeVisible();
-        await page.waitForTimeout(2300); // let the display debounce expire
-
-        handle.setTasks([betaTask]);
-        await page.keyboard.press("r");
-
-        const toast = page.getByRole("button", { name: "New first-due task! Click to update..." });
-        await expect(toast).toBeVisible();
-        await expect(page.getByRole("heading", { name: "Beta due task" })).toBeHidden();
-        await toast.click();
-        await expect(page.getByRole("heading", { name: "Beta due task" })).toBeVisible();
-    });
-
     test("keeps the displayed task and shows an error toast when a refresh fails", async ({
         page,
     }) => {
