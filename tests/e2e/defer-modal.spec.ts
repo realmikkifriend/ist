@@ -1,0 +1,136 @@
+import { expect, test } from "@playwright/test";
+import { DateTime } from "luxon";
+import { loadApp } from "./helpers";
+import { dueObject, makeTask } from "./mock-data";
+import { makeScenario } from "./scenarios";
+
+/**
+ * Builds a due date earlier today (never yesterday, so it is due but not
+ * overdue, which leaves it untouched by the overdue auto-defer).
+ * @returns {DateTime} A local moment a little before now, clamped to today.
+ */
+function dueEarlierToday(): DateTime {
+    const now = DateTime.now();
+    const minutesNow = now.hour * 60 + now.minute;
+    const minutesAgo = Math.max(0, Math.min(minutesNow - 30, minutesNow - 1));
+    return now.set({
+        hour: Math.floor(minutesAgo / 60),
+        minute: minutesAgo % 60,
+        second: 0,
+        millisecond: 0,
+    });
+}
+
+/**
+ * Returns the index of the given local date's day button in the defer modal's
+ * calendar grid (buttons cover the displayed month, then the next month's
+ * trailing days; the month's leading days are rendered without buttons).
+ * @param {DateTime} target - The local date whose day button to locate.
+ * @returns {number} Zero-based button index within the day grid.
+ */
+function dayButtonIndex(target: DateTime): number {
+    const now = DateTime.now();
+    return target.hasSame(now, "month")
+        ? target.day - 1
+        : now.startOf("month").daysInMonth + target.day - 1;
+}
+
+test.describe("defer modal", () => {
+    test("tasks with a due time start on the time tab; arrow keys switch tabs", async ({
+        page,
+    }) => {
+        // The due string defines a time (the app derives the all-day flag from
+        // the string, not the date), so the time tab is active initially.
+        const task = makeTask("timed-task", "Timed defer task", {
+            due: { ...dueObject(dueEarlierToday().toJSDate()), string: "at 9:30am" },
+        });
+        await loadApp(page, makeScenario({ tasks: [task] }));
+        await expect(page.getByRole("heading", { name: "Timed defer task" })).toBeVisible();
+
+        // Reveal the keyboard shortcut labels so the tabs are identified by them.
+        await page.evaluate(() => document.body.classList.add("show-kbd"));
+        await page.keyboard.press("d");
+        await expect(page.locator("#defer_modal")).toBeVisible();
+
+        const timeTab = page.getByRole("tab", { name: "←" });
+        const calendarTab = page.getByRole("tab", { name: "→" });
+        await expect(timeTab).toHaveClass(/tab-active/);
+        // The time tab offers quick options, with "tomorrow" keeping the due time.
+        await expect(
+            page.locator("#defer_modal").getByRole("button", { name: /tomorrow 9:30 AM/ }),
+        ).toBeVisible();
+
+        await page.keyboard.press("ArrowRight");
+        await expect(calendarTab).toHaveClass(/tab-active/);
+        await expect(page.locator("#defer_modal .grid-cols-7")).toBeVisible();
+
+        await page.keyboard.press("ArrowLeft");
+        await expect(timeTab).toHaveClass(/tab-active/);
+    });
+
+    test("all-day tasks start on the calendar tab", async ({ page }) => {
+        // An all-day due (date only, no time in the due string) starts on the
+        // calendar tab.
+        const task = makeTask("all-day-task", "All day task", {
+            due: dueObject(new Date(), true),
+        });
+        await loadApp(page, makeScenario({ tasks: [task] }));
+        await expect(page.getByRole("heading", { name: "All day task" })).toBeVisible();
+
+        await page.evaluate(() => document.body.classList.add("show-kbd"));
+        await page.keyboard.press("d");
+        await expect(page.locator("#defer_modal")).toBeVisible();
+        await expect(page.getByRole("tab", { name: "→" })).toHaveClass(/tab-active/);
+        await expect(page.locator("#defer_modal .grid-cols-7")).toBeVisible();
+    });
+
+    test("calendar tab: deferring to a specific date keeps the time of day", async ({ page }) => {
+        const dueString = "at 9:30am";
+        const task = makeTask("preserve-time-task", "Preserve time task", {
+            due: { ...dueObject(dueEarlierToday().toJSDate()), string: dueString },
+        });
+        const handle = await loadApp(page, makeScenario({ tasks: [task] }));
+        await expect(page.getByRole("heading", { name: "Preserve time task" })).toBeVisible();
+
+        await page.keyboard.press("d");
+        await expect(page.locator("#defer_modal")).toBeVisible();
+        await page.keyboard.press("ArrowRight");
+
+        const target = DateTime.now().plus({ days: 3 });
+        await page.locator("#defer_modal .grid-cols-7 button").nth(dayButtonIndex(target)).click();
+
+        await expect(
+            page.getByRole("button", { name: "Task deferred successfully." }),
+        ).toBeVisible();
+        // The defer keeps the time extracted from the due string on the picked date.
+        const updates = handle.updates().filter((entry) => entry.id === "preserve-time-task");
+        expect(updates.length).toBe(1);
+        expect(updates[0].body.due_datetime).toBe(`${target.toISODate()}T09:30:00`);
+        expect(updates[0].body.due_string).toBe(dueString);
+    });
+
+    test("calendar tab: deferring an all-day task to a specific date defers without a time", async ({
+        page,
+    }) => {
+        const task = makeTask("all-day-defer", "All day defer task", {
+            due: dueObject(new Date(), true),
+        });
+        const handle = await loadApp(page, makeScenario({ tasks: [task] }));
+        await expect(page.getByRole("heading", { name: "All day defer task" })).toBeVisible();
+
+        await page.keyboard.press("d");
+        await expect(page.locator("#defer_modal")).toBeVisible();
+
+        const target = DateTime.now().plus({ days: 3 });
+        await page.locator("#defer_modal .grid-cols-7 button").nth(dayButtonIndex(target)).click();
+
+        await expect(
+            page.getByRole("button", { name: "Task deferred successfully." }),
+        ).toBeVisible();
+        // No time of day is defined, so the defer is an all-day date.
+        const updates = handle.updates().filter((entry) => entry.id === "all-day-defer");
+        expect(updates.length).toBe(1);
+        expect(updates[0].body.due_date).toBe(target.toISODate());
+        expect(updates[0].body.due_datetime).toBeUndefined();
+    });
+});

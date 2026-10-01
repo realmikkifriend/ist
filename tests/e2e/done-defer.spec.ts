@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { DateTime } from "luxon";
+import { failTodoistRoutes } from "./mock-failures";
 import { loadApp } from "./helpers";
 import { dueObject, makeTask } from "./mock-data";
 import { makeScenario } from "./scenarios";
@@ -87,5 +88,32 @@ test.describe("done & defer", () => {
             expect(last.body.due_datetime).toBe(`${today}T${pad(due.hour)}:${pad(due.minute)}:00`);
         }
         expect(handle.closes()).toContain("recurring-task");
+    });
+
+    test("marking done fails: error toast, displayed task unchanged", async ({ page }) => {
+        await loadApp(page, makeScenario());
+        await failTodoistRoutes(page, { done: ["task-alpha"] });
+        await expect(page.getByRole("heading", { name: "Alpha due task" })).toBeVisible();
+
+        await page.evaluate(() => document.body.classList.add("show-kbd"));
+        await page.getByRole("button", { name: "CTRL+Enter" }).click();
+
+        await expect(page.getByRole("button", { name: "Failed to mark task done." })).toBeVisible();
+        await expect(page.getByRole("heading", { name: "Alpha due task" })).toBeVisible();
+    });
+
+    test("deferring fails: error toast, displayed task unchanged", async ({ page }) => {
+        await loadApp(page, makeScenario());
+        await failTodoistRoutes(page, { defer: ["task-alpha"] });
+        await expect(page.getByRole("heading", { name: "Alpha due task" })).toBeVisible();
+
+        await page.keyboard.press("d");
+        await page
+            .locator("#defer_modal")
+            .getByRole("button", { name: /tomorrow/ })
+            .click();
+
+        await expect(page.getByRole("button", { name: "Failed to defer task." })).toBeVisible();
+        await expect(page.getByRole("heading", { name: "Alpha due task" })).toBeVisible();
     });
 });

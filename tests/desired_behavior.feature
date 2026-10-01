@@ -195,16 +195,19 @@ Feature: Done / Defer
     AND the next due task is displayed.
 
   Scenario: The defer modal offers time and calendar picking
+    # e2e: defer-modal.spec.ts › "tasks with a due time start on the time tab; arrow keys switch tabs"
+    # e2e: defer-modal.spec.ts › "all-day tasks start on the calendar tab"
     GIVEN the user opens the defer modal (d)
     WHEN the modal is displayed
     THEN it shows Time and Calendar tabs (switchable with the arrow keys), with the Time tab active initially for timed tasks
     AND the Time tab offers quick options such as "tomorrow".
 
   Scenario: Deferring a timed or recurring task keeps its time-of-day
+    # e2e: defer-modal.spec.ts › "calendar tab: deferring to a specific date keeps the time of day"
+    # e2e: defer-modal.spec.ts › "calendar tab: deferring an all-day task to a specific date defers without a time"
     GIVEN the displayed task has a due string that defines a time
     WHEN the user defers it to a specific date
     THEN the new due datetime keeps the original time-of-day.
-    TODO (e2e): add a spec for time preservation on date-based defer.
 
   Scenario: Completing a recurring task re-defers it first
     # e2e: done-defer.spec.ts › "marking a recurring task done re-defers it to today and closes it"
@@ -216,11 +219,12 @@ Feature: Done / Defer
     TODO: after an overdue auto-defer rewrites the local due string to a date ("yyyy-MM-dd"), the re-defer has no time to keep and lands on midnight, silently losing the recurring time.
 
   Scenario: Done or defer fails
+    # e2e: done-defer.spec.ts › "marking done fails: error toast, displayed task unchanged"
+    # e2e: done-defer.spec.ts › "deferring fails: error toast, displayed task unchanged"
     GIVEN the displayed task is done or deferred
     WHEN the corresponding Todoist API call fails
     THEN an error toast is shown ("Failed to mark task done." / "Failed to defer task.")
     AND the displayed task is unchanged.
-    TODO (e2e): add a spec for API failure on done/defer.
 
   Scenario: The displayed task was summoned from the agenda
     GIVEN a task was summoned while an agenda hash was open
@@ -260,11 +264,11 @@ Feature: Agenda
     AND tasks with a time are grouped in an hour grid (7:00 to 21:00 at minimum).
 
   Scenario: Schedule a task from the agenda
+    # e2e: agenda.spec.ts › "scheduling from the agenda defers the task to the picked time"
     GIVEN the agenda view is open
     WHEN the user clicks the schedule control of a task
     THEN a schedule modal opens for a specific date and time
     AND confirming defers the task and shows "Task scheduled successfully."
-    TODO (e2e): add a spec for scheduling from the agenda.
 
   Scenario: The displayed task is highlighted in the agenda
     GIVEN a task is currently displayed
