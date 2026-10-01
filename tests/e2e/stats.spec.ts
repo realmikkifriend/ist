@@ -45,6 +45,16 @@ test.describe("stats", () => {
         await expect(page.locator("#stats")).toBeVisible();
     });
 
+    test("the s key toggles the stats view", async ({ page }) => {
+        await loadApp(page, makeStatsScenario());
+        await page.keyboard.press("s");
+        await expect(page).toHaveURL(/#stats$/);
+        await expect(page.locator("#stats")).toBeVisible();
+        await page.keyboard.press("s");
+        await expect(page.locator("#stats")).toBeHidden();
+        await expect(page.getByRole("heading", { name: "Alpha due task" })).toBeVisible();
+    });
+
     test("the stats view appears on a page load with the #stats hash", async ({ page }) => {
         await loadApp(page, makeStatsScenario());
         await page.goto("/#stats");

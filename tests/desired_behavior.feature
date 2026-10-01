@@ -401,6 +401,16 @@ Feature: Stats
     AND the stats view is displayed in place of the task display
     AND the sidebar drawer button is hidden while the stats view is open.
 
+  Scenario: The s key toggles the stats view
+    # e2e: stats.spec.ts › "the s key toggles the stats view"
+    GIVEN the app is loaded and signed in
+    WHEN the user presses s
+    THEN the URL hash becomes #stats
+    AND the stats view is displayed in place of the task display
+    WHEN the user presses s again
+    THEN the stats view is closed
+    AND the task view is displayed.
+
   Scenario: The stats view appears on a page load with a #stats hash
     # e2e: stats.spec.ts › "the stats view appears on a page load with the #stats hash"
     GIVEN the app is loaded with the #stats URL hash

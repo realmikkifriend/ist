@@ -70,6 +70,17 @@
                 modifier: "shift",
             },
             {
+                key: "s",
+                callback: () => {
+                    window.location.hash = $hashStore === "#stats" ? "" : "#stats";
+                    // Close the sidebar through its own Escape trigger.
+                    window.dispatchEvent(
+                        new KeyboardEvent("keydown", { key: "Escape", bubbles: true }),
+                    );
+                },
+                modifier: false,
+            },
+            {
                 key: "r",
                 callback: () => {
                     void handleRefresh();

@@ -112,6 +112,7 @@
             type="button"
         >
             <Icon class="h-6 w-7" src={ChartBarSquare} />
+            <kbd>s</kbd>
         </button>
         <button
             class="drawer-button relative -top-px bg-transparent hover:border-transparent hover:bg-transparent"
