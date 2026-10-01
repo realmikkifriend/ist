@@ -37,7 +37,10 @@
     };
 
     /**
-     * Reloads activity stats, resetting any temporary entries.
+     * Reloads activity stats. Temporary entries are not stripped up front: the
+     * refetch reconciles them via mergeActivity (a confirmed log replaces its
+     * temporary twin, and unconfirmed temporaries are kept), so a just-completed
+     * task is not lost before its log lands server-side.
      */
     const reloadActivity = () => {
         if (isLoading) {
@@ -46,7 +49,6 @@
         if (debounceTimeoutId) {
             clearTimeout(debounceTimeoutId);
         }
-        $taskActivity = $taskActivity.filter((activity) => activity.temporary !== true);
         fetchActivity();
     };
 
