@@ -13,7 +13,7 @@
         "lint": "eslint 'src/**/*.{svelte,ts}' 'tests/e2e/**/*.ts' 'playwright.config.ts'",
         "depcruiser": "depcruise src --include-only '^src' --output-type x-dot-webpage -f dependencies.htm",
         "knip": "knip",
-        "scan": "npm run depcruiser --silent && svelte-check && npm run knip --silent && npm run lint --silent"
+        "scan": "npm run depcruiser --silent && svelte-check && npm run knip --silent && npm run lint --silent && npm run test:e2e"
     },
     "repository": {
         "type": "git",
