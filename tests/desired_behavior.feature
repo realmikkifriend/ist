@@ -220,7 +220,7 @@ Feature: Done / Defer
 
   Scenario: Done or defer fails
     # e2e: done-defer.spec.ts › "marking done fails: error toast, displayed task unchanged"
-    # e2e: done-defer.spec.ts › "deferring fails: error toast, displayed task unchanged"
+    # e2e: defer-modal.spec.ts › "deferring fails: error toast, displayed task unchanged"
     GIVEN the displayed task is done or deferred
     WHEN the corresponding Todoist API call fails
     THEN an error toast is shown ("Failed to mark task done." / "Failed to defer task.")

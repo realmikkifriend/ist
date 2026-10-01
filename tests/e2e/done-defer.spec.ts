@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 import { DateTime } from "luxon";
 import { failTodoistRoutes } from "./mock-failures";
-import { loadApp } from "./helpers";
+import { dueEarlierToday, loadApp } from "./helpers";
 import { dueObject, makeTask } from "./mock-data";
 import { makeScenario } from "./scenarios";
 
@@ -37,15 +37,7 @@ test.describe("done & defer", () => {
     test("marking a recurring task done re-defers it to today and closes it", async ({ page }) => {
         // The task is a recurring task due earlier today (past, so it is due but
         // not overdue, which leaves its due string untouched by the auto-defer).
-        // The minutes are chosen relative to now so the due time is in the past
-        // at any wall-clock hour (e.g. right after midnight, "now - 30 min"
-        // would land on yesterday and be treated as overdue).
-        const now = DateTime.now();
-        const minutesNow = now.hour * 60 + now.minute;
-        const minutesAgo = Math.max(0, Math.min(minutesNow - 30, minutesNow - 1));
-        const due = now
-            .set({ hour: Math.floor(minutesAgo / 60), minute: minutesAgo % 60, second: 0 })
-            .set({ millisecond: 0 });
+        const due = dueEarlierToday();
         const hour12 = ((due.hour + 11) % 12) + 1;
         const meridiem = due.hour < 12 ? "am" : "pm";
         const dueString = `every day at ${hour12}:${pad(due.minute)}${meridiem}`;
@@ -99,21 +91,6 @@ test.describe("done & defer", () => {
         await page.getByRole("button", { name: "CTRL+Enter" }).click();
 
         await expect(page.getByRole("button", { name: "Failed to mark task done." })).toBeVisible();
-        await expect(page.getByRole("heading", { name: "Alpha due task" })).toBeVisible();
-    });
-
-    test("deferring fails: error toast, displayed task unchanged", async ({ page }) => {
-        await loadApp(page, makeScenario());
-        await failTodoistRoutes(page, { defer: ["task-alpha"] });
-        await expect(page.getByRole("heading", { name: "Alpha due task" })).toBeVisible();
-
-        await page.keyboard.press("d");
-        await page
-            .locator("#defer_modal")
-            .getByRole("button", { name: /tomorrow/ })
-            .click();
-
-        await expect(page.getByRole("button", { name: "Failed to defer task." })).toBeVisible();
         await expect(page.getByRole("heading", { name: "Alpha due task" })).toBeVisible();
     });
 });

@@ -1,25 +1,9 @@
 import { expect, test } from "@playwright/test";
 import { DateTime } from "luxon";
-import { loadApp } from "./helpers";
+import { failTodoistRoutes } from "./mock-failures";
+import { dueEarlierToday, loadApp } from "./helpers";
 import { dueObject, makeTask } from "./mock-data";
 import { makeScenario } from "./scenarios";
-
-/**
- * Builds a due date earlier today (never yesterday, so it is due but not
- * overdue, which leaves it untouched by the overdue auto-defer).
- * @returns {DateTime} A local moment a little before now, clamped to today.
- */
-function dueEarlierToday(): DateTime {
-    const now = DateTime.now();
-    const minutesNow = now.hour * 60 + now.minute;
-    const minutesAgo = Math.max(0, Math.min(minutesNow - 30, minutesNow - 1));
-    return now.set({
-        hour: Math.floor(minutesAgo / 60),
-        minute: minutesAgo % 60,
-        second: 0,
-        millisecond: 0,
-    });
-}
 
 /**
  * Returns the index of the given local date's day button in the defer modal's
@@ -124,13 +108,29 @@ test.describe("defer modal", () => {
         const target = DateTime.now().plus({ days: 3 });
         await page.locator("#defer_modal .grid-cols-7 button").nth(dayButtonIndex(target)).click();
 
-        await expect(
-            page.getByRole("button", { name: "Task deferred successfully." }),
-        ).toBeVisible();
-        // No time of day is defined, so the defer is an all-day date.
-        const updates = handle.updates().filter((entry) => entry.id === "all-day-defer");
-        expect(updates.length).toBe(1);
-        expect(updates[0].body.due_date).toBe(target.toISODate());
-        expect(updates[0].body.due_datetime).toBeUndefined();
+        // No time of day is defined, so the defer is an all-day date. (The
+        // success toast is already asserted by the timed calendar defer test
+        // above, so here we only check the sent payload.)
+        await expect
+            .poll(() => handle.updates().filter((entry) => entry.id === "all-day-defer"))
+            .toHaveLength(1);
+        const body = handle.updates().filter((entry) => entry.id === "all-day-defer")[0].body;
+        expect(body.due_date).toBe(target.toISODate());
+        expect(body.due_datetime).toBeUndefined();
+    });
+
+    test("deferring fails: error toast, displayed task unchanged", async ({ page }) => {
+        await loadApp(page, makeScenario());
+        await failTodoistRoutes(page, { defer: ["task-alpha"] });
+        await expect(page.getByRole("heading", { name: "Alpha due task" })).toBeVisible();
+
+        await page.keyboard.press("d");
+        await page
+            .locator("#defer_modal")
+            .getByRole("button", { name: /tomorrow/ })
+            .click();
+
+        await expect(page.getByRole("button", { name: "Failed to defer task." })).toBeVisible();
+        await expect(page.getByRole("heading", { name: "Alpha due task" })).toBeVisible();
     });
 });
