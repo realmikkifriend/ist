@@ -38,9 +38,14 @@
         isSpinning = false;
     };
 
-    let dataPromise: Promise<void> = $state(
-        $displayTask?.summoned ? Promise.resolve() : handleRefresh(),
-    );
+    // A persisted summoned task is cleared on load, so the app takes the
+    // normal load path (initial refresh + first-due task) instead of keeping
+    // the stale summoned task and skipping the refresh.
+    if ($displayTask?.summoned) {
+        displayTask.set(null);
+    }
+
+    let dataPromise: Promise<void> = $state(handleRefresh());
 
     /**
      * Updates the displayed task.
