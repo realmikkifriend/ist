@@ -1,4 +1,4 @@
-import type { Page } from "@playwright/test";
+import { expect, type Page } from "@playwright/test";
 import { DateTime } from "luxon";
 import { mockTodoistApi } from "./mock";
 import type { makeScenario } from "./scenarios";
@@ -23,6 +23,33 @@ export async function loadApp(
     const handle = await mockTodoistApi(page, scenario);
     await page.goto("/");
     return handle;
+}
+
+/**
+ * Builds a local Date at a given hour/minute, offset from now by a number of
+ * days. Fixed hours keep the tasks inside the intended day regardless of when
+ * the suite runs (avoids the past-midnight edge that "now minus X hours" has).
+ * @param {number} offsetDays - Days to offset from today (0 = today).
+ * @param {number} hour - The hour of the day to use (0-23).
+ * @param {number} [minute] - The minute of the hour (defaults to 0).
+ * @returns {Date} A local Date at the offset day's given hour and minute.
+ */
+export function atHour(offsetDays: number, hour: number, minute: number = 0): Date {
+    const date = new Date(Date.now() + offsetDays * 24 * 60 * 60 * 1000);
+    date.setHours(hour, minute, 0, 0);
+    return date;
+}
+
+/**
+ * Opens the agenda view for the given hash (e.g. "#today") and waits for the
+ * agenda container to be visible.
+ * @param {Page} page - The browser page.
+ * @param {string} hash - The agenda view hash to navigate to.
+ * @returns {Promise<void>} Resolves once the agenda is visible.
+ */
+export async function openAgenda(page: Page, hash: string): Promise<void> {
+    await page.evaluate((h) => (window.location.hash = h), hash);
+    await expect(page.locator("#agenda")).toBeVisible();
 }
 
 /**

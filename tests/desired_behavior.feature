@@ -245,19 +245,22 @@ Feature: Agenda
     AND summoning an already-displayed task does nothing.
 
   Scenario: Switch agenda views
+    # e2e: agenda.spec.ts › "the a key, NoTasks, and close button switch agenda views"
     GIVEN the app is loaded
     WHEN the user presses a
     THEN the agenda cycles between today, tomorrow, and closed
     AND the agenda can also be opened from the sidebar or the NoTasks page and closed with its close button.
 
   Scenario: The agenda header summarizes the day
+    # e2e: agenda.spec.ts › "agenda header splits the day's tasks from routines"
+    # e2e: agenda.spec.ts › "agenda header warns about tasks left over from today (tomorrow view)"
     GIVEN an agenda view is open
     WHEN the agenda header is rendered
     THEN it shows the total task count split into normal tasks and routines (never-done tasks)
     AND on the tomorrow view it also warns about tasks left over from today.
-    TODO (e2e): add a spec for the agenda header counts.
 
   Scenario: The agenda body lists the day
+    # e2e: agenda.spec.ts › "the agenda body lists all-day tasks above the hour grid, with a 4+ overflow"
     GIVEN an agenda view is open
     WHEN the agenda is rendered
     THEN tasks without a time are listed at the top
@@ -271,6 +274,8 @@ Feature: Agenda
     AND confirming defers the task and shows "Task scheduled successfully."
 
   Scenario: The displayed task is highlighted in the agenda
+    # e2e: agenda.spec.ts › "the displayed task is highlighted in the agenda"
+    # e2e: agenda.spec.ts › "the displayed all-day task is highlighted in the agenda"
     GIVEN a task is currently displayed
     WHEN the agenda view is open
     THEN the displayed task is marked with a highlight and an inbox icon.
