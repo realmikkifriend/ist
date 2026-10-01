@@ -68,7 +68,7 @@
                 class="href text-blue-500 hover:underline"
                 href="https://dynalist.io/developer">Dynalist access</a
             >
-            <p class="invalid-token invisible text-red-500">Invalid token</p>
+            <p class="invalid-token hidden text-red-500">Invalid token</p>
         </div>
     </div>
     <form class="mb-4 flex gap-2" onsubmit={handleToken}>
