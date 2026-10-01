@@ -78,9 +78,9 @@
                 modifier: false,
             },
             {
-                key: "c",
+                key: "Escape",
                 callback: () => closeSidebar(),
-                modifier: [["ctrl", "shift"]],
+                modifier: false,
             },
         ],
     }}

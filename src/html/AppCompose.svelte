@@ -52,13 +52,9 @@
                 key: "a",
                 callback: () => {
                     toggleAgendaHash();
+                    // Close the sidebar through its own Escape trigger.
                     window.dispatchEvent(
-                        new KeyboardEvent("keydown", {
-                            key: "c",
-                            bubbles: true,
-                            ctrlKey: true,
-                            shiftKey: true,
-                        }),
+                        new KeyboardEvent("keydown", { key: "Escape", bubbles: true }),
                     );
                 },
                 modifier: false,
