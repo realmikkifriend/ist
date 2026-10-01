@@ -19,7 +19,7 @@
     const { clearPreviousDisplayTask, updateTodoistDataResources } =
         getContext<AppStateMutatorsContext>("appStateMutators");
 
-    const displayTaskClasses = "shadow-sm shadow-red-400";
+    const displayTaskClasses = "ring-4 ring-green-500/60";
     const taskPriority = $derived(task.priority as Priority);
 
     /**
