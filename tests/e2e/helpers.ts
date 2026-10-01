@@ -1,7 +1,8 @@
 import { expect, type Page } from "@playwright/test";
 import { DateTime } from "luxon";
+import { mockDynalistDocument } from "./mock-dynalist";
 import { mockTodoistApi } from "./mock";
-import type { makeScenario } from "./scenarios";
+import { makeScenario } from "./scenarios";
 import { seedLocalStorage } from "./seed";
 
 export const TODOIST_TOKEN = "e2e-todoist-token";
@@ -50,6 +51,53 @@ export function atHour(offsetDays: number, hour: number, minute: number = 0): Da
 export async function openAgenda(page: Page, hash: string): Promise<void> {
     await page.evaluate((h) => (window.location.hash = h), hash);
     await expect(page.locator("#agenda")).toBeVisible();
+}
+
+/**
+ * Builds a Todoist comment carrying a Dynalist document URL on task-alpha
+ * (the default scenario's first due task).
+ * @param {string} url - The `https://dynalist.io/d/...` URL to embed.
+ * @returns {Record<string, unknown>} The raw comment.
+ */
+export function dynalistComment(url: string): Record<string, unknown> {
+    return {
+        id: "comment-dynalist",
+        item_id: "task-alpha",
+        content: url,
+        posted_at: new Date().toISOString(),
+        file_attachment: null,
+        posted_uid: "17324928",
+        uids_to_notify: null,
+        reactions: null,
+        is_deleted: false,
+    };
+}
+
+/**
+ * Loads the app against the default scenario with a task-alpha comment linking
+ * to a Dynalist document, mocking both the Todoist and Dynalist APIs.
+ * @param {Page} page - The browser page to load.
+ * @param {string} url - The Dynalist document URL to embed in the comment.
+ * @param {Record<string, unknown>} document - The document served on `doc/read`.
+ * @param {boolean} [withToken] - Whether to seed a Dynalist access token (default true).
+ * @returns {Promise<{ edits: () => Record<string, unknown>[][] }>} The Dynalist mock handle.
+ */
+export async function loadDynalist(
+    page: Page,
+    url: string,
+    document: Record<string, unknown>,
+    withToken: boolean = true,
+) {
+    const seed: Record<string, unknown> = { todoist_access_token: TODOIST_TOKEN };
+    if (withToken) seed.dynalist_access_token = DYNALIST_TOKEN;
+    await seedLocalStorage(page, seed);
+    await mockTodoistApi(
+        page,
+        makeScenario({ comments: { "task-alpha": [dynalistComment(url)] } }),
+    );
+    const handle = await mockDynalistDocument(page, document);
+    await page.goto("/");
+    return handle;
 }
 
 /**

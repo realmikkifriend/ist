@@ -1,6 +1,11 @@
 import type { Page } from "@playwright/test";
 
 const CORS_HEADERS: Record<string, string> = { "access-control-allow-origin": "*" };
+const OPTIONS_HEADERS: Record<string, string> = {
+    ...CORS_HEADERS,
+    "access-control-allow-methods": "POST, OPTIONS",
+    "access-control-allow-headers": "content-type",
+};
 const DAY = 24 * 60 * 60 * 1000;
 
 const pad = (value: number): string => String(value).padStart(2, "0");
@@ -36,6 +41,27 @@ export function makeDynalistDocument(
     nodes: Record<string, unknown>[],
 ): Record<string, unknown> {
     return { file_id: fileId, nodes };
+}
+
+/**
+ * Builds a Dynalist document that renders as a checklist: the root note is
+ * `checklist` and its children are the items, shown one at a time.
+ * @param {string} [fileId] - Which Dynalist document this serves.
+ * @param {string[]} [items] - The item contents, in order.
+ * @returns {Record<string, unknown>} The raw document.
+ */
+export function makeChecklistDynalistDocument(
+    fileId: string = "e2e-dynalist",
+    items: string[] = ["First item", "Second item", "Third item"],
+): Record<string, unknown> {
+    const itemNodes = items.map((item, index) => makeDynalistNode(`n${index + 1}`, item));
+    return makeDynalistDocument(fileId, [
+        makeDynalistNode("root", "Daily checklist", {
+            note: "checklist",
+            children: itemNodes.map((node) => node.id),
+        }),
+        ...itemNodes,
+    ]);
 }
 
 /**
@@ -103,6 +129,30 @@ export function makeTrackingDynalistDocument(
 }
 
 /**
+ * Intercepts the Dynalist `pref/get` token-validation endpoint used by the
+ * access-token request form.
+ * @param {Page} page - Playwright page on which to register the route.
+ * @param {boolean} [valid] - Whether the validation succeeds (default `true`;
+ *   an invalid response carries the `_code: "InvalidToken"` marker).
+ * @returns {Promise<void>} Resolves once the route is registered.
+ */
+export async function mockDynalistTokenValidation(
+    page: Page,
+    valid: boolean = true,
+): Promise<void> {
+    await page.route("**/dynalist.io/api/v1/pref/get", (route) => {
+        if (route.request().method() === "OPTIONS") {
+            return route.fulfill({ status: 204, headers: OPTIONS_HEADERS });
+        }
+        return route.fulfill({
+            status: 200,
+            headers: CORS_HEADERS,
+            json: valid ? { inbox_location: "top" } : { _code: "InvalidToken" },
+        });
+    });
+}
+
+/**
  * Intercepts the Dynalist `doc/read` and `doc/edit` endpoints. `doc/read`
  * serves the given document; `doc/edit` records each change set (exposed via
  * the returned handle) and answers with the ids of any inserted nodes.
@@ -116,22 +166,17 @@ export async function mockDynalistDocument(
     document: Record<string, unknown>,
 ): Promise<{ edits: () => Record<string, unknown>[][] }> {
     const edits: Record<string, unknown>[][] = [];
-    const optionsHeaders = {
-        ...CORS_HEADERS,
-        "access-control-allow-methods": "POST, OPTIONS",
-        "access-control-allow-headers": "content-type",
-    };
 
     await page.route("**/dynalist.io/api/v1/doc/read", (route) => {
         if (route.request().method() === "OPTIONS") {
-            return route.fulfill({ status: 204, headers: optionsHeaders });
+            return route.fulfill({ status: 204, headers: OPTIONS_HEADERS });
         }
         return route.fulfill({ status: 200, headers: CORS_HEADERS, json: document });
     });
 
     await page.route("**/dynalist.io/api/v1/doc/edit", (route) => {
         if (route.request().method() === "OPTIONS") {
-            return route.fulfill({ status: 204, headers: optionsHeaders });
+            return route.fulfill({ status: 204, headers: OPTIONS_HEADERS });
         }
         const body = (route.request().postDataJSON() ?? {}) as Record<string, unknown>;
         const changes = (body.changes ?? []) as Record<string, unknown>[];

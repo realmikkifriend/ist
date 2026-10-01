@@ -286,14 +286,16 @@ Feature: Dynalist
   So that I can work through linked documents from Ist.
 
   Scenario: A Dynalist URL appears in a comment without a stored token
+    # e2e: dynalist.spec.ts › "auth request with a valid token stores it and renders the document"
     GIVEN the displayed task has a comment starting with https://dynalist.io/d/
     AND no Dynalist access token is stored
     WHEN the comments are rendered
     THEN a Dynalist access token request form is shown
     AND the comment itself shows "Dynalist URL detected but no access code stored."
-    TODO (e2e): add a spec for the auth request flow.
 
   Scenario: Store a Dynalist access token
+    # e2e: dynalist.spec.ts › "auth request with a valid token stores it and renders the document"
+    # e2e: dynalist.spec.ts › "auth request with an invalid token shows an inline error"
     GIVEN the Dynalist token request form is shown
     WHEN the user submits a token
     AND the token validates against the Dynalist API
@@ -308,7 +310,8 @@ Feature: Dynalist
     THEN the document is fetched and rendered according to its detected type
     AND the type can be switched with the type menu (read, checklist, count, rotating, cross off, tracking)
     AND on fetch failure an error toast and inline error message are shown.
-    TODO (e2e): add specs for type detection and the type menu.
+    # e2e: dynalist.spec.ts › "type menu switches the rendered view" (read detection + type menu);
+    # e2e: count / cross-off / tracking detection covered by their widget specs
 
   Scenario: Checklist
     # e2e: dynalist.spec.ts › "dynalist URL in a comment renders an interactive checklist"
@@ -320,26 +323,26 @@ Feature: Dynalist
     TODO: checklist progress is local to the app and is not written back to Dynalist.
 
   Scenario: Count
+    # e2e: dynalist-widgets.spec.ts › "count widget writes the updated count note"
     GIVEN a Dynalist document is rendered as a counter
     WHEN the user clicks +1 or -1
     THEN the current count is updated in the Dynalist document
     AND an "Updated count!" toast is shown.
-    TODO (e2e): add a spec for the count widget.
 
   Scenario: Cross off
+    # e2e: dynalist-widgets.spec.ts › "cross-off checks the item in Dynalist and removes it from the local list"
     GIVEN a Dynalist document is rendered as a cross-off list
     WHEN the user clicks the cross-off button (z / Enter)
     THEN the first item is marked checked in the Dynalist document
     AND it is removed from the local list with a remaining-count indicator
     AND a "Removed from list in Dynalist!" toast is shown.
-    TODO (e2e): add a spec for cross-off.
 
   Scenario: Tracking
+    # e2e: dynalist-widgets.spec.ts › "tracking adds and removes today's date, shown in the calendar modal"
     GIVEN a Dynalist document is rendered as a tracker
     WHEN the user clicks the tracking button
     THEN today's date is added to (or removed from) the document's tracked dates
     AND a calendar modal can show the tracked dates.
-    TODO (e2e): add a spec for tracking.
 
   Scenario: Cycle comment focus
     GIVEN the displayed task has focusable comment content
