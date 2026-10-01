@@ -355,23 +355,30 @@ Feature: Activity & History
   So that I can keep a daily goal and review a task's history.
 
   Scenario: Daily goal
+    # e2e: activity-history.spec.ts › "daily goal pill shows today's completions with a lime overflow"
     GIVEN the app is loaded and signed in
     WHEN the sidebar is rendered
     THEN a daily goal pill shows today's completions against the user's daily goal
-    AND completions are segmented by context color, with an overflow segment when the goal is exceeded
-    AND clicking the pill reloads today's activity, discarding temporary entries.
-    TODO (e2e): add a spec for the daily goal pill.
+    AND completions are segmented by context color, with an overflow segment when the goal is exceeded.
+
+  Scenario: Clicking the daily goal pill reloads today's activity
+    # e2e: activity-history.spec.ts › "reloading the daily goal keeps a just-completed task"
+    GIVEN the app is loaded and signed in
+    WHEN the user clicks the daily goal pill
+    THEN today's activity is reloaded from the API
+    AND temporary entries are reconciled: a confirmed log replaces its temporary twin, and an unconfirmed temporary entry is kept (not lost).
 
   Scenario: Completing a task updates today's activity immediately
+    # e2e: activity-history.spec.ts › "marking a task done adds a temporary activity entry"
     GIVEN the user marks a task done
     WHEN the completion succeeds
     THEN a temporary activity entry for that task is added to today's activity.
 
   Scenario: Task completion history
+    # e2e: activity-history.spec.ts › "task history calendar shows completion dates and disables future days"
     GIVEN the displayed task has been completed before
     WHEN the user presses h or clicks the history button
     THEN a calendar modal shows the task's completion dates (last 3 months), with future dates disabled.
-    TODO (e2e): add a spec for the history calendar.
 
 Feature: State Persistence
 

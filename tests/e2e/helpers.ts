@@ -42,6 +42,16 @@ export function atHour(offsetDays: number, hour: number, minute: number = 0): Da
 }
 
 /**
+ * Opens the sidebar drawer (the contexts + daily-goal panel) via its drawer
+ * toggle button.
+ * @param {Page} page - The browser page.
+ * @returns {Promise<void>} Resolves once the sidebar has been opened.
+ */
+export async function openSidebar(page: Page): Promise<void> {
+    await page.locator(".drawer-content .drawer-button").click();
+}
+
+/**
  * Opens the agenda view for the given hash (e.g. "#today") and waits for the
  * agenda container to be visible.
  * @param {Page} page - The browser page.
