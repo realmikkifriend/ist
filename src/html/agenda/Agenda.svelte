@@ -1,9 +1,9 @@
 <script lang="ts">
     import { DateTime } from "luxon";
-    import { todoistData } from "../../stores/stores";
+    import { displayTask, todoistData } from "../../stores/stores";
     import { hashStore } from "../../stores/interface";
     import { updateAgenda, getTitle } from "../../services/agendaService";
-    import { getDisplayHours } from "../../utils/agendaDisplayUtils";
+    import { getDisplayHours, markTasks } from "../../utils/agendaDisplayUtils";
     import { computeHeaderGradientColor } from "../../utils/agendaGradientUtils";
     import { getTaskColor } from "../../styles/styleUtils";
     import AgendaHeader from "./AgendaHeader.svelte";
@@ -22,6 +22,10 @@
         const length = maxHour - minHour + 1;
         return Array.from({ length }, (_, i) => i + minHour);
     });
+
+    // Mark the un-timed tasks as displayed too, so the highlight also applies to
+    // the list at the top of the agenda (not just the hour grid).
+    let noTimeTasks = $derived(markTasks(agendaStore.tasksWithNoTime, $displayTask));
 </script>
 
 {#key agendaStore.tasks}
@@ -34,9 +38,9 @@
             }}
         />
 
-        {#if agendaStore.tasksWithNoTime.length > 0}
+        {#if noTimeTasks.length > 0}
             <div class="mb-4 flex w-full flex-col items-center pr-2 pl-18">
-                {#each agendaStore.tasksWithNoTime as task (task.id)}
+                {#each noTimeTasks as task (task.id)}
                     <AgendaTask
                         color={getTaskColor(task.contextId || "0", $todoistData.contexts) ??
                             "berry_red"}
