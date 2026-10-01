@@ -76,6 +76,7 @@ Feature: Task Display
     THEN tasks are ordered by context order (tasks without a context first), then priority (highest first), then due date (earliest first).
 
   Scenario: Refresh data
+    # e2e: task-refresh.spec.ts › "keeps the displayed task while the 2 s display debounce is active" (r key)
     GIVEN the app is loaded and signed in
     WHEN the user clicks the refresh button or presses r
     THEN the Todoist data is refetched
@@ -134,10 +135,13 @@ Feature: Contexts
   So that I can focus on one area at a time.
 
   Scenario: The context sidebar lists contexts with due counts
+    # e2e: contexts.spec.ts › "the sidebar opens and closes with the c key"
+    # e2e: contexts.spec.ts › "the escape key closes the open sidebar"
     GIVEN the app is loaded and due tasks exist
-    WHEN the user opens the sidebar (c)
+    WHEN the user opens the sidebar (c key or the sidebar button)
     THEN each non-inbox context is listed with its due-task count and priority breakdown
     AND a context is disabled when it has no due tasks or when a different context is selected.
+    AND the sidebar closes with c or Escape (opening the agenda with a closes it too).
 
   Scenario: Filter displayed tasks by selected context
     # e2e: contexts.spec.ts › "context filter turns on and off"
@@ -147,8 +151,9 @@ Feature: Contexts
 
   Scenario: The user can clear the selected context
     # e2e: contexts.spec.ts › "context filter turns on and off"
+    # e2e: contexts.spec.ts › "the x key clears the selected context"
     GIVEN a context has been selected
-    WHEN the user de-selects the context
+    WHEN the user de-selects the context (clicking the selected context, or pressing x)
     THEN the selection is cleared
     AND the general due tasks are displayed
     AND a "New first-due task!" toast is shown to confirm the general task.
@@ -188,8 +193,9 @@ Feature: Done / Defer
 
   Scenario: Display next due task after completing or deferring
     # e2e: done-defer.spec.ts › "done and defer advance to the next due task"
+    # e2e: done-defer.spec.ts › "the keyboard shortcut marks the displayed task done"
     GIVEN a task is displayed
-    WHEN the task is marked done (CTRL+Enter) or deferred (d)
+    WHEN the task is marked done (CTRL+Enter keyboard shortcut or button) or deferred (d key or button)
     THEN the task is removed from the local list
     AND the data is refreshed
     AND the next due task is displayed.
@@ -197,10 +203,12 @@ Feature: Done / Defer
   Scenario: The defer modal offers time and calendar picking
     # e2e: defer-modal.spec.ts › "tasks with a due time start on the time tab; arrow keys switch tabs"
     # e2e: defer-modal.spec.ts › "all-day tasks start on the calendar tab"
+    # e2e: defer-modal.spec.ts › "time tab quick options are picked with number keys"
     GIVEN the user opens the defer modal (d)
     WHEN the modal is displayed
     THEN it shows Time and Calendar tabs (switchable with the arrow keys), with the Time tab active initially for timed tasks
-    AND the Time tab offers quick options such as "tomorrow".
+    AND the Time tab offers quick options such as "tomorrow"
+    AND the quick options can be picked with the number keys (1–9, then SHIFT+… for the rest).
 
   Scenario: Deferring a timed or recurring task keeps its time-of-day
     # e2e: defer-modal.spec.ts › "calendar tab: deferring to a specific date keeps the time of day"
@@ -345,6 +353,7 @@ Feature: Dynalist
     AND a calendar modal can show the tracked dates.
 
   Scenario: Cycle comment focus
+    # e2e: dynalist.spec.ts › "the z key cycles focus across the comment focus targets"
     GIVEN the displayed task has focusable comment content
     WHEN the user presses z
     THEN focus moves to the next comment focus target, wrapping around.
@@ -405,3 +414,33 @@ Feature: State Persistence
     AND the initial data refresh is skipped.
     TODO: the original spec expected app load to RESET the summoned task and selected context; the app actually persists them. Decide the desired behavior.
     TODO (e2e): add a spec for the summoned-task load-skip.
+
+Feature: Keyboard Shortcuts
+
+  As a user, I want keyboard shortcuts for app-wide controls
+  So that I can work without reaching for the mouse.
+
+  (Shortcuts that belong to a specific area — a, c, /, x, r, d, Ctrl+Enter,
+  h, z, the defer tab arrow keys, and the time-tab number keys — are
+  documented in the feature they belong to.)
+
+  Scenario: Toggle the keyboard shortcut labels
+    # e2e: keyboard-shortcuts.spec.ts › "the ? key toggles the keyboard shortcut labels"
+    GIVEN the app is loaded and signed in
+    WHEN the user presses ?
+    THEN the keyboard shortcut labels are shown over the controls
+    AND pressing ? again hides them.
+
+  Scenario: Close an open modal or the sidebar
+    # e2e: keyboard-shortcuts.spec.ts › "Escape closes the defer and task-search modals"
+    # e2e: contexts.spec.ts › "the escape key closes the open sidebar"
+    GIVEN a modal (the defer modal or task search) or the sidebar is open
+    WHEN the user presses Escape
+    THEN the open layer is closed
+    AND the underlying view is unchanged.
+
+  Scenario: Navigate months in the calendar modal
+    # e2e: keyboard-shortcuts.spec.ts › "the arrow keys change the month in the calendar modal"
+    GIVEN the calendar modal is open (task history)
+    WHEN the user presses ArrowUp or ArrowDown
+    THEN the displayed month changes, staying within the modal's allowed range.

@@ -1,11 +1,12 @@
 import { expect, test } from "@playwright/test";
-import { loadDynalist } from "./helpers";
+import { loadApp, loadDynalist } from "./helpers";
 import {
     makeChecklistDynalistDocument,
     makeDynalistDocument,
     makeDynalistNode,
     mockDynalistTokenValidation,
 } from "./mock-dynalist";
+import { makeScenario } from "./scenarios";
 
 test.describe("dynalist", () => {
     test("dynalist URL in a comment renders an interactive checklist", async ({ page }) => {
@@ -85,5 +86,39 @@ test.describe("dynalist", () => {
         await page.locator(".comment-item .dropdown > [role='button']").click();
         await page.getByRole("button", { name: "Checklist" }).click();
         await expect(page.getByRole("button", { name: "Next item" })).toBeVisible();
+    });
+
+    test("the z key cycles focus across the comment focus targets", async ({ page }) => {
+        const comment = (id: string, content: string): Record<string, unknown> => ({
+            id,
+            item_id: "task-alpha",
+            content,
+            posted_at: new Date().toISOString(),
+            file_attachment: null,
+            posted_uid: "17324928",
+            uids_to_notify: null,
+            reactions: null,
+            is_deleted: false,
+        });
+        const scenario = makeScenario({
+            comments: {
+                "task-alpha": [
+                    comment("comment-one", "First plain comment"),
+                    comment("comment-two", "Second plain comment"),
+                ],
+            },
+        });
+        await loadApp(page, scenario);
+        await expect(page.getByRole("heading", { name: "Alpha due task" })).toBeVisible();
+
+        const items = page.locator(".comment-item");
+        await expect(items).toHaveCount(2);
+        await page.keyboard.press("z");
+        await expect(items.nth(0)).toBeFocused();
+        await page.keyboard.press("z");
+        await expect(items.nth(1)).toBeFocused();
+        // Wraps around to the first target.
+        await page.keyboard.press("z");
+        await expect(items.nth(0)).toBeFocused();
     });
 });

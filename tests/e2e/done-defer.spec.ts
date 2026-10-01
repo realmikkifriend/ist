@@ -93,4 +93,16 @@ test.describe("done & defer", () => {
         await expect(page.getByRole("button", { name: "Failed to mark task done." })).toBeVisible();
         await expect(page.getByRole("heading", { name: "Alpha due task" })).toBeVisible();
     });
+
+    test("the keyboard shortcut marks the displayed task done", async ({ page }) => {
+        const handle = await loadApp(page, makeScenario());
+        await expect(page.getByRole("heading", { name: "Alpha due task" })).toBeVisible();
+        // Let the display debounce expire so the task change is not suppressed.
+        await page.waitForTimeout(2300);
+
+        await page.keyboard.press("Control+Enter");
+        await expect(page.getByRole("button", { name: "Task marked done." })).toBeVisible();
+        expect(handle.closes()).toContain("task-alpha");
+        await expect(page.getByRole("heading", { name: "Beta due task" })).toBeVisible();
+    });
 });

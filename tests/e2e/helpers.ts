@@ -52,6 +52,37 @@ export async function openSidebar(page: Page): Promise<void> {
 }
 
 /**
+ * Selects the context with the given name in the sidebar (opens the drawer
+ * first).
+ * @param {Page} page - The browser page.
+ * @param {string | RegExp} name - The context name (or name matcher) to click.
+ * @returns {Promise<void>} Resolves once the context has been clicked.
+ */
+export async function selectContext(page: Page, name: string | RegExp): Promise<void> {
+    await openSidebar(page);
+    await page.locator(".menu").getByRole("button", { name }).click();
+}
+
+/**
+ * Reads the persisted selected context from localStorage.
+ * @param {Page} page - The browser page.
+ * @returns {Promise<{ id: string; name: string } | null>} The selected context, or
+ * null when nothing is selected.
+ */
+export async function readSelectedContext(
+    page: Page,
+): Promise<{ id: string; name: string } | null> {
+    return page.evaluate(
+        () =>
+            (
+                JSON.parse(localStorage.getItem("user_settings") ?? "{}") as {
+                    selectedContext: { id: string; name: string } | null;
+                }
+            ).selectedContext,
+    );
+}
+
+/**
  * Opens the agenda view for the given hash (e.g. "#today") and waits for the
  * agenda container to be visible.
  * @param {Page} page - The browser page.

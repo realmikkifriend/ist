@@ -18,7 +18,11 @@ test.describe("task refresh & display update", () => {
     test("keeps the displayed task while the 2 s display debounce is active", async ({ page }) => {
         const handle = await loadApp(page, makeScenario({ tasks: [alphaTask] }));
         await expect(page.getByRole("heading", { name: "Alpha due task" })).toBeVisible();
-        await page.waitForTimeout(1200); // let the initial "Todoist data updated!" toast expire
+        // Let the initial "Todoist data updated!" toast expire (incl. its exit
+        // animation) so only the refresh toast is in the DOM when we assert on it.
+        await expect(page.getByRole("button", { name: "Todoist data updated!" })).toBeHidden({
+            timeout: 10000,
+        });
 
         handle.setTasks([betaTask]);
         await page.keyboard.press("r");

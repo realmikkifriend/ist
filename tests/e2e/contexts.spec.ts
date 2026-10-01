@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { loadApp } from "./helpers";
+import { loadApp, openSidebar, readSelectedContext, selectContext } from "./helpers";
 import { dueObject, E2E_CONTEXTS, makeProject, makeTask } from "./mock-data";
 import { makeMultiContextScenario, makeScenario } from "./scenarios";
 
@@ -10,12 +10,10 @@ test.describe("contexts", () => {
         await loadApp(page, makeScenario());
         await expect(page.getByRole("heading", { name: "Alpha due task" })).toBeVisible();
 
-        await page.locator(".drawer-content .drawer-button").click();
-        await page.locator(".menu").getByRole("button", { name: /Home/ }).click();
+        await selectContext(page, /Home/);
         await expect(page.getByRole("heading", { name: "Gamma due task" })).toBeVisible();
 
-        await page.locator(".drawer-content .drawer-button").click();
-        await page.locator(".menu").getByRole("button", { name: /Home/ }).click();
+        await selectContext(page, /Home/);
         // Deselecting the context surfaces the new-first-due-task toast; confirm it.
         await page.getByRole("button", { name: /New first-due task/ }).click();
         await expect(page.getByRole("heading", { name: "Alpha due task" })).toBeVisible();
@@ -25,11 +23,7 @@ test.describe("contexts", () => {
         const handle = await loadApp(page, makeScenario(makeMultiContextScenario()));
         await expect(page.getByRole("heading", { name: "Inbox due task" })).toBeVisible();
 
-        await page.locator(".drawer-content .drawer-button").click();
-        await page
-            .locator(".menu")
-            .getByRole("button", { name: /Reading/ })
-            .click();
+        await selectContext(page, /Reading/);
         await expect(page.getByRole("heading", { name: "Reading due task" })).toBeVisible();
 
         // Let the display debounce expire so the re-evaluation below is not suppressed.
@@ -43,18 +37,7 @@ test.describe("contexts", () => {
         await expect(page.getByRole("button", { name: "Task marked done." })).toBeVisible();
         expect(handle.closes()).toContain("task-reading");
 
-        await expect
-            .poll(() =>
-                page.evaluate(
-                    () =>
-                        (
-                            JSON.parse(localStorage.getItem("user_settings") ?? "{}") as {
-                                selectedContext: { id: string; name: string } | null;
-                            }
-                        ).selectedContext,
-                ),
-            )
-            .toBeNull();
+        await expect.poll(() => readSelectedContext(page)).toBeNull();
         await expect(page.getByRole("heading", { name: "Inbox due task" })).toBeVisible();
     });
 
@@ -85,7 +68,7 @@ test.describe("contexts", () => {
 
         // Let the display debounce expire so the re-evaluation after the drag is not suppressed.
         await page.waitForTimeout(2300);
-        await page.locator(".drawer-content .drawer-button").click();
+        await openSidebar(page);
         await page
             .locator(".menu")
             .getByRole("button", { name: /Reading/ })
@@ -119,7 +102,7 @@ test.describe("contexts", () => {
         await loadApp(page, makeScenario());
         await expect(page.getByRole("heading", { name: "Alpha due task" })).toBeVisible();
 
-        await page.locator(".drawer-content .drawer-button").click();
+        await openSidebar(page);
         await page.keyboard.press("/");
         const input = page.locator("#task_search_modal_input");
         await input.fill("delta");
@@ -132,9 +115,43 @@ test.describe("contexts", () => {
         await expect(input).toBeHidden();
 
         // A term that matches nothing shows the "No results..." state.
-        await page.locator(".drawer-content .drawer-button").click();
+        await openSidebar(page);
         await page.keyboard.press("/");
         await input.fill("zzz");
         await expect(page.locator("#task_search_modal").getByText("No results...")).toBeVisible();
+    });
+
+    test("the sidebar opens and closes with the c key", async ({ page }) => {
+        await loadApp(page, makeScenario());
+        await expect(page.getByRole("heading", { name: "Alpha due task" })).toBeVisible();
+
+        const toggle = page.locator("#sidebar-toggle");
+        await expect(toggle).not.toBeChecked();
+        await page.keyboard.press("c");
+        await expect(toggle).toBeChecked();
+        await page.keyboard.press("c");
+        await expect(toggle).not.toBeChecked();
+    });
+
+    test("the escape key closes the open sidebar", async ({ page }) => {
+        await loadApp(page, makeScenario());
+        await expect(page.getByRole("heading", { name: "Alpha due task" })).toBeVisible();
+
+        const toggle = page.locator("#sidebar-toggle");
+        await page.keyboard.press("c");
+        await expect(toggle).toBeChecked();
+        await page.keyboard.press("Escape");
+        await expect(toggle).not.toBeChecked();
+    });
+
+    test("the x key clears the selected context", async ({ page }) => {
+        await loadApp(page, makeScenario());
+        await selectContext(page, /Home/);
+        await expect(page.getByRole("heading", { name: "Gamma due task" })).toBeVisible();
+
+        await page.keyboard.press("x");
+        // Deselecting the context surfaces the new-first-due-task toast; confirm it.
+        await page.getByRole("button", { name: /New first-due task/ }).click();
+        await expect(page.getByRole("heading", { name: "Alpha due task" })).toBeVisible();
     });
 });
