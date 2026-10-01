@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { onMount } from "svelte";
     import { Icon, ArrowPath } from "svelte-hero-icons";
     import { todoistData, taskActivity } from "../../stores/stores";
     import { fetchDailyActivity } from "../../services/activityService";
@@ -8,6 +9,14 @@
     import type { TaskActivity } from "../../types/activity";
 
     let debounceTimeoutId: ReturnType<typeof setTimeout> | null = null;
+
+    // Guards against writes from activity fetches that resolve after the
+    // component is gone (e.g. a reload debounced just before Log Out), which
+    // would re-persist the activity store after a reset.
+    let mounted = $state(true);
+    onMount(() => () => {
+        mounted = false;
+    });
 
     let sortedLists: { byContext: TaskActivity[]; byTime: TaskActivity[] } = $derived({
         byContext: [],
@@ -27,6 +36,9 @@
         if (activity.promise) {
             isLoading = true;
             void activity.promise.then(({ display, newActivities }) => {
+                if (!mounted) {
+                    return;
+                }
                 sortedLists = display;
                 $taskActivity = mergeActivity($taskActivity, newActivities);
                 isLoading = false;
@@ -60,6 +72,11 @@
 
             debounceTimeoutId = setTimeout(fetchActivity, 2000);
         }
+        return () => {
+            if (debounceTimeoutId) {
+                clearTimeout(debounceTimeoutId);
+            }
+        };
     });
 </script>
 
