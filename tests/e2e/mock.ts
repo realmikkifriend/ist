@@ -33,7 +33,8 @@ function rawFixture(name: "projects" | "user"): unknown {
  *   `syncs()` the recorded `POST /sync` request bodies, and `taskFetches()`
  *   the number of `GET /tasks` fetches served. `project_reorder` sync commands
  *   are persisted, so later projects fetches serve the new `child_order`
- *   values.
+ *   values. `activityRequests()` returns the recorded `GET /activities`
+ *   query parameters (date range, object filter, cursor) in order.
  */
 export async function mockTodoistApi(
     page: Page,
@@ -44,11 +45,23 @@ export async function mockTodoistApi(
     closes: () => string[];
     syncs: () => Record<string, unknown>[];
     taskFetches: () => number;
+    activityRequests: () => Array<{
+        dateFrom: string | null;
+        dateTo: string | null;
+        objectId: string | null;
+        cursor: string | null;
+    }>;
 }> {
     const byId = new Map<string, Record<string, unknown>>(
         scenario.tasks.map((task) => [String(task.id), task]),
     );
     const closedIds = new Set<string>();
+    const recordedActivityRequests: Array<{
+        dateFrom: string | null;
+        dateTo: string | null;
+        objectId: string | null;
+        cursor: string | null;
+    }> = [];
     let taskFetchCount = 0;
     const recordedUpdates: Array<{ id: string; body: Record<string, unknown> }> = [];
     const recordedCloses: string[] = [];
@@ -102,7 +115,14 @@ export async function mockTodoistApi(
         }
 
         if (request.method() === "GET" && path === "activities") {
-            const events = scenario.activity[url.searchParams.get("object_id") ?? ""] ?? [];
+            const params = url.searchParams;
+            recordedActivityRequests.push({
+                dateFrom: params.get("date_from"),
+                dateTo: params.get("date_to"),
+                objectId: params.get("object_id"),
+                cursor: params.get("cursor"),
+            });
+            const events = scenario.activity[params.get("object_id") ?? ""] ?? [];
             await ok({ results: events, next_cursor: null });
             return;
         }
@@ -152,5 +172,11 @@ export async function mockTodoistApi(
         closes: (): string[] => recordedCloses,
         syncs: (): Record<string, unknown>[] => recordedSyncs,
         taskFetches: (): number => taskFetchCount,
+        activityRequests: (): Array<{
+            dateFrom: string | null;
+            dateTo: string | null;
+            objectId: string | null;
+            cursor: string | null;
+        }> => recordedActivityRequests,
     };
 }
