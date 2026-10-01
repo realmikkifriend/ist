@@ -51,7 +51,9 @@ test.describe("state persistence & reset", () => {
         // path runs: the initial refresh happens and the display is re-derived
         // as the first-due task.
         await expect(page.getByRole("heading", { name: "Alpha due task" })).toBeVisible();
-        expect(handle.taskFetches()).toBe(fetchesBeforeReload + 1);
+        // The display can render from persisted data before the initial refresh
+        // fetch lands, so poll for the fetch rather than asserting immediately.
+        await expect.poll(() => handle.taskFetches()).toBe(fetchesBeforeReload + 1);
     });
 
     test("logging out resets all persisted state to the landing page", async ({ page }) => {

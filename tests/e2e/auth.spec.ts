@@ -24,4 +24,32 @@ test.describe("auth & onboarding", () => {
 
         await expect(page.getByRole("heading", { name: "Alpha due task" })).toBeVisible();
     });
+
+    test("silent token exchange failure leaves the user on the Authenticating screen", async ({
+        page,
+    }) => {
+        await page.route("**/oauth/access_token", (route) =>
+            route.fulfill({ status: 500, json: { error: "Simulated failure" } }),
+        );
+
+        const consoleErrors: string[] = [];
+        page.on("console", (msg) => {
+            if (msg.type() === "error") {
+                consoleErrors.push(msg.text());
+            }
+        });
+
+        await page.goto("/?code=e2e-fail");
+
+        // The console error is the only observable failure signal (no error UI exists).
+        await expect
+            .poll(() => consoleErrors.join("\n"))
+            .toContain("Failed to exchange code for token");
+
+        await expect(page.getByText("Authenticating...")).toBeVisible();
+        expect(page.url()).toContain("?code=e2e-fail");
+        expect(await page.evaluate(() => localStorage.getItem("todoist_access_token"))).toBeNull();
+        await expect(page.getByRole("link", { name: "Continue with Todoist" })).toBeHidden();
+        expect(await page.locator(".toast").count()).toBe(0);
+    });
 });

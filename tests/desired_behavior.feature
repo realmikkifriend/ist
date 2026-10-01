@@ -32,6 +32,7 @@ Feature: Auth & Onboarding
     AND the app mounts and displays the current first-due task.
 
   Scenario: Token exchange fails
+    # e2e: auth.spec.ts › "silent token exchange failure leaves the user on the Authenticating screen"
     GIVEN the app received an OAuth callback with a valid code
     AND the token exchange request fails
     THEN the failure is logged to the console only
