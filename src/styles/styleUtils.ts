@@ -54,6 +54,32 @@ export const colorClasses: Record<ColorName, { default: string; faded: string }>
     taupe: { default: "bg-red-100", faded: "bg-red-100/50" },
 };
 
+/**
+ * SVG fill color classes for context colors, mirroring `colorClasses`.
+ */
+export const chartFillClasses: Record<ColorName, string> = {
+    berry_red: "fill-red-500",
+    red: "fill-red-700",
+    orange: "fill-orange-500",
+    yellow: "fill-yellow-500",
+    olive_green: "fill-lime-700",
+    lime_green: "fill-lime-500",
+    green: "fill-green-600",
+    mint_green: "fill-emerald-400",
+    teal: "fill-teal-600",
+    sky_blue: "fill-sky-400",
+    light_blue: "fill-blue-300",
+    blue: "fill-blue-500",
+    grape: "fill-purple-500",
+    violet: "fill-violet-600",
+    lavender: "fill-purple-300",
+    magenta: "fill-pink-600",
+    salmon: "fill-rose-400",
+    charcoal: "fill-slate-600",
+    grey: "fill-gray-400",
+    taupe: "fill-red-100",
+};
+
 export const borderClasses: Record<ColorName, string> = {
     berry_red: "border-red-500",
     red: "border-red-700",

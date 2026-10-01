@@ -66,7 +66,7 @@ test.describe("stats", () => {
     }) => {
         const handle = await loadApp(page, makeStatsScenario());
         const initialFetches = () =>
-            handle.activityRequests().filter((req) => req.dateFrom === isoDaysAgo(28)).length;
+            handle.activityRequests().filter((req) => req.date_from === isoDaysAgo(28)).length;
         await openStats(page);
         await expect.poll(initialFetches).toBe(1);
         // both contexts completed on this day, so the day stacks two segments
@@ -82,7 +82,7 @@ test.describe("stats", () => {
     test("stored history is used without refetching on reload", async ({ page }) => {
         const handle = await loadApp(page, makeStatsScenario());
         const initialFetches = () =>
-            handle.activityRequests().filter((req) => req.dateFrom === isoDaysAgo(28)).length;
+            handle.activityRequests().filter((req) => req.date_from === isoDaysAgo(28)).length;
         await openStats(page);
         await expect.poll(initialFetches).toBe(1);
         await page.reload();
@@ -100,12 +100,16 @@ test.describe("stats", () => {
         await page.getByRole("button", { name: "Retrieve more history" }).click();
         await expect
             .poll(() =>
-                handle.activityRequests().some(
-                    (req) => req.dateFrom === isoDaysAgo(42) && req.dateTo === isoDaysAgo(28),
-                ),
+                handle
+                    .activityRequests()
+                    .some(
+                        (req) => req.date_from === isoDaysAgo(42) && req.date_to === isoDaysAgo(28),
+                    ),
             )
             .toBe(true);
-        await expect(page.locator(`#stats .stats-day[data-date="${isoDaysAgo(30)}"]`)).toBeVisible();
+        await expect(
+            page.locator(`#stats .stats-day[data-date="${isoDaysAgo(30)}"]`),
+        ).toBeVisible();
     });
 
     test("the longest-idle list ranks by last completion and excludes never-completed", async ({

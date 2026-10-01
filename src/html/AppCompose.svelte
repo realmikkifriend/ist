@@ -9,6 +9,7 @@
     import Sidebar from "./sidebar/Sidebar.svelte";
     import ContextBadge from "./sidebar/ContextBadge.svelte";
     import Agenda from "./agenda/Agenda.svelte";
+    import Stats from "./stats/Stats.svelte";
     import Toasts from "./interface/Toasts.svelte";
     import type { HandlerMethodsContext } from "../types/methods";
 
@@ -23,7 +24,7 @@
 <div class="xs:flex hidden w-fit items-center">
     <Sidebar hash={$hashStore} />
 
-    {#if $displayTask && $hashStore !== "#today" && $hashStore !== "#tomorrow"}
+    {#if $displayTask && $hashStore !== "#today" && $hashStore !== "#tomorrow" && $hashStore !== "#stats"}
         {#key $displayTask.id}
             <ContextBadge />
         {/key}
@@ -32,6 +33,8 @@
 
 {#if $hashStore === "#today" || $hashStore === "#tomorrow"}
     <Agenda />
+{:else if $hashStore === "#stats"}
+    <Stats />
 {:else}
     <AppView {dataPromise} />
 {/if}

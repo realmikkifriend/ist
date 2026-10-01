@@ -1,7 +1,7 @@
 <script lang="ts">
     import { getContext } from "svelte";
     import { shortcut } from "@svelte-put/shortcut";
-    import { Icon, XCircle, Calendar, MagnifyingGlass } from "svelte-hero-icons";
+    import { Icon, XCircle, Calendar, MagnifyingGlass, ChartBarSquare } from "svelte-hero-icons";
     import { dndzone } from "svelte-dnd-action";
     import { todoistData } from "../../stores/stores";
     import { userSettings } from "../../stores/interface";
@@ -100,6 +100,18 @@
         >
             <Icon class="h-6 w-7" src={Calendar} />
             <kbd>a</kbd>
+        </button>
+        <button
+            class="relative"
+            aria-label="Stats"
+            onclick={() => {
+                window.location.hash = "#stats";
+                closeSidebar();
+            }}
+            tabindex="-1"
+            type="button"
+        >
+            <Icon class="h-6 w-7" src={ChartBarSquare} />
         </button>
         <button
             class="drawer-button relative -top-px bg-transparent hover:border-transparent hover:bg-transparent"

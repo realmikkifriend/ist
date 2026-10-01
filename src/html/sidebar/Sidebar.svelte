@@ -30,8 +30,14 @@
 
     <div
         class="drawer-content flex flex-row items-center"
-        class:invisible={isSidebarOpen || hash === "#today" || hash === "#tomorrow"}
-        class:pointer-events-none={isSidebarOpen || hash === "#today" || hash === "#tomorrow"}
+        class:invisible={isSidebarOpen ||
+            hash === "#today" ||
+            hash === "#tomorrow" ||
+            hash === "#stats"}
+        class:pointer-events-none={isSidebarOpen ||
+            hash === "#today" ||
+            hash === "#tomorrow" ||
+            hash === "#stats"}
     >
         <button
             class="btn drawer-button hover:bg-primary relative mt-0 w-12 bg-transparent p-0 shadow-none"

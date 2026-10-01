@@ -120,7 +120,7 @@ export function getActivity(
  * @param {GetAllActivityDataParams} params - Parameters for retrieving activity data.
  * @returns {Promise<TaskActivity[]>} - A promise that resolves to an array of TaskActivity objects.
  */
-const getAllActivityData = async ({
+export const getAllActivityData = async ({
     timeframe,
     accumulatedData = [],
     cursor = null,
