@@ -388,6 +388,61 @@ Feature: Activity & History
     WHEN the user presses h or clicks the history button
     THEN a calendar modal shows the task's completion dates (last 3 months), with future dates disabled.
 
+Feature: Stats
+
+  As a user, I want to see statistics about my task completion history
+  So that I can review my patterns and spot tasks I have been neglecting.
+
+  Scenario: The stats view opens from the sidebar
+    GIVEN the app is loaded and signed in
+    WHEN the user opens the sidebar and clicks the stats button
+    THEN the URL hash becomes #stats
+    AND the stats view is displayed in place of the task display
+    AND the sidebar drawer button is hidden while the stats view is open.
+
+  Scenario: The stats view appears on a page load with a #stats hash
+    GIVEN the app is loaded with the #stats URL hash
+    WHEN the app initializes
+    THEN the stats view is displayed.
+
+  Scenario: Closing the stats view restores the task view
+    GIVEN the stats view is open
+    WHEN the user clicks the stats close button
+    THEN the URL hash is cleared
+    AND the task view is displayed
+    AND the agenda views (#today and #tomorrow) continue to open and close as before.
+
+  Scenario: The stats view retrieves several weeks of completion history
+    GIVEN the stats view has never been opened
+    WHEN the stats view is opened
+    THEN the last four weeks of task completions are retrieved from the activity API
+    AND the retrieved history is saved to the persisted activity store
+    AND a record of the fetched window (oldest and newest date) is stored.
+
+  Scenario: Stored history is used before retrieving
+    GIVEN the stats history window has already been retrieved and stored
+    WHEN the stats view is opened again or the app is reloaded
+    THEN the stored history is displayed without retrieving the already-covered range.
+
+  Scenario: The retrieve-more button extends the history window
+    GIVEN the stats view is open with a stored history window
+    WHEN the user clicks the retrieve-more button
+    THEN two more weeks of history are retrieved, limited to the not-yet-covered range
+    AND the stored history window is extended
+    AND the chart displays the additional history.
+
+  Scenario: The completion chart stacks completions per day by context
+    GIVEN completion history is displayed in the stats view
+    WHEN the chart is rendered
+    THEN it shows one bar per day of the fetched window
+    AND each bar is stacked in segments colored by the contexts of the completed tasks.
+
+  Scenario: The longest-idle list ranks tasks by their last completion
+    GIVEN completion history is displayed in the stats view
+    WHEN the list is rendered
+    THEN tasks that have been completed before are listed in descending order of days since their last completion
+    AND tasks that have never been completed are excluded from the list.
+
 Feature: State Persistence
 
   As a user, I want my app state to survive a reload
