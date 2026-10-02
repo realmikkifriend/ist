@@ -26,9 +26,7 @@
      */
     const dueTasksByContext = $derived(getTasksGroupedByContext($todoistData.dueTasks));
 
-    let currentContexts: Context[] = $derived(
-        $todoistData.contexts.filter((context) => !context.inboxProject),
-    );
+    let currentContexts: Context[] = $derived($todoistData.contexts.filter((c) => !c.inboxProject));
 
     let taskSearchTerm = $state("");
 
@@ -37,8 +35,7 @@
      * @param e The event containing the list of contexts.
      */
     function handleDndConsider(e: CustomEvent<DndEvent<Context>>) {
-        const { items } = e.detail;
-        currentContexts = items;
+        currentContexts = e.detail.items;
     }
 
     /**
@@ -57,7 +54,7 @@
     /**
      * Opens the task search modal.
      */
-    function openTaskSearchModal() {
+    function openSearch() {
         taskSearchTerm = "";
         (document.getElementById("task_search_modal") as HTMLDialogElement)?.showModal();
         setTimeout(() => {
@@ -71,54 +68,53 @@
      */
     function closeOnBackdropClick(event: MouseEvent) {
         const dialog = event.currentTarget as HTMLDialogElement;
-        if (event.target === dialog) {
-            dialog.close();
-        }
+        if (event.target === dialog) dialog.close();
+    }
+
+    /**
+     * Opens the agenda for today and closes the sidebar.
+     */
+    function openTodayAgenda() {
+        openAgenda("today");
+        closeSidebar();
+    }
+
+    /**
+     * Navigates to the stats view and closes the sidebar.
+     */
+    function openStats() {
+        window.location.hash = "#stats";
+        closeSidebar();
+    }
+
+    /**
+     * Switches to the given context and closes the sidebar.
+     * @param context The context to select.
+     */
+    function selectContext(context: Context) {
+        handleContextChange(context.id);
+        closeSidebar();
     }
 </script>
 
 <div class="mb-2 ml-2 flex justify-between">
     <h1 class="text-2xl font-bold">Contexts</h1>
     <div class="buttons mt-0.5">
-        <button
-            class="relative"
-            onclick={() => void openTaskSearchModal()}
-            tabindex="-1"
-            type="button"
-        >
+        <button class="relative" onclick={openSearch} tabindex="-1" type="button">
             <Icon class="h-6 w-7" src={MagnifyingGlass} />
             <kbd>/</kbd>
         </button>
-        <button
-            class="relative"
-            onclick={() => {
-                openAgenda("today");
-                closeSidebar();
-            }}
-            tabindex="-1"
-            type="button"
-        >
+        <button class="relative" onclick={openTodayAgenda} tabindex="-1" type="button">
             <Icon class="h-6 w-7" src={Calendar} />
             <kbd>a</kbd>
         </button>
-        <button
-            class="relative"
-            aria-label="Stats"
-            onclick={() => {
-                window.location.hash = "#stats";
-                closeSidebar();
-            }}
-            tabindex="-1"
-            type="button"
-        >
+        <button class="relative" aria-label="Stats" onclick={openStats} tabindex="-1" type="button">
             <Icon class="h-6 w-7" src={ChartBarSquare} />
             <kbd>s</kbd>
         </button>
         <button
             class="drawer-button relative -top-px bg-transparent hover:border-transparent hover:bg-transparent"
-            onclick={() => {
-                closeSidebar();
-            }}
+            onclick={closeSidebar}
             tabindex="-1"
             type="button"
         >
@@ -135,32 +131,24 @@
     use:dndzone={{ items: currentContexts, flipDurationMs: 100, autoAriaDisabled: true }}
 >
     {#each currentContexts as context, i (context.id)}
+        {@const due = dueTasksByContext[context.id]}
         {@const isDisabled =
             ($userSettings.selectedContext && $userSettings.selectedContext.id !== context.id) ||
-            !dueTasksByContext[context.id] ||
-            dueTasksByContext[context.id].total === 0}
+            !due ||
+            due.total === 0}
         <button
             class="bg-secondary text-base-100 tooltip sm:tooltip-right tooltip-bottom mb-2 w-full rounded-lg border-l-6 {borderClasses[
                 context.color as ColorName
             ]}"
             class:opacity-25={isDisabled}
-            onclick={() => {
-                if (!isDisabled) {
-                    handleContextChange(context.id);
-                    closeSidebar();
-                }
-            }}
+            onclick={isDisabled ? undefined : () => selectContext(context)}
             tabindex={i + 1}
             type="button"
         >
             <ContextButtonContents
                 {context}
                 {isDisabled}
-                tasksForContext={dueTasksByContext[context.id] || {
-                    total: 0,
-                    priorities: {},
-                    tasks: [],
-                }}
+                tasksForContext={due ?? { total: 0, priorities: {}, tasks: [] }}
             />
         </button>
     {/each}
@@ -177,15 +165,6 @@
 
 <svelte:window
     use:shortcut={{
-        trigger: [
-            {
-                key: "/",
-                callback: () => {
-                    void openTaskSearchModal();
-                },
-                modifier: false,
-                preventDefault: true,
-            },
-        ],
+        trigger: [{ key: "/", callback: openSearch, modifier: false, preventDefault: true }],
     }}
 />
