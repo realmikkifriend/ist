@@ -394,7 +394,7 @@ Feature: Stats
   So that I can review my patterns and spot tasks I have been neglecting.
 
   Scenario: The stats view opens from the sidebar
-    # e2e: stats.spec.ts › "the sidebar button opens the stats view at #stats"
+    # e2e: stats.spec.ts › "the stats view opens, toggles, navigates, and closes"
     GIVEN the app is loaded and signed in
     WHEN the user opens the sidebar and clicks the stats button
     THEN the URL hash becomes #stats
@@ -402,7 +402,7 @@ Feature: Stats
     AND the sidebar drawer button is hidden while the stats view is open.
 
   Scenario: The s key toggles the stats view
-    # e2e: stats.spec.ts › "the s key toggles the stats view"
+    # e2e: stats.spec.ts › "the stats view opens, toggles, navigates, and closes"
     GIVEN the app is loaded and signed in
     WHEN the user presses s
     THEN the URL hash becomes #stats
@@ -412,13 +412,13 @@ Feature: Stats
     AND the task view is displayed.
 
   Scenario: The stats view appears on a page load with a #stats hash
-    # e2e: stats.spec.ts › "the stats view appears on a page load with the #stats hash"
+    # e2e: stats.spec.ts › "the stats view opens, toggles, navigates, and closes"
     GIVEN the app is loaded with the #stats URL hash
     WHEN the app initializes
     THEN the stats view is displayed.
 
   Scenario: Closing the stats view restores the task view
-    # e2e: stats.spec.ts › "closing the stats view restores the task view and the agenda views"
+    # e2e: stats.spec.ts › "the stats view opens, toggles, navigates, and closes"
     GIVEN the stats view is open
     WHEN the user clicks the stats close button
     THEN the URL hash is cleared
@@ -426,7 +426,7 @@ Feature: Stats
     AND the agenda views (#today and #tomorrow) continue to open and close as before.
 
   Scenario: The stats view retrieves several weeks of completion history
-    # e2e: stats.spec.ts › "completion history is fetched, stored, and stacked by day and context"
+    # e2e: stats.spec.ts › "completion history is fetched, stored, displayed, and reused after reload"
     GIVEN the stats view has never been opened
     WHEN the stats view is opened
     THEN the last four weeks of task completions are retrieved from the activity API
@@ -434,7 +434,7 @@ Feature: Stats
     AND a record of the fetched window (oldest and newest date) is stored.
 
   Scenario: Stored history is used before retrieving
-    # e2e: stats.spec.ts › "stored history is used without refetching on reload"
+    # e2e: stats.spec.ts › "completion history is fetched, stored, displayed, and reused after reload"
     GIVEN the stats history window has already been retrieved and stored
     WHEN the stats view is opened again or the app is reloaded
     THEN the stored history is displayed without retrieving the already-covered range.
@@ -448,18 +448,28 @@ Feature: Stats
     AND the chart displays the additional history.
 
   Scenario: The completion chart stacks completions per day by context
-    # e2e: stats.spec.ts › "completion history is fetched, stored, and stacked by day and context"
+    # e2e: stats.spec.ts › "completion history is fetched, stored, displayed, and reused after reload"
     GIVEN completion history is displayed in the stats view
     WHEN the chart is rendered
     THEN it shows one bar per day of the fetched window
     AND each bar is stacked in segments colored by the contexts of the completed tasks.
 
   Scenario: The longest-idle list ranks tasks by their last completion
-    # e2e: stats.spec.ts › "the longest-idle list ranks by last completion and excludes never-completed"
+    # e2e: stats.spec.ts › "the longest-idle list ranks tasks by days since their last completion"
+    # e2e: stats.spec.ts › "the longest-idle list is limited to the ten longest-idle entries"
     GIVEN completion history is displayed in the stats view
     WHEN the list is rendered
-    THEN tasks that have been completed before are listed in descending order of days since their last completion
-    AND tasks that have never been completed are excluded from the list.
+    THEN tasks with no completion in the retrieved window are listed first, each labeled with the window size and a plus sign
+    AND the remaining tasks are listed in descending order of days since their last completion
+    AND the list is limited to the ten longest-idle tasks
+    AND tasks with the never-mark-done label are excluded from the list.
+
+  Scenario: The longest-idle labels track the retrieved window
+    # e2e: stats.spec.ts › "out-of-window labels track the retrieved window after load more"
+    GIVEN the longest-idle list shows tasks with no completion labeled by the window size
+    WHEN the user retrieves more history
+    THEN those tasks are relabeled with the larger window size
+    AND tasks whose last completion now falls inside the window are listed with exact day counts.
 
 Feature: State Persistence
 

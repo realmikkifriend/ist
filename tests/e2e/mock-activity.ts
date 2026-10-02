@@ -1,4 +1,17 @@
+import { DateTime } from "luxon";
 import { E2E_PROJECTS } from "./mock-data";
+
+/**
+ * Builds a local-noon date a number of days ago, so activity events fall
+ * inside the fetched history window on a stable part of the day.
+ * @param {number} days - Number of days in the past.
+ * @returns {Date} The moment.
+ */
+export const daysAgoNoon = (days: number): Date =>
+    DateTime.now()
+        .minus({ days })
+        .set({ hour: 12, minute: 0, second: 0, millisecond: 0 })
+        .toJSDate();
 
 /**
  * Builds a Todoist wire-format activity-log event for a completed task. Activity

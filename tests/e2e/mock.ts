@@ -1,6 +1,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import type { Page } from "@playwright/test";
+import { DateTime } from "luxon";
 import { applySyncCommands, applyTaskUpdate } from "./mock-state";
 import { makeScenario } from "./scenarios";
 
@@ -19,6 +20,25 @@ function rawFixture(name: "projects" | "user"): unknown {
         );
     }
     return JSON.parse(readFileSync(file, "utf8")) as unknown;
+}
+
+/**
+ * Filters activity events to the requested date range (date_from inclusive,
+ * date_to exclusive), matching the live API's behavior.
+ * @param {Record<string, unknown>[]} events - The events to filter.
+ * @param {string | null} dateFrom - The inclusive start day (yyyy-MM-dd), or null.
+ * @param {string | null} dateTo - The exclusive end day (yyyy-MM-dd), or null.
+ * @returns {Record<string, unknown>[]} The events inside the range.
+ */
+function filterActivityByDate(
+    events: Record<string, unknown>[],
+    dateFrom: string | null,
+    dateTo: string | null,
+): Record<string, unknown>[] {
+    return events.filter((event) => {
+        const day = DateTime.fromISO(String(event.event_date)).toISODate() ?? "";
+        return (!dateFrom || day >= dateFrom) && (!dateTo || day < dateTo);
+    });
 }
 
 /**
@@ -107,7 +127,11 @@ export async function mockTodoistApi(
         if (request.method() === "GET" && path === "activities") {
             const params = url.searchParams;
             recordedActivityRequests.push(Object.fromEntries(params.entries()));
-            const events = scenario.activity[params.get("object_id") ?? ""] ?? [];
+            const events = filterActivityByDate(
+                scenario.activity[params.get("object_id") ?? ""] ?? [],
+                params.get("date_from"),
+                params.get("date_to"),
+            );
             await ok({ results: events, next_cursor: null });
             return;
         }

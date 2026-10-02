@@ -40,10 +40,14 @@ export interface StatsDayRow {
 
 /**
  * A task ranked by how many days have passed since their last completion.
+ * Tasks with no completion in the retrieved window rank first, with the
+ * window size shown as a lower bound.
  */
 export interface LongestIdleTask {
     taskId: string;
     title: string;
     contextId: string;
     days: number;
+    /** True when the task has no completion in the retrieved window. */
+    beyondWindow: boolean;
 }

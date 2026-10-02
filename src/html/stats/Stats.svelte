@@ -10,6 +10,7 @@
         extendStatsWindow,
         fetchRangeForWindow,
         initialStatsWindow,
+        statsWindowDays,
     } from "../../utils/statsUtils";
     import { buildDayStatsRows } from "../../utils/statsChartUtils";
     import { getLongestIdleTasks } from "../../utils/longestIdleUtils";
@@ -30,7 +31,9 @@
 
     let dayRows = $derived(buildDayStatsRows($taskActivity, statsWindow, $todoistData.contexts));
 
-    let longestIdle = $derived(getLongestIdleTasks($todoistData.tasks, $taskActivity));
+    let longestIdle = $derived(
+        getLongestIdleTasks($todoistData.tasks, $taskActivity, statsWindowDays(statsWindow)),
+    );
 
     /**
      * Fetches a range of completion history and stores the results along
@@ -111,7 +114,7 @@
         <StatsChart rows={dayRows} />
         <div class="mt-2 flex justify-center">
             <button
-                class="flex items-center gap-1.5 rounded-md bg-neutral px-3 py-1.5 text-sm text-primary-content transition-colors duration-200 hover:bg-base-300"
+                class="bg-neutral text-primary-content hover:bg-base-300 flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm transition-colors duration-200"
                 class:cursor-progress={isLoading}
                 onclick={retrieveMore}
                 title="Retrieve more history"
@@ -132,7 +135,8 @@
                         class="stats-longest-item border-base-300 flex items-center justify-between border-b py-1"
                     >
                         <span>{entry.title}</span>
-                        <span class="text-xs">{entry.days} days</span>
+                        <span class="text-xs">{entry.days}{entry.beyondWindow ? "+" : ""} days</span
+                        >
                     </li>
                 {/each}
             </ul>

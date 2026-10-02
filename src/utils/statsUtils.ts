@@ -20,6 +20,17 @@ export function initialStatsWindow(now: DateTime = DateTime.now()): StatsHistory
 }
 
 /**
+ * Counts the days of history covered by a fetched window.
+ * @param {StatsHistoryWindow} window - The fetched window.
+ * @returns {number} The number of retrieved days (oldest to newest).
+ */
+export function statsWindowDays(window: StatsHistoryWindow): number {
+    const oldest = DateTime.fromISO(window.oldest);
+    const newest = DateTime.fromISO(window.newest);
+    return Math.round(newest.diff(oldest, "days").days);
+}
+
+/**
  * Computes the range of history not yet covered by the stored window.
  * @param {StatsHistoryWindow | null} window - The stored fetched window, or null.
  * @param {DateTime} now - The reference moment.
