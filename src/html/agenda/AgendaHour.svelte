@@ -44,7 +44,7 @@
 
 <div class="hour group relative flex w-full items-start">
     <div
-        class="mr-1 flex w-16 min-w-16 flex-row items-center justify-end text-right font-extrabold"
+        class="mr-1 flex w-12 min-w-12 flex-row items-center justify-end text-right font-extrabold"
     >
         {#if tasks.length >= 4}
             <span class="mr-0.5 text-xs text-red-500">4+</span>

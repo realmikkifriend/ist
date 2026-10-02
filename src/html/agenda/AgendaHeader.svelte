@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { Icon, XCircle, Calendar } from "svelte-hero-icons";
+    import { Icon, XCircle, Calendar, ChartBarSquare } from "svelte-hero-icons";
     import NeverDoneIcon from "./NeverDoneIcon.svelte";
     import type { AgendaHeaderProps } from "../../types/agenda";
 
@@ -40,20 +40,39 @@
     function closeAgenda(): void {
         window.location.hash = "";
     }
+
+    /**
+     * Opens the stats view.
+     */
+    function openStatsView(): void {
+        window.location.hash = "#stats";
+    }
 </script>
 
-<div class="flex items-center justify-between pb-2 pl-16">
-    <button
-        class="relative rounded-full p-1 transition-colors duration-200 hover:bg-blue-800"
-        onclick={switchView}
-        title="switch agenda view"
-        type="button"
-    >
-        <Icon class="h-5 w-6" src={Calendar} />
-        <kbd>a</kbd>
-    </button>
-    <div class="mr-6 flex grow cursor-default flex-col items-center">
-        <h1 class="flex-1 text-center">{title}</h1>
+<div class="grid grid-cols-[1fr_auto_1fr] items-center pb-2">
+    <div class="flex items-center gap-1">
+        <button
+            class="relative rounded-full p-1 transition-colors duration-200 hover:bg-blue-800"
+            onclick={switchView}
+            title="switch agenda view"
+            type="button"
+        >
+            <Icon class="h-5 w-6" src={Calendar} />
+            <kbd>a</kbd>
+        </button>
+        <button
+            class="relative rounded-full p-1 transition-colors duration-200 hover:bg-blue-800"
+            aria-label="Stats"
+            onclick={openStatsView}
+            title="Open stats"
+            type="button"
+        >
+            <Icon class="h-5 w-6" src={ChartBarSquare} />
+            <kbd>s</kbd>
+        </button>
+    </div>
+    <div class="flex cursor-default flex-col items-center">
+        <h1 class="text-center">{title}</h1>
         <h2 class="rounded-lg px-3 py-0.5 text-center {headerGradientColor}" title={h2title}>
             {#if tasksNeverDone.length > 0 || (todayTasks.length > 0 && window.location.hash === "#tomorrow")}
                 <div class="mt-0 mb-1 flex flex-row items-center justify-center gap-1 text-xs">
@@ -80,11 +99,13 @@
             tasks
         </h2>
     </div>
-    <button
-        class="rounded-full p-1 transition-colors duration-200 hover:bg-red-700"
-        onclick={closeAgenda}
-        type="button"
-    >
-        <Icon class="h-5 w-6" src={XCircle} />
-    </button>
+    <div class="flex justify-end">
+        <button
+            class="rounded-full p-1 transition-colors duration-200 hover:bg-red-700"
+            onclick={closeAgenda}
+            type="button"
+        >
+            <Icon class="h-5 w-6" src={XCircle} />
+        </button>
+    </div>
 </div>

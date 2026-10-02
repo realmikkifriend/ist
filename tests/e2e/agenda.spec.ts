@@ -80,6 +80,14 @@ test.describe("agenda", () => {
         );
     });
 
+    test("the stats button in the agenda header opens the stats view", async ({ page }) => {
+        await loadApp(page, makeScenario());
+        await openAgenda(page, "#today");
+        await page.locator("#agenda").getByRole("button", { name: "Stats" }).click();
+        await expect(page).toHaveURL(/#stats$/);
+        await expect(page.locator("#stats")).toBeVisible();
+    });
+
     test("the displayed task is highlighted in the agenda", async ({ page }) => {
         await loadApp(page, makeScenario());
         await expect(page.getByRole("heading", { name: "Alpha due task" })).toBeVisible();

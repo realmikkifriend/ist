@@ -29,7 +29,7 @@
 </script>
 
 {#key agendaStore.tasks}
-    <div id="agenda" class="-mt-8 mr-4 max-w-lg sm:mx-auto sm:max-w-96">
+    <div id="agenda" class="xs:-mt-10 mt-0 mr-4 max-w-lg sm:mx-auto sm:max-w-96">
         <AgendaHeader
             agendaData={agendaStore}
             displayData={{
@@ -39,7 +39,7 @@
         />
 
         {#if noTimeTasks.length > 0}
-            <div class="mb-4 flex w-full flex-col items-center pr-2 pl-18">
+            <div class="mb-4 flex w-full flex-col items-center pr-6 pl-6">
                 {#each noTimeTasks as task (task.id)}
                     <AgendaTask
                         color={getTaskColor(task.contextId || "0", $todoistData.contexts) ??
@@ -50,7 +50,7 @@
             </div>
         {/if}
 
-        <div class="w-[99%] overflow-hidden pr-1">
+        <div class="-ml-4 w-[99%] overflow-hidden pr-2">
             {#key (DateTime.now().hour, agendaStore.tasks)}
                 {#each hourSlots as hour (hour)}
                     {#if getDisplayHours(agendaStore, DateTime.now(), hourSlots, getTitle($hashStore))[hour]}

@@ -1,9 +1,10 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import { DateTime } from "luxon";
-    import { Icon, XCircle, PlusCircle } from "svelte-hero-icons";
+    import { Icon, XCircle, PlusCircle, Calendar } from "svelte-hero-icons";
     import { todoistData, taskActivity, statsHistoryWindow } from "../../stores/stores";
     import { fetchCompletionHistory } from "../../services/statsService";
+    import { openAgenda } from "../../services/agendaService";
     import { mergeActivity } from "../../utils/activityUtils";
     import {
         extendStatsWindow,
@@ -82,44 +83,59 @@
 </script>
 
 <div id="stats" class="-mt-8 mr-4 max-w-lg sm:mx-auto sm:max-w-96">
-    <div class="flex items-center justify-between pb-2 pl-16">
+    <div class="grid grid-cols-[1fr_auto_1fr] items-center pb-2">
         <button
             class="relative rounded-full p-1 transition-colors duration-200 hover:bg-blue-800"
-            class:cursor-progress={isLoading}
-            onclick={retrieveMore}
-            title="Retrieve more history"
+            aria-label="Agenda"
+            onclick={() => openAgenda("today")}
+            title="Open today's agenda"
             type="button"
         >
-            <Icon class="h-5 w-6" src={PlusCircle} />
+            <Icon class="h-5 w-6" src={Calendar} />
+            <kbd>a</kbd>
         </button>
-        <div class="mr-6 flex grow cursor-default flex-col items-center">
-            <h1 class="flex-1 text-center">Stats</h1>
+        <h1 class="cursor-default text-center">Stats</h1>
+        <div class="flex justify-end">
+            <button
+                class="rounded-full p-1 transition-colors duration-200 hover:bg-red-700"
+                onclick={closeStats}
+                title="Close stats"
+                type="button"
+            >
+                <Icon class="h-5 w-6" src={XCircle} />
+            </button>
         </div>
-        <button
-            class="rounded-full p-1 transition-colors duration-200 hover:bg-red-700"
-            onclick={closeStats}
-            title="Close stats"
-            type="button"
-        >
-            <Icon class="h-5 w-6" src={XCircle} />
-        </button>
     </div>
 
     <section class="mb-6 w-full">
         <StatsChart rows={dayRows} />
+        <div class="mt-2 flex justify-center">
+            <button
+                class="flex items-center gap-1.5 rounded-md bg-neutral px-3 py-1.5 text-sm text-primary-content transition-colors duration-200 hover:bg-base-300"
+                class:cursor-progress={isLoading}
+                onclick={retrieveMore}
+                title="Retrieve more history"
+                type="button"
+            >
+                <Icon class="h-4 w-4" src={PlusCircle} />
+                <span>Load more</span>
+            </button>
+        </div>
     </section>
 
     <section class="w-full">
-        <h2 class="mb-1 text-center text-sm font-semibold">Longest without a completion</h2>
-        <ul class="stats-longest">
-            {#each longestIdle as entry (entry.taskId)}
-                <li
-                    class="stats-longest-item border-base-300 flex items-center justify-between border-b py-1"
-                >
-                    <span>{entry.title}</span>
-                    <span class="text-xs">{entry.days} days</span>
-                </li>
-            {/each}
-        </ul>
+        <div class="card bg-neutral text-primary-content rounded-xl p-3">
+            <h2 class="mb-1 text-center text-sm font-semibold">Longest without a completion</h2>
+            <ul class="stats-longest">
+                {#each longestIdle as entry (entry.taskId)}
+                    <li
+                        class="stats-longest-item border-base-300 flex items-center justify-between border-b py-1"
+                    >
+                        <span>{entry.title}</span>
+                        <span class="text-xs">{entry.days} days</span>
+                    </li>
+                {/each}
+            </ul>
+        </div>
     </section>
 </div>

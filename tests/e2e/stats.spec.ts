@@ -45,6 +45,14 @@ test.describe("stats", () => {
         await expect(page.locator("#stats")).toBeVisible();
     });
 
+    test("the agenda button in the stats header opens today's agenda", async ({ page }) => {
+        await loadApp(page, makeStatsScenario());
+        await openStats(page);
+        await page.locator("#stats").getByRole("button", { name: "Agenda" }).click();
+        await expect(page).toHaveURL(/#today$/);
+        await expect(page.locator("#agenda")).toBeVisible();
+    });
+
     test("the s key toggles the stats view", async ({ page }) => {
         await loadApp(page, makeStatsScenario());
         await page.keyboard.press("s");
@@ -107,7 +115,7 @@ test.describe("stats", () => {
         const handle = await loadApp(page, makeStatsScenario());
         await openStats(page);
         await expect(page.locator(`#stats .stats-day[data-date="${isoDaysAgo(30)}"]`)).toBeHidden();
-        await page.getByRole("button", { name: "Retrieve more history" }).click();
+        await page.getByRole("button", { name: "Load more" }).click();
         await expect
             .poll(() =>
                 handle
