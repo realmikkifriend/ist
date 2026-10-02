@@ -5,7 +5,7 @@
     let { row }: { row: StatsDayRow } = $props();
 </script>
 
-<div class="tooltip-content left-0 ml-24 w-80 translate-x-0 text-left">
+<div class="tooltip-content left-1/2 w-80 max-w-[85vw] text-left md:left-0 md:ml-24 md:translate-x-0">
     {#if row.entries.length > 0}
         {row.entries.length} tasks completed...
         <div class="my-2 space-y-1">

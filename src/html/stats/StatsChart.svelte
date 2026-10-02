@@ -1,18 +1,19 @@
 <script lang="ts">
     import { scaleBand } from "d3-scale";
-    import type { ScaleBand } from "d3-scale";
     import { DateTime } from "luxon";
     import { LayerCake, Svg } from "layercake";
     import type { LayerCakeContext } from "layercake";
     import { todoistData } from "../../stores/stores";
     import { chartFillClasses } from "../../styles/styleUtils";
-    import { chartColumnColors, totalColorClass } from "../../utils/statsChartUtils";
+    import { chartColumns, isWeekBoundary, totalColorClass } from "../../utils/statsChartUtils";
     import StatsDayTooltip from "./StatsDayTooltip.svelte";
     import type { StatsDayRow } from "../../types/stats";
 
     let { rows }: { rows: StatsDayRow[] } = $props();
 
     const rowHeight = 14;
+    /** Extra space inserted below a Sunday row to separate the weeks. */
+    const weekGap = 6;
     const leftPad = 128;
     const rightPad = 30;
     const colGap = 2;
@@ -20,18 +21,31 @@
 
     const dailyGoal = $derived($todoistData.user.dailyGoal);
 
-    const chartHeight = $derived(rows.length * rowHeight + 4);
-    const yDomain = $derived(rows.map((row) => row.date));
+    const columns = $derived(chartColumns(rows));
 
-    /** The largest count a single column reached in the window; all bars scale to it. */
-    const maxColumnCount = $derived(
-        rows.length > 0
-            ? Math.max(...rows.flatMap((row) => row.segments.map((segment) => segment.count)))
-            : 1,
+    /**
+     * The week gap following each row: present when the next (older) row falls
+     * in a different week, so a visible gap separates the weeks.
+     */
+    const afterRowGaps = $derived(
+        rows.map((row, i) =>
+            rows[i + 1] ? (isWeekBoundary(row.date, rows[i + 1].date) ? weekGap : 0) : 0,
+        ),
+    );
+    /** Running totals of the gaps, so `cumulativeGaps[i]` is all gap after row i. */
+    const cumulativeGaps = $derived(
+        afterRowGaps.reduce<number[]>((acc, gap, i) => [...acc, (acc[i - 1] ?? 0) + gap], []),
+    );
+    /** Vertical offset of each row, including the week gaps above it. */
+    const rowOffsets = $derived(
+        rows.map((_, i) => i * rowHeight + (i === 0 ? 0 : (cumulativeGaps[i - 1] ?? 0))),
     );
 
-    /** One chart column per distinct color present in the window. */
-    const columnColors = $derived(chartColumnColors(rows));
+    const chartHeight = $derived(
+        rows.length > 0 ? rows.length * rowHeight + (cumulativeGaps[rows.length - 2] ?? 0) + 4 : 4,
+    );
+
+    const yDomain = $derived(rows.map((row) => row.date));
 
     /**
      * Formats a row date with its abbreviated weekday.
@@ -63,37 +77,50 @@
             yScale={scaleBand()}
         >
             {#snippet children(k: LayerCakeContext)}
-                {@const yScale = k.yScale as ScaleBand<string>}
-                {@const colWidth = k.width / columnColors.length}
+                {@const totalMax = columns.reduce((sum, column) => sum + column.maxCount, 0)}
+                {@const columnLayout = columns.map((column, i) => {
+                    const width = totalMax > 0 ? (column.maxCount / totalMax) * k.width : 0;
+                    const start = columns
+                        .slice(0, i)
+                        .reduce(
+                            (sum, previous) => sum + (previous.maxCount / totalMax) * k.width,
+                            0,
+                        );
+                    return { ...column, width, start };
+                })}
                 <Svg pointerEvents={false}>
-                    {#each rows as row (row.date)}
+                    {#each rows as row, rowIndex (row.date)}
                         {@const isToday = row.date === todayIso}
                         <g
                             class="stats-day"
                             class:stats-day-today={isToday}
                             data-date={row.date}
-                            transform={`translate(0, ${yScale(row.date)})`}
+                            transform={`translate(0, ${rowOffsets[rowIndex]})`}
                         >
                             {#if isToday}
                                 <rect
                                     class="stats-today-band fill-current opacity-10"
-                                    height={yScale.bandwidth()}
+                                    height={rowHeight}
                                     width={k.width + leftPad + rightPad}
                                     x={-leftPad}
                                 />
                             {/if}
                             {#each row.segments as segment (segment.color ?? "unknown")}
-                                {@const colIndex = columnColors.indexOf(segment.color)}
+                                {@const colIndex = columns.findIndex(
+                                    (column) => column.color === segment.color,
+                                )}
+                                {@const column = columnLayout[colIndex]}
+                                {@const barWidth =
+                                    (segment.count / column.maxCount) * (column.width - 2 * colGap)}
                                 <rect
                                     class={`stats-segment ${
                                         segment.color
                                             ? chartFillClasses[segment.color]
                                             : "fill-gray-400"
                                     }`}
-                                    height={yScale.bandwidth() - 1}
-                                    width={(segment.count / maxColumnCount) *
-                                        (colWidth - 2 * colGap)}
-                                    x={colIndex * colWidth + colGap}
+                                    height={rowHeight - 1}
+                                    width={barWidth}
+                                    x={column.start + (column.width - barWidth) / 2}
                                 />
                             {/each}
                             <text
@@ -102,7 +129,7 @@
                                 dominant-baseline="middle"
                                 text-anchor="end"
                                 x={-8}
-                                y={yScale.bandwidth() / 2}
+                                y={rowHeight / 2}
                             >
                                 {dayLabel(row.date)}
                             </text>
@@ -111,7 +138,7 @@
                                 class:font-bold={isToday}
                                 dominant-baseline="middle"
                                 x={k.width + 4}
-                                y={yScale.bandwidth() / 2}
+                                y={rowHeight / 2}
                             >
                                 {row.total}
                             </text>
@@ -121,10 +148,14 @@
             {/snippet}
         </LayerCake>
         <div class="pointer-events-none absolute inset-y-0.5 right-0 left-0">
-            {#each rows as row (row.date)}
+            {#each rows as row, rowIndex (row.date)}
+                {@const gapBefore = rowIndex > 0 ? (afterRowGaps[rowIndex - 1] ?? 0) : 0}
                 <div
                     style:height="{rowHeight}px"
-                    class="stats-row tooltip tooltip-bottom pointer-events-auto w-full"
+                    style:margin-top="{gapBefore}px"
+                    class="stats-row tooltip pointer-events-auto w-full"
+                    class:tooltip-bottom={rowIndex !== rows.length - 1}
+                    class:tooltip-top={rowIndex === rows.length - 1}
                     onblur={(e) => showTooltip(e.currentTarget, false)}
                     onfocus={(e) => showTooltip(e.currentTarget, true)}
                     onmouseenter={(e) => showTooltip(e.currentTarget, true)}

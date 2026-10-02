@@ -10,6 +10,15 @@ export interface StatsHistoryWindow {
 }
 
 /**
+ * One chart column: a bar color and the largest single-day count that color
+ * reached in the window. Column widths and bar scaling key off this max.
+ */
+export interface StatsChartColumn {
+    color: ColorName | null;
+    maxCount: number;
+}
+
+/**
  * One per-color bar of a per-day chart row, in completion-count units
  * (same-colored contexts merged).
  */

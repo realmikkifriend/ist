@@ -3,6 +3,7 @@ import type { Context, ColorName } from "../types/todoist";
 import type { TaskActivity } from "../types/activity";
 import type {
     StatsHistoryWindow,
+    StatsChartColumn,
     StatsDaySegment,
     StatsDayRow,
     StatsDayEntry,
@@ -127,16 +128,45 @@ export function totalColorClass(total: number, dailyGoal: number): string {
 }
 
 /**
- * Collects the distinct bar colors present across chart rows, in one equal
- * column per color.
+ * Collects one column per distinct bar color present across chart rows, each
+ * carrying the largest single-day count that color reached.
  * @param {StatsDayRow[]} rows - The chart rows to inspect.
- * @returns {(ColorName | null)[]} The colors, in the standard color order
+ * @returns {StatsChartColumn[]} The columns, in the standard color order
  *   (unknown colors last).
  */
-export function chartColumnColors(rows: StatsDayRow[]): (ColorName | null)[] {
-    const colors = new Set<ColorName | null>();
-    rows.flatMap((row) => row.segments).forEach((segment) => colors.add(segment.color));
+export function chartColumns(rows: StatsDayRow[]): StatsChartColumn[] {
+    const maxByColor = new Map<ColorName | null, number>();
+    rows.forEach((row) =>
+        row.segments.forEach((segment) =>
+            maxByColor.set(segment.color, Math.max(maxByColor.get(segment.color) ?? 0, segment.count)),
+        ),
+    );
     const order = (color: ColorName | null): number =>
         color ? CONTEXT_COLOR_ORDER.indexOf(color) : 999;
-    return [...colors].sort((a, b) => order(a) - order(b));
+    return [...maxByColor.entries()]
+        .sort((a, b) => order(a[0]) - order(b[0]))
+        .map(([color, maxCount]) => ({ color, maxCount }));
+}
+
+/**
+ * Resolves the Monday of the calendar week (Mon–Sun) containing a day, as a
+ * local ISO date, so two days can be compared for week membership.
+ * @param {string} date - A local ISO date.
+ * @returns {string} The ISO date of that week's Monday.
+ */
+export function weekStartIso(date: string): string {
+    const day = DateTime.fromISO(date);
+    return day.minus({ days: day.weekday - 1 }).toISODate() ?? "";
+}
+
+/**
+ * Determines whether two days fall in different calendar weeks (Mon–Sun). The
+ * chart is newest-first, so the week boundary is the pair of consecutive rows
+ * straddling two weeks.
+ * @param {string} a - A local ISO date.
+ * @param {string} b - A local ISO date.
+ * @returns {boolean} True when the dates are in different weeks.
+ */
+export function isWeekBoundary(a: string, b: string): boolean {
+    return weekStartIso(a) !== weekStartIso(b);
 }

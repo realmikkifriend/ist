@@ -75,6 +75,14 @@ body {
     line-height: 1;
 }
 
+/* STATS */
+
+.stats-day-label,
+.stats-day-total {
+    opacity: 0.6;
+    font-size: 0.75rem;
+}
+
 /* BUTTONS */
 button,
 .btn {

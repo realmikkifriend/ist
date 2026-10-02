@@ -37,6 +37,27 @@ export const makeStatsScenarioWithNeverDoneTask = (): ReturnType<typeof makeScen
 };
 
 /**
+ * Builds a scenario for chart-column layout: three home (blue) completions one
+ * day ago, plus one home (blue) and one self-care (berry_red) completion four
+ * days ago — so blue's busiest day (3) is far busier than berry's (1).
+ * @returns {object} A scenario with per-color completions for the chart.
+ */
+export const makeChartColumnScenario = (): ReturnType<typeof makeScenario> =>
+    makeScenario({
+        activity: {
+            "": [
+                makeActivityEvent("task-alpha", daysAgoNoon(1)),
+                makeActivityEvent("task-gamma", daysAgoNoon(1)),
+                makeActivityEvent("task-epsilon", daysAgoNoon(1)),
+                makeActivityEvent("task-alpha", daysAgoNoon(4)),
+                makeActivityEvent("task-beta", daysAgoNoon(4), {
+                    parent_project_id: E2E_PROJECTS.selfCare,
+                }),
+            ],
+        },
+    });
+
+/**
  * Builds a scenario whose eleven tasks were each completed once, 1 through 11
  * days ago — enough completions to overflow the longest-idle list's limit.
  * @returns {object} A scenario with eleven once-completed tasks.
