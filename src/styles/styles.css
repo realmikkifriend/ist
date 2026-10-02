@@ -59,11 +59,13 @@ body {
 /* AGENDA */
 
 #agenda h1,
-#agenda h2 {
+#agenda h2,
+#stats h1 {
     text-align: center;
     font-weight: 700;
 }
-#agenda h1 {
+#agenda h1,
+#stats h1 {
     font-size: 1.5rem;
     line-height: 2rem;
 }

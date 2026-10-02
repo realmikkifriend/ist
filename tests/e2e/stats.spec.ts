@@ -71,7 +71,7 @@ test.describe("stats", () => {
         await expect(page.locator("#agenda")).toBeVisible();
     });
 
-    test("completion history is fetched, stored, and stacked by day and context", async ({
+    test("completion history is fetched, stored, and grouped by day and context", async ({
         page,
     }) => {
         const handle = await loadApp(page, makeStatsScenario());

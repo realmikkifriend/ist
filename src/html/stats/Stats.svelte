@@ -6,12 +6,12 @@
     import { fetchCompletionHistory } from "../../services/statsService";
     import { mergeActivity } from "../../utils/activityUtils";
     import {
-        buildDayStatsRows,
         extendStatsWindow,
         fetchRangeForWindow,
-        getLongestIdleTasks,
         initialStatsWindow,
     } from "../../utils/statsUtils";
+    import { buildDayStatsRows } from "../../utils/statsChartUtils";
+    import { getLongestIdleTasks } from "../../utils/longestIdleUtils";
     import StatsChart from "./StatsChart.svelte";
     import type { StatsHistoryWindow } from "../../types/stats";
 
@@ -94,7 +94,6 @@
         </button>
         <div class="mr-6 flex grow cursor-default flex-col items-center">
             <h1 class="flex-1 text-center">Stats</h1>
-            <h2 class="text-center">Completions since {statsWindow.oldest}</h2>
         </div>
         <button
             class="rounded-full p-1 transition-colors duration-200 hover:bg-red-700"
@@ -107,7 +106,6 @@
     </div>
 
     <section class="mb-6 w-full">
-        <h2 class="mb-1 text-center text-sm font-semibold">Completions per day</h2>
         <StatsChart rows={dayRows} />
     </section>
 

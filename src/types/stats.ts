@@ -10,27 +10,36 @@ export interface StatsHistoryWindow {
 }
 
 /**
- * One stacked segment of a per-day chart row, in completion-count units.
+ * One per-color bar of a per-day chart row, in completion-count units
+ * (same-colored contexts merged).
  */
 export interface StatsDaySegment {
-    contextId: string;
     color: ColorName | null;
     count: number;
-    start: number;
-    end: number;
 }
 
 /**
- * One day of the chart, with its per-context segments stacked in order.
+ * One completion entry in a day's tooltip list, in completion order.
+ */
+export interface StatsDayEntry {
+    taskId: string;
+    title: string;
+    time: string;
+    temporary: boolean;
+}
+
+/**
+ * One day of the chart, with its per-color segments and completion entries.
  */
 export interface StatsDayRow {
     date: string;
     total: number;
     segments: StatsDaySegment[];
+    entries: StatsDayEntry[];
 }
 
 /**
- * A task ranked by how many days have passed since its last completion.
+ * A task ranked by how many days have passed since their last completion.
  */
 export interface LongestIdleTask {
     taskId: string;
