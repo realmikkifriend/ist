@@ -12,8 +12,13 @@
 
     let isSpinning = $state(false);
 
-    const { changeSelectedContext, setTask, handleDataUpdates, handleTaskDisplay } =
-        getContext<AppStateMutatorsContext>("appStateMutators");
+    const {
+        changeSelectedContext,
+        clearPreviousDisplayTask,
+        setTask,
+        handleDataUpdates,
+        handleTaskDisplay,
+    } = getContext<AppStateMutatorsContext>("appStateMutators");
 
     $effect(() => {
         if ($userSettings.selectedContext || $todoistData.dueTasks) {
@@ -66,6 +71,10 @@
      */
     function handleContextChange(contextId: string | null): void {
         debounceState.clearDebounceTimeout();
+
+        // Context changes are user-initiated, so clear the previous first-due task to
+        // suppress the "new first-due task" toast on the re-display (like done/defer).
+        clearPreviousDisplayTask();
 
         const isCurrentlySelected = $userSettings.selectedContext?.id === contextId;
         const newSelectedContext = isCurrentlySelected

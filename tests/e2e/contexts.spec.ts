@@ -19,18 +19,18 @@ test.describe("contexts", () => {
         await selectContext(page, /Home/);
         await expect(page.getByRole("heading", { name: "Gamma due task" })).toBeVisible();
 
-        // Deselecting by re-clicking the selected context surfaces the
-        // new-first-due-task toast; confirm it.
+        // Deselecting by re-clicking the selected context displays the general
+        // first-due task immediately (user-initiated, so no toast).
         await selectContext(page, /Home/);
-        await page.getByRole("button", { name: /New first-due task/ }).click();
         await expect(page.getByRole("heading", { name: "Alpha due task" })).toBeVisible();
+        await expect(page.getByRole("button", { name: /New first-due task/ })).toHaveCount(0);
 
         // The x key clears the selection the same way.
         await selectContext(page, /Home/);
         await expect(page.getByRole("heading", { name: "Gamma due task" })).toBeVisible();
         await page.keyboard.press("x");
-        await page.getByRole("button", { name: /New first-due task/ }).click();
         await expect(page.getByRole("heading", { name: "Alpha due task" })).toBeVisible();
+        await expect(page.getByRole("button", { name: /New first-due task/ })).toHaveCount(0);
     });
 
     test("auto-unselects a selected context when it has no due tasks left", async ({ page }) => {

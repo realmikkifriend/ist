@@ -156,8 +156,7 @@ Feature: Contexts
     GIVEN a context has been selected
     WHEN the user de-selects the context (clicking the selected context, or pressing x)
     THEN the selection is cleared
-    AND the general due tasks are displayed
-    AND a "New first-due task!" toast is shown to confirm the general task.
+    AND the general first-due task is displayed immediately (the change is user-initiated, so no toast is shown).
 
   Scenario: The selected context has no due tasks left
     # e2e: contexts.spec.ts › "auto-unselects a selected context when it has no due tasks left"
