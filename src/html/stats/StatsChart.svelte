@@ -153,7 +153,7 @@
                 <div
                     style:height="{rowHeight}px"
                     style:margin-top="{gapBefore}px"
-                    class="stats-row tooltip pointer-events-auto w-full"
+                    class="stats-row tooltip pointer-events-auto block w-full"
                     class:tooltip-bottom={rowIndex !== rows.length - 1}
                     class:tooltip-top={rowIndex === rows.length - 1}
                     onblur={(e) => showTooltip(e.currentTarget, false)}
