@@ -35,6 +35,7 @@ export interface StatsDayEntry {
     title: string;
     time: string;
     temporary: boolean;
+    contextColor: ColorName | null;
 }
 
 /**

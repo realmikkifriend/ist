@@ -54,17 +54,24 @@ function buildSegments(dayActivities: TaskActivity[], contexts: Context[]): Stat
 /**
  * Builds the day's tooltip entries (its completions, in completion order).
  * @param {TaskActivity[]} dayActivities - Completions on a single day.
+ * @param {Context[]} contexts - The contexts to look up context colors from.
  * @returns {StatsDayEntry[]} The day's entries, oldest first.
  */
-function buildEntries(dayActivities: TaskActivity[]): StatsDayEntry[] {
+function buildEntries(dayActivities: TaskActivity[], contexts: Context[]): StatsDayEntry[] {
+    const contextMap = new Map(contexts.map((context) => [context.id, context]));
     return [...dayActivities]
         .sort((a, b) => a.date.valueOf() - b.date.valueOf())
-        .map((activity) => ({
-            taskId: activity.taskId,
-            title: activity.title,
-            time: activity.date.toFormat("hh:mm a"),
-            temporary: activity.temporary === true,
-        }));
+        .map((activity) => {
+            const context = contextMap.get(activity.contextId);
+            const contextColor = context ? (context.color as ColorName) : null;
+            return ({
+                taskId: activity.taskId,
+                title: activity.title,
+                time: activity.date.toFormat("hh:mm a"),
+                temporary: activity.temporary === true,
+                contextColor,
+            });
+        });
 }
 
 /**
@@ -101,7 +108,7 @@ export function buildDayStatsRows(
             return {
                 date,
                 segments,
-                entries: buildEntries(dayActivities),
+                entries: buildEntries(dayActivities, contexts),
                 total: segments.reduce((sum, s) => sum + s.count, 0),
             };
         });

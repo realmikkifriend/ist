@@ -2,6 +2,7 @@
     import { DateTime } from "luxon";
     import { Icon, ArrowPath } from "svelte-hero-icons";
     import type { StatsDayRow } from "../../types/stats";
+    import { colorClasses } from "../../styles/styleUtils";
 
     let { row }: { row: StatsDayRow } = $props();
 
@@ -16,8 +17,15 @@
         {dayLabel}: {row.entries.length} tasks completed...
         <div class="my-2 space-y-1">
             {#each row.entries as entry (`${entry.taskId}:${entry.time}`)}
-                <div class="ml-20 -indent-20">
+                <div class="flex flex-row gap-1">
                     <span class="font-mono tracking-tighter opacity-50">[{entry.time}]</span>
+                    {#if entry.contextColor}
+                        <div
+                            class="mt-1.25 h-1 w-0.5 max-w-0.5 rounded-sm border-none p-1 {colorClasses[
+                                entry.contextColor
+                            ].default}"
+                        ></div>
+                    {/if}
                     {entry.title}
                     {#if entry.temporary}
                         <Icon class="inline-block h-3 w-3 opacity-50" src={ArrowPath} />
