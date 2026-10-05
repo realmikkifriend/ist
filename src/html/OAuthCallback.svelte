@@ -1,6 +1,7 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import { getAuthToken } from "@doist/todoist-sdk";
+    import type { CustomFetchResponse } from "@doist/todoist-sdk";
     import { todoistAccessToken } from "../stores/secret";
 
     const TODOIST_CLIENT_ID: string | undefined = process.env.TODOIST_CLIENT_ID;
@@ -14,6 +15,33 @@
     // headers for any origin).
     const TOKEN_BASE_URL =
         typeof process === "object" ? window.location.origin : "https://todoist.com";
+
+    /**
+     * Fetch wrapper for the token exchange. Todoist's CORS preflight only
+     * allows the Authorization and Content-Type headers, but the SDK adds an
+     * X-Request-Id to POSTs, which would fail the preflight on a cross-origin
+     * call. Strip the header and forward to the native fetch.
+     * @param url - The request URL.
+     * @param options - The fetch options (plus an optional timeout, ignored).
+     * @returns The fetch response in the shape the SDK expects.
+     */
+    const corsSafeFetch = async (
+        url: string,
+        options?: RequestInit & { timeout?: number },
+    ): Promise<CustomFetchResponse> => {
+        const headers = new Headers(options?.headers);
+        headers.delete("x-request-id");
+        const response = await fetch(url, { ...options, headers });
+        const clone = response.clone();
+        return {
+            ok: response.ok,
+            status: response.status,
+            statusText: response.statusText,
+            headers: Object.fromEntries(response.headers.entries()),
+            text: () => clone.text(),
+            json: () => clone.json(),
+        };
+    };
 
     onMount((): void => {
         if (!TODOIST_CLIENT_ID || !TODOIST_CLIENT_SECRET) {
@@ -43,7 +71,10 @@
         clientId: string,
         clientSecret: string,
     ): Promise<void> {
-        return getAuthToken({ clientId, clientSecret, code }, { baseUrl: TOKEN_BASE_URL })
+        return getAuthToken(
+            { clientId, clientSecret, code },
+            { baseUrl: TOKEN_BASE_URL, customFetch: corsSafeFetch },
+        )
             .then(({ accessToken }) => {
                 todoistAccessToken.set(accessToken);
             })
