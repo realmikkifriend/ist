@@ -6,6 +6,15 @@
     const TODOIST_CLIENT_ID: string | undefined = process.env.TODOIST_CLIENT_ID;
     const TODOIST_CLIENT_SECRET: string | undefined = process.env.TODOIST_CLIENT_SECRET;
 
+    // The dev server injects a `window.process` polyfill into index.html (the
+    // production build statically replaces `process.env.*` instead), so the
+    // global's presence marks the local Vite server, which proxies /oauth to
+    // todoist.com. On a static production deploy there is no proxy, so the
+    // exchange must call Todoist directly (its token endpoint sends CORS
+    // headers for any origin).
+    const TOKEN_BASE_URL =
+        typeof process === "object" ? window.location.origin : "https://todoist.com";
+
     onMount((): void => {
         if (!TODOIST_CLIENT_ID || !TODOIST_CLIENT_SECRET) {
             console.error("Missing environment variables for Todoist OAuth");
@@ -34,7 +43,7 @@
         clientId: string,
         clientSecret: string,
     ): Promise<void> {
-        return getAuthToken({ clientId, clientSecret, code }, { baseUrl: window.location.origin })
+        return getAuthToken({ clientId, clientSecret, code }, { baseUrl: TOKEN_BASE_URL })
             .then(({ accessToken }) => {
                 todoistAccessToken.set(accessToken);
             })
