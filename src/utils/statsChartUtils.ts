@@ -4,11 +4,17 @@ import type { TaskActivity } from "../types/activity";
 import type {
     StatsHistoryWindow,
     StatsChartColumn,
+    StatsColumnLayout,
     StatsDaySegment,
     StatsDayRow,
     StatsDayEntry,
 } from "../types/stats";
 import { CONTEXT_COLOR_ORDER } from "./colorOrder";
+
+/** The height in pixels of one day row in the stats chart. */
+export const ROW_HEIGHT = 14;
+/** Extra space in pixels inserted after the week's last row to separate weeks. */
+export const WEEK_GAP = 6;
 
 /**
  * Orders segments by their context's position in the standard color order
@@ -64,13 +70,13 @@ function buildEntries(dayActivities: TaskActivity[], contexts: Context[]): Stats
         .map((activity) => {
             const context = contextMap.get(activity.contextId);
             const contextColor = context ? (context.color as ColorName) : null;
-            return ({
+            return {
                 taskId: activity.taskId,
                 title: activity.title,
                 time: activity.date.toFormat("hh:mm a"),
                 temporary: activity.temporary === true,
                 contextColor,
-            });
+            };
         });
 }
 
@@ -115,26 +121,6 @@ export function buildDayStatsRows(
 }
 
 /**
- * Colors a day's completion total relative to the user's daily goal:
- * red under the goal, blue from meeting it up to three over, green beyond.
- * @param {number} total - The day's completion count.
- * @param {number} dailyGoal - The user's daily goal.
- * @returns A Tailwind fill class (the inherited color when no goal is set).
- */
-export function totalColorClass(total: number, dailyGoal: number): string {
-    if (!dailyGoal) {
-        return "fill-current";
-    }
-    if (total < dailyGoal) {
-        return "fill-red-500";
-    }
-    if (total <= dailyGoal + 3) {
-        return "fill-blue-500";
-    }
-    return "fill-green-500";
-}
-
-/**
  * Collects one column per distinct bar color present across chart rows, each
  * carrying the largest single-day count that color reached.
  * @param {StatsDayRow[]} rows - The chart rows to inspect.
@@ -145,7 +131,10 @@ export function chartColumns(rows: StatsDayRow[]): StatsChartColumn[] {
     const maxByColor = new Map<ColorName | null, number>();
     rows.forEach((row) =>
         row.segments.forEach((segment) =>
-            maxByColor.set(segment.color, Math.max(maxByColor.get(segment.color) ?? 0, segment.count)),
+            maxByColor.set(
+                segment.color,
+                Math.max(maxByColor.get(segment.color) ?? 0, segment.count),
+            ),
         ),
     );
     const order = (color: ColorName | null): number =>
@@ -153,6 +142,34 @@ export function chartColumns(rows: StatsDayRow[]): StatsChartColumn[] {
     return [...maxByColor.entries()]
         .sort((a, b) => order(a[0]) - order(b[0]))
         .map(([color, maxCount]) => ({ color, maxCount }));
+}
+
+/**
+ * Computes the pixel layout of each chart column: a width proportional to its
+ * largest single-day count, and a start offset placing the columns in order
+ * across the chart area.
+ * @param {StatsChartColumn[]} columns - The chart columns to lay out.
+ * @param {number} containerWidth - Width of the chart area in pixels.
+ * @returns {StatsColumnLayout[]} The same columns with width and start added.
+ */
+export function layoutColumns(
+    columns: StatsChartColumn[],
+    containerWidth: number,
+): StatsColumnLayout[] {
+    const totalMax = columns.reduce((sum, column) => sum + column.maxCount, 0);
+    const widthOf = (column: StatsChartColumn): number =>
+        totalMax > 0 ? (column.maxCount / totalMax) * containerWidth : 0;
+    return columns.reduce<StatsColumnLayout[]>(
+        (acc, column, index) => [
+            ...acc,
+            {
+                ...column,
+                width: widthOf(column),
+                start: acc.slice(0, index).reduce((sum, previous) => sum + previous.width, 0),
+            },
+        ],
+        [],
+    );
 }
 
 /**

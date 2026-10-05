@@ -19,6 +19,17 @@ export interface StatsChartColumn {
 }
 
 /**
+ * A chart column with its computed pixel layout: a proportional width and a
+ * horizontal start offset within the chart area.
+ */
+export interface StatsColumnLayout extends StatsChartColumn {
+    /** The column's computed width in pixels. */
+    width: number;
+    /** The column's horizontal start offset in pixels. */
+    start: number;
+}
+
+/**
  * One per-color bar of a per-day chart row, in completion-count units
  * (same-colored contexts merged).
  */
@@ -46,6 +57,19 @@ export interface StatsDayRow {
     total: number;
     segments: StatsDaySegment[];
     entries: StatsDayEntry[];
+}
+
+/**
+ * The computed vertical pixel layout of the chart rows: the week gap
+ * following each row, each row's vertical offset, and the total height.
+ */
+export interface StatsRowLayout {
+    /** Gap after each row (the week gap when the next row starts a new week). */
+    afterRowGaps: number[];
+    /** Vertical pixel offset of each row, including the gaps above it. */
+    rowOffsets: number[];
+    /** Total height of the chart in pixels. */
+    chartHeight: number;
 }
 
 /**

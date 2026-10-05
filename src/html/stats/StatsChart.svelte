@@ -5,15 +5,15 @@
     import type { LayerCakeContext } from "layercake";
     import { todoistData } from "../../stores/stores";
     import { chartFillClasses } from "../../styles/styleUtils";
-    import { chartColumns, isWeekBoundary, totalColorClass } from "../../utils/statsChartUtils";
+    import { chartColumns, layoutColumns, ROW_HEIGHT } from "../../utils/statsChartUtils";
+    import { computeStreakStatus, streakHighlightHeight } from "../../utils/streakUtils";
+    import { dayLabel, rowLayout, showTooltip } from "../../utils/statsChartHelpers";
     import StatsDayTooltip from "./StatsDayTooltip.svelte";
     import type { StatsDayRow } from "../../types/stats";
 
     let { rows }: { rows: StatsDayRow[] } = $props();
 
-    const rowHeight = 14;
-    /** Extra space inserted below a Sunday row to separate the weeks. */
-    const weekGap = 6;
+    const highlightWidth = 18;
     const leftPad = 128;
     const rightPad = 30;
     const colGap = 2;
@@ -23,45 +23,16 @@
 
     const columns = $derived(chartColumns(rows));
 
-    /**
-     * The week gap following each row: present when the next (older) row falls
-     * in a different week, so a visible gap separates the weeks.
-     */
-    const afterRowGaps = $derived(
-        rows.map((row, i) =>
-            rows[i + 1] ? (isWeekBoundary(row.date, rows[i + 1].date) ? weekGap : 0) : 0,
-        ),
-    );
-    /** Running totals of the gaps, so `cumulativeGaps[i]` is all gap after row i. */
-    const cumulativeGaps = $derived(
-        afterRowGaps.reduce<number[]>((acc, gap, i) => [...acc, (acc[i - 1] ?? 0) + gap], []),
-    );
-    /** Vertical offset of each row, including the week gaps above it. */
-    const rowOffsets = $derived(
-        rows.map((_, i) => i * rowHeight + (i === 0 ? 0 : (cumulativeGaps[i - 1] ?? 0))),
-    );
+    const { afterRowGaps, rowOffsets, chartHeight } = $derived(rowLayout(rows));
 
-    const chartHeight = $derived(
-        rows.length > 0 ? rows.length * rowHeight + (cumulativeGaps[rows.length - 2] ?? 0) + 4 : 4,
-    );
+    const hitGoal = $derived(rows.map((row) => row.total >= dailyGoal && dailyGoal > 0));
+    /**
+     * For each row: 0 = not in a streak of length >=2, 1 = first day of one,
+     * 2 = a middle day, 3 = the last day.
+     */
+    const streakStatus = $derived(computeStreakStatus(hitGoal));
 
     const yDomain = $derived(rows.map((row) => row.date));
-
-    /**
-     * Formats a row date with its abbreviated weekday.
-     * @param date - A local ISO date.
-     * @returns E.g. "Mon 2026-10-01".
-     */
-    const dayLabel = (date: string): string => DateTime.fromISO(date).toFormat("ccc yyyy-MM-dd");
-
-    /**
-     * Toggles the row tooltip's open state (daisyUI tooltip).
-     * @param element - The row element whose tooltip is toggled.
-     * @param open - Whether the tooltip should be open.
-     */
-    const showTooltip = (element: Element, open: boolean): void => {
-        element.classList.toggle("tooltip-open", open);
-    };
 </script>
 
 {#if rows.length === 0}
@@ -77,17 +48,7 @@
             yScale={scaleBand()}
         >
             {#snippet children(k: LayerCakeContext)}
-                {@const totalMax = columns.reduce((sum, column) => sum + column.maxCount, 0)}
-                {@const columnLayout = columns.map((column, i) => {
-                    const width = totalMax > 0 ? (column.maxCount / totalMax) * k.width : 0;
-                    const start = columns
-                        .slice(0, i)
-                        .reduce(
-                            (sum, previous) => sum + (previous.maxCount / totalMax) * k.width,
-                            0,
-                        );
-                    return { ...column, width, start };
-                })}
+                {@const columnLayout = layoutColumns(columns, k.width)}
                 <Svg pointerEvents={false}>
                     {#each rows as row, rowIndex (row.date)}
                         {@const isToday = row.date === todayIso}
@@ -97,10 +58,26 @@
                             data-date={row.date}
                             transform={`translate(0, ${rowOffsets[rowIndex]})`}
                         >
+                            {#if streakStatus[rowIndex] !== 0}
+                                <rect
+                                    class="fill-gray-600"
+                                    height={streakHighlightHeight(
+                                        row.date,
+                                        rowIndex,
+                                        rows,
+                                        afterRowGaps,
+                                    )}
+                                    rx={2}
+                                    ry={2}
+                                    width={highlightWidth}
+                                    x={k.width + 6}
+                                    y={-1.5}
+                                />
+                            {/if}
                             {#if isToday}
                                 <rect
                                     class="stats-today-band fill-current opacity-10"
-                                    height={rowHeight}
+                                    height={ROW_HEIGHT}
                                     width={k.width + leftPad + rightPad}
                                     x={-leftPad}
                                 />
@@ -118,7 +95,7 @@
                                             ? chartFillClasses[segment.color]
                                             : "fill-gray-400"
                                     }`}
-                                    height={rowHeight - 1}
+                                    height={ROW_HEIGHT - 1}
                                     width={barWidth}
                                     x={column.start + (column.width - barWidth) / 2}
                                 />
@@ -129,16 +106,18 @@
                                 dominant-baseline="middle"
                                 text-anchor="end"
                                 x={-8}
-                                y={rowHeight / 2}
+                                y={ROW_HEIGHT / 2}
                             >
                                 {dayLabel(row.date)}
                             </text>
                             <text
-                                class={`stats-day-total ${totalColorClass(row.total, dailyGoal)}`}
-                                class:font-bold={isToday}
+                                class="stats-day-total"
+                                class:font-bold={isToday || row.total >= dailyGoal}
                                 dominant-baseline="middle"
-                                x={k.width + 4}
-                                y={rowHeight / 2}
+                                fill="#f8f9fa"
+                                text-anchor="middle"
+                                x={k.width + rightPad / 2}
+                                y={ROW_HEIGHT / 2}
                             >
                                 {row.total}
                             </text>
@@ -151,7 +130,7 @@
             {#each rows as row, rowIndex (row.date)}
                 {@const gapBefore = rowIndex > 0 ? (afterRowGaps[rowIndex - 1] ?? 0) : 0}
                 <div
-                    style:height="{rowHeight}px"
+                    style:height="{ROW_HEIGHT}px"
                     style:margin-top="{gapBefore}px"
                     class="stats-row tooltip pointer-events-auto block w-full"
                     class:tooltip-bottom={rowIndex !== rows.length - 1}
