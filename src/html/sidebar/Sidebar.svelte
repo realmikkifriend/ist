@@ -17,6 +17,15 @@
     function closeSidebar(): void {
         isSidebarOpen = false;
     }
+
+    /**
+     * Handles page show event (e.g., restoring from back/forward cache).
+     * Ensures sidebar state is reset when page is restored from cache.
+     */
+    function handlePageShow(): void {
+        // Reset sidebar state when page is shown (restored from cache)
+        isSidebarOpen = false;
+    }
 </script>
 
 <div class="drawer">
@@ -90,4 +99,5 @@
             },
         ],
     }}
+    on:pageshow={handlePageShow}
 />
