@@ -83,6 +83,7 @@
 </div>
 
 <svelte:window
+    on:pageshow={handlePageShow}
     use:shortcut={{
         trigger: [
             {
@@ -99,5 +100,4 @@
             },
         ],
     }}
-    on:pageshow={handlePageShow}
 />
