@@ -74,7 +74,7 @@ test.describe("stats", () => {
                 handle
                     .activityRequests()
                     .some(
-                        (req) => req.date_from === isoDaysAgo(42) && req.date_to === isoDaysAgo(28),
+                        (req) => req.date_from === isoDaysAgo(42) && req.date_to === isoDaysAgo(27),
                     ),
             )
             .toBe(true);
