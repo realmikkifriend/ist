@@ -71,6 +71,9 @@ export const updateDisplayTask = async (
 
 /**
  * Processes the update for the first due task, including loading comments and handling toast notifications.
+ * When the first-due task is unchanged since the previous display, the previous
+ * task is reused as-is (same reference) so its cached comments, activity and
+ * Dynalist widgets are not re-enriched or re-rendered.
  * @param {Task[]} dueTasks - The list of due tasks.
  * @param {Task | null} prevTask - The previously set first due task.
  * @param {string | null} selectedContextId - The ID of the currently selected context.
@@ -88,6 +91,11 @@ const processDueTaskUpdate = async (
     }
 
     const taskToProcess = preEnrichedTask || dueTasks[0];
+
+    if (!preEnrichedTask && prevTask && prevTask.id === taskToProcess.id) {
+        return { task: prevTask, showNewTaskToast: false };
+    }
+
     const taskWithData = await enrichTask(taskToProcess, get(todoistAccessToken));
 
     const showNewTaskToast = doShowNewTaskToast(taskWithData, prevTask, selectedContextId);

@@ -99,6 +99,16 @@ Feature: Task Display
     WHEN new data arrives
     THEN the currently displayed task is kept unchanged.
 
+  Scenario: A refresh does not re-enrich an unchanged displayed task
+    # e2e: task-refresh.spec.ts › "keeps an unchanged displayed task's Dynalist checklist without refetching"
+    # unit: first-task-service.test.ts › "reuses the previous task when the first-due task is unchanged"
+    GIVEN a task is displayed
+    WHEN a refresh (button, r key, or the 5-minute auto-refresh) fetches new data
+    AND the first-due task is unchanged
+    THEN the displayed task is kept as-is without re-enrichment
+    AND its comments, activity history and Dynalist widgets are not reloaded.
+    TODO: the task's scalar fields (content, due date, ...) go stale until the first-due task changes.
+
   Scenario: The first-due task changes while the user is on another task
     # e2e: task-refresh.spec.ts › "keeps the displayed task while the 2 s display debounce is active" (ends with the toast click)
     GIVEN a task is displayed

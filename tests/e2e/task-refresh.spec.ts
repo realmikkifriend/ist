@@ -1,6 +1,7 @@
 import { expect, test } from "@playwright/test";
-import { loadApp, TODOIST_TOKEN } from "./helpers";
+import { loadApp, loadDynalist, TODOIST_TOKEN } from "./helpers";
 import { failTodoistRoutes } from "./mock-failures";
+import { makeChecklistDynalistDocument } from "./mock-dynalist";
 import { dueObject, makeTask } from "./mock-data";
 import { mockTodoistApi } from "./mock";
 import { seedLocalStorage } from "./seed";
@@ -36,6 +37,30 @@ test.describe("task refresh & display update", () => {
         // After the window, the changed first-due task surfaces as a toast; click adopts it.
         await page.getByRole("button", { name: "New first-due task! Click to update..." }).click();
         await expect(page.getByRole("heading", { name: "Beta due task" })).toBeVisible();
+    });
+
+    test("keeps an unchanged displayed task's Dynalist checklist without refetching", async ({
+        page,
+    }) => {
+        const handle = await loadDynalist(
+            page,
+            "https://dynalist.io/d/e2e-dynalist#z=root",
+            makeChecklistDynalistDocument(),
+        );
+        await expect(page.getByRole("heading", { name: "Alpha due task" })).toBeVisible();
+        await expect(page.getByText("First item")).toBeVisible();
+        expect(handle.reads()).toBe(1);
+
+        // Let the 2 s display debounce expire so the refresh recomputes the display.
+        await page.waitForTimeout(2500);
+        await page.keyboard.press("r");
+        await expect(page.getByRole("button", { name: "Todoist data updated!" })).toBeVisible();
+
+        // Give any (incorrect) re-enrichment chain a moment to land its doc/read.
+        await page.waitForTimeout(1000);
+        // The first-due task is unchanged, so the Dynalist document is not refetched.
+        expect(handle.reads()).toBe(1);
+        await expect(page.getByText("First item")).toBeVisible();
     });
 
     test("keeps the displayed task and shows an error toast when a refresh fails", async ({

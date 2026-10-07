@@ -154,23 +154,31 @@ export async function mockDynalistTokenValidation(
 
 /**
  * Intercepts the Dynalist `doc/read` and `doc/edit` endpoints. `doc/read`
- * serves the given document; `doc/edit` records each change set (exposed via
- * the returned handle) and answers with the ids of any inserted nodes.
+ * serves the given document (counted by the returned handle); `doc/edit`
+ * records each change set and answers with the ids of any inserted nodes.
  * @param {Page} page - Playwright page on which to register the routes.
  * @param {Record<string, unknown>} document - The `{ file_id, nodes }` payload to serve.
- * @returns {Promise<{ edits: () => Record<string, unknown>[][] }>} A handle whose
- *   `edits()` returns the recorded change sets, one entry per `doc/edit` call.
+ * @returns {Promise<{
+ *   edits: () => Record<string, unknown>[][];
+ *   reads: () => number;
+ * }>} A handle whose `edits()` returns the recorded change sets (one entry per
+ *   `doc/edit` call) and whose `reads()` returns the `doc/read` call count.
  */
 export async function mockDynalistDocument(
     page: Page,
     document: Record<string, unknown>,
-): Promise<{ edits: () => Record<string, unknown>[][] }> {
+): Promise<{
+    edits: () => Record<string, unknown>[][];
+    reads: () => number;
+}> {
     const edits: Record<string, unknown>[][] = [];
+    let reads = 0;
 
     await page.route("**/dynalist.io/api/v1/doc/read", (route) => {
         if (route.request().method() === "OPTIONS") {
             return route.fulfill({ status: 204, headers: OPTIONS_HEADERS });
         }
+        reads += 1;
         return route.fulfill({ status: 200, headers: CORS_HEADERS, json: document });
     });
 
@@ -192,5 +200,5 @@ export async function mockDynalistDocument(
         });
     });
 
-    return { edits: () => edits };
+    return { edits: () => edits, reads: () => reads };
 }
