@@ -52,7 +52,7 @@ const buildActivityLogsQuery = (
     const taskFilter = task?.id ? { object_type: "item", objectId: task.id } : {};
     return {
         dateFrom: startDate.toISODate() ?? "",
-        dateTo: endDate.plus({ days: 1 }).toISODate() ?? "",
+        dateTo: endDate.plus({ days: 2 }).toISODate() ?? "",
         objectEventTypes: "task:completed",
         cursor,
         limit: 100,
