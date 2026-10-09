@@ -4,7 +4,7 @@ import type { TaskActivity } from "../types/activity";
 import type { LongestIdleTask } from "../types/stats";
 
 /** Maximum number of entries in the longest-idle list. */
-const LONGEST_IDLE_LIMIT = 10;
+const LONGEST_IDLE_LIMIT = 7;
 
 /**
  * Ranks tasks by how many days have passed since their last completion. Tasks

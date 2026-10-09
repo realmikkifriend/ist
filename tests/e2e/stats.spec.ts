@@ -119,15 +119,15 @@ test.describe("stats", () => {
         await expect(items.nth(2)).toHaveText(/Zeta no date.*30 days/);
     });
 
-    test("the longest-idle list is limited to the ten longest-idle entries", async ({ page }) => {
+    test("the longest-idle list is limited to the seven longest-idle entries", async ({ page }) => {
         await loadApp(page, makeLongestIdleLimitScenario());
         await openStats(page);
         const items = page.locator("#stats .stats-longest-item");
-        await expect(items).toHaveCount(10);
+        await expect(items).toHaveCount(7);
         await expect(items.nth(0)).toContainText("Idle task 11");
         await expect(items.nth(0)).toContainText("11 days");
-        await expect(items.nth(9)).toContainText("Idle task 2");
-        await expect(items.nth(9)).toContainText("2 days");
+        await expect(items.nth(6)).toContainText("Idle task 5");
+        await expect(items.nth(6)).toContainText("5 days");
         // the most recently completed task fell off the limited list
         await expect(
             page.locator("#stats .stats-longest").getByText("Idle task 1", { exact: true }),

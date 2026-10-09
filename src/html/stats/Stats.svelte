@@ -135,7 +135,8 @@
                         class="stats-longest-item border-base-300 flex items-center justify-between border-b py-1"
                     >
                         <span>{entry.title}</span>
-                        <span class="text-xs">{entry.days}{entry.beyondWindow ? "+" : ""} days</span
+                        <span class="min-w-16 text-right text-xs"
+                            >{entry.days}{entry.beyondWindow ? "+" : ""} days</span
                         >
                     </li>
                 {/each}
