@@ -101,14 +101,14 @@
                                 />
                             {/each}
                             <text
-                                class="stats-day-label fill-current"
+                                class="stats-day-label fill-current font-mono"
                                 class:font-bold={isToday}
                                 dominant-baseline="middle"
                                 text-anchor="end"
                                 x={-8}
                                 y={ROW_HEIGHT / 2}
                             >
-                                {dayLabel(row.date)}
+                                {dayLabel(row.date, rows[rowIndex - 1]?.date)}
                             </text>
                             <text
                                 class="stats-day-total"

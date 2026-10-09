@@ -26,12 +26,21 @@ export function rowLayout(rows: StatsDayRow[]): StatsRowLayout {
 }
 
 /**
- * Formats a row date with its abbreviated weekday.
+ * Formats a row date compactly against the newer row above it: the year is
+ * included when it differs from the row above (or there is none), the month
+ * abbreviation when the month differs, and the zero-padded day and
+ * abbreviated weekday are always shown — e.g. "2026 Oct 03 Sat", "02 Fri",
+ * "Sep 30 Wed".
  * @param {string} date - A local ISO date.
+ * @param {string} [prevDate] - The ISO date of the row above.
  * @returns {string} Formatted date string.
  */
-export function dayLabel(date: string): string {
-    return DateTime.fromISO(date).toFormat("ccc yyyy-MM-dd");
+export function dayLabel(date: string, prevDate?: string): string {
+    const dt = DateTime.fromISO(date);
+    const prev = prevDate ? DateTime.fromISO(prevDate) : null;
+    const year = !prev || prev.year !== dt.year ? `${dt.year} ` : "";
+    const month = !prev || prev.month !== dt.month ? dt.monthShort + " " : "";
+    return `${year}${month}${dt.toFormat("dd ccc")}`;
 }
 
 /**
