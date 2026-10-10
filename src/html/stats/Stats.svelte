@@ -129,11 +129,9 @@
     <section class="w-full">
         <div class="card bg-neutral text-primary-content rounded-xl p-3">
             <h2 class="mb-1 text-center text-sm font-semibold">Longest without a completion</h2>
-            <ul class="stats-longest">
+            <ul class="stats-longest divide-base-300 divide-y">
                 {#each longestIdle as entry (entry.taskId)}
-                    <li
-                        class="stats-longest-item border-base-300 flex items-center justify-between border-b py-1"
-                    >
+                    <li class="stats-longest-item flex items-center justify-between py-1">
                         <span>{entry.title}</span>
                         <span class="min-w-16 text-right text-xs"
                             >{entry.days}{entry.beyondWindow ? "+" : ""} days</span

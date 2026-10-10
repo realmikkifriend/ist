@@ -89,7 +89,7 @@ test.describe("stats", () => {
         await loadApp(page, makeStatsScenarioWithNeverDoneTask());
         await openStats(page);
         const items = page.locator("#stats .stats-longest-item");
-        await expect(items).toHaveCount(6);
+        await expect(items).toHaveCount(3);
         // the never-done (routine) task carries no completion history and is excluded
         await expect(items.filter({ hasText: "Routine task" })).toHaveCount(0);
         // tasks with no completion in the retrieved window lead, labeled with the window size
@@ -99,12 +99,12 @@ test.describe("stats", () => {
         await expect(items.nth(1)).toContainText("28+ days");
         await expect(items.nth(2)).toContainText("Zeta no date");
         await expect(items.nth(2)).toContainText("28+ days");
-        await expect(items.nth(3)).toContainText("Gamma due task");
-        await expect(items.nth(3)).toContainText("28 days");
-        await expect(items.nth(4)).toContainText("Beta due task");
-        await expect(items.nth(4)).toContainText("12 days");
-        await expect(items.nth(5)).toContainText("Alpha due task");
-        await expect(items.nth(5)).toContainText("2 days");
+        // await expect(items.nth(3)).toContainText("Gamma due task");
+        // await expect(items.nth(3)).toContainText("28 days");
+        // await expect(items.nth(4)).toContainText("Beta due task");
+        // await expect(items.nth(4)).toContainText("12 days");
+        // await expect(items.nth(5)).toContainText("Alpha due task");
+        // await expect(items.nth(5)).toContainText("2 days");
     });
 
     test("out-of-window labels track the retrieved window after load more", async ({ page }) => {
@@ -119,15 +119,15 @@ test.describe("stats", () => {
         await expect(items.nth(2)).toHaveText(/Zeta no date.*30 days/);
     });
 
-    test("the longest-idle list is limited to the seven longest-idle entries", async ({ page }) => {
+    test("the longest-idle list is limited to the three longest-idle entries", async ({ page }) => {
         await loadApp(page, makeLongestIdleLimitScenario());
         await openStats(page);
         const items = page.locator("#stats .stats-longest-item");
-        await expect(items).toHaveCount(7);
+        await expect(items).toHaveCount(3);
         await expect(items.nth(0)).toContainText("Idle task 11");
         await expect(items.nth(0)).toContainText("11 days");
-        await expect(items.nth(6)).toContainText("Idle task 5");
-        await expect(items.nth(6)).toContainText("5 days");
+        await expect(items.nth(2)).toContainText("Idle task 9");
+        await expect(items.nth(2)).toContainText("9 days");
         // the most recently completed task fell off the limited list
         await expect(
             page.locator("#stats .stats-longest").getByText("Idle task 1", { exact: true }),

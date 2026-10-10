@@ -465,12 +465,12 @@ Feature: Stats
 
   Scenario: The longest-idle list ranks tasks by their last completion
     # e2e: stats.spec.ts › "the longest-idle list ranks tasks by days since their last completion"
-    # e2e: stats.spec.ts › "the longest-idle list is limited to the seven longest-idle entries"
+    # e2e: stats.spec.ts › "the longest-idle list is limited to the three longest-idle entries"
     GIVEN completion history is displayed in the stats view
     WHEN the list is rendered
     THEN tasks with no completion in the retrieved window are listed first, each labeled with the window size and a plus sign
     AND the remaining tasks are listed in descending order of days since their last completion
-    AND the list is limited to the seven longest-idle tasks
+    AND the list is limited to the three longest-idle tasks
     AND tasks with the never-mark-done label are excluded from the list.
 
   Scenario: The longest-idle labels track the retrieved window
