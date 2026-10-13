@@ -9,6 +9,7 @@ import type {
     StatsDayRow,
     StatsDayEntry,
 } from "../types/stats";
+import { completionKey } from "./activityUtils";
 import { CONTEXT_COLOR_ORDER } from "./colorOrder";
 
 /** The height in pixels of one day row in the stats chart. */
@@ -71,6 +72,7 @@ function buildEntries(dayActivities: TaskActivity[], contexts: Context[]): Stats
             const context = contextMap.get(activity.contextId);
             const contextColor = context ? (context.color as ColorName) : null;
             return {
+                key: completionKey(activity),
                 taskId: activity.taskId,
                 title: activity.title,
                 time: activity.date.toFormat("hh:mm a"),

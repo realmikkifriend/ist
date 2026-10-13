@@ -16,7 +16,7 @@
     {#if row.entries.length > 0}
         {dayLabel}: {row.entries.length} tasks completed...
         <div class="my-2 space-y-1">
-            {#each row.entries as entry (`${entry.taskId}:${entry.time}`)}
+            {#each row.entries as entry (entry.key)}
                 <div class="flex flex-row gap-1">
                     <span class="font-mono tracking-tighter opacity-50">[{entry.time}]</span>
                     {#if entry.contextColor}

@@ -42,6 +42,7 @@ export interface StatsDaySegment {
  * One completion entry in a day's tooltip list, in completion order.
  */
 export interface StatsDayEntry {
+    key: string;
     taskId: string;
     title: string;
     time: string;

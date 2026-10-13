@@ -103,6 +103,16 @@ export const processActivityData = (newActivityData: GetActivityLogsResponse): T
 };
 
 /**
+ * Builds a unique identity for a completion from its task id and full-precision
+ * completion time, so two completions of the same task within the same minute
+ * are still distinct.
+ * @param {TaskActivity} activity - The task-completion event to identify.
+ * @returns {string} A key unique to that completion.
+ */
+export const completionKey = (activity: TaskActivity): string =>
+    `${activity.taskId}:${activity.date.toMillis()}`;
+
+/**
  * Merges new activity logs into existing.
  * @param {TaskActivity[]} accumulated - Existing logs.
  * @param {TaskActivity[]} newActivity - Logs to merge in.

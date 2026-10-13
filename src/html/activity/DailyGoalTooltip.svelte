@@ -1,5 +1,6 @@
 <script lang="ts">
     import { Icon, ArrowPath } from "svelte-hero-icons";
+    import { completionKey } from "../../utils/activityUtils";
     import type { DailyGoalTooltipProps } from "../../types/activity";
 
     let { dailyGoal, sortedByTime, isLoading }: DailyGoalTooltipProps = $props();
@@ -9,7 +10,7 @@
     {#if sortedByTime && sortedByTime.length > 0}
         {sortedByTime.length} tasks completed today...
         <div class="my-2 space-y-1">
-            {#each sortedByTime as r (`${r.taskId}:${r.date.toMillis()}`)}
+            {#each sortedByTime as r (completionKey(r))}
                 <div class="ml-20 -indent-20">
                     <span class="font-mono tracking-tighter opacity-50"
                         >[{r.date.toFormat("hh:mm a")}]</span

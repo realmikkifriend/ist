@@ -3,6 +3,7 @@ import { DateTime } from "luxon";
 import { loadApp, openSidebar } from "./helpers";
 import {
     makeLongestIdleLimitScenario,
+    makeSameMinuteCompletionScenario,
     makeStatsScenario,
     makeStatsScenarioWithNeverDoneTask,
 } from "./stats-scenarios";
@@ -60,6 +61,19 @@ test.describe("stats", () => {
         await openStats(page);
         await page.waitForTimeout(1500);
         expect(initialFetches()).toBe(1);
+    });
+
+    test("the stats view renders a task completed twice in the same minute", async ({ page }) => {
+        await loadApp(page, makeSameMinuteCompletionScenario());
+        await openStats(page);
+        // the day's chart bar renders
+        await expect(page.locator(`#stats .stats-day[data-date="${isoDaysAgo(1)}"]`)).toHaveCount(
+            1,
+        );
+        // the day's tooltip lists both completions (no duplicate-key throw)
+        await expect(
+            page.locator("#stats .tooltip-content", { hasText: "2 tasks completed" }),
+        ).toHaveCount(1);
     });
 
     test("the retrieve-more button extends the window with only the missing chunk", async ({

@@ -1,3 +1,4 @@
+import { DateTime } from "luxon";
 import { daysAgoNoon, makeActivityEvent } from "./mock-activity";
 import { E2E_PROJECTS, makeRoutineTask, makeTask } from "./mock-data";
 import { makeScenario } from "./scenarios";
@@ -73,3 +74,20 @@ export const makeLongestIdleLimitScenario = (): ReturnType<typeof makeScenario> 
             ),
         },
     });
+
+/**
+ * Builds a scenario where a task was completed twice within the same minute
+ * (same day, different seconds), so its per-day tooltip list carries two entries
+ * that share a minute-granular key but differ in full-precision time.
+ * @returns {object} A scenario with one task's double same-minute completion.
+ */
+export const makeSameMinuteCompletionScenario = (): ReturnType<typeof makeScenario> => {
+    const day = DateTime.now().minus({ days: 1 });
+    const at = (second: number): Date =>
+        day.set({ hour: 11, minute: 58, second, millisecond: 0 }).toJSDate();
+    return makeScenario({
+        activity: {
+            "": [makeActivityEvent("task-alpha", at(10)), makeActivityEvent("task-alpha", at(45))],
+        },
+    });
+};
