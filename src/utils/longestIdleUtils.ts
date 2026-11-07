@@ -33,7 +33,7 @@ export function getLongestIdleTasks(
 
     const today = now.startOf("day");
 
-    return tasks
+    const allTasks = tasks
         .filter((task) => !task.neverDone)
         .flatMap((task): LongestIdleTask[] => {
             const latest = latestByTask.get(task.id);
@@ -51,4 +51,7 @@ export function getLongestIdleTasks(
         })
         .sort((a, b) => Number(b.beyondWindow) - Number(a.beyondWindow) || b.days - a.days)
         .slice(0, LONGEST_IDLE_LIMIT);
+
+    const DAY_LIMIT = 21;
+    return allTasks.filter((entry) => entry.beyondWindow || entry.days >= DAY_LIMIT);
 }
