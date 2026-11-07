@@ -7,9 +7,9 @@
     import { openAgenda } from "../../services/agendaService";
     import { mergeActivity } from "../../utils/activityUtils";
     import {
-        extendStatsWindow,
         fetchRangeForWindow,
         initialStatsWindow,
+        nextDisplayWindow,
         statsWindowDays,
     } from "../../utils/statsUtils";
     import { buildDayStatsRows } from "../../utils/statsChartUtils";
@@ -29,7 +29,11 @@
 
     let statsWindow: StatsHistoryWindow = $derived($statsHistoryWindow ?? initialStatsWindow());
 
-    let dayRows = $derived(buildDayStatsRows($taskActivity, statsWindow, $todoistData.contexts));
+    let displayOldest = $state(initialStatsWindow().oldest);
+    const todayIso = $derived(DateTime.now().toISODate() ?? "");
+    const displayWindow = $derived({ oldest: displayOldest, newest: todayIso });
+
+    let dayRows = $derived(buildDayStatsRows($taskActivity, displayWindow, $todoistData.contexts));
 
     let longestIdle = $derived(
         getLongestIdleTasks($todoistData.tasks, $taskActivity, statsWindowDays(statsWindow)),
@@ -66,15 +70,20 @@
     onMount(() => refreshHistory());
 
     /**
-     * Extends the history window two weeks back and fetches the new chunk.
+     * Advances the day chart back two weeks, revealing stored history first and
+     * fetching from the API only when the new range exceeds what is stored.
      */
     const retrieveMore = () => {
         if (isLoading || !$statsHistoryWindow) {
             return;
         }
+        const { oldest, apiRange } = nextDisplayWindow(displayOldest, $statsHistoryWindow);
+        displayOldest = oldest;
+        if (!apiRange) {
+            return;
+        }
         isLoading = true;
-        const { range, next } = extendStatsWindow($statsHistoryWindow);
-        void saveHistory(range, next);
+        void saveHistory(apiRange, { oldest, newest: $statsHistoryWindow.newest });
     };
 
     /**

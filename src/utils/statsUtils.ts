@@ -53,19 +53,21 @@ export function fetchRangeForWindow(
 }
 
 /**
- * Computes the two-week chunk fetched by "retrieve more" and the resulting
- * extended window.
- * @param {StatsHistoryWindow} window - The stored fetched window.
- * @returns The range to fetch and the window to store afterwards.
+ * Advances the day-chart display window one chunk back and reports whether
+ * the new range reaches beyond the stored (fetched) window and must be
+ * pulled from the API.
+ * @param {string} displayOldest - The oldest date the chart currently shows.
+ * @param {StatsHistoryWindow | null} storage - The stored fetched window.
+ * @returns The new oldest date to display, and the API range to fetch (null
+ *   when the new range is already covered by storage).
  */
-export function extendStatsWindow(window: StatsHistoryWindow): {
-    range: [DateTime, DateTime];
-    next: StatsHistoryWindow;
-} {
-    const oldest = DateTime.fromISO(window.oldest);
-    const rangeStart = oldest.minus({ days: STATS_EXTEND_DAYS });
-    return {
-        range: [rangeStart, oldest.minus({ days: 1 })],
-        next: { oldest: rangeStart.toISODate() ?? "", newest: window.newest },
-    };
+export function nextDisplayWindow(
+    displayOldest: string,
+    storage: StatsHistoryWindow | null,
+): { oldest: string; apiRange: [DateTime, DateTime] | null } {
+    const next = DateTime.fromISO(displayOldest).minus({ days: STATS_EXTEND_DAYS });
+    const storageOldest = storage ? DateTime.fromISO(storage.oldest) : null;
+    const apiRange: [DateTime, DateTime] | null =
+        storageOldest && next < storageOldest ? [next, storageOldest.minus({ days: 1 })] : null;
+    return { oldest: next.toISODate() ?? "", apiRange };
 }
