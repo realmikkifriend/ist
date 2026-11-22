@@ -1,5 +1,11 @@
 <script lang="ts">
-    import { Icon, XCircle, Calendar, ChartBarSquare } from "svelte-hero-icons";
+    import { getContext } from "svelte";
+    import { DateTime } from "luxon";
+    import { Icon, XCircle, Calendar, ChartBarSquare, Backward } from "svelte-hero-icons";
+    import { hashStore } from "../../stores/interface";
+    import { deferTasksToDay } from "../../services/taskHandlerService";
+    import { success, error } from "../../services/toastService";
+    import type { HandlerMethodsContext, AppStateMutatorsContext } from "../../types/methods";
     import NeverDoneIcon from "./NeverDoneIcon.svelte";
     import type { AgendaHeaderProps } from "../../types/agenda";
 
@@ -7,6 +13,35 @@
 
     let { tasks, tasksWithNoTime, todayTasks } = $derived(agendaData);
     let { title, headerGradientColor } = $derived(displayData);
+
+    const { handleRefresh, updateDisplayedTask } =
+        getContext<HandlerMethodsContext>("handlerMethods");
+    const { clearPreviousDisplayTask, updateTodoistDataResources } =
+        getContext<AppStateMutatorsContext>("appStateMutators");
+
+    let isTomorrow = $derived($hashStore === "#tomorrow");
+
+    /**
+     * Defers all tasks due tomorrow to today, keeping each task's time.
+     */
+    async function deferAllToToday(): Promise<void> {
+        if (agendaData.tasksForDate.length === 0) return;
+
+        clearPreviousDisplayTask();
+        const { success: deferSuccessful, taskUpdates } = await deferTasksToDay(
+            agendaData.tasksForDate,
+            DateTime.now().startOf("day"),
+        );
+
+        if (deferSuccessful) {
+            updateTodoistDataResources(taskUpdates);
+            success("Tomorrow's tasks deferred to today.");
+            await handleRefresh();
+            await updateDisplayedTask();
+        } else {
+            error("Failed to defer tomorrow's tasks.");
+        }
+    }
 
     /**
      * Combines .neverDone tasks from both tasks and tasksWithNoTime
@@ -99,7 +134,18 @@
             tasks
         </h2>
     </div>
-    <div class="flex justify-end">
+    <div class="flex items-center justify-end gap-1">
+        {#if isTomorrow}
+            <button
+                class="rounded-full p-1 transition-colors duration-200 hover:bg-blue-800"
+                aria-label="Defer all of tomorrow's tasks to today"
+                onclick={deferAllToToday}
+                title="Defer all of tomorrow's tasks to today"
+                type="button"
+            >
+                <Icon class="h-5 w-6" src={Backward} />
+            </button>
+        {/if}
         <button
             class="rounded-full p-1 transition-colors duration-200 hover:bg-red-700"
             onclick={closeAgenda}

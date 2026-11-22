@@ -62,3 +62,28 @@ export async function handleOverdueTasks(tasks: Task[]): Promise<TaskUpdates | n
     }
     return null;
 }
+
+/**
+ * Defers the given tasks to the target day, preserving each task's time of day.
+ * Tasks with a timed due date (due.date contains "T") are moved to the same
+ * hour:minute on the target day; tasks with an all-day due date become all-day
+ * on the target day.
+ * @param {Task[]} tasks - The tasks whose due dates move to the target day.
+ * @param {DateTime} targetDay - The day to defer to (e.g. start of today).
+ * @returns Promise&lt;{ success: boolean; taskUpdates: TaskUpdates }> - True if all defers succeeded, plus the applied [taskId, newDueDateTime] updates.
+ */
+export async function deferTasksToDay(
+    tasks: Task[],
+    targetDay: DateTime,
+): Promise<{ success: boolean; taskUpdates: TaskUpdates }> {
+    const startOfTargetDay = targetDay.startOf("day");
+    const taskUpdates: [Task, DateTime][] = tasks.map((task) => {
+        const due = task.due?.date ?? "";
+        const dueTime = due.includes("T") ? DateTime.fromISO(due) : null;
+        const time: DateTime = dueTime
+            ? startOfTargetDay.plus({ hours: dueTime.hour, minutes: dueTime.minute })
+            : startOfTargetDay;
+        return [task, time];
+    });
+    return handleTaskDefer(taskUpdates);
+}

@@ -268,8 +268,8 @@ Feature: Agenda
     AND the agenda can also be opened from the sidebar or the NoTasks page and closed with its close button.
 
   Scenario: The agenda header summarizes the day
-    # e2e: agenda.spec.ts › "agenda header splits the day's tasks from routines"
-    # e2e: agenda.spec.ts › "agenda header warns about tasks left over from today (tomorrow view)"
+    # e2e: agenda-header.spec.ts › "agenda header splits the day's tasks from routines"
+    # e2e: agenda-header.spec.ts › "agenda header warns about tasks left over from today (tomorrow view)"
     GIVEN an agenda view is open
     WHEN the agenda header is rendered
     THEN it shows the total task count split into normal tasks and routines (never-done tasks)
@@ -288,6 +288,15 @@ Feature: Agenda
     WHEN the user clicks the schedule control of a task
     THEN a schedule modal opens for a specific date and time
     AND confirming defers the task and shows "Task scheduled successfully."
+
+  Scenario: Defer all of tomorrow's tasks to today
+    # e2e: agenda-header.spec.ts › "deferring tomorrow to today moves all of tomorrow's tasks to today"
+    GIVEN the tomorrow agenda view is open
+    WHEN the user clicks the defer-to-today button in the agenda header
+    THEN every task due tomorrow is deferred to today, including routines
+    AND each task keeps its time of day (timed tasks stay timed, all-day tasks stay all-day)
+    AND the success toast "Tomorrow's tasks deferred to today." is shown
+    AND the button is present only in the tomorrow view.
 
   Scenario: The displayed task is highlighted in the agenda
     # e2e: agenda.spec.ts › "the displayed task is highlighted in the agenda"
